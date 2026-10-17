@@ -13,7 +13,12 @@ import {
   loadStampedIds,
   isTeacherSession,
   loadTaskStats,
-  setLayoutSeed,
+  loadInstance,
+  saveLayout,
+  saveRules,
+  setItemSold,
+  type InstanceRules,
+  type ShopEntry,
   type TaskStat,
   setClassFlags,
   signInTeacher,
@@ -108,6 +113,7 @@ async function renderTeacherArea(root: HTMLElement, supabase: SupabaseClient): P
     main.innerHTML = '<p>Lädt …</p>';
     const pupils = await loadPupils(supabase, classId);
     const flags = await loadClassFlags(supabase, classId);
+    const instance = await loadInstance(supabase, classId);
     if (!pupils.ok || !flags.ok) {
       main.innerHTML = `<p class="error">${esc(!pupils.ok ? pupils.message : flags.ok ? '' : flags.message)}</p>`;
       return;
@@ -119,14 +125,14 @@ async function renderTeacherArea(root: HTMLElement, supabase: SupabaseClient): P
       ${accountSection(list, classId)}
       ${coinSection(list)}
       ${switchSection(flags.value)}
-      ${layoutSection(flags.value)}
+      ${instanceSection(instance.ok ? instance.value : null)}
       ${statsSection()}
       <p id="status" role="status" class="status"></p>`;
     wireStamps();
     wireAccounts(list, classId);
     wireCoins();
     wireSwitches(classId);
-    wireLayout(classId);
+    wireInstance(classId);
     wireStats();
   };
 
@@ -295,18 +301,46 @@ async function renderTeacherArea(root: HTMLElement, supabase: SupabaseClient): P
     });
   };
 
-  const wireLayout = (cls: ClassId): void => {
-    const form = root.querySelector<HTMLFormElement>('#layoutForm');
-    form?.addEventListener('submit', async (ev) => {
+  const wireInstance = (cls: ClassId): void => {
+    const layout = root.querySelector<HTMLFormElement>('#layoutForm');
+    layout?.addEventListener('submit', async (ev) => {
       ev.preventDefault();
-      const seed = Number(new FormData(form).get('seed'));
-      if (!Number.isInteger(seed) || seed < 1 || seed > 99999) {
+      const d = new FormData(layout);
+      const seed = Number(d.get('seed'));
+      if (!Number.isInteger(seed) || seed < 1 || seed > 99999)
         return status('Seed: eine Zahl von 1 bis 99999', true);
-      }
       if (!window.confirm(`Dorf der Klasse ${cls} neu festlegen? Alle Grundstücke wandern.`)) return;
-      const res = await setLayoutSeed(supabase, cls, seed);
-      status(res.ok ? 'Dorf-Layout gespeichert.' : res.message, !res.ok);
+      const res = await saveLayout(supabase, cls, String(d.get('map')), seed);
+      status(res.ok ? 'Dorf gespeichert.' : res.message, !res.ok);
       void drawClass();
+    });
+    const rules = root.querySelector<HTMLFormElement>('#rulesForm');
+    rules?.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const d = new FormData(rules);
+      const res = await saveRules(supabase, cls, {
+        stampReward: Number(d.get('stamp')),
+        dailyTaskCap: Number(d.get('cap')),
+        maxAttempts: Number(d.get('attempts')),
+        plotCols: Number(d.get('cols')),
+        plotRows: Number(d.get('rows')),
+        mapId: '',
+        layoutSeed: 0,
+      });
+      status(res.ok ? 'Regeln gespeichert.' : res.message, !res.ok);
+    });
+    const shop = root.querySelector<HTMLFormElement>('#shopForm');
+    shop?.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const soldIds = new Set(
+        Array.from(shop.querySelectorAll<HTMLInputElement>('input[name=sold]:checked')).map((c) => c.value),
+      );
+      const all = Array.from(shop.querySelectorAll<HTMLInputElement>('input[name=sold]')).map((c) => c.value);
+      for (const id of all) {
+        const res = await setItemSold(supabase, cls, id, soldIds.has(id));
+        if (!res.ok) return status(res.message, true);
+      }
+      status('Shop gespeichert.');
     });
   };
 
@@ -400,12 +434,42 @@ function coinSection(list: Pupil[]): string {
     </form></section>`;
 }
 
-function layoutSection(flags: { layoutSeed: number }): string {
-  return `<section><h2>Dorf-Layout</h2>
-    <p class="hint">Der Seed bestimmt Gelände, Wege und Grundstücke. Ein neuer Wert verschiebt alle Grundstücke der Klasse.</p>
+function instanceSection(
+  inst: { rules: InstanceRules; maps: Array<{ id: string; name: string }>; shop: ShopEntry[] } | null,
+): string {
+  if (!inst)
+    return '<section><h2>Instanz</h2><p class="error">Die Einstellungen konnten nicht geladen werden.</p></section>';
+  const r = inst.rules;
+  const maps = inst.maps
+    .map((m) => `<option value="${esc(m.id)}" ${m.id === r.mapId ? 'selected' : ''}>${esc(m.name)}</option>`)
+    .join('');
+  const shop = inst.shop
+    .map(
+      (s) =>
+        `<label><input type="checkbox" name="sold" value="${esc(s.id)}" ${s.sold ? 'checked' : ''} /> ${esc(s.name)} (${s.price})</label>`,
+    )
+    .join('');
+  return `<section><h2>Dorf und Regeln</h2>
+    <h3>Dorf-Vorlage und Seed</h3>
+    <p class="hint">Vorlage und Seed bestimmen das Dorf. Eine Änderung verschiebt alle Grundstücke dieser Klasse.</p>
     <form id="layoutForm" class="row">
-      <label>Seed <input name="seed" type="number" min="1" max="99999" value="${flags.layoutSeed}" /></label>
+      <label>Vorlage <select name="map">${maps}</select></label>
+      <label>Seed <input name="seed" type="number" min="1" max="99999" value="${r.layoutSeed}" /></label>
       <button type="submit">Speichern</button>
+    </form>
+    <h3>Spielregeln</h3>
+    <form id="rulesForm" class="row">
+      <label>Stempel <input name="stamp" type="number" min="0" max="1000" value="${r.stampReward}" /></label>
+      <label>Tageslimit <input name="cap" type="number" min="0" max="1000" value="${r.dailyTaskCap}" /></label>
+      <label>Versuche <input name="attempts" type="number" min="1" max="10" value="${r.maxAttempts}" /></label>
+      <label>Raster Spalten <input name="cols" type="number" min="3" max="12" value="${r.plotCols}" /></label>
+      <label>Raster Zeilen <input name="rows" type="number" min="4" max="12" value="${r.plotRows}" /></label>
+      <button type="submit">Regeln speichern</button>
+    </form>
+    <h3>Shop: verkaufte Sachen</h3>
+    <form id="shopForm">
+      <div class="checklist">${shop}</div>
+      <button type="submit">Shop speichern</button>
     </form></section>`;
 }
 

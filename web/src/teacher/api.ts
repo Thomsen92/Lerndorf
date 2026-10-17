@@ -188,3 +188,105 @@ export async function loadTaskStats(supabase: SupabaseClient, week: string): Pro
     ),
   };
 }
+
+export interface InstanceRules {
+  stampReward: number;
+  dailyTaskCap: number;
+  maxAttempts: number;
+  plotCols: number;
+  plotRows: number;
+  mapId: string;
+  layoutSeed: number;
+}
+
+export interface ShopEntry {
+  id: string;
+  name: string;
+  price: number;
+  sold: boolean;
+}
+
+/** Rules, layout and shop switches of one instance (SPEC §1a). */
+export async function loadInstance(
+  supabase: SupabaseClient,
+  classId: string,
+): Promise<Result<{ rules: InstanceRules; maps: Array<{ id: string; name: string }>; shop: ShopEntry[] }>> {
+  const [cls, maps, items, hidden] = await Promise.all([
+    supabase
+      .from('classes')
+      .select('stamp_reward, daily_task_cap, max_attempts, plot_cols, plot_rows, map_id, layout_seed')
+      .eq('id', classId)
+      .single(),
+    supabase.from('map_templates').select('id, name').order('id'),
+    supabase.from('items').select('id, name_de, price').eq('kind', 'deco').eq('active', true).order('price'),
+    supabase.from('class_items').select('item_id, enabled').eq('class_id', classId),
+  ]);
+  if (cls.error || !cls.data) return fail('Die Einstellungen der Klasse konnten nicht geladen werden');
+  if (maps.error || items.error || hidden.error) return fail('Die Auswahl konnte nicht geladen werden');
+  const soldOff = new Set((hidden.data ?? []).filter((h) => !h.enabled).map((h) => h.item_id));
+  return {
+    ok: true,
+    value: {
+      rules: {
+        stampReward: cls.data.stamp_reward,
+        dailyTaskCap: cls.data.daily_task_cap,
+        maxAttempts: cls.data.max_attempts,
+        plotCols: cls.data.plot_cols,
+        plotRows: cls.data.plot_rows,
+        mapId: cls.data.map_id,
+        layoutSeed: cls.data.layout_seed,
+      },
+      maps: (maps.data ?? []).map((m) => ({ id: m.id, name: m.name })),
+      shop: (items.data ?? []).map((i) => ({
+        id: i.id,
+        name: i.name_de,
+        price: i.price,
+        sold: !soldOff.has(i.id),
+      })),
+    },
+  };
+}
+
+export async function saveRules(
+  supabase: SupabaseClient,
+  classId: string,
+  r: InstanceRules,
+): Promise<Result<true>> {
+  const { error } = await supabase.rpc('set_class_rules', {
+    p_class_id: classId,
+    p_stamp: r.stampReward,
+    p_daily_cap: r.dailyTaskCap,
+    p_max_attempts: r.maxAttempts,
+    p_plot_cols: r.plotCols,
+    p_plot_rows: r.plotRows,
+  });
+  if (error) return fail(error.message);
+  return { ok: true, value: true };
+}
+
+export async function setItemSold(
+  supabase: SupabaseClient,
+  classId: string,
+  itemId: string,
+  sold: boolean,
+): Promise<Result<true>> {
+  const { error } = await supabase.rpc('set_item_sold', {
+    p_class_id: classId,
+    p_item_id: itemId,
+    p_sold: sold,
+  });
+  if (error) return fail(error.message);
+  return { ok: true, value: true };
+}
+
+/** Template and seed of one instance in one step (set_layout). */
+export async function saveLayout(
+  supabase: SupabaseClient,
+  classId: string,
+  mapId: string,
+  seed: number,
+): Promise<Result<true>> {
+  const { error } = await supabase.rpc('set_layout', { p_class_id: classId, p_map_id: mapId, p_seed: seed });
+  if (error) return fail(error.message);
+  return { ok: true, value: true };
+}
