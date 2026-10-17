@@ -184,6 +184,32 @@ export function placeReeds(layout: Layout, maxReeds = 80): Scatter[] {
   return out;
 }
 
+/** Stones on the river banks, 4.6 to 5.8 m from the centre line, sunk halfway (LOOK §4). */
+export function placeShoreStones(layout: Layout, maxStones = 90): Scatter[] {
+  const rng = createRng(layout.seed * 239 + 31);
+  const river = layout.terrain.river;
+  const out: Scatter[] = [];
+  for (let tries = 0; tries < 5000 && out.length < maxStones; tries++) {
+    const p = river[Math.floor(rng() * river.length)];
+    const a = rng() * Math.PI * 2;
+    const d = 4.6 + rng() * 1.2;
+    const x = p.x + Math.cos(a) * d;
+    const z = p.z + Math.sin(a) * d;
+    if (nearBridge(layout, x, z, 2.5)) continue;
+    const rd = layout.terrain.riverDistance(x, z);
+    if (rd < 4.6 || rd > 5.8) continue;
+    if (Math.hypot(x - layout.plaza.x, z - layout.plaza.z) < PLAZA_RADIUS + 2) continue;
+    out.push({
+      x,
+      z,
+      y: layout.terrain.groundHeight(x, z),
+      scale: 0.25 + rng() * 0.35,
+      rot: rng() * Math.PI * 2,
+    });
+  }
+  return out;
+}
+
 /** Flower patches just outside the plots (garden edges and free plots). */
 export function placeFlowers(layout: Layout, maxFlowers = 120): Scatter[] {
   const rng = createRng(layout.seed * 211 + 19);

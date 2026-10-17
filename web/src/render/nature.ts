@@ -13,6 +13,7 @@ import {
   placeMeadows,
   placeReeds,
   placeRocks,
+  placeShoreStones,
   placeTrees,
   type Lamp,
   type Tree,
@@ -210,6 +211,22 @@ export function buildVegetation(layout: Layout): THREE.Group {
         // half sunk into the ground (LOOK §4)
         m.makeRotationFromEuler(new THREE.Euler(r.rot, r.rot * 0.7, r.rot * 0.3))
           .scale(new THREE.Vector3(r.scale, r.scale * 0.8, r.scale))
+          .setPosition(r.x, r.y - r.scale * 0.1, r.z);
+      },
+    ),
+  );
+
+  // stones on the river banks (LOOK §4)
+  const stones = placeShoreStones(layout);
+  root.add(
+    instanced(
+      rockGeo,
+      new THREE.MeshStandardMaterial({ color: '#a39f94', flatShading: true, roughness: 0.95 }),
+      stones.length,
+      (i, m) => {
+        const r = stones[i];
+        m.makeRotationY(r.rot)
+          .scale(new THREE.Vector3(r.scale, r.scale * 0.7, r.scale))
           .setPosition(r.x, r.y - r.scale * 0.1, r.z);
       },
     ),

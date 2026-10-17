@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { buildLayout } from '../../src/world/layout';
-import { laneDistance, placeHedges, placeLamps, placeMeadows, placeTrees } from '../../src/world/scatter';
+import {
+  laneDistance,
+  placeHedges,
+  placeLamps,
+  placeMeadows,
+  placeShoreStones,
+  placeTrees,
+} from '../../src/world/scatter';
 import { MAP_IDS } from '../../src/world/maps';
 
 for (const mapId of MAP_IDS) {
@@ -80,6 +87,16 @@ for (const mapId of MAP_IDS) {
       const hedges = placeHedges(layout);
       expect(hedges.length).toBeGreaterThan(0);
       for (const h of hedges) expect(laneDistance(layout, h.x, h.z)).toBeGreaterThan(1.3);
+    });
+
+    it('puts shore stones on the bank only, never in the water', () => {
+      const stones = placeShoreStones(layout);
+      expect(stones.length).toBeGreaterThan(0);
+      for (const s of stones) {
+        const rd = layout.terrain.riverDistance(s.x, s.z);
+        expect(rd).toBeGreaterThanOrEqual(4.6);
+        expect(rd).toBeLessThanOrEqual(5.8);
+      }
     });
 
     it('places meadows with flowers inside their radius, off paths and plots', () => {
