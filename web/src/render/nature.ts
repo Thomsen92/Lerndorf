@@ -8,7 +8,9 @@ import type { Layout } from '../world/layout';
 import {
   placeBushes,
   placeFlowers,
+  placeHedges,
   placeLamps,
+  placeMeadows,
   placeReeds,
   placeRocks,
   placeTrees,
@@ -171,6 +173,7 @@ export function buildNature(layout: Layout): THREE.Group {
 
 const BUSH = ['#3f8f5a', '#4d9a5d', '#2f7d5b', '#5d8f3e'];
 const FLOWER = ['#f2c94c', '#eb5757', '#f2a7d0', '#ffffff', '#bb6bd9'];
+const MEADOW = ['#a9d17a', '#93c26a', '#b8d98a'];
 
 /** Shrubs, rocks, reeds and flower patches (SPEC §10.6), all as instanced meshes. */
 export function buildVegetation(layout: Layout): THREE.Group {
@@ -229,6 +232,42 @@ export function buildVegetation(layout: Layout): THREE.Group {
     ),
   );
 
+  // hedges: clipped rows beside the lanes (LOOK §8)
+  const hedges = placeHedges(layout);
+  const hedgeGeo = new THREE.BoxGeometry(1, 1, 1);
+  hedgeGeo.translate(0, 0.5, 0);
+  root.add(
+    instanced(
+      hedgeGeo,
+      new THREE.MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 0.85 }),
+      hedges.length,
+      (i, m) => {
+        const h = hedges[i];
+        m.makeRotationY(h.rot)
+          .scale(new THREE.Vector3(0.6, 0.9, h.len))
+          .setPosition(h.x, h.y, h.z);
+      },
+      (i) => pick(BUSH, i),
+    ),
+  );
+
+  // blossom meadows: a flat patch of lighter grass with flowers on it
+  const meadows = placeMeadows(layout);
+  root.add(
+    instanced(
+      new THREE.CircleGeometry(1, 14),
+      new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.95 }),
+      meadows.length,
+      (i, m) => {
+        const w = meadows[i];
+        m.makeRotationX(-Math.PI / 2)
+          .scale(new THREE.Vector3(w.radius, w.radius, 1))
+          .setPosition(w.x, w.y + 0.04, w.z);
+      },
+      (i) => pick(MEADOW, i),
+    ),
+  );
+
   // flower patches: five small blossoms around each patch centre
   const patches = placeFlowers(layout);
   const blossoms: Array<{ x: number; y: number; z: number; colour: number }> = [];
@@ -243,6 +282,9 @@ export function buildVegetation(layout: Layout): THREE.Group {
       });
     }
   });
+  for (const w of meadows) {
+    for (const f of w.flowers) blossoms.push({ x: f.x, y: f.y + 0.22, z: f.z, colour: f.colour });
+  }
   root.add(
     instanced(
       new THREE.SphereGeometry(0.12, 5, 4),

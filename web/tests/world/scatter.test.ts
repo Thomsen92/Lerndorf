@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildLayout } from '../../src/world/layout';
-import { laneDistance, placeLamps, placeTrees } from '../../src/world/scatter';
+import { laneDistance, placeHedges, placeLamps, placeMeadows, placeTrees } from '../../src/world/scatter';
 import { MAP_IDS } from '../../src/world/maps';
 
 for (const mapId of MAP_IDS) {
@@ -68,6 +68,30 @@ for (const mapId of IDS) {
     it('keeps flowers off the paths', () => {
       for (const f of placeFlowers(layout))
         expect(laneDistance(layout, f.x, f.z)).toBeGreaterThanOrEqual(1.8);
+    });
+  });
+}
+
+for (const mapId of MAP_IDS) {
+  describe(`hedges and meadows on ${mapId}`, () => {
+    const layout = buildLayout(11, 34, mapId);
+
+    it('keeps hedges beside the lanes, never on them', () => {
+      const hedges = placeHedges(layout);
+      expect(hedges.length).toBeGreaterThan(0);
+      for (const h of hedges) expect(laneDistance(layout, h.x, h.z)).toBeGreaterThan(1.3);
+    });
+
+    it('places meadows with flowers inside their radius, off paths and plots', () => {
+      const meadows = placeMeadows(layout);
+      expect(meadows.length).toBeGreaterThan(0);
+      for (const m of meadows) {
+        expect(laneDistance(layout, m.x, m.z)).toBeGreaterThan(3.4);
+        for (const f of m.flowers) {
+          expect(Math.hypot(f.x - m.x, f.z - m.z)).toBeLessThanOrEqual(m.radius);
+          expect(laneDistance(layout, f.x, f.z)).toBeGreaterThan(1.9);
+        }
+      }
     });
   });
 }

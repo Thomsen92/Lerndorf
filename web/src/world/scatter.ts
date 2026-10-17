@@ -208,3 +208,84 @@ export function placeFlowers(layout: Layout, maxFlowers = 120): Scatter[] {
   }
   return out;
 }
+
+/** A clipped hedge beside a lane: a short row, turned along the lane. */
+export interface Hedge extends Scatter {
+  len: number;
+}
+
+/**
+ * Hedges along the lanes (LOOK §8): about every 3.6 m of lane, on one side, 1.6 m from the centre line.
+ * Half of the spots stay empty, so the hedges come in short rows.
+ */
+export function placeHedges(layout: Layout, maxHedges = 60): Hedge[] {
+  const rng = createRng(layout.seed * 223 + 23);
+  const s = layout.laneSamples;
+  const out: Hedge[] = [];
+  const step = 3;
+  for (let i = 4; i < s.length - 4 && out.length < maxHedges; i += step) {
+    if (rng() < 0.5) continue;
+    const a = s[i - 1];
+    const b = s[i + 1];
+    const tx = b.x - a.x;
+    const tz = b.z - a.z;
+    const l = Math.hypot(tx, tz) || 1;
+    const side = rng() < 0.5 ? 1 : -1;
+    const off = 1.6 + rng() * 0.3;
+    const x = s[i].x - (tz / l) * off * side;
+    const z = s[i].z + (tx / l) * off * side;
+    if (!freeForNature(layout, x, z, 1.4)) continue;
+    out.push({
+      x,
+      z,
+      y: layout.terrain.groundHeight(x, z),
+      scale: 1,
+      rot: Math.atan2(tx, tz),
+      len: 2.4 + rng() * 1.2,
+    });
+  }
+  return out;
+}
+
+/** A blossom meadow: a flat patch on free ground with a few flowers scattered on it. */
+export interface Meadow {
+  x: number;
+  z: number;
+  y: number;
+  radius: number;
+  flowers: Array<{ x: number; y: number; z: number; colour: number }>;
+}
+
+/** Meadows on free ground away from paths, plots and water. Flowers stay inside the radius. */
+export function placeMeadows(layout: Layout, maxMeadows = 14): Meadow[] {
+  const rng = createRng(layout.seed * 229 + 29);
+  const out: Meadow[] = [];
+  for (let tries = 0; tries < 4000 && out.length < maxMeadows; tries++) {
+    const x = (rng() - 0.5) * VALLEY_RADIUS * 2;
+    const z = (rng() - 0.5) * VALLEY_RADIUS * 2;
+    if (!freeForNature(layout, x, z, 3.5)) continue;
+    if (out.some((m) => Math.hypot(m.x - x, m.z - z) < 9)) continue;
+    const radius = 2.2 + rng() * 1.2;
+    // flat ground only: the flat patch would sink into a slope
+    const h0 = layout.terrain.groundHeight(x, z);
+    const level = [0, 1, 2, 3].every((k) => {
+      const q = (k * Math.PI) / 2 + 0.4;
+      const h = layout.terrain.groundHeight(x + Math.cos(q) * radius * 0.9, z + Math.sin(q) * radius * 0.9);
+      return Math.abs(h - h0) < 0.2;
+    });
+    if (!level) continue;
+    const count = 9 + Math.floor(rng() * 6);
+    const flowers: Meadow['flowers'] = [];
+    for (let k = 0; k < count; k++) {
+      const a = rng() * Math.PI * 2;
+      const r = Math.sqrt(rng()) * radius * 0.9;
+      const fx = x + Math.cos(a) * r;
+      const fz = z + Math.sin(a) * r;
+      if (!freeForNature(layout, fx, fz, 2.0)) continue;
+      flowers.push({ x: fx, y: layout.terrain.groundHeight(fx, fz), z: fz, colour: Math.floor(rng() * 5) });
+    }
+    if (flowers.length < 4) continue;
+    out.push({ x, z, y: layout.terrain.groundHeight(x, z), radius, flowers });
+  }
+  return out;
+}
