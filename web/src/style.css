@@ -1,0 +1,107 @@
+/* Base styles. Colours as tokens, dark scheme only (the village is a night scene). */
+:root {
+  --night: #1b2238;
+  --panel: rgba(22, 28, 48, 0.9);
+  --ink: #f5eddc;
+  --muted: #b9b3a6;
+  --lantern: #ffb547;
+  --warn: #ff8a65;
+  --line: rgba(255, 236, 200, 0.16);
+  --font: 'Atkinson Hyperlegible', Verdana, system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--night);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 18px;
+  overflow: hidden;
+}
+
+#app {
+  height: 100%;
+}
+
+button,
+input {
+  font: inherit;
+  min-height: 44px; /* touch target (SPEC §12) */
+}
+
+button.primary {
+  background: var(--lantern);
+  color: #2a1d05;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* login */
+.login {
+  max-width: 360px;
+  margin: 12vh auto 0;
+  padding: 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.login h1 {
+  margin: 0 0 16px;
+  font-size: 28px;
+  color: var(--lantern);
+}
+
+.login label {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+  color: var(--muted);
+}
+
+.login input {
+  background: #0f1426;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.login .error {
+  color: var(--warn);
+  margin: 0 0 12px;
+}
+
+/* village */
+.stage {
+  position: fixed;
+  inset: 0;
+  touch-action: none;
+}
+
+.stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.village-hud {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 5;
+}
