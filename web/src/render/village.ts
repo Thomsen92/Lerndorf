@@ -9,6 +9,7 @@ import type { Point2 } from '../world/geometry';
 import { laneDistance } from '../world/scatter';
 import { buildNature, buildVegetation } from './nature';
 import { buildPlaza } from './plaza';
+import { buildBridge } from './bridges';
 import { dirtTexture, grassTexture } from './textures';
 import { chimney, fenceGeometry, gableRoof, gardenPathGeometry } from './house';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -292,14 +293,7 @@ export function buildVillage(
   // plaza: paving, fountain, quest board, stalls, benches (render/plaza.ts)
   root.add(buildPlaza(layout));
 
-  for (const b of layout.bridges) {
-    const len = Math.hypot(b.b.x - b.a.x, b.b.z - b.a.z) + 1.2;
-    const deck = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.25, len), MAT.wood);
-    deck.position.set((b.a.x + b.b.x) / 2, b.y, (b.a.z + b.b.z) / 2);
-    deck.rotation.y = Math.atan2(b.b.x - b.a.x, b.b.z - b.a.z);
-    deck.castShadow = true;
-    root.add(deck);
-  }
+  for (const b of layout.bridges) root.add(buildBridge(b, MAT.wood));
 
   for (const p of layout.plots) {
     root.add(plotGroup(p, byPlot.get(p.index), p.index === ownPlotIndex));
