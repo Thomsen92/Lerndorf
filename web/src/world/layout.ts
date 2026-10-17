@@ -31,10 +31,21 @@ export interface Plot {
   door: Point2;
 }
 
+/** A footbridge: both ends sit on the ground of their banks, the deck arches up in between. */
 export interface Bridge {
   a: Point2;
   b: Point2;
-  y: number;
+  /** Deck height at each end (ground plus a few cm). */
+  ya: number;
+  yb: number;
+}
+
+/** How much the deck rises above the straight line between its ends (LOOK §9). */
+export const BRIDGE_ARCH = 0.8;
+
+/** Deck height at t from 0 (bank a) to 1 (bank b). Used by the deck mesh and by walking figures. */
+export function bridgeHeight(b: Bridge, t: number): number {
+  return b.ya + (b.yb - b.ya) * t + BRIDGE_ARCH * Math.sin(Math.PI * t);
 }
 
 export type NodeTag = 'path' | 'plaza' | 'bench' | 'board' | 'fountain' | 'gate' | 'home' | 'landmark';
@@ -180,8 +191,9 @@ function findBridges(terrain: Terrain, laneCurves: THREE.CatmullRomCurve3[]): Br
       const wet = terrain.riverDistance(v.x, v.z) < 5.2;
       if (wet && !start) start = pts[Math.max(0, i - 1)];
       if (!wet && start) {
-        const y = Math.max(terrain.groundHeight(start.x, start.z), terrain.groundHeight(v.x, v.z)) + 0.25;
-        bridges.push({ a: start, b: { x: v.x, z: v.z }, y });
+        const ya = terrain.groundHeight(start.x, start.z) + 0.05;
+        const yb = terrain.groundHeight(v.x, v.z) + 0.05;
+        bridges.push({ a: start, b: { x: v.x, z: v.z }, ya, yb });
         start = null;
       }
     });

@@ -92,6 +92,25 @@ export const dirtTexture = (): THREE.CanvasTexture =>
       cx.arc(rnd() * 256, rnd() * 256, r, 0, Math.PI * 2);
       cx.fill();
     }
+    // wheel-worn ruts and sandy patches: soft blotches of two warm tones
+    for (let i = 0; i < 34; i++) {
+      const x = rnd() * 256;
+      const y = rnd() * 256;
+      const r = 10 + rnd() * 24;
+      const g = cx.createRadialGradient(x, y, 0, x, y, r);
+      const warm = rnd() < 0.5;
+      g.addColorStop(0, warm ? 'rgba(150,108,62,0.22)' : 'rgba(205,190,160,0.22)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      cx.fillStyle = g;
+      cx.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+    // a few tufts of grass at the edges of the strip
+    for (let i = 0; i < 40; i++) {
+      cx.fillStyle = 'rgba(110,140,70,0.45)';
+      cx.beginPath();
+      cx.ellipse(rnd() * 256, rnd() * 256, 1 + rnd() * 1.5, 0.8 + rnd(), rnd() * Math.PI, 0, Math.PI * 2);
+      cx.fill();
+    }
     for (let i = 0; i < 26; i++) {
       cx.fillStyle = 'rgba(120,110,100,0.35)';
       cx.beginPath();

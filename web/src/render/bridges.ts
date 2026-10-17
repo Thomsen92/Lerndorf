@@ -4,10 +4,9 @@
  */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import type { Bridge } from '../world/layout';
+import { bridgeHeight, type Bridge } from '../world/layout';
 
 const DECK_WIDTH = 2.0;
-const ARCH = 0.8; // how much the middle rises above the ends
 const RAIL_HEIGHT = 0.85;
 const SEGMENTS = 14;
 
@@ -15,7 +14,7 @@ const SEGMENTS = 14;
 function deckPoint(b: Bridge, t: number): { x: number; y: number; z: number; nx: number; nz: number } {
   const x = b.a.x + (b.b.x - b.a.x) * t;
   const z = b.a.z + (b.b.z - b.a.z) * t;
-  const y = b.y + ARCH * Math.sin(Math.PI * t);
+  const y = bridgeHeight(b, t);
   const len = Math.hypot(b.b.x - b.a.x, b.b.z - b.a.z) || 1;
   return { x, y, z, nx: -(b.b.z - b.a.z) / len, nz: (b.b.x - b.a.x) / len };
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildLayout } from '../../src/world/layout';
+import { bridgeHeight, buildLayout } from '../../src/world/layout';
 import { shortestPath, walkHeight } from '../../src/world/walk';
 
 describe('shortestPath', () => {
@@ -41,6 +41,6 @@ describe('walkHeight', () => {
     const layout = buildLayout(11, 24);
     const b = layout.bridges[0];
     const mid = { x: (b.a.x + b.b.x) / 2, z: (b.a.z + b.b.z) / 2 };
-    expect(walkHeight(layout, mid)).toBe(b.y);
+    expect(walkHeight(layout, mid)).toBeCloseTo(bridgeHeight(b, 0.5), 6);
   });
 });

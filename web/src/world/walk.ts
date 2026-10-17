@@ -3,7 +3,7 @@
  * (ground, or bridge deck). Pure functions, tested in Node.
  */
 import { segmentDistance, type Point2 } from './geometry';
-import type { Layout, WalkGraph } from './layout';
+import { bridgeHeight, type Layout, type WalkGraph } from './layout';
 
 /**
  * Shortest route in number of steps (breadth-first search) from node `from` to node `to`.
@@ -38,7 +38,15 @@ function buildPath(prev: number[], from: number, to: number): number[] {
  */
 export function walkHeight(layout: Layout, p: Point2): number {
   for (const b of layout.bridges) {
-    if (segmentDistance(p.x, p.z, b.a, b.b) < 1.6) return b.y;
+    if (segmentDistance(p.x, p.z, b.a, b.b) < 1.6) {
+      const dx = b.b.x - b.a.x;
+      const dz = b.b.z - b.a.z;
+      const t = Math.min(
+        1,
+        Math.max(0, ((p.x - b.a.x) * dx + (p.z - b.a.z) * dz) / (dx * dx + dz * dz || 1)),
+      );
+      return bridgeHeight(b, t);
+    }
   }
   return layout.terrain.groundHeight(p.x, p.z);
 }

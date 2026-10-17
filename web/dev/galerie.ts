@@ -2,7 +2,7 @@
 // Shows one map and seed from fixed viewpoints with sample residents, so the layout can be
 // judged from pictures. `scripts/galerie.ts` drives it with Playwright.
 import * as THREE from 'three';
-import { buildLayout } from '../src/world/layout';
+import { bridgeHeight, buildLayout } from '../src/world/layout';
 import { buildVillage } from '../src/render/village';
 import { Crowd } from '../src/render/crowd';
 
@@ -94,7 +94,7 @@ const VIEWS: Record<string, { target: THREE.Vector3; offset: THREE.Vector3 }> = 
     target: layout.bridges[0]
       ? new THREE.Vector3(
           (layout.bridges[0].a.x + layout.bridges[0].b.x) / 2,
-          layout.bridges[0].y,
+          bridgeHeight(layout.bridges[0], 0.5),
           (layout.bridges[0].a.z + layout.bridges[0].b.z) / 2,
         )
       : new THREE.Vector3(0, 0, 0),

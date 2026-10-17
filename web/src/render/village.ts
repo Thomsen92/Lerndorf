@@ -84,6 +84,7 @@ function terrainMesh(layout: Layout): THREE.Mesh {
   const bank = new THREE.Color('#a99b72');
   // darker, earthier path colour; paths are narrower than before (cozy citybuilder look)
   const pathCol = new THREE.Color('#a8926c');
+  const trampled = new THREE.Color('#8a9a5c');
   const tmp = new THREE.Color();
   const t = layout.terrain;
   for (let i = 0; i < pos.count; i++) {
@@ -97,6 +98,10 @@ function terrainMesh(layout: Layout): THREE.Mesh {
     // paths painted into the ground: soft edge, no floating strip (review befund 4)
     const onPath = Math.min(1, Math.max(0, (1.7 - laneDistance(layout, x, z)) / 0.8));
     tmp.lerp(pathCol, onPath);
+    // trampled grass at the very edge of the path, and a little brightness noise so no area is one colour
+    tmp.lerp(trampled, (1 - Math.abs(2 * onPath - 1)) * 0.35 * (onPath > 0 ? 1 : 0));
+    const noise = Math.sin(x * 12.9898 + z * 78.233) * 43758.5453;
+    tmp.multiplyScalar(1 + (noise - Math.floor(noise) - 0.5) * 0.12);
     col[i * 3] = tmp.r;
     col[i * 3 + 1] = tmp.g;
     col[i * 3 + 2] = tmp.b;
