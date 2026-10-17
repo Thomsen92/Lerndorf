@@ -53,12 +53,12 @@ Geprüft an der Galerie (`Konzept/Galerie/2026-10-17/`, Seeds 11 und 23, drei Vo
 | 3 | erledigt | Laternen an den Wegen, leuchtende Fenster, Lichtkegel. Licht nach LOOK nachgezogen |
 | 4 | erledigt | Wege sind ins Gelände gemalt, das Gelände darunter ist geglättet (L.3). Auf dem Tablet zu prüfen |
 | 5 | teilweise | Ufersteine, Breite wechselt. Offen: Uferschnitt an steilen Hängen |
-| 6 | teilweise | Bögen, Geländer und Enden auf Ufer-Höhe. Offen: Rampen zum Weg |
+| 6 | teilweise | Bögen, Geländer und Enden auf Ufer-Höhe, Figuren steigen mit. Rampen sind nicht nötig, weil die Enden auf dem Boden liegen; Abnahme auf dem Tablet offen |
 | 7 | teilweise | Zaun mit Tor, Haus mit Tür und Fenstern, Gartenweg. Offen: Vergabe von innen nach außen prüfen |
 | 8 | teilweise | Einebnung wird an steilen Hängen breiter (max. 1,1 m pro m, vorher 1,8). Offen: einzelne keilförmige Grundstücke |
 | 9 | erledigt | Verbindungswege in allen Vorlagen, Test „keine Sackgassen“ |
 | 10 | erledigt | Drei Vorlagen plus Seed, die Lehrkraft wählt pro Klasse (I.3) |
-| 11 | offen | Freie Plätze als Bauplatz stehen aus (Rest von L.5) |
+| 11 | teilweise | Freie Grundstücke haben drei Büsche und Blüten (`plantFreeLot` in `render/village.ts`). Offen: Bauplatz-Funktion (Haus ansehen oder bauen) |
 | 12 | teilweise | Namen nur in der Nähe der Kamera. Offen: Name beim Antippen |
 | 13 | erledigt | Übersicht: rund 60 Draw Calls, Welt rund 35 (Budget < 150) |
 | 14 | erledigt | Höchstens 40 % der Figuren am Platz |

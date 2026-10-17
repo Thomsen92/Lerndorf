@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { MAP_SIZE } from '../world/constants';
 import type { Layout, Plot } from '../world/layout';
 import type { Point2 } from '../world/geometry';
+import { createRng } from '../world/rng';
 import { laneDistance } from '../world/scatter';
 import { buildNature, buildVegetation } from './nature';
 import { buildPlaza } from './plaza';
@@ -201,7 +202,47 @@ function freeLot(p: Plot): THREE.Group {
   sign.scale.set(1.4, 0.36, 1);
   sign.position.set(0, 1.4, -p.d / 2 + 0.6);
   g.add(sign);
+  plantFreeLot(g, p);
   return g;
+}
+
+const LOT_BUSH = ['#3f8f5a', '#4d9a5d', '#2f7d5b', '#5d8f3e'];
+const LOT_FLOWER = ['#f2c94c', '#eb5757', '#f2a7d0', '#ffffff', '#bb6bd9'];
+
+/**
+ * Three small shrubs and a few blossoms on a free plot, always the same for the same plot (LOOK §8),
+ * so the lot reads as a garden waiting for its owner instead of bare lawn.
+ */
+function plantFreeLot(g: THREE.Group, p: Plot): void {
+  const rng = createRng(p.index * 97 + 5);
+  const bush = new THREE.IcosahedronGeometry(0.55, 0);
+  bush.translate(0, 0.4, 0);
+  for (let k = 0; k < 3; k++) {
+    const m = new THREE.Mesh(
+      bush,
+      new THREE.MeshStandardMaterial({
+        color: LOT_BUSH[(p.index + k) % LOT_BUSH.length],
+        flatShading: true,
+        roughness: 0.85,
+      }),
+    );
+    m.position.set((rng() - 0.5) * p.w * 0.55, 0.05, (rng() - 0.5) * p.d * 0.5);
+    m.scale.set(0.8 + rng() * 0.5, 0.7 + rng() * 0.3, 0.8 + rng() * 0.5);
+    m.rotation.y = rng() * Math.PI * 2;
+    g.add(m);
+  }
+  const blossom = new THREE.SphereGeometry(0.1, 5, 4);
+  for (let k = 0; k < 6; k++) {
+    const m = new THREE.Mesh(
+      blossom,
+      new THREE.MeshStandardMaterial({
+        color: LOT_FLOWER[(p.index + k) % LOT_FLOWER.length],
+        roughness: 0.7,
+      }),
+    );
+    m.position.set((rng() - 0.5) * p.w * 0.8, 0.12, (rng() - 0.5) * p.d * 0.8);
+    g.add(m);
+  }
 }
 
 function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): THREE.Group {
