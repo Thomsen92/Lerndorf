@@ -1,0 +1,184 @@
+/* Teacher area. Simple layout for a laptop or tablet. Print rules for the access cards. */
+.teacher-page {
+  overflow: auto; /* the teacher area scrolls, unlike the village */
+}
+
+.teacher-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.teacher-top h1 {
+  margin: 0 auto 0 0;
+  font-size: 22px;
+  color: var(--lantern);
+}
+
+.class-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+main.teacher {
+  padding: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+main.teacher section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+main.teacher h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+main.teacher h3 {
+  margin: 16px 0 8px;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+td.num,
+th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.row input,
+.row select,
+main.teacher textarea {
+  background: #0f1426;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+main.teacher textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.checklist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 6px 12px;
+  margin: 12px 0;
+}
+
+.checklist label {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checklist label.done {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+button.danger {
+  background: var(--warn);
+  color: #2a0d05;
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-weight: 700;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.status {
+  min-height: 1.4em;
+  font-weight: 700;
+}
+
+.status.error,
+.error {
+  color: var(--warn);
+}
+
+.cards {
+  display: none;
+}
+
+/* Print: only the cards, cut-out size (about 85 x 55 mm) */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .cards,
+  .cards * {
+    visibility: visible;
+  }
+  .cards {
+    display: grid;
+    position: absolute;
+    inset: 0 auto auto 0;
+    grid-template-columns: repeat(2, 85mm);
+    gap: 6mm;
+    padding: 8mm;
+    background: #fff;
+    color: #000;
+  }
+  .card-item {
+    width: 85mm;
+    height: 55mm;
+    border: 1px dashed #999;
+    box-sizing: border-box;
+    padding: 4mm;
+    break-inside: avoid;
+  }
+  .card-title {
+    font-size: 10pt;
+    margin: 0;
+  }
+  .card-nick {
+    font-size: 22pt;
+    font-weight: 700;
+    margin: 2mm 0;
+  }
+  .card-pass {
+    font-size: 14pt;
+    margin: 0;
+  }
+  .card-url {
+    font-size: 9pt;
+    margin: 2mm 0 0;
+  }
+}

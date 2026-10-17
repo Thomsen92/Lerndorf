@@ -1,0 +1,11 @@
+# Supabase project config for the CLI (db push, functions deploy).
+# The project itself is linked in the workflow with the project ref from SUPABASE_URL.
+project_id = "lerndorf"
+
+[api]
+enabled = true
+schemas = ["public"]
+
+[functions.admin-accounts]
+# the function checks the caller's token and the teacher role itself
+verify_jwt = true

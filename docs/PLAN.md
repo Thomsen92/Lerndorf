@@ -133,3 +133,11 @@ Ziel: Schüler kaufen Deko und gestalten ihr Grundstück; Mitschüler sehen es.
 | 17.10.2026 | 1.6 erledigt (lokal) | `0004_rpc_teacher.sql`: `add_stamps`, `adjust_coins`, `set_class_flags` mit Rollenprüfung, Doppel-Stempel-Sperre, Notizpflicht |
 | 17.10.2026 | Abweichung | Supabase-Projekt liegt in `eu-west-1` (Irland) statt `eu-central-1` (Frankfurt). Von der Lehrkraft so gewünscht |
 | 17.10.2026 | Abweichung | 40 Grundstücke sind nicht zuverlässig platzierbar (Seed 7: 37). Planung mit 34 Plätzen (32 + 2 Reserve) |
+| 17.10.2026 | 1.7 geschrieben | `supabase/functions/admin-accounts/`: Konten einzeln und per Liste, Passwort zurücksetzen, Klasse wechseln, löschen; nur Lehrkräfte. Prüfregeln getestet (`validate.ts`). Der Deno-Handler ist **nicht ausgeführt** (Deno lokal nicht installiert) |
+| 17.10.2026 | 1.8 erledigt (lokal) | Login über Pseudo-Adresse, Sitzung in `sessionStorage`, Auto-Logout nach 15 Min., Abmelden-Knopf. Unit-Tests für Auto-Logout grün |
+| 17.10.2026 | 1.9 geschrieben | Dorf mit echten Daten (`api/village.ts`, `ui/villageView.ts`): eigenes Haus markiert, Namensschilder, Kamera am eigenen Haus. **Nicht gegen die Datenbank geprüft** |
+| 17.10.2026 | 1.10 geschrieben | Lehrer-Bereich unter `/lehrer/` (`teacher/`): Übersicht, Stempel (Montag, schon gebuchte ausgegraut), Konten, Zugangskärtchen-Druck, Passwort, Löschen, Münzen, Schalter. **Nicht gegen die Datenbank geprüft** |
+| 17.10.2026 | 1.11 geschrieben | `.github/workflows/`: `deploy.yml` (Test, Build, Pages), `migrate.yml` (Migrationen und Funktion), `keepalive.yml` (alle 3 Tage). YAML geprüft, **noch nicht ausgeführt** |
+| 17.10.2026 | 1.12 geschrieben | `docs/ANLEITUNG_LEHRKRAFT.md`: Einrichtung und Alltag. Nicht mit der Lehrkraft durchgegangen |
+| 17.10.2026 | 1.3 Smoke-Test | Playwright: zwei Smoke-Tests (beide Seiten laden ohne Laufzeitfehler) grün |
+| 17.10.2026 | Offen | Vite warnt wegen Chunk-Größe (Three.js, ~500 kB). Später aufteilen. Migrationen und Funktion noch nicht auf dem Supabase-Projekt angewendet |

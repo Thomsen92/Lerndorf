@@ -105,10 +105,57 @@ function riverMesh(): THREE.Mesh {
   return ribbon(RIVER_POINTS, 7, () => -0.55, MAT.water);
 }
 
-function plotGroup(p: Plot): THREE.Group {
+export interface VillageMember {
+  /** Plot index in the class village (profiles.plot_index). */
+  plotIndex: number;
+  nickname: string;
+}
+
+/** Floating name label above a house. Canvas texture, so no HTML inside the 3D scene. */
+function nameTag(text: string, own: boolean): THREE.Sprite {
+  const cv = document.createElement('canvas');
+  cv.width = 256;
+  cv.height = 64;
+  const cx = cv.getContext('2d');
+  if (cx) {
+    cx.fillStyle = own ? 'rgba(255,181,71,0.95)' : 'rgba(20,24,40,0.8)';
+    cx.beginPath();
+    cx.roundRect(6, 10, 244, 44, 22);
+    cx.fill();
+    cx.fillStyle = own ? '#2a1d05' : '#ffffff';
+    cx.font = 'bold 26px Atkinson Hyperlegible, Verdana, sans-serif';
+    cx.textAlign = 'center';
+    cx.textBaseline = 'middle';
+    cx.fillText(text, 128, 33, 236);
+  }
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthWrite: false, transparent: true }),
+  );
+  sprite.scale.set(2.4, 0.6, 1);
+  sprite.renderOrder = 10;
+  return sprite;
+}
+
+function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): THREE.Group {
   const g = new THREE.Group();
   g.position.set(p.x, p.h, p.z);
   g.rotation.y = p.face;
+
+  if (member) {
+    const tag = nameTag(member.nickname, own);
+    tag.position.set(0, 4.6, -p.d / 2 + 1.5);
+    g.add(tag);
+  }
+  if (own) {
+    // marker: a small yellow cone above the own house
+    const marker = new THREE.Mesh(
+      new THREE.ConeGeometry(0.35, 0.7, 8),
+      new THREE.MeshBasicMaterial({ color: '#ffd23f' }),
+    );
+    marker.position.set(0, 5.6, -p.d / 2 + 1.5);
+    marker.rotation.x = Math.PI;
+    g.add(marker);
+  }
 
   // lawn
   const lawn = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.1, p.d), MAT.grass);
@@ -155,9 +202,17 @@ function plotGroup(p: Plot): THREE.Group {
   return g;
 }
 
-/** Builds the whole village as one Group. The caller adds it to the scene. */
-export function buildVillage(layout: Layout): THREE.Group {
+/**
+ * Builds the whole village as one Group. The caller adds it to the scene.
+ * `members` labels the houses of the class; `ownPlotIndex` marks the pupil's own house.
+ */
+export function buildVillage(
+  layout: Layout,
+  members: VillageMember[] = [],
+  ownPlotIndex: number | null = null,
+): THREE.Group {
   const root = new THREE.Group();
+  const byPlot = new Map(members.map((m) => [m.plotIndex, m]));
   root.add(terrainMesh(layout));
   root.add(riverMesh());
 
@@ -201,6 +256,8 @@ export function buildVillage(layout: Layout): THREE.Group {
     root.add(deck);
   }
 
-  for (const p of layout.plots) root.add(plotGroup(p));
+  for (const p of layout.plots) {
+    root.add(plotGroup(p, byPlot.get(p.index), p.index === ownPlotIndex));
+  }
   return root;
 }
