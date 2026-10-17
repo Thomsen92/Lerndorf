@@ -156,3 +156,5 @@ Ziel: Schüler kaufen Deko und gestalten ihr Grundstück; Mitschüler sehen es.
 | 17.10.2026 | 3.4 und 4.3 Oberfläche | Aufgabentafel (`ui/taskBoardView.ts`: Antwortformen choice, gap, match, order; Rückmeldung; Versuche) und Shop (`ui/shopView.ts`: eigene Kaufbestätigung, ausgegraut bei Geldmangel oder geschlossenem Shop). Knöpfe „Aufgaben“ und „Shop“ im Dorf. 142 Tests grün |
 | 17.10.2026 | Nicht geprüft | Oberflächen nur im Build; mit echten Schülerkonten noch nicht durchgeklickt. Der Knopf „Versuche heute: x von 3“ nutzt fest 3 (Standard aus `settings`) |
 | 17.10.2026 | Offen | Baumodus (4.4), Avatar-Editor (2.10), Import einer echten Wochendatei, `content/items.json` mit 30–50 Teilen |
+| 17.10.2026 | Backend 0008 angewendet | `task_attempts` (Antwort-Protokoll, RLS), `submit_answer` schreibt das Protokoll, `task_stats(week)` für die Lehrkraft (Anteil richtig je Aufgabe, PLAN 3.6), `set_layout_seed(class, seed)` (SPEC §10), Katalog auf 30 kostenpflichtige Teile erweitert. 50 SQL-Tests grün |
+| 17.10.2026 | Lehrkonto | Noch nicht angelegt (Schritte aus der Anleitung stehen bei der Lehrkraft). Prüfung am Stand: kein Profil mit Rolle teacher |
