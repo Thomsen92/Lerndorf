@@ -190,6 +190,7 @@ export async function mountVillage(
   renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   stage.appendChild(renderer.domElement);
   const gl = renderer;
@@ -203,6 +204,8 @@ export async function mountVillage(
   sun.castShadow = true;
   Object.assign(sun.shadow.camera, { left: -62, right: 62, top: 62, bottom: -62, near: 1, far: 180 });
   sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.bias = -0.0006; // LOOK §3: no shadow acne on the grass
+  sun.shadow.normalBias = 0.04;
   scene.add(sun);
 
   const layout = buildLayout(layoutSeed, PLOT_COUNT, mapId);

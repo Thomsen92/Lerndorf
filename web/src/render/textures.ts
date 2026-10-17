@@ -26,7 +26,7 @@ function canvasTexture(
 /** Grass grain: many short strokes in light and dark grey on a mid-grey base. */
 export const grassTexture = (): THREE.CanvasTexture =>
   canvasTexture(512, (cx, rnd) => {
-    cx.fillStyle = '#e4e4e4';
+    cx.fillStyle = '#f2f2f2'; // near white: the vertex colours carry the green (LOOK §4)
     cx.fillRect(0, 0, 512, 512);
     for (let i = 0; i < 2600; i++) {
       const x = rnd() * 512;

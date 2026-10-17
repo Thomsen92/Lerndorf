@@ -48,6 +48,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
 app.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -59,6 +60,8 @@ sun.position.set(-40, 55, 25);
 sun.castShadow = true;
 Object.assign(sun.shadow.camera, { left: -62, right: 62, top: 62, bottom: -62, near: 1, far: 180 });
 sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.bias = -0.0006; // LOOK §3: no shadow acne on the grass
+sun.shadow.normalBias = 0.04;
 scene.add(sun);
 
 // the map template of this picture (SPEC §10.1)

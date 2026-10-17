@@ -109,7 +109,7 @@ function terrainMesh(layout: Layout): THREE.Mesh {
   const ground = new THREE.MeshStandardMaterial({
     vertexColors: true,
     map: grass,
-    roughness: 0.95,
+    roughness: 0.88,
   });
   const mesh = new THREE.Mesh(geo, ground);
   mesh.receiveShadow = true;
