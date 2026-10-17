@@ -99,3 +99,24 @@ export const dirtTexture = (): THREE.CanvasTexture =>
       cx.fill();
     }
   });
+
+/** Evening sky for reflections: deep blue at the top, warm horizon, dark green below (cheap env map). */
+export const skyTexture = (): THREE.CanvasTexture => {
+  const cv = document.createElement('canvas');
+  cv.width = 512;
+  cv.height = 256;
+  const cx = cv.getContext('2d');
+  if (cx) {
+    const g = cx.createLinearGradient(0, 0, 0, 256);
+    g.addColorStop(0, '#33405e');
+    g.addColorStop(0.5, '#8f7f8f');
+    g.addColorStop(0.56, '#d9a77a');
+    g.addColorStop(1, '#2a3a2a');
+    cx.fillStyle = g;
+    cx.fillRect(0, 0, 512, 256);
+  }
+  const tex = new THREE.CanvasTexture(cv);
+  tex.mapping = THREE.EquirectangularReflectionMapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+};

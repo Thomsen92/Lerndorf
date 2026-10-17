@@ -14,7 +14,8 @@ function isBakeable(mesh: THREE.Mesh): boolean {
   const std = m as THREE.MeshStandardMaterial;
   if (std.map) return false; // textured: keep the texture
   if (std.transparent) return false;
-  if (std.emissive && std.emissive.getHex() !== 0) return false; // water and other glowing surfaces
+  if (std.emissive && std.emissive.getHex() !== 0) return false; // glowing surfaces
+  if (std.envMap) return false; // water: keeps its reflection
   return m instanceof THREE.MeshStandardMaterial || m instanceof THREE.MeshBasicMaterial;
 }
 

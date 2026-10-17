@@ -11,7 +11,7 @@ import { buildNature, buildVegetation } from './nature';
 import { buildPlaza } from './plaza';
 import { buildBridge } from './bridges';
 import { bakeStatic } from './merge';
-import { dirtTexture, grassTexture } from './textures';
+import { dirtTexture, grassTexture, skyTexture } from './textures';
 import { chimney, fenceGeometry, gableRoof, gardenPathGeometry } from './house';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -121,7 +121,15 @@ function riverMesh(river: Point2[]): THREE.Mesh {
     river,
     (i) => 7.2 + 1.6 * Math.sin(i * 0.09),
     () => -0.55,
-    MAT.water,
+    // water reflects the evening sky (cheap environment map, no second render pass)
+    new THREE.MeshStandardMaterial({
+      color: '#5fb3d9',
+      roughness: 0.12,
+      metalness: 0.45,
+      envMap: skyTexture(),
+      envMapIntensity: 1.1,
+      side: THREE.DoubleSide,
+    }),
   );
 }
 
