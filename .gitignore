@@ -1,0 +1,25 @@
+# dependencies and builds
+node_modules/
+web/dist/
+web/coverage/
+web/test-results/
+web/playwright-report/
+
+# Blender source packs: large, third-party, not in the repo (see blender/sources/LICENSES.md)
+blender/sources/*
+!blender/sources/LICENSES.md
+blender/*.blend1
+blender/*.blend2
+
+# local secrets: never commit keys
+.env
+.env.*
+!.env.example
+supabase/.temp/
+*.log
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

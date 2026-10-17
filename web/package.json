@@ -1,0 +1,31 @@
+{
+  "name": "lerndorf-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Lerndorf: 3D-Klassendorf im Browser (Three.js + Supabase)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.47.0",
+    "@types/three": "0.170.0",
+    "eslint": "^9.39.5",
+    "prettier": "^3.9.10",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.71.2",
+    "vite": "^5.4.0",
+    "vitest": "^2.1.0"
+  }
+}
