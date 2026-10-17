@@ -6,6 +6,8 @@ import * as THREE from 'three';
 import { PLAZA_RADIUS, MAP_SIZE } from '../world/constants';
 import type { Layout, Plot } from '../world/layout';
 import type { Point2 } from '../world/geometry';
+import { laneDistance } from '../world/scatter';
+import { buildNature } from './nature';
 
 const MAT = {
   ground: new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.9 }),
@@ -32,13 +34,14 @@ const ROOF_COLORS = ['#c4574b', '#3f8f88', '#5a62b8', '#d08a3c', '#8c5aa8', '#4f
 /** Vertical ribbon on the ground (lanes, river) following a list of 2D points. */
 function ribbon(
   points: Point2[],
-  width: number,
+  width: number | ((i: number) => number),
   heightAt: (x: number, z: number) => number,
   mat: THREE.Material,
 ): THREE.Mesh {
   const verts: number[] = [];
   const idx: number[] = [];
   points.forEach((p, i) => {
+    const w = typeof width === 'number' ? width : width(i);
     const prev = points[Math.max(0, i - 1)];
     const next = points[Math.min(points.length - 1, i + 1)];
     const tx = next.x - prev.x;
@@ -46,16 +49,9 @@ function ribbon(
     const l = Math.hypot(tx, tz) || 1;
     const nx = -tz / l;
     const nz = tx / l;
-    const hL = heightAt(p.x + (nx * width) / 2, p.z + (nz * width) / 2) + 0.06;
-    const hR = heightAt(p.x - (nx * width) / 2, p.z - (nz * width) / 2) + 0.06;
-    verts.push(
-      p.x + (nx * width) / 2,
-      hL,
-      p.z + (nz * width) / 2,
-      p.x - (nx * width) / 2,
-      hR,
-      p.z - (nz * width) / 2,
-    );
+    const hL = heightAt(p.x + (nx * w) / 2, p.z + (nz * w) / 2) + 0.06;
+    const hR = heightAt(p.x - (nx * w) / 2, p.z - (nz * w) / 2) + 0.06;
+    verts.push(p.x + (nx * w) / 2, hL, p.z + (nz * w) / 2, p.x - (nx * w) / 2, hR, p.z - (nz * w) / 2);
     if (i > 0) {
       const a = (i - 1) * 2;
       idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
@@ -71,7 +67,7 @@ function ribbon(
 }
 
 function terrainMesh(layout: Layout): THREE.Mesh {
-  const seg = 110;
+  const seg = 140; // about 1 vertex per metre in the valley (SPEC §10.2)
   const geo = new THREE.PlaneGeometry(MAP_SIZE + 30, MAP_SIZE + 30, seg, seg);
   geo.rotateX(-Math.PI / 2);
   const pos = geo.attributes.position;
@@ -79,6 +75,7 @@ function terrainMesh(layout: Layout): THREE.Mesh {
   const low = new THREE.Color('#4e7a45');
   const high = new THREE.Color('#7aa35c');
   const bank = new THREE.Color('#a99b72');
+  const pathCol = new THREE.Color('#c9b48c');
   const tmp = new THREE.Color();
   const t = layout.terrain;
   for (let i = 0; i < pos.count; i++) {
@@ -89,6 +86,9 @@ function terrainMesh(layout: Layout): THREE.Mesh {
     tmp.copy(low).lerp(high, Math.min(1, Math.max(0, (h - 1) / 8)));
     const rd = t.riverDistance(x, z);
     tmp.lerp(bank, Math.min(1, Math.max(0, (6.5 - rd) / 2.5)) * 0.85);
+    // paths painted into the ground: soft edge, no floating strip (review befund 4)
+    const onPath = Math.min(1, Math.max(0, (2.4 - laneDistance(layout, x, z)) / 1.2));
+    tmp.lerp(pathCol, onPath);
     col[i * 3] = tmp.r;
     col[i * 3 + 1] = tmp.g;
     col[i * 3 + 2] = tmp.b;
@@ -101,7 +101,13 @@ function terrainMesh(layout: Layout): THREE.Mesh {
 }
 
 function riverMesh(river: Point2[]): THREE.Mesh {
-  return ribbon(river, 7, () => -0.55, MAT.water);
+  // width changes between 5.6 and 8.8 m along the course (LOOK §4)
+  return ribbon(
+    river,
+    (i) => 7.2 + 1.6 * Math.sin(i * 0.09),
+    () => -0.55,
+    MAT.water,
+  );
 }
 
 export interface VillageMember {
@@ -215,18 +221,7 @@ export function buildVillage(
   root.add(terrainMesh(layout));
   root.add(riverMesh(layout.terrain.river));
 
-  // lanes: each lane is a Catmull-Rom curve through its control points
-  for (const pts of layout.map.lanes) {
-    const curve = new THREE.CatmullRomCurve3(
-      pts.map((p) => new THREE.Vector3(p.x, 0, p.z)),
-      false,
-      'centripetal',
-    );
-    const samples = curve
-      .getSpacedPoints(Math.ceil(curve.getLength() / 0.7))
-      .map((v) => ({ x: v.x, z: v.z }));
-    root.add(ribbon(samples, 1.8, (x, z) => layout.terrain.groundHeight(x, z), MAT.path));
-  }
+  // paths are painted into the terrain (see terrainMesh), so they need no floating strips
 
   // plaza: a flat disc with a fountain
   const plazaDisc = new THREE.Mesh(
@@ -259,5 +254,6 @@ export function buildVillage(
   for (const p of layout.plots) {
     root.add(plotGroup(p, byPlot.get(p.index), p.index === ownPlotIndex));
   }
+  root.add(buildNature(layout));
   return root;
 }
