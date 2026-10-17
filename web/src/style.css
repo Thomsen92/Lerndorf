@@ -306,3 +306,55 @@ button:disabled {
 .notice-in {
   color: var(--warn);
 }
+
+/* build mode bar: bottom of the screen, above the village */
+.build-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+  padding: 10px max(12px, env(safe-area-inset-left)) max(10px, env(safe-area-inset-bottom));
+  display: grid;
+  gap: 8px;
+}
+
+.build-bar[hidden] {
+  display: none;
+}
+
+.build-items,
+.build-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.build-bar button {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.build-bar button.primary {
+  background: var(--lantern);
+  color: #2a1d05;
+  border: 0;
+  font-weight: 700;
+}
+
+.build-bar button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.build-info {
+  margin: 0;
+  color: var(--muted);
+}

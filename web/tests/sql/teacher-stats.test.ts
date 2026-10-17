@@ -39,9 +39,14 @@ const SUPABASE_DEFAULT_GRANTS = `
 `;
 
 let db: PGlite;
-const asSuperuser = (sql: string): Promise<void> => db.exec(`reset role; ${sql}`);
-const asUser = (uid: string): Promise<void> =>
-  db.exec(`reset role; select set_config('request.jwt.claim.sub', '${uid}', false); set role authenticated;`);
+const asSuperuser = async (sql: string): Promise<void> => {
+  await db.exec(`reset role; ${sql}`);
+};
+const asUser = async (uid: string): Promise<void> => {
+  await db.exec(
+    `reset role; select set_config('request.jwt.claim.sub', '${uid}', false); set role authenticated;`,
+  );
+};
 
 const MONDAY_NOW = mondayOf(new Date().toISOString().slice(0, 10)) as string;
 

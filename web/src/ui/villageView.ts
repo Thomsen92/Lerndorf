@@ -21,6 +21,7 @@ import { buildVillage } from '../render/village';
 import { Crowd } from '../render/crowd';
 import { openShop } from './shopView';
 import { openTaskBoard } from './taskBoardView';
+import { BuildMode } from '../render/buildMode';
 import {
   AUTO_MEASURE_SECONDS,
   decideAuto,
@@ -38,6 +39,7 @@ interface Loaded {
   profile: MyProfile;
   layoutSeed: number;
   shopOpen: boolean;
+  buildOpen: boolean;
   members: Member[];
 }
 
@@ -45,7 +47,7 @@ async function load(supabase: SupabaseClient): Promise<Loaded> {
   const profile = await loadMyProfile(supabase);
   const cls = await loadClass(supabase, profile.classId);
   const members = await loadMembers(supabase);
-  return { profile, layoutSeed: cls.layoutSeed, shopOpen: cls.shopOpen, members };
+  return { profile, layoutSeed: cls.layoutSeed, shopOpen: cls.shopOpen, buildOpen: cls.buildOpen, members };
 }
 
 /** Shows the village. Calls `onLogout` after a manual or automatic logout. */
@@ -65,6 +67,7 @@ export async function mountVillage(
       </div>
       <button type="button" id="taskBoard">Aufgaben</button>
       <button type="button" id="shop">Shop</button>
+      <button type="button" id="build">Bauen</button>
       <button type="button" id="toMarket">Marktplatz</button>
       <button type="button" id="toHouse">Mein Haus</button>
       <button type="button" id="logout" class="primary">Abmelden</button>
@@ -81,6 +84,7 @@ export async function mountVillage(
   let choice: QualityChoice = 'auto';
 
   const stop = (): void => {
+    buildMode?.dispose();
     document.querySelectorAll('.overlay').forEach((el) => el.remove());
     autoLogout.stop();
     running = false;
@@ -120,7 +124,7 @@ export async function mountVillage(
     return { dispose: stop };
   }
 
-  const { profile, layoutSeed, shopOpen, members } = loaded;
+  const { profile, layoutSeed, shopOpen, buildOpen, members } = loaded;
   const who = root.querySelector<HTMLSpanElement>('#who');
   const coins = root.querySelector<HTMLSpanElement>('#coins');
   if (who) who.textContent = profile.nickname;
@@ -235,11 +239,39 @@ export async function mountVillage(
       ((ev.clientX - rect.left) / rect.width) * 2 - 1,
       -((ev.clientY - rect.top) / rect.height) * 2 + 1,
     );
+    // in build mode a tap picks a cell of the own plot; otherwise a villager waves
+    if (buildMode?.isActive) {
+      buildMode.handleTap(pointer, camera);
+      return;
+    }
     raycaster.setFromCamera(pointer, camera);
     const hit = raycaster.intersectObjects(scene.children, true)[0];
     const v = hit ? crowd.findByObject(hit.object) : null;
     if (v) crowd.wave(v);
   });
+
+  // build mode: only on the own plot; the camera comes back when the pupil is done
+  let buildMode: BuildMode | null = null;
+  const exitBuild = (): void => {
+    buildMode?.exit();
+    jumpTo(homeTarget);
+  };
+  if (home) {
+    buildMode = new BuildMode({ scene, plot: home, supabase, uid: profile.id, onChange: () => exitBuild() });
+  }
+  root.querySelector<HTMLButtonElement>('#build')?.addEventListener('click', async () => {
+    if (!buildMode) return showNotice('Du hast noch kein Grundstück.');
+    if (!buildOpen) return showNotice('Das Bauen ist gerade geschlossen.');
+    const err = await buildMode.enter();
+    if (err) return showNotice(err);
+    jumpTo(homeTarget);
+  });
+  const showNotice = (text: string): void => {
+    if (!notice) return;
+    notice.hidden = false;
+    notice.textContent = text;
+    window.setTimeout(() => (notice.hidden = true), 3000);
+  };
 
   window.addEventListener('resize', resize);
   applyQuality();
