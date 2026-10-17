@@ -5,7 +5,16 @@
  */
 import * as THREE from 'three';
 import type { Layout } from '../world/layout';
-import { placeLamps, placeTrees, type Lamp, type Tree } from '../world/scatter';
+import {
+  placeBushes,
+  placeFlowers,
+  placeLamps,
+  placeReeds,
+  placeRocks,
+  placeTrees,
+  type Lamp,
+  type Tree,
+} from '../world/scatter';
 
 const TRUNK = '#6b4a2f';
 const CROWNS = ['#2f7d5b', '#3a8f63', '#2c6e57', '#4d9a5d', '#5d8f3e'];
@@ -156,5 +165,91 @@ export function buildNature(layout: Layout): THREE.Group {
   root.add(treeGroup(trees, 'pine'));
   root.add(treeGroup(trees, 'round'));
   root.add(lampGroup(placeLamps(layout)));
+  return root;
+}
+
+const BUSH = ['#3f8f5a', '#4d9a5d', '#2f7d5b', '#5d8f3e'];
+const FLOWER = ['#f2c94c', '#eb5757', '#f2a7d0', '#ffffff', '#bb6bd9'];
+
+/** Shrubs, rocks, reeds and flower patches (SPEC §10.6), all as instanced meshes. */
+export function buildVegetation(layout: Layout): THREE.Group {
+  const root = new THREE.Group();
+  const pick = (list: string[], i: number): THREE.Color => new THREE.Color(list[i % list.length]);
+
+  const bushes = placeBushes(layout);
+  const bushGeo = new THREE.IcosahedronGeometry(0.6, 0);
+  bushGeo.translate(0, 0.45, 0);
+  root.add(
+    instanced(
+      bushGeo,
+      new THREE.MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 0.85 }),
+      bushes.length,
+      (i, m) => {
+        const b = bushes[i];
+        m.makeRotationY(b.rot)
+          .scale(new THREE.Vector3(b.scale, b.scale * 0.8, b.scale))
+          .setPosition(b.x, b.y, b.z);
+      },
+      (i) => pick(BUSH, i),
+    ),
+  );
+
+  const rocks = placeRocks(layout);
+  const rockGeo = new THREE.DodecahedronGeometry(0.5, 0);
+  root.add(
+    instanced(
+      rockGeo,
+      new THREE.MeshStandardMaterial({ color: '#8f8d86', flatShading: true, roughness: 0.95 }),
+      rocks.length,
+      (i, m) => {
+        const r = rocks[i];
+        // half sunk into the ground (LOOK §4)
+        m.makeRotationFromEuler(new THREE.Euler(r.rot, r.rot * 0.7, r.rot * 0.3))
+          .scale(new THREE.Vector3(r.scale, r.scale * 0.8, r.scale))
+          .setPosition(r.x, r.y - r.scale * 0.1, r.z);
+      },
+    ),
+  );
+
+  const reeds = placeReeds(layout);
+  const reedGeo = new THREE.CylinderGeometry(0.03, 0.05, 1.1, 4);
+  reedGeo.translate(0, 0.55, 0);
+  root.add(
+    instanced(
+      reedGeo,
+      new THREE.MeshStandardMaterial({ color: '#6f8f45', roughness: 0.9 }),
+      reeds.length,
+      (i, m) => {
+        const r = reeds[i];
+        m.makeRotationY(i * 1.3)
+          .scale(new THREE.Vector3(r.scale, r.scale, r.scale))
+          .setPosition(r.x, r.y, r.z);
+      },
+    ),
+  );
+
+  // flower patches: five small blossoms around each patch centre
+  const patches = placeFlowers(layout);
+  const blossoms: Array<{ x: number; y: number; z: number; colour: number }> = [];
+  patches.forEach((p, i) => {
+    for (let k = 0; k < 5; k++) {
+      const a = (k / 5) * Math.PI * 2 + i;
+      blossoms.push({
+        x: p.x + Math.cos(a) * 0.35,
+        y: p.y + 0.22,
+        z: p.z + Math.sin(a) * 0.35,
+        colour: (i + k) % FLOWER.length,
+      });
+    }
+  });
+  root.add(
+    instanced(
+      new THREE.SphereGeometry(0.12, 5, 4),
+      new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.7 }),
+      blossoms.length,
+      (i, m) => m.makeTranslation(blossoms[i].x, blossoms[i].y, blossoms[i].z),
+      (i) => pick(FLOWER, blossoms[i].colour),
+    ),
+  );
   return root;
 }

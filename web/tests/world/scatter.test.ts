@@ -45,3 +45,29 @@ for (const mapId of MAP_IDS) {
     });
   });
 }
+
+import { placeBushes, placeFlowers, placeReeds, placeRocks } from '../../src/world/scatter';
+import { MAP_IDS as IDS } from '../../src/world/maps';
+
+for (const mapId of IDS) {
+  describe(`bushes, rocks, reeds and flowers on ${mapId}`, () => {
+    const layout = buildLayout(23, 34, mapId);
+    it('keeps shrubs and rocks off paths and water', () => {
+      for (const s of [...placeBushes(layout), ...placeRocks(layout)]) {
+        expect(laneDistance(layout, s.x, s.z)).toBeGreaterThanOrEqual(1.5);
+        expect(layout.terrain.riverDistance(s.x, s.z)).toBeGreaterThanOrEqual(5.5);
+      }
+    });
+    it('puts reeds on the banks, 4 to 6 m from the river', () => {
+      for (const r of placeReeds(layout)) {
+        const rd = layout.terrain.riverDistance(r.x, r.z);
+        expect(rd).toBeGreaterThanOrEqual(4);
+        expect(rd).toBeLessThanOrEqual(6.2);
+      }
+    });
+    it('keeps flowers off the paths', () => {
+      for (const f of placeFlowers(layout))
+        expect(laneDistance(layout, f.x, f.z)).toBeGreaterThanOrEqual(1.8);
+    });
+  });
+}

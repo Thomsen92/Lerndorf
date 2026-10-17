@@ -115,3 +115,96 @@ export function placeLamps(layout: Layout): Lamp[] {
   }
   return lamps;
 }
+
+export interface Scatter {
+  x: number;
+  z: number;
+  y: number;
+  scale: number;
+  rot: number;
+}
+
+/** Shrubs and rocks in the valley, off paths, plaza, bridges and water; shrubs may stand next to plots. */
+export function placeBushes(layout: Layout, maxBushes = 50): Scatter[] {
+  const rng = createRng(layout.seed * 151 + 11);
+  const out: Scatter[] = [];
+  const span = VALLEY_RADIUS;
+  for (let tries = 0; tries < 6000 && out.length < maxBushes; tries++) {
+    const x = (rng() - 0.5) * span * 2;
+    const z = (rng() - 0.5) * span * 2;
+    if (!freeForNature(layout, x, z, 2.0)) continue;
+    if (out.some((b) => Math.hypot(b.x - x, b.z - z) < 1.8)) continue;
+    out.push({
+      x,
+      z,
+      y: layout.terrain.groundHeight(x, z),
+      scale: 0.6 + rng() * 0.6,
+      rot: rng() * Math.PI * 2,
+    });
+  }
+  return out;
+}
+
+/** Rocks: sunk halfway into the ground, anywhere free. */
+export function placeRocks(layout: Layout, maxRocks = 30): Scatter[] {
+  const rng = createRng(layout.seed * 173 + 13);
+  const out: Scatter[] = [];
+  for (let tries = 0; tries < 6000 && out.length < maxRocks; tries++) {
+    const x = (rng() - 0.5) * VALLEY_RADIUS * 2.4;
+    const z = (rng() - 0.5) * VALLEY_RADIUS * 2.4;
+    if (!freeForNature(layout, x, z, 1.5)) continue;
+    out.push({
+      x,
+      z,
+      y: layout.terrain.groundHeight(x, z),
+      scale: 0.3 + rng() * 0.6,
+      rot: rng() * Math.PI * 2,
+    });
+  }
+  return out;
+}
+
+/** Reeds along the river banks, 4.2 to 5.6 m from the centre line, not at bridges. */
+export function placeReeds(layout: Layout, maxReeds = 80): Scatter[] {
+  const rng = createRng(layout.seed * 191 + 17);
+  const river = layout.terrain.river;
+  const out: Scatter[] = [];
+  for (let tries = 0; tries < 4000 && out.length < maxReeds; tries++) {
+    const p = river[Math.floor(rng() * river.length)];
+    const a = rng() * Math.PI * 2;
+    const d = 4.2 + rng() * 1.4;
+    const x = p.x + Math.cos(a) * d;
+    const z = p.z + Math.sin(a) * d;
+    if (nearBridge(layout, x, z, 2.5)) continue;
+    const rd = layout.terrain.riverDistance(x, z);
+    if (rd < 4 || rd > 6.2) continue; // on the bank, not in the water
+    if (Math.hypot(x - layout.plaza.x, z - layout.plaza.z) < PLAZA_RADIUS + 2) continue;
+    out.push({ x, z, y: layout.terrain.groundHeight(x, z), scale: 0.9 + rng() * 0.6, rot: 0 });
+  }
+  return out;
+}
+
+/** Flower patches just outside the plots (garden edges and free plots). */
+export function placeFlowers(layout: Layout, maxFlowers = 120): Scatter[] {
+  const rng = createRng(layout.seed * 211 + 19);
+  const out: Scatter[] = [];
+  for (const p of layout.plots) {
+    const n = 1 + Math.floor(rng() * 3);
+    for (let k = 0; k < n && out.length < maxFlowers; k++) {
+      const a = rng() * Math.PI * 2;
+      const r = p.rad + 0.8 + rng() * 1.2;
+      const x = p.x + Math.cos(a) * r;
+      const z = p.z + Math.sin(a) * r;
+      if (laneDistance(layout, x, z) < 1.8) continue;
+      if (layout.terrain.riverDistance(x, z) < 5.5) continue;
+      out.push({
+        x,
+        z,
+        y: layout.terrain.groundHeight(x, z),
+        scale: 0.8 + rng() * 0.4,
+        rot: rng() * Math.PI * 2,
+      });
+    }
+  }
+  return out;
+}

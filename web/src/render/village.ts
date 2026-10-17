@@ -7,7 +7,7 @@ import { MAP_SIZE } from '../world/constants';
 import type { Layout, Plot } from '../world/layout';
 import type { Point2 } from '../world/geometry';
 import { laneDistance } from '../world/scatter';
-import { buildNature } from './nature';
+import { buildNature, buildVegetation } from './nature';
 import { buildPlaza } from './plaza';
 import { dirtTexture, grassTexture } from './textures';
 import { chimney, fenceGeometry, gableRoof, gardenPathGeometry } from './house';
@@ -312,5 +312,6 @@ export function buildVillage(
   gardenMesh.receiveShadow = true;
   root.add(gardenMesh);
   root.add(buildNature(layout));
+  root.add(buildVegetation(layout));
   return root;
 }
