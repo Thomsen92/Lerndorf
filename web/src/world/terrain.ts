@@ -10,6 +10,8 @@ export interface Flat {
   z: number;
   r: number;
   h: number;
+  /** Width of the embankment beyond r, in metres. Steeper slopes get a longer, gentler ramp (befund 8). */
+  ramp?: number;
 }
 
 /** River centre line: centripetal Catmull-Rom through the control points, sampled evenly. */
@@ -123,7 +125,8 @@ export class Terrain {
     let v = this.pathBlend(x, z, this.carvedHeight(x, z));
     for (const f of this.flats) {
       const d = Math.hypot(x - f.x, z - f.z);
-      if (d < f.r + 4) v = lerp(v, f.h, smooth(f.r + 4, f.r, d));
+      const ramp = f.ramp ?? 4;
+      if (d < f.r + ramp) v = lerp(v, f.h, smooth(f.r + ramp, f.r, d));
     }
     return v;
   }

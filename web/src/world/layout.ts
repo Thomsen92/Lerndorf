@@ -146,7 +146,13 @@ function scatterPlots(rng: Rng, nPlots: number, terrain: Terrain, samples: Point
   }
   return plots.map((p, index) => {
     const h = Math.max(0.5, terrain.naturalHeight(p.x, p.z));
-    terrain.flats.push({ x: p.x, z: p.z, r: p.rad + 0.6, h });
+    terrain.flats.push({
+      x: p.x,
+      z: p.z,
+      r: p.rad + 0.6,
+      h,
+      ramp: embankmentWidth(terrain, p.x, p.z, p.rad + 0.6, h),
+    });
     return {
       ...p,
       index,
@@ -180,6 +186,20 @@ function orientPlot(plot: Plot, rng: Rng, samples: Point2[]): void {
   });
   plot.gate = toWorld(0, plot.d / 2 + 0.6);
   plot.door = toWorld(0, -plot.d / 2 + 2.5);
+}
+
+/**
+ * Width of the embankment around a levelled plot: 4 m on flat ground, up to 14 m where the natural
+ * ground at 4 m beyond the edge differs by more than 1 m (LOOK §4, review befund 8).
+ */
+function embankmentWidth(terrain: Terrain, x: number, z: number, r: number, h: number): number {
+  let spread = 0;
+  for (let k = 0; k < 8; k++) {
+    const a = (k / 8) * Math.PI * 2;
+    const d = r + 4;
+    spread = Math.max(spread, Math.abs(terrain.naturalHeight(x + Math.cos(a) * d, z + Math.sin(a) * d) - h));
+  }
+  return Math.min(14, Math.max(4, 4 + (spread - 1) * 4));
 }
 
 function findBridges(terrain: Terrain, laneCurves: THREE.CatmullRomCurve3[]): Bridge[] {
