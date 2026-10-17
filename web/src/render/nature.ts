@@ -20,7 +20,10 @@ import {
 } from '../world/scatter';
 
 const TRUNK = '#6b4a2f';
-const CROWNS = ['#2f7d5b', '#3a8f63', '#2c6e57', '#4d9a5d', '#5d8f3e'];
+// round crowns: greens with warm and teal accents, so the valley is not one green (LOOK §8)
+const CROWNS = ['#2f7d5b', '#5fa04c', '#c9a23e', '#3f8f8a', '#8aa84a', '#d4893a', '#4d9a5d', '#b9b24a'];
+// pines stay dark and cool
+const PINES = ['#2c6e57', '#2f6e5a', '#3a7f66', '#2a5f6b'];
 const BLOSSOM = '#d98cc5';
 
 /** Soft radial gradient for the light pools on the ground (LOOK §7). */
@@ -76,11 +79,12 @@ function treeGroup(trees: Tree[], kind: Tree['kind']): THREE.Group {
         .setPosition(t.x, t.y, t.z);
     }),
   );
+  const palette = kind === 'pine' ? PINES : CROWNS;
   const colour = (i: number): THREE.Color => {
     const t = list[i];
     // a fixed colour per tree; about one in nine is a rare pink blossom tree (LOOK §8)
     const h = Math.abs(Math.floor(t.x * 7 + t.z * 3));
-    return new THREE.Color(h % 9 === 0 ? BLOSSOM : CROWNS[h % CROWNS.length]);
+    return new THREE.Color(h % 9 === 0 ? BLOSSOM : palette[h % palette.length]);
   };
   if (kind === 'pine') {
     const crown = new THREE.ConeGeometry(1.2, 1.8, 7);
