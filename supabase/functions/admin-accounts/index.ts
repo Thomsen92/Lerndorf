@@ -148,6 +148,9 @@ async function moveClass(
 ): Promise<Response> {
   if (!isClassId(classId)) return json(400, { error: 'Klasse muss 8a oder 8b sein' });
   const plot = await nextPlotIndex(admin, classId);
+  // SPEC §1a: placements go back into the inventory; coins, inventory and avatar move along
+  const { error: delErr } = await admin.from('placements').delete().eq('player_id', userId);
+  if (delErr) return json(400, { error: delErr.message });
   const { error } = await admin
     .from('profiles')
     .update({ class_id: classId, plot_index: plot })

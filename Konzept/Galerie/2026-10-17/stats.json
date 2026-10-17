@@ -1,0 +1,42 @@
+{
+  "tal_11_overview": {
+    "total": 413,
+    "world": 244
+  },
+  "tal_11_topdown": {
+    "total": 399,
+    "world": 228
+  },
+  "tal_11_marketplace": {
+    "total": 213,
+    "world": 70
+  },
+  "tal_11_plot": {
+    "total": 227,
+    "world": 91
+  },
+  "tal_11_bridge": {
+    "total": 34,
+    "world": 20
+  },
+  "tal_23_overview": {
+    "total": 404,
+    "world": 227
+  },
+  "tal_23_topdown": {
+    "total": 407,
+    "world": 230
+  },
+  "tal_23_marketplace": {
+    "total": 228,
+    "world": 78
+  },
+  "tal_23_plot": {
+    "total": 93,
+    "world": 58
+  },
+  "tal_23_bridge": {
+    "total": 35,
+    "world": 27
+  }
+}

@@ -13,7 +13,8 @@ Fortschritt wird hier abgehakt (`[x]`) und kurz notiert (Datum, Abweichungen).
 | Stufe | Inhalt | Sitzungen CC | Zeit LK | Abhängig von |
 | --- | --- | --- | --- | --- |
 | 1 | Fundament: Setup, Datenbank, Login, Lehrer-Bereich, Deploy | 3–4 | ca. 60 Min. einmalig | – |
-| 2 | Dorf + Avatare im Comic-Look | 4–5 | 2 × 15 Min. Abnahme | 1 |
+| 1b | Dorf-Layout: Kartenvorlagen, Wege, Vegetation, Marktplatz, Grundstücke, Leistung (Platzhalter-Optik) | 3–4 | 15 Min. Galerie-Abnahme | 1 |
+| 2 | Dorf + Avatare im Comic-Look | 4–5 | 2 × 15 Min. Abnahme | 1b |
 | 3 | Aufgabentafel + Münzen durch Aufgaben | 2 | 15 Min. | 1 (2 nicht zwingend) |
 | 4 | Shop, Inventar, Baumodus | 2–3 | 15 Min. | 1, 2 |
 | 5 | Probebetrieb, Feinschliff, Anleitung | 1–2 | 1 Woche Beobachtung | 1–4 |
@@ -42,6 +43,27 @@ Ziel: Lehrkraft legt Konten an, Schüler melden sich an und sehen das Dorf ihrer
 | [ ] 1.12 | CC | Anleitung Teil „Alltag“: Konten anlegen, Kärtchen drucken, Stempel buchen | `docs/ANLEITUNG_LEHRKRAFT.md` | verständlich ohne Fachbegriffe |
 | [ ] 1.13 | LK | **Abnahme Stufe 1** auf Schul-Tablet (Kriterien SPEC §18) | Notiz hier | Kriterien erfüllt |
 
+## Stufe 1b – Instanzen und Dorf-Layout
+
+Ziel: 8a und 8b sind sauber getrennte Instanzen (SPEC §1a), und das Dorf sieht schon mit Platzhaltern so lebendig und gemütlich aus wie der Prototyp und erfüllt die Regeln aus SPEC §10. Grundlage: `docs/REVIEW_2026-10-17_Dorflayout.md` (Befunde 1–14) und `Konzept/Review_2026-10-17/`. Blender-Modelle sind **nicht** Teil dieser Stufe; alles wird mit Platzhaltern an den richtigen Positionen gebaut – **aber in der Optik des Prototyps nach `docs/LOOK.md`** (Farben, Formen, Licht). Fertig-Kriterium jedes L-Pakets zusätzlich: Galerie-Bild hält dem Soll-Bild in `Konzept/Stil_Referenz/` stand.
+
+| AP | Wer | Aufgabe | Ergebnis / Dateien | Fertig, wenn |
+| --- | --- | --- | --- | --- |
+| [x] I.1 | CC | **Instanzen (SPEC §1a)**: Spielregeln je Instanz in `classes` (Belohnung, Tageslimit, Versuche, Raster), `class_items`, alle RPCs lesen Regeln aus der Instanz; `map_id` | Migration `0009_instances.sql` | Regeln einer Instanz wirken nicht in der anderen |
+| [ ] I.2 | CC | **Trennung beweisen**: SQL-Tests, dass 8a nichts von 8b sieht oder auslöst; `move_class` nach §1a (Münzen/Inventar/Avatar ziehen mit, Platzierungen zurück ins Inventar, neuer Platz innen nach außen) | `web/tests/sql/instances.test.ts`, Edge Function | Tests grün, am Projekt mit Rücknahme geprüft |
+| [ ] I.3 | CC | **Lehrer-Bereich**: Instanz-Umschalter oben, alle Ansichten je Instanz, Spielregeln und Shop-Sperren je Instanz bearbeiten, Vorlage + Seed je Instanz | `web/src/teacher/*` | Wechsel 8a/8b zeigt nur die jeweilige Instanz |
+| [x] L.1 | CC | **Layout-Galerie** zuerst bauen: Dev-Seite + `npm run galerie` (Vorlage × Seed × 5 Blickwinkel, Draw Calls im Bild) | `web/dev/galerie.html`, `web/scripts/galerie.ts`, Bilder in `Konzept/Galerie/<datum>/` | Galerie zeigt den heutigen Stand (Vorher-Bilder) |
+| [ ] L.2 | CC | **Kartenvorlagen**: Fluss, Wege, Platz, Wahrzeichen und Hügel als Vorlage-Datei; 3 deutlich verschiedene Vorlagen; Vorlage per `classes.map_id` (aus I.1) und `set_layout`-RPC (Vorlage + Seed) | `world/maps/*.ts` | 8a/8b in der Galerie klar unterscheidbar |
+| [ ] L.3 | CC | **Gelände, Wege, Fluss**: höhere Auflösung im Talboden, Wege und Platz als Vertex-Farbe/Splat ins Gelände, Gelände unter Wegen glätten, Flussbreite variabel, Ufer sauber unter Wasser, Ufersteine | `world/terrain.ts`, `render/terrain.ts` | keine Zacken/Durchstechen in Galerie-Nahaufnahmen (Befunde 4, 5) |
+| [ ] L.4 | CC | **Wegenetz**: Hierarchie (2,2 / 1,5 / 1,0 m), keine Sackgassen, Wahrzeichen an Wegenden als Ziele im Wegegraph, Brücken mit Geländer und Rampen | `world/layout.ts`, `render/bridges.ts` | Vitest „keine Sackgassen“, „Wahrzeichen erreichbar“ grün (Befunde 6, 9) |
+| [ ] L.5 | CC | **Grundstücke**: Vergabe von innen nach außen (`plot_index` nach Wegstrecke), Hangregel, kurze Böschungen, Gartenweg ins Wegenetz, Zaun mit Pfosten und Tor, Haus mit Tür/Fenstern/Satteldach im Grundstück, **freie Plätze als Bauplatz** | `world/plots.ts`, `render/plots.ts`; Edge Function vergibt weiter den nächsten freien Index | Vitest für Reihenfolge und Hangregel; Galerie-Nahaufnahme ok (Befunde 7, 8, 11) |
+| [ ] L.6 | CC | **Vegetation und Details**: Poisson-Disk-Verteilung, Waldgürtel, Baumgruppen, Büsche, Hecken, Blumenwiesen, Felsen, Schilf; Mengen nach SPEC §10.6 | `world/scatter.ts`, `render/nature.ts` (InstancedMesh) | Vitest „nichts auf Wegen/Plätzen/Grundstücken/Wasser“, Mengen im Rahmen (Befund 1) |
+| [ ] L.7 | CC | **Marktplatz und Licht**: Pflaster mit Ringmuster, Brunnen, Aufgabentafel zum Hauptzugang, 3 Stände, 4 Bänke, Kübel, Laternen an Wegen, leuchtende Fenster, Lichtflecken, Abendstimmung wie Prototyp | `render/plaza.ts`, `render/lights.ts` | Galerie-Bild Marktplatz vergleichbar mit Prototyp (Befunde 2, 3) |
+| [ ] L.8 | CC | **Namen und Figuren**: keine Schilder an fremden Häusern, Figuren-Schilder ab ~30 m ausblenden, Name beim Antippen; Ziele der Figuren gleichmäßiger verteilen (Wahrzeichen, Häuser von Freunden), max. 3 an der Tafel | `render/crowd.ts`, `avatars/behaviour.ts` | Galerie-Übersicht ruhig lesbar; < 40 % der Figuren gleichzeitig am Platz (Befunde 12, 14) |
+| [ ] L.9 | CC | **Leistung**: statische Szenerie je Material zusammenfassen, Instancing für Wiederholtes; Draw Calls und Dreiecke in der Galerie protokollieren | `render/merge.ts` | Welt < 60 Draw Calls, gesamt mit 32 Figuren < 150 (Befund 13) |
+| [ ] L.10 | CC | Galerie neu erzeugen, Soll/Ist nebeneinander (wie `Konzept/Stil_Referenz/`), Befundliste im Review und Fehlerliste LOOK §11 abhaken | `Konzept/Galerie/<datum>/`, `docs/REVIEW_…` | alle 14 Befunde erledigt oder begründet |
+| [ ] L.11 | LK | **Abnahme Layout** anhand der Galerie und kurz auf dem Tablet (Bildrate) | Notiz hier | Layout freigegeben |
+
 ## Stufe 2 – Dorf und Avatare im Comic-Look
 
 Ziel: Dorf und Figuren sehen aus wie aus einem Guss, Schüler gestalten ihren Avatar mit Starter-Teilen.
@@ -53,7 +75,7 @@ Ziel: Dorf und Figuren sehen aus wie aus einem Guss, Schüler gestalten ihren Av
 | [ ] 2.3 | CC | Blender-Pipeline: `build_assets.py` (Import, Umfärben nach `palette.json`, AO als Vertex-Farbe, Decimate, GLB-Export) + `gltf-transform` (meshopt, KTX2) + Budget-Prüfung | `blender/scripts/*`, `blender/palette.json`, `npm run assets` | ein Befehl erzeugt alle GLBs; Bericht mit Dreieckszahlen |
 | [ ] 2.4 | CC | **Stil-Test:** 1 Haus-Set (Wände, 3 Dächer, Fenster, Tür), 5 Deko-Teile, 1 animierte Figur ins Dorf einbauen; Vorher/Nachher-Screenshots | Test-Deploy, Screenshots in `Konzept/` | – |
 | [ ] 2.5 | LK | **Abnahme Stil-Test** (Look, Farben, Figur) – Rückmeldung einarbeiten | Notiz hier | Look freigegeben |
-| [ ] 2.6 | CC | Alle Dorf-Assets: Häuser in Varianten (1–2 Stockwerke), Marktplatz (Brunnen, Tafel, Stände, Bänke), Laternen, Brücken, Zäune, Bäume, Felsen, Schilf; Platzhalter ersetzen; Instancing für Bäume/Zäune/Laternen | `web/public/assets/*`, `render/assets.ts` | Draw Calls < 150, Download < 8 MB |
+| [ ] 2.6 | CC | Alle Dorf-Assets: Häuser in Varianten (1–2 Stockwerke), Marktplatz (Brunnen, Tafel, Stände, Bänke), Laternen, Brücken, Zäune, Bäume, Felsen, Schilf; **nur die Platzhalter-Meshes aus Stufe 1b austauschen, Positionen bleiben**; Instancing beibehalten | `web/public/assets/*`, `render/assets.ts` | Draw Calls < 150, Download < 8 MB |
 | [ ] 2.7 | CC | Avatar-Baukasten: gemeinsames Skelett, Teile pro Slot, Farben, `AnimationMixer` mit Überblenden; Figur aus Rezept bauen | `avatars/avatar.ts` | 32 Figuren, 1–2 Draw Calls je Figur |
 | [ ] 2.8 | CC | Verhalten auf echte Animationen umstellen (walk/idle/sit/wave), Laufen auf Gelände- und Brückenhöhe, Marker über eigenem Avatar | `avatars/behaviour.ts`, `crowd.ts` | wirkt flüssig, keine Figur läuft durch Häuser |
 | [ ] 2.9 | CC | `items.json` mit Starter-Teilen + RPC `save_avatar` + Import des Katalogs | `content/items.json`, `0005_rpc_avatar.sql`, Workflow-Schritt | ungültige Teile/Farben abgelehnt |
@@ -116,6 +138,7 @@ Ziel: Schüler kaufen Deko und gestalten ihr Grundstück; Mitschüler sehen es.
 | --- | --- | --- |
 | Modellpakete nicht herunterladbar | Stufe 2 wartet | Stufe 3 vorziehen; LK lädt ZIPs |
 | Stil-Test gefällt nicht | Nacharbeit Assets | Stil-Test bewusst klein halten, erst dann alle Assets |
+| Layout wirkt trotz Regeln leer oder unruhig | Nacharbeit vor Stufe 2 | Galerie früh und oft erzeugen; Lehrkraft schaut auf Bilder statt auf Code |
 | Ältestes Tablet zu langsam | ruckelt | Qualitätsstufen, weniger Figuren gleichzeitig animieren, Budget nachschärfen |
 | Supabase-Pause trotz Keepalive | Seite nach Ferien aus | Keepalive-Lauf in Actions prüfen; Anleitung „Projekt wiederherstellen“ |
 | Freiarbeit wird Bauzeit | Lernen leidet | Schalter Shop/Bauen pro Klasse; Münzen nur für Englisch |
@@ -169,3 +192,10 @@ Ziel: Schüler kaufen Deko und gestalten ihr Grundstück; Mitschüler sehen es.
 | 17.10.2026 | Offen Stufe 3 | Echte Aufgabenwoche aus dem Wochenplan-Projekt, Service-Key als GitHub-Secret für den Import, Abnahme (3.8) |
 | 17.10.2026 | 4.5 Platzierungen aller Mitschüler | `render/placements.ts`: eine InstancedMesh je Gegenstandstyp, auf dem Grundstück des jeweiligen Schülers. Daten über `loadClassPlacements` (RLS: nur eigene Klasse). Umrechnung getestet. Im Browser geprüft: die Deko liegt an der berechneten Stelle, nur nicht im Ausschnitt der Kamera. Frustum-Culling für Instancing abgeschaltet |
 | 17.10.2026 | Stufe 4 offen | Abnahme (4.6), echte Modelle für den Katalog, Prüfung mit echten Konten |
+| 17.10.2026 | Review Layout (Claude, Chat) | Dorf aus dem Code mit Beispieldaten gerendert: Welt-Logik gut, Optik hinter Prototyp (keine Vegetation, leerer Marktplatz, kein Abendlicht, zackige Wege/Ufer, Sackgassen, 8a≈8b, leere Häuser, 400–480 Draw Calls). Neue Stufe **1b Dorf-Layout** eingefügt, SPEC §10 neu geschrieben (Kartenvorlagen, Regeln, Galerie). Siehe `docs/REVIEW_2026-10-17_Dorflayout.md`. Hinweis: erledigte APs bitte in den Tabellen abhaken, nicht nur in den Notizen |
+| 17.10.2026 | Vorgabe Lehrkraft | **8a und 8b sind zwei getrennte Instanzen** (eigenes Dorf, eigene Bewohner, eigene Spielregeln, keine gegenseitige Sicht). SPEC §1a neu, APs I.1–I.3 in Stufe 1b |
+| 17.10.2026 | Stil-Leitfaden | `docs/LOOK.md` mit allen Farben, Maßen und Lichtwerten aus dem Prototyp; Soll/Ist-Bilder in `Konzept/Stil_Referenz/`. Vorgabe Lehrkraft: Das Dorf soll aussehen wie im Prototyp |
+| 17.10.2026 | I.1 erledigt | `0009_instances.sql` auf dem Projekt angewendet: Regeln je Instanz in `classes` (Belohnung, Tageslimit, Versuche, Raster, `map_id`), `class_items`; `add_stamps`, `place_item`, `buy_item`, `submit_answer` lesen die Regeln der eigenen Instanz. 8 SQL-Tests grün |
+| 17.10.2026 | I.2 teilweise | `move_student_class` (Lehrkraft): Platzierungen zurück ins Inventar, Münzen/Inventar/Avatar bleiben, nächster freier Platz. Tests grün. Edge Function im Repo angepasst (löscht Platzierungen), **noch nicht neu deployt**. Platz „innen nach außen“ folgt mit L.5 (braucht Wegstrecke), noch nicht geprüft am Projekt |
+| 17.10.2026 | L.1 erledigt | `npm run galerie`: Dev-Seite `web/dev/galerie.html`, Skript `web/scripts/galerie.ts`. Bilder in `Konzept/Galerie/2026-10-17/` (Vorlage tal × Seed 11/23 × 5 Blickwinkel) mit `stats.json`. Vorher-Stand: Übersicht 404–413 Draw Calls (Welt 227–244) |
+| 17.10.2026 | Offen Stufe 1b | I.3 Lehrer-Bereich mit Instanz-Umschalter, I.2 Prüfung am Projekt und Deploy der Edge Function, L.2–L.11 |

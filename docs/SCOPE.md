@@ -18,7 +18,7 @@ Schüler sind 13–14 Jahre alt; teils schwächere Lesekompetenz. Oberfläche au
 ## Im Umfang (MVP = Stufen 1–4)
 
 1. **Login** mit Spitzname + Passwort, beides von der Lehrkraft vergeben. Automatisches Abmelden.
-2. **Klassendorf** pro Klasse: organisches Gelände (Hügel, Fluss, Brücken, geschwungene Wege), Marktplatz in der Mitte, ein Grundstück mit Haus pro Schüler, verstreut und unterschiedlich weit auseinander. Layout pro Klasse fest (alle sehen dasselbe Dorf).
+2. **Klassendorf** pro Klasse: organisches Gelände (Hügel, Fluss, Brücken, geschwungene Wege, Wald, Wahrzeichen), Marktplatz in der Mitte, ein Grundstück mit Haus pro Schüler, verstreut und unterschiedlich weit auseinander. 8a und 8b sind **zwei getrennte Instanzen** mit eigenem Dorf (andere Kartenvorlage), eigenen Bewohnern, eigenen Spielregeln und ohne gegenseitige Sicht. Alle Schüler einer Klasse sehen dasselbe Dorf.
 3. **Avatare** aller Klassenmitglieder laufen selbständig und nicht steuerbar durchs Dorf (gehen, stehen, sitzen, winken, grüßen sich). Antippen lässt eine Figur winken.
 4. **Avatar-Editor**: Frisur, Farben, Kleidung, Accessoires. Grundausstattung gratis, weitere Teile im Shop.
 5. **Aufgabentafel** am Marktplatz: kurze Englisch-Aufgaben zum Stoff der Woche (Vokabeln, Irregular verbs, Grammatik). Richtige Antworten bringen Münzen. Prüfung nur auf dem Server, Tageslimit.
@@ -68,6 +68,7 @@ Schüler sind 13–14 Jahre alt; teils schwächere Lesekompetenz. Oberfläche au
 | --- | --- | --- |
 | 0 | Prototyp (erledigt) | `Prototyp/index.html` |
 | 1 | Fundament: Projekt-Setup, Supabase-Schema, Login, Lehrer-Bereich (Konten, Stempel), Deploy, Weck-Auftrag | Lehrkraft kann Konten anlegen, Schüler können sich anmelden und sehen ihr Dorf mit Platzhaltern |
+| 1b | Dorf-Layout: Kartenvorlagen je Klasse, Wege und Platz im Gelände, Vegetation, Marktplatz, Licht, Grundstücks-Regeln, Leistung – noch mit Platzhaltern | Dorf wirkt lebendig wie der Prototyp; Lehrkraft gibt Layout per Galerie frei |
 | 2 | Dorf + Avatare: Stil-Test mit CC0-Modellen, Blender-Pipeline, Avatar-Baukasten mit Animationen, Avatar-Editor | Dorf im Comic-Look, eigene Avatare |
 | 3 | Aufgaben: Aufgabentafel, Prüfung auf dem Server, Tageslimit, Aufgaben-JSON + Import | Münzen durch Aufgaben |
 | 4 | Bauen: Shop, Inventar, Baumodus | Grundstücke werden gestaltet |

@@ -9,7 +9,7 @@ Markierung offener Punkte: **[OFFEN]** = mit der Lehrkraft klären; bis dahin de
 ## 1. Architektur
 
 ```
-Tablet (Browser)                         Supabase (Frankfurt)
+Tablet (Browser)                         Supabase (EU)
 ┌──────────────────────────┐   HTTPS    ┌───────────────────────────────┐
 │ web/ (Vite-Build)        │──────────▶│ Auth (E-Mail/Passwort,        │
 │  Three.js-Dorf           │            │   Pseudo-Adressen)            │
@@ -23,6 +23,30 @@ GitHub Pages (Repo „Lerndorf“)          GitHub Actions: Deploy, Aufgaben-
 ```
 
 **Grundsatz:** Der Browser zeigt nur an. Alles, was Münzen, Besitz oder Platzierungen verändert, läuft über RPC-Funktionen mit `security definer`, die prüfen und dann buchen. Tabellen sind für Clients **nur lesbar** (über RLS), nie direkt beschreibbar.
+
+## 1a. Instanzen: 8a und 8b sind getrennte Welten
+
+**8a und 8b sind zwei vollständig getrennte Instanzen** desselben Spiels. Technisch laufen beide in **einer** Website und **einem** Supabase-Projekt; getrennt wird über `class_id` (= Instanz-ID). Eine Instanz ist eine Zeile in `classes`; eine weitere Klasse (z. B. 7M) ist später nur eine neue Zeile, kein neuer Code.
+
+| Bereich | Pro Instanz eigen | Gemeinsam |
+| --- | --- | --- |
+| Dorf | Kartenvorlage (`map_id`), Seed, 34 Grundstücke, Wahrzeichen, Marktplatz-Projekt (später) | Code, Modelle |
+| Bewohner | Schülerkonten, Avatare, Häuser, Platzierungen, Inventar, Münzen, Kontoauszug | – |
+| Spielregeln | Stempel-Belohnung, Tageslimit, Versuche, Raster, Shop offen, Bauen offen (§5 `classes`) | Standardwerte für neue Instanzen (`settings`) |
+| Aufgaben | Aufgaben mit `class_id` gelten nur dort; `class_id = null` gilt für alle Instanzen. Ergebnisse und Statistik je Instanz | Aufgabendateien, Schema |
+| Shop | Gegenstände können je Instanz gesperrt werden (`class_items`, optional) | Katalog und Preise (`items`) |
+| Lehrkraft | Ansicht immer **für eine gewählte Instanz** (Umschalter oben im Lehrer-Bereich), Stempel, Statistik, Schalter je Instanz | ein Lehrkonto für alle Instanzen |
+
+**Trennungsregeln (hart, per RLS und in jeder RPC geprüft):**
+1. Ein Schüler gehört genau einer Instanz an (`profiles.class_id`, Pflicht für Schüler).
+2. Schüler lesen nur Daten der eigenen Instanz: Bewohner, Platzierungen, Aufgaben, Klassen-Einstellungen. Es gibt **keine** Abfrage, die Daten mehrerer Instanzen an Schüler liefert, keinen instanzübergreifenden Vergleich und keine Rangliste.
+3. Jede RPC ermittelt die Instanz aus dem angemeldeten Nutzer (`current_class()`), **nie** aus einem Parameter des Clients. Lehrer-RPCs bekommen `class_id` als Parameter und prüfen die Rolle.
+4. Grundstücke, Platzierungen und Aufgaben-Ergebnisse sind immer an genau eine Instanz gebunden; `unique (class_id, plot_index)`.
+5. Spitznamen sind **global eindeutig** (Login ohne Klassenangabe), damit niemand die Klasse eingeben muss.
+
+**Wechsel eines Schülers in die andere Instanz** (`move_class`, nur Lehrkraft, mit Bestätigung): Münzen, Inventar, Avatar und Kontoauszug ziehen mit; alle Platzierungen werden entfernt und gehen ins Inventar zurück; der Schüler bekommt in der neuen Instanz den nächsten freien Platz (innen nach außen, §10.5); der alte Platz wird wieder frei (Bauplatz-Optik).
+
+**Löschen einer Instanz** ist im MVP nicht vorgesehen (nur über die Datenbank).
 
 ## 2. Repository und Ordner
 
@@ -87,9 +111,15 @@ Lerndorf/
 create table classes (
   id text primary key,                 -- '8a', '8b'
   name text not null,
-  layout_seed int not null,            -- bestimmt Gelände, Grundstücke, Bäume
+  map_id text not null default 'tal',  -- Kartenvorlage (§10.1)
+  layout_seed int not null,            -- streut Grundstücke, Bäume, Details
   shop_open boolean not null default true,
   build_open boolean not null default true,
+  -- Spielregeln je Instanz (§1a); beim Anlegen aus settings übernommen
+  stamp_reward int not null default 100,
+  daily_task_cap int not null default 60,
+  max_attempts int not null default 3,
+  plot_cols int not null default 7, plot_rows int not null default 6,
   created_at timestamptz default now()
 );
 
@@ -167,14 +197,23 @@ create table coin_ledger (
   created_at timestamptz default now()
 );
 
-create table settings (                -- eine Zeile
+create table settings (                -- eine Zeile: Standardwerte für NEUE Instanzen; gültig sind die Werte in classes
   id int primary key default 1 check (id = 1),
   stamp_reward int not null default 100,
   daily_task_cap int not null default 60,
   max_attempts int not null default 3,
   plot_cols int not null default 7, plot_rows int not null default 6
 );
+
+create table class_items (             -- optional: Gegenstand in einer Instanz sperren
+  class_id text references classes on delete cascade,
+  item_id text references items on delete cascade,
+  enabled boolean not null default true,
+  primary key (class_id, item_id)
+);
 ```
+
+Alle RPCs lesen Belohnung, Tageslimit, Versuche und Raster aus der Zeile der Instanz in `classes`, nicht aus `settings`.
 
 **Invariante:** `profiles.coins` = Summe von `coin_ledger.delta` des Spielers. Nur RPC-Funktionen schreiben beides in derselben Transaktion.
 
@@ -192,6 +231,7 @@ create table settings (                -- eine Zeile
 | task_results | eigene | – | alles |
 | coin_ledger | eigene | – | alles |
 | settings | lesen | – | schreiben |
+| class_items | eigene Instanz | – | alles |
 
 Münzstände anderer Schüler sind für Schüler **nicht** sichtbar.
 
@@ -221,7 +261,7 @@ Münzstände anderer Schüler sind für Schüler **nicht** sichtbar.
 
 **Antwortprüfung** (`submit_answer`): Vergleich nach Normalisierung – trimmen, Kleinschreibung, mehrfache Leerzeichen zusammenfassen, typografische Apostrophe → `'`. `gap` erlaubt mehrere richtige Lösungen (Array). Kein Teilpunkt.
 
-**Edge Function `admin-accounts`** (nur Lehrkraft): `create` (nickname, password, class_id → nächster freier `plot_index`), `reset_password`, `move_class`, `delete`. Bulk-Anlegen aus einer Liste (eine Zeile pro Schüler: `Spitzname;Passwort;Klasse`).
+**Edge Function `admin-accounts`** (nur Lehrkraft): `create` (nickname, password, class_id → nächster freier `plot_index` der Instanz), `reset_password`, `move_class` (Regeln §1a), `delete`. Bulk-Anlegen aus einer Liste (eine Zeile pro Schüler: `Spitzname;Passwort;Klasse`).
 
 ## 9. Aufgaben-Inhalte
 
@@ -243,16 +283,81 @@ Datei `content/tasks/<Montag>.json`:
 
 ## 10. Dorf (Welt)
 
-Referenz: `Prototyp/index.html` (`buildWorld`, Wegenetz, `Avatar`-Klasse).
+**Wie es aussehen soll, regelt `docs/LOOK.md` (Stil-Leitfaden mit allen Farben und Maßen aus dem Prototyp).** Soll-Bilder: `Konzept/Stil_Referenz/`. Der Prototyp ist das freigegebene Soll-Bild. Befunde zum Stand 17.10.: `docs/REVIEW_2026-10-17_Dorflayout.md`.
 
-- **Deterministisch:** `layout(classes.layout_seed, Anzahl Grundstücke)` erzeugt Gelände, Fluss, Wege, Grundstücksplätze, Bäume. Gleicher Seed + gleiche Zahl ⇒ identisches Dorf auf jedem Gerät (eigener seeded PRNG, kein `Math.random` in der Welt). Unit-Test dafür.
-- Gelände: Höhenfeld (Summe von Sinuswellen + Anstieg zum Rand), Fluss als Spline mit ausgefrästem Bett, Brücken automatisch an Weg/Fluss-Kreuzungen, Grundstücke und Marktplatz eingeebnet.
-- Grundstücke: Anzahl = Schüler der Klasse + 2 Reserve; verstreut entlang der Wege, Abstand variiert; jeder `plot_index` hat eine feste Position.
-- Grundstücksraster: `plot_cols × plot_rows` Zellen à 1 m; hintere Zellen (Haus) gesperrt; Tor vorne mittig.
-- Marktplatz: Brunnen, Aufgabentafel mit schwebendem „!“, Stände, Bänke, Laternen.
-- Licht: Abendstimmung; Fenster und Laternen leuchten (emissive + additive Lichtflecken); echte Punktlichter nur am Marktplatz und nur in Qualität „Hoch“.
-- Kamera: schräg von oben, Wischen verschiebt, zwei Finger drehen/zoomen, begrenzt auf das Tal. Start: auf das eigene Grundstück schauen. Knopf „Zum Marktplatz“, „Zu meinem Haus“.
-- Die Lehrkraft kann pro Klasse aus mehreren Seeds wählen (Vorschau im Lehrer-Bereich). Wechsel des Seeds nach Start nur mit Warnung (Grundstücke bleiben über `plot_index` erhalten, Lage ändert sich).
+Grundsatz: **Das Layout (Positionen von allem) entsteht im Code in `world/`, deterministisch.** Das Rendering (`render/`) setzt jetzt Platzhalter an diese Positionen; in Stufe 2 tauscht die Blender-Pipeline nur die Meshes aus. Vegetation, Laternen und Marktplatz-Ausstattung sind daher **Teil des Layouts** und warten nicht auf Blender.
+
+### 10.1 Kartenvorlagen und Seed
+
+- Es gibt **3 handgestaltete Kartenvorlagen** (`world/maps/*.ts`): je ein Flusslauf (Spline), 6–9 Hauptwege (Splines), Lage des Marktplatzes, 3–5 Wahrzeichen (§10.6), Hügel-Parameter. Vorlagen unterscheiden sich deutlich (z. B. Fluss im Süden / Fluss in der Mitte mit Insel-Brücke / Bach mit Teich und Hügel im Norden).
+- `classes.map_id` (neu, `text`, Standard `'tal'`) wählt die Vorlage, `classes.layout_seed` streut Grundstücke, Bäume und Details. **8a und 8b bekommen verschiedene Vorlagen.**
+- Gleiche Vorlage + gleicher Seed ⇒ identisches Dorf auf jedem Gerät (eigener PRNG, kein `Math.random` in `world/`).
+
+### 10.2 Gelände
+
+- Höhenfeld wie bisher (Wellen + Anstieg zum Talrand). Talboden flach genug für Wege und Häuser, Rand als bewaldete Hügel.
+- Auflösung im Talboden ≥ 1 Vertex pro 1,2 m, damit Wege und Ufer sauber werden.
+- Farben: Wiese (2–3 Grüntöne als weiche Flecken), Ufer sandig, Hänge dunkler, Wege und Platz **ins Gelände gemalt** (§10.4).
+
+### 10.3 Fluss und Brücken
+
+- Breite variiert 6–9 m entlang des Laufs; Gelände wird unter der Wasserfläche sauber abgesenkt (kein Geländedreieck sticht durch). Ufer: Sandstreifen, einzelne Steine, Schilf in Gruppen.
+- Wasser leicht animiert (Farbe/Glanz), keine Shader-Kosten über dem Budget.
+- Brücken automatisch an Weg-Fluss-Kreuzungen, ausgerichtet in Wegrichtung, mit Geländer, Pfosten, kurzer Rampe an beiden Enden; Breite = Wegbreite + 0,6 m. Figuren laufen auf Brückenhöhe.
+
+### 10.4 Wege
+
+- Hierarchie: Hauptweg 2,2 m, Nebenweg 1,5 m, Gartenweg 1,0 m; Marktplatz gepflastert (eigene Farbe + Ringmuster).
+- **Darstellung im Gelände** (Vertex-Farbe oder Splat-Textur mit weichem Rand, Gelände unter dem Weg leicht geglättet) statt schwebender Bänder. Keine Z-Konflikte, keine Zacken.
+- **Keine Sackgassen**: Jeder Weg endet an einer Kreuzung, am Marktplatz, an einem Grundstück oder an einem Wahrzeichen.
+- Laternen alle 10–12 m abwechselnd links/rechts, nicht auf Brücken, nicht in Kreuzungen.
+
+### 10.5 Grundstücke
+
+- **34 feste Plätze pro Klasse** (32 Schüler + 2 Reserve), Lage hängt nicht von der Schülerzahl ab.
+- **Vergabe von innen nach außen:** `plot_index` 0 ist der Platz mit kürzestem Weg zum Marktplatz, dann aufsteigend. So entsteht ein dichter Dorfkern; Außenplätze bleiben frei, bis sie gebraucht werden.
+- Verteilung: ca. 40 % der Plätze im Kern (Wegstrecke ≤ 25 m zum Platz), Rest entlang der Wege; Abstand zu Nachbarn variiert 2,5–9 m; ≥ 3 m vom Ufer, ≥ 0,6 m vom Weg; Lage im Tal (nicht am Steilhang).
+- **Hangregel:** Höhenunterschied des natürlichen Geländes unter dem Grundstück ≤ 1,5 m; Einebnung mit kurzer, weicher Böschung (≤ 2 m), keine Erdwände.
+- Ausrichtung: Haus und Tor zeigen zum nächsten Weg; **Gartenweg** vom Tor zum Weg wird gezeichnet und ist im Wegegraph.
+- Aufbau: Rasenfläche, Zaun aus Pfosten + Latten mit Tor vorn (keine geschlossene Wand), Haus mit Tür, 2–4 Fenstern (leuchtend), Satteldach mit Dachüberstand, das innerhalb des Grundstücks bleibt; Briefkasten am Tor. Hausgröße und Farben variieren deterministisch.
+- **Freie Plätze** (ohne Schüler): kein Haus, sondern Bauplatz-Optik (Wiese, Holzpflöcke an den Ecken, kleines Schild „frei“). Wird ein Schüler angelegt, erscheint dort sein Haus.
+- Baumodus-Raster: `plot_cols × plot_rows` Zellen à 1 m (aus `classes`, §1a); Hausbereich hinten gesperrt, Tor und Gartenweg vorne mittig frei (§8 `place_item`).
+- Wechsel von Vorlage oder Seed nach dem Start nur mit Warnung im Lehrer-Bereich: Grundstücke bleiben über `plot_index` erhalten, ihre Lage ändert sich.
+
+### 10.6 Wahrzeichen und Details
+
+- Pro Vorlage 3–5 **Wahrzeichen** an Wegenden: z. B. Aussichtspunkt mit Bank auf dem Hügel, Steg am Fluss, Windmühle, Obstwiese, Waldhütte. Sie sind Ziele im Wegegraph (Figuren besuchen sie).
+- **Vegetation** (deterministisch, Poisson-Disk-Verteilung): Waldgürtel am Talrand mit nach außen steigender Dichte; im Tal Baumgruppen (3–7 Bäume) statt gleichmäßiger Streuung; 0–2 Bäume oder Büsche neben manchen Grundstücken; Hecken an einigen Wegen; Blumenwiesen-Flecken; Felsen an Hängen; Schilf am Ufer. Nie auf Wegen, Plätzen, Grundstücken, Brücken oder im Wasser.
+- Zielmengen bei 34 Plätzen: 150–250 Bäume, 30–60 Büsche, 20–40 Felsen, 60–100 Schilfhalme, 20–30 Laternen.
+
+### 10.7 Marktplatz
+
+- Gepflastert, Durchmesser 16–18 m, Zugänge exakt dort, wo Wege ankommen.
+- Ausstattung: Brunnen in der Mitte, **Aufgabentafel** mit schwebendem „!“ (zeigt zum Hauptzugang, gut sichtbar aus der Startkamera), 3 Marktstände, 4 Bänke, 4 Laternen, Blumenkübel. Alles bleibt frei begehbar (Wegegraph um die Objekte herum).
+
+### 10.8 Licht und Stimmung
+
+- Abendstimmung wie im Prototyp: Himmel/Nebel blau-violett, warmes Sonnenlicht flach, Hemisphere-Licht.
+- Fenster und Laternen leuchtend (emissive Material, kein Licht pro Objekt) plus additive Lichtflecken auf dem Boden; echte Punktlichter nur am Marktplatz und nur in Qualität „Hoch“.
+
+### 10.9 Namen und Markierungen
+
+- Eigenes Haus: Markierung (schwebender Pfeil) und eigener Name immer sichtbar.
+- Namensschilder der Figuren nur bis ca. 30 m Kameraabstand, darüber ausgeblendet; **keine** Namensschilder an fremden Häusern (Name erscheint beim Antippen eines Hauses oder einer Figur).
+
+### 10.10 Kamera
+
+- Start: schräg auf das eigene Grundstück, Marktplatz im Bild. Knöpfe „Zum Marktplatz“, „Zu meinem Haus“. Wischen/Zoomen begrenzt auf das Tal; kein Blick unter das Gelände.
+
+### 10.11 Leistung der Welt
+
+- Statische Szenerie (Gelände, Wege, Häuser, Zäune, Brücken, Platz) zu wenigen Meshes je Material zusammengefasst; Bäume, Büsche, Felsen, Laternen, Zaunpfosten als `InstancedMesh`.
+- **Ziel: < 60 Draw Calls für die Welt** (ohne Figuren), < 150 gesamt mit 32 Figuren.
+
+### 10.12 Layout-Galerie (Abnahmewerkzeug)
+
+- Entwicklungsseite `web/dev/galerie.html` (nicht im Produktions-Build): rendert jede Vorlage × 2 Seeds mit 24 Beispielbewohnern aus 5 festen Blickwinkeln (Übersicht, Draufsicht, Marktplatz, Grundstück, Brücke).
+- Playwright-Skript `npm run galerie` speichert die Bilder nach `Konzept/Galerie/<datum>/`. Die Lehrkraft nimmt das Layout anhand dieser Bilder ab.
 
 ## 11. Avatare und Verhalten
 
@@ -279,15 +384,17 @@ Touch-Ziele mind. 44 px; einfache Sprache; keine Emojis als Bedienelemente.
 
 ## 13. Lehrer-Bereich (`/lehrer`)
 
+- **Instanz-Umschalter** (8a / 8b) oben; alle folgenden Ansichten gelten für die gewählte Instanz.
 - Klassen-Übersicht: Spitzname, Münzen, letzte Anmeldung, Aufgaben diese Woche gelöst.
+- Spielregeln der Instanz bearbeiten (Stempel-Belohnung, Tageslimit, Versuche) und Gegenstände je Instanz sperren.
 - **Stempel buchen:** Klasse + Woche (Montag) wählen → Liste mit Häkchen → „Stempel buchen“. Bereits gebuchte Stempel sind markiert. Ziel: eine Klasse < 3 Min.
 - Konten: anlegen (einzeln/Liste), Passwort zurücksetzen, löschen; Druckansicht „Zugangskärtchen“ (Spitzname + Passwort, zum Ausschneiden).
 - Münzen korrigieren mit Notiz.
 - Schalter: Shop offen, Bauen offen (pro Klasse).
-- Dorf-Layout wählen (Seed-Vorschau).
+- Dorf-Layout wählen: Kartenvorlage + Seed, mit Vorschaubild.
 - Aufgaben-Statistik pro Aufgabe (Anteil richtig) – hilft bei der Unterrichtsplanung.
 
-## 14. Wirtschaft (Standardwerte, alles in `settings`/`items` änderbar)
+## 14. Wirtschaft (Standardwerte; je Instanz in `classes` änderbar, Preise in `items`)
 
 | Größe | Standard |
 | --- | --- |
@@ -317,7 +424,7 @@ Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3
 
 | Bereich | Anforderung |
 | --- | --- |
-| Leistung | ≥ 30 fps auf dem ältesten Schul-Tablet bei 32 Figuren (Qualität automatisch); Draw Calls < 150; Dreiecke < 150.000 |
+| Leistung | ≥ 30 fps auf dem ältesten Schul-Tablet bei 32 Figuren (Qualität automatisch); Draw Calls < 150 gesamt, Welt allein < 60; Dreiecke < 150.000 |
 | Ladezeit | erster Start < 8 s im Schul-WLAN; Download < 8 MB; danach Browser-Cache |
 | Qualitätsstufen | Auto (misst die ersten 5 s), Hoch, Niedrig: Schatten, Pixeldichte, Punktlichter |
 | Browser | aktuelle Safari (iPadOS), Chrome (Android, Windows), Edge |
@@ -332,12 +439,13 @@ Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3
 - `deploy.yml`: bei Push auf `main` → Tests → Vite-Build → GitHub Pages.
 - Supabase-Migrationen über Supabase CLI (`supabase db push`), lokal mit `supabase start` testbar.
 - Secrets (von der Lehrkraft einzutragen, Anleitung in `docs/ANLEITUNG_LEHRKRAFT.md`): `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`.
-- Die Lehrkraft muss anlegen: GitHub-Repo `Lerndorf`, Supabase-Projekt (Region `eu-central-1`, Frankfurt). Schritte dafür als einfache Anleitung mit Screenshots-Beschreibung.
+- Die Lehrkraft muss anlegen: GitHub-Repo `Lerndorf`, Supabase-Projekt (Region `eu-west-1`, Irland – so von der Lehrkraft gewählt). Schritte dafür als einfache Anleitung mit Screenshots-Beschreibung.
 
 ## 18. Tests und Abnahme
 
-- **Vitest:** Layout deterministisch (gleicher Seed ⇒ gleiche Positionen), Grundstücke überlappen nicht, kein Grundstück im Fluss, jeder Hauseingang über den Wegegraph vom Marktplatz erreichbar; Antwort-Normalisierung; Raster-Kollision.
-- **SQL-Tests** (pgTAP oder Skript gegen lokales Supabase): Schüler kann keine Tabelle direkt schreiben; `task_solutions` nicht lesbar; Tageslimit, Doppel-Stempel, Kauf ohne Geld, Platzieren ohne Besitz werden abgelehnt; Ledger-Summe = Münzstand.
+- **Vitest:** Layout deterministisch (gleiche Vorlage + Seed ⇒ gleiche Positionen), Grundstücke überlappen nicht, kein Grundstück im Fluss oder am Steilhang (Hangregel), jeder Hauseingang und jedes Wahrzeichen über den Wegegraph vom Marktplatz erreichbar, keine Sackgassen, `plot_index` aufsteigend nach Wegstrecke zum Marktplatz, keine Vegetation auf Wegen/Plätzen/Grundstücken/Wasser, Mengen aus §10.6 eingehalten; Antwort-Normalisierung; Raster-Kollision.
+- **Layout-Galerie** (§10.12) bei jeder Änderung an `world/` oder `render/village*` neu erzeugen; Draw Calls der Welt pro Bild protokollieren.
+- **SQL-Tests** (pgTAP oder Skript gegen lokales Supabase): **Instanz-Trennung** – ein Schüler der 8a sieht keine Bewohner, Platzierungen, Aufgaben-Ergebnisse oder Einstellungen der 8b und kann keine RPC mit Wirkung auf die 8b auslösen; Regeln einer Instanz wirken nicht in der anderen; `move_class` nach §1a; Schüler kann keine Tabelle direkt schreiben; `task_solutions` nicht lesbar; Tageslimit, Doppel-Stempel, Kauf ohne Geld, Platzieren ohne Besitz werden abgelehnt; Ledger-Summe = Münzstand.
 - **Playwright-Smoke:** Login → Dorf rendert ohne Konsolenfehler → Aufgabe lösen → Münzen steigen → Item kaufen → platzieren.
 - Abnahme jeder Stufe durch die Lehrkraft auf einem Schul-Tablet.
 
@@ -345,7 +453,8 @@ Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3
 
 | Stufe | Abgenommen, wenn |
 | --- | --- |
-| 1 | Lehrkraft legt per Liste 5 Testkonten an, druckt Zugangskärtchen; Schüler-Login auf dem Tablet zeigt das Dorf der richtigen Klasse mit eigenem Haus; Auto-Logout funktioniert; Stempel buchen erhöht Münzstand; Weck-Auftrag läuft |
+| 1 | Instanz-Trennung per SQL-Test belegt; Lehrkraft legt per Liste 5 Testkonten an, druckt Zugangskärtchen; Schüler-Login auf dem Tablet zeigt das Dorf der richtigen Klasse mit eigenem Haus; Auto-Logout funktioniert; Stempel buchen erhöht Münzstand; Weck-Auftrag läuft |
+| 1b | Layout-Galerie: alle Befunde aus `REVIEW_2026-10-17_Dorflayout.md` behoben; 8a/8b sichtbar verschieden; Welt < 60 Draw Calls; Lehrkraft gibt das Layout anhand der Galerie frei |
 | 2 | Stil-Test freigegeben; Dorf im Comic-Look; Avatar-Editor speichert; alle Figuren der Klasse laufen mit echten Animationen; ≥ 30 fps auf dem ältesten Tablet |
 | 3 | Aufgaben-JSON einer Woche wird per Push importiert; Lösen bringt Münzen; Limit und Versuche greifen; Lösungen nicht im Netzwerkverkehr vor dem Lösen sichtbar |
 | 4 | Kaufen, Platzieren, Drehen, Entfernen funktionieren; andere Schüler sehen die Deko nach Neuladen; Sperr-Schalter wirken |
@@ -355,10 +464,11 @@ Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3
 
 | # | Frage | Standard bis zur Klärung |
 | --- | --- | --- |
-| 1 | Klassengröße 8a / 8b | je 32 Plätze möglich |
+| 1 | Klassengröße 8a / 8b | je 32 Plätze pro Instanz |
 | 2 | Münzbeträge, Tageslimit | §14 |
 | 3 | Aufgaben auch zu Hause? | ja, gleiche Regeln |
 | 4 | Ältere Wochen: Belohnung | halbe Belohnung |
 | 5 | Ältestes Tablet-Modell | Qualität „Auto“ entscheidet |
 | 6 | Datenschutz-/Impressumstext | Platzhalter, mit Schulleitung klären |
-| 7 | Seed pro Klasse | Lehrkraft wählt im Lehrer-Bereich |
+| 7 | Vorlage und Seed pro Klasse | 8a: Vorlage 1, 8b: Vorlage 2; Lehrkraft kann im Lehrer-Bereich wechseln |
+| 8 | Wahrzeichen je Vorlage | Vorschlag von Claude Code in der Galerie, Lehrkraft entscheidet |
