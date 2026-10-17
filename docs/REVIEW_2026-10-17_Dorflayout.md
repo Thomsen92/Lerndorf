@@ -41,3 +41,24 @@ Neue Stufe **1b „Dorf-Layout“** im PLAN (vor dem Stil-Test der Stufe 2), Reg
 6. **Jeder Weg endet an etwas** (Aussichtspunkt, Steg, Mühle, Obstwiese, Waldhütte).
 7. **Draw Calls** durch Zusammenfassen und Instancing unter Budget.
 8. **Layout-Galerie** (Screenshots aus festen Blickwinkeln) als Abnahmewerkzeug.
+
+## Stand nach Stufe 1b (18.10.2026)
+
+Geprüft an der Galerie (`Konzept/Galerie/2026-10-17/`, Seeds 11 und 23, drei Vorlagen). Abnahme auf dem Tablet und durch die Lehrkraft steht noch aus (L.11).
+
+| # | Stand | Was geschehen ist, was offen ist |
+| --- | --- | --- |
+| 1 | teilweise | Bäume, Waldgürtel, Büsche, Felsen, Schilf, Hecken und Blumenwiesen sind platziert. Offen: freie Grundstücke sind noch kahl |
+| 2 | erledigt | Marktplatz mit Pflaster, Brunnen mit Wasser, Tafel, drei Stände, Bänke, Kübel (L.7) |
+| 3 | erledigt | Laternen an den Wegen, leuchtende Fenster, Lichtkegel. Licht nach LOOK nachgezogen |
+| 4 | erledigt | Wege sind ins Gelände gemalt, das Gelände darunter ist geglättet (L.3). Auf dem Tablet zu prüfen |
+| 5 | teilweise | Ufersteine, Breite wechselt. Offen: Uferschnitt an steilen Hängen |
+| 6 | teilweise | Bögen, Geländer und Enden auf Ufer-Höhe. Offen: Rampen zum Weg |
+| 7 | teilweise | Zaun mit Tor, Haus mit Tür und Fenstern, Gartenweg. Offen: Vergabe von innen nach außen prüfen |
+| 8 | teilweise | Einebnung wird an steilen Hängen breiter (max. 1,1 m pro m, vorher 1,8). Offen: einzelne keilförmige Grundstücke |
+| 9 | erledigt | Verbindungswege in allen Vorlagen, Test „keine Sackgassen“ |
+| 10 | erledigt | Drei Vorlagen plus Seed, die Lehrkraft wählt pro Klasse (I.3) |
+| 11 | offen | Freie Plätze als Bauplatz stehen aus (Rest von L.5) |
+| 12 | teilweise | Namen nur in der Nähe der Kamera. Offen: Name beim Antippen |
+| 13 | erledigt | Übersicht: rund 60 Draw Calls, Welt rund 35 (Budget < 150) |
+| 14 | erledigt | Höchstens 40 % der Figuren am Platz |
