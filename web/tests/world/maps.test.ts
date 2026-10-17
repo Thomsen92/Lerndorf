@@ -63,3 +63,16 @@ describe('8a and 8b look different', () => {
     expect(a.plots[0].x).not.toBeCloseTo(b.plots[0].x, 3);
   });
 });
+
+describe('plot numbers run from the inside out (SPEC §10.5)', () => {
+  for (const mapId of MAP_IDS) {
+    it(`${mapId}: index 0 has the shortest walk to the plaza, the walk never shrinks`, async () => {
+      const { hopsFrom } = await import('../../src/world/layout');
+      const layout = buildLayout(11, PLOTS, mapId);
+      const hops = hopsFrom(layout.graph, layout.graph.wander[layout.graph.wander.length - 1]);
+      const walk = layout.plots.map((p) => hops[layout.graph.homes[p.index]]);
+      expect(layout.plots.map((p) => p.index)).toEqual(layout.plots.map((_, i) => i));
+      for (let i = 1; i < walk.length; i++) expect(walk[i]).toBeGreaterThanOrEqual(walk[i - 1]);
+    });
+  }
+});

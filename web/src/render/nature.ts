@@ -139,6 +139,7 @@ function lampGroup(lamps: Lamp[]): THREE.Group {
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
+      opacity: 0.6, // softer light pools (cozy, not glaring)
     }),
     lamps.length,
     (i, m) => m.makeTranslation(lamps[i].x, lamps[i].y + 0.12, lamps[i].z),

@@ -100,22 +100,22 @@ function nearPath(samples: Point2[], x: number, z: number, r: number): boolean {
 function scatterPlots(rng: Rng, nPlots: number, terrain: Terrain, samples: Point2[], plaza: Point2): Plot[] {
   const plots: Array<Omit<Plot, 'h' | 'face' | 'link' | 'gate' | 'door' | 'index'>> = [];
   let tries = 0;
-  while (plots.length < nPlots && tries++ < 12000) {
+  while (plots.length < nPlots && tries++ < 20000) {
     const relax = Math.max(0.25, 1 - tries / 6000); // loosen the rules if the valley fills up
     const s = samples[Math.floor(rng() * samples.length)];
     const ang = rng() * Math.PI * 2;
-    const dd = 6 + rng() * rng() * (14 + (1 - relax) * 8); // mostly close, sometimes far out
+    const dd = 6 + rng() * rng() * (18 + (1 - relax) * 8); // mostly close, sometimes far out
     const x = s.x + Math.cos(ang) * dd;
     const z = s.z + Math.sin(ang) * dd;
     const big = rng() < 0.3;
-    const w = big ? 8.4 : 6.6 + rng() * 1.2;
-    const d = big ? 7.2 : 5.6 + rng() * 1.0;
+    const w = big ? 9.4 : 7.6 + rng() * 1.0; // plots are larger than the house (LOOK §6 keeps the house size)
+    const d = big ? 8.0 : 6.2 + rng() * 0.8;
     const rad = Math.hypot(w, d) / 2;
-    if (Math.hypot(x, z) > VALLEY_RADIUS + (1 - relax) * 6) continue;
+    if (Math.hypot(x, z) > VALLEY_RADIUS + (1 - relax) * 10) continue;
     if (terrain.riverDistance(x, z) < rad + 5) continue;
     if (Math.hypot(x - plaza.x, z - plaza.z) < PLAZA_RADIUS + rad + 4) continue;
     if (nearPath(samples, x, z, rad + 0.6)) continue;
-    const minGap = (2.5 + rng() * 6) * relax; // some neighbours close, some far apart
+    const minGap = (2.5 + rng() * 3.8) * relax; // more space between neighbours, but the valley must still hold 34 plots
     if (plots.some((p) => Math.hypot(p.x - x, p.z - z) < p.rad + rad + minGap)) continue;
     plots.push({ x, z, w, d, rad, big });
   }
@@ -271,6 +271,23 @@ function buildGraph(plots: Plot[], map: MapDef, laneCurves: THREE.CatmullRomCurv
   return { nodes, adj, homes, benches, fountains, board, wander };
 }
 
+/** Steps (edges) from `from` to every node; Infinity if unreachable. */
+export function hopsFrom(graph: WalkGraph, from: number): number[] {
+  const hops = new Array<number>(graph.nodes.length).fill(Infinity);
+  hops[from] = 0;
+  const queue = [from];
+  for (let head = 0; head < queue.length; head++) {
+    const u = queue[head];
+    for (const v of graph.adj[u]) {
+      if (hops[v] === Infinity) {
+        hops[v] = hops[u] + 1;
+        queue.push(v);
+      }
+    }
+  }
+  return hops;
+}
+
 /** Breadth-first search: all nodes reachable from `from`. */
 export function reachableFrom(graph: WalkGraph, from: number): Set<number> {
   const seen = new Set<number>([from]);
@@ -308,13 +325,28 @@ export function buildLayout(layoutSeed: number, plotCount: number, mapId = 'tal'
   const bridges = findBridges(terrain, laneCurves);
   const graph = buildGraph(plots, { ...map, plaza }, laneCurves);
 
+  // numbers from the inside out (SPEC §10.5): index 0 is the plot with the shortest walk to the plaza
+  const hops = hopsFrom(graph, graph.wander[graph.wander.length - 1]);
+  const order = plots
+    .map((_, i) => i)
+    .sort((a, b) => {
+      const byWalk = hops[graph.homes[a]] - hops[graph.homes[b]];
+      if (byWalk !== 0) return byWalk;
+      return (
+        Math.hypot(plots[a].x - plaza.x, plots[a].z - plaza.z) -
+        Math.hypot(plots[b].x - plaza.x, plots[b].z - plaza.z)
+      );
+    });
+  const numbered = order.map((oldIndex, newIndex) => ({ ...plots[oldIndex], index: newIndex }));
+  graph.homes = order.map((i) => graph.homes[i]);
+
   return {
     seed: layoutSeed,
     plotCount,
     map,
     plaza,
     plazaHeight,
-    plots,
+    plots: numbered,
     bridges,
     terrain,
     graph,
