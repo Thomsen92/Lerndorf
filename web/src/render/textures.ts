@@ -79,3 +79,23 @@ export const pavingTexture = (): THREE.CanvasTexture =>
       cx.fillRect(rnd() * 256, rnd() * 256, 3, 3);
     }
   });
+
+/** Dirt path: packed earth with darker speckles and a few pebbles, for the lanes and garden paths. */
+export const dirtTexture = (): THREE.CanvasTexture =>
+  canvasTexture(256, (cx, rnd) => {
+    cx.fillStyle = '#d6d0c4';
+    cx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 900; i++) {
+      cx.fillStyle = rnd() < 0.6 ? 'rgba(90,70,40,0.18)' : 'rgba(255,255,255,0.20)';
+      const r = 0.6 + rnd() * 1.8;
+      cx.beginPath();
+      cx.arc(rnd() * 256, rnd() * 256, r, 0, Math.PI * 2);
+      cx.fill();
+    }
+    for (let i = 0; i < 26; i++) {
+      cx.fillStyle = 'rgba(120,110,100,0.35)';
+      cx.beginPath();
+      cx.ellipse(rnd() * 256, rnd() * 256, 2 + rnd() * 2, 1.5 + rnd(), rnd() * Math.PI, 0, Math.PI * 2);
+      cx.fill();
+    }
+  });

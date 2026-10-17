@@ -9,7 +9,9 @@ import type { Point2 } from '../world/geometry';
 import { laneDistance } from '../world/scatter';
 import { buildNature } from './nature';
 import { buildPlaza } from './plaza';
-import { grassTexture } from './textures';
+import { dirtTexture, grassTexture } from './textures';
+import { chimney, fenceGeometry, gableRoof, gardenPathGeometry } from './house';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const MAT = {
   ground: new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.9 }),
@@ -77,7 +79,8 @@ function terrainMesh(layout: Layout): THREE.Mesh {
   const low = new THREE.Color('#4e7a45');
   const high = new THREE.Color('#7aa35c');
   const bank = new THREE.Color('#a99b72');
-  const pathCol = new THREE.Color('#c9b48c');
+  // darker, earthier path colour; paths are narrower than before (cozy citybuilder look)
+  const pathCol = new THREE.Color('#a8926c');
   const tmp = new THREE.Color();
   const t = layout.terrain;
   for (let i = 0; i < pos.count; i++) {
@@ -89,7 +92,7 @@ function terrainMesh(layout: Layout): THREE.Mesh {
     const rd = t.riverDistance(x, z);
     tmp.lerp(bank, Math.min(1, Math.max(0, (6.5 - rd) / 2.5)) * 0.85);
     // paths painted into the ground: soft edge, no floating strip (review befund 4)
-    const onPath = Math.min(1, Math.max(0, (2.4 - laneDistance(layout, x, z)) / 1.2));
+    const onPath = Math.min(1, Math.max(0, (1.7 - laneDistance(layout, x, z)) / 0.8));
     tmp.lerp(pathCol, onPath);
     col[i * 3] = tmp.r;
     col[i * 3 + 1] = tmp.g;
@@ -205,30 +208,16 @@ function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): TH
     win.position.set(wx, bh * 0.55, front);
     house.add(win);
   }
-  const roofMat = new THREE.MeshStandardMaterial({
-    color: ROOF_COLORS[p.index % ROOF_COLORS.length],
-    flatShading: true,
-    roughness: 0.8,
-  });
-  const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(bw, bd) * 0.75, 1.6, 4), roofMat);
-  roof.position.y = bh + 0.8;
-  roof.rotation.y = Math.PI / 4;
-  roof.castShadow = true;
+  const roof = gableRoof(bw, bd, 1.3 + ((p.index * 13) % 5) * 0.1, ROOF_COLORS[p.index % ROOF_COLORS.length]);
+  roof.position.y = bh;
   house.add(roof);
+  house.add(chimney(bw, bh, 1.3));
   g.add(house);
 
-  // fence along the front and sides, gate at the front
-  const fenceH = 0.7;
-  const addFence = (x: number, z: number, w: number, d: number) => {
-    const f = new THREE.Mesh(new THREE.BoxGeometry(w, fenceH, d), MAT.wood);
-    f.position.set(x, fenceH / 2, z);
-    g.add(f);
-  };
-  addFence(0, -p.d / 2, p.w, 0.12);
-  addFence(-p.w / 2, 0, 0.12, p.d);
-  addFence(p.w / 2, 0, 0.12, p.d);
-  addFence(-p.w / 4 - 0.6, p.d / 2, p.w / 2 - 1.2, 0.12);
-  addFence(p.w / 4 + 0.6, p.d / 2, p.w / 2 - 1.2, 0.12);
+  // post-and-rail fence with a 1.6 m gate in front, merged into one mesh (LOOK §6)
+  const fence = new THREE.Mesh(fenceGeometry(p.w, p.d), MAT.wood);
+  fence.castShadow = true;
+  g.add(fence);
 
   return g;
 }
@@ -247,7 +236,27 @@ export function buildVillage(
   root.add(terrainMesh(layout));
   root.add(riverMesh(layout.terrain.river));
 
-  // paths are painted into the terrain (see terrainMesh), so they need no floating strips
+  // lanes: a thin dirt strip on the ground (1.6 m), textured, lifted 5 cm; the colour in the
+  // terrain (see terrainMesh) underneath matches, so the edge is soft
+  const dirt = new THREE.MeshStandardMaterial({
+    map: dirtTexture(),
+    color: '#b8a07a',
+    roughness: 0.95,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -4,
+  });
+  for (const pts of layout.map.lanes) {
+    const curve = new THREE.CatmullRomCurve3(
+      pts.map((p) => new THREE.Vector3(p.x, 0, p.z)),
+      false,
+      'centripetal',
+    );
+    const samples = curve
+      .getSpacedPoints(Math.ceil(curve.getLength() / 0.7))
+      .map((v) => ({ x: v.x, z: v.z }));
+    root.add(ribbon(samples, 1.6, (x, z) => layout.terrain.groundHeight(x, z) + 0.05, dirt));
+  }
 
   // plaza: paving, fountain, quest board, stalls, benches (render/plaza.ts)
   root.add(buildPlaza(layout));
@@ -264,6 +273,13 @@ export function buildVillage(
   for (const p of layout.plots) {
     root.add(plotGroup(p, byPlot.get(p.index), p.index === ownPlotIndex));
   }
+  // garden paths from each gate to its lane: one merged mesh for the whole village
+  const gardens = layout.plots.map((p) =>
+    gardenPathGeometry(p.gate, p.link, 1.0, (x, z) => layout.terrain.groundHeight(x, z)),
+  );
+  const gardenMesh = new THREE.Mesh(mergeGeometries(gardens), dirt);
+  gardenMesh.receiveShadow = true;
+  root.add(gardenMesh);
   root.add(buildNature(layout));
   return root;
 }
