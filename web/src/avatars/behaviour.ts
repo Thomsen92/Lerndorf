@@ -38,7 +38,9 @@ export function nextAction(rng: Rng, graph: WalkGraph, from: number, plazaFull =
   } else if (roll < 0.9) {
     goal = plazaFull ? pick(rng, graph.wander, from) : graph.board;
   } else {
-    goal = pick(rng, graph.homes, -1);
+    // the last tenth: half of the time a house, half a landmark, so the walks reach the whole valley
+    const landmark = graph.landmarks.length > 0 && rng() < 0.5;
+    goal = landmark ? pick(rng, graph.landmarks, -1) : pick(rng, graph.homes, -1);
   }
 
   const path = shortestPath(graph, from, goal);

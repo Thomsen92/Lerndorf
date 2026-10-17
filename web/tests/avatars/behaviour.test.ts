@@ -44,6 +44,16 @@ describe('nextAction', () => {
     expect(PLAZA_SHARE_MAX).toBe(0.4);
   });
 
+  it('sometimes sends villagers to a landmark', () => {
+    const rng = createRng(21);
+    const reached = new Set<number>();
+    for (let i = 0; i < 2000; i++) {
+      const a = nextAction(rng, graph, graph.wander[0]);
+      if (a.kind === 'walk') reached.add(a.path[a.path.length - 1]);
+    }
+    expect(graph.landmarks.some((n) => reached.has(n))).toBe(true);
+  });
+
   it('is deterministic for the same random sequence', () => {
     const a = nextAction(createRng(9), graph, graph.wander[0]);
     const b = nextAction(createRng(9), graph, graph.wander[0]);
