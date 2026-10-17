@@ -4,7 +4,13 @@ import { PGlite } from '@electric-sql/pglite';
 import { readFileSync } from 'node:fs';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
-const MIGRATIONS = ['0001_schema.sql', '0002_rls.sql', '0003_seed.sql', '0004_rpc_teacher.sql'];
+const MIGRATIONS = [
+  '0001_schema.sql',
+  '0002_rls.sql',
+  '0003_seed.sql',
+  '0004_rpc_teacher.sql',
+  '0005_grants_hardening.sql',
+];
 const migrationDir = new URL('../../../supabase/migrations/', import.meta.url);
 
 const TEACHER = '00000000-0000-0000-0000-000000000001';

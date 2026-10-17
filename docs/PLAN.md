@@ -141,3 +141,7 @@ Ziel: Schüler kaufen Deko und gestalten ihr Grundstück; Mitschüler sehen es.
 | 17.10.2026 | 1.12 geschrieben | `docs/ANLEITUNG_LEHRKRAFT.md`: Einrichtung und Alltag. Nicht mit der Lehrkraft durchgegangen |
 | 17.10.2026 | 1.3 Smoke-Test | Playwright: zwei Smoke-Tests (beide Seiten laden ohne Laufzeitfehler) grün |
 | 17.10.2026 | Offen | Vite warnt wegen Chunk-Größe (Three.js, ~500 kB). Später aufteilen. Migrationen und Funktion noch nicht auf dem Supabase-Projekt angewendet |
+| 17.10.2026 | Datenbank angewendet | Projekt `ygopamapzhlwrpjzjunq` (eu-west-1): Migrationen 0001 bis 0005 angewendet (Schema, RLS, Seed 8a/8b, Lehrer-RPCs, Rechte-Korrektur). RLS auf allen Tabellen aktiv, `task_solutions` ohne Policy (gewollt) |
+| 17.10.2026 | Edge Function deployed | `admin-accounts` aktiv; ohne Anmeldung 401 |
+| 17.10.2026 | Sicherheitsberater | Verbleibende Hinweise sind gewollt: Policy-Helper (`current_class`, `is_teacher`) sind für anon und angemeldete Nutzer ausführbar, weil RLS sie braucht; die Teacher-RPCs prüfen die Rolle selbst |
+| 17.10.2026 | Offen (Lehrkraft) | Öffentliche Registrierung in Supabase abschalten; Lehrkonto anlegen und Profil-Zeile setzen (Anleitung Teil 1) |
