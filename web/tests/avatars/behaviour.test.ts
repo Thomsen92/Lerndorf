@@ -1,7 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { buildLayout } from '../../src/world/layout';
 import { createRng } from '../../src/world/rng';
-import { arrivalAction, greetingFor, GREETINGS, nextAction, Walker } from '../../src/avatars/behaviour';
+import {
+  arrivalAction,
+  greetingFor,
+  GREETINGS,
+  nextAction,
+  PLAZA_SHARE_MAX,
+  Walker,
+} from '../../src/avatars/behaviour';
 
 describe('nextAction', () => {
   const layout = buildLayout(11, 24);
@@ -21,6 +28,20 @@ describe('nextAction', () => {
         expect(a.kind).toBe('idle');
       }
     }
+  });
+
+  it('a full plaza sends nobody to the fountain or the board', () => {
+    const rng = createRng(3);
+    const start = graph.wander[0];
+    for (let i = 0; i < 300; i++) {
+      const a = nextAction(rng, graph, start, true);
+      if (a.kind === 'walk') {
+        const end = a.path[a.path.length - 1];
+        expect(graph.nodes[end].tag).not.toBe('fountain');
+        expect(graph.nodes[end].tag).not.toBe('board');
+      }
+    }
+    expect(PLAZA_SHARE_MAX).toBe(0.4);
   });
 
   it('is deterministic for the same random sequence', () => {

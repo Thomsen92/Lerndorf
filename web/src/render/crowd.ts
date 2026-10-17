@@ -8,7 +8,14 @@ import { bakeStatic } from './merge';
 import { createRng, type Rng } from '../world/rng';
 import type { Layout } from '../world/layout';
 import { walkHeight } from '../world/walk';
-import { arrivalAction, greetingFor, nextAction, Walker, type Action } from '../avatars/behaviour';
+import {
+  arrivalAction,
+  greetingFor,
+  nextAction,
+  PLAZA_SHARE_MAX,
+  Walker,
+  type Action,
+} from '../avatars/behaviour';
 
 const WALK_SPEED = 2.2; // world units per second
 const GREET_RANGE = 3.2;
@@ -240,8 +247,19 @@ export class Crowd {
     return path.length ? path[path.length - 1] : v.node;
   }
 
+  /** Share of villagers standing on the plaza (fountain, board or plaza ring). */
+  private plazaShare(): number {
+    if (this.villagers.length === 0) return 0;
+    const onPlaza = this.villagers.filter((v) => {
+      const tag = this.layout.graph.nodes[v.node].tag;
+      return tag === 'fountain' || tag === 'board' || tag === 'plaza';
+    }).length;
+    return onPlaza / this.villagers.length;
+  }
+
   private startNext(v: Villager): void {
-    const action = nextAction(v.rng, this.layout.graph, v.node);
+    const full = this.plazaShare() >= PLAZA_SHARE_MAX;
+    const action = nextAction(v.rng, this.layout.graph, v.node, full);
     v.action = action;
     if (action.kind === 'walk') {
       v.walkPath = action.path;

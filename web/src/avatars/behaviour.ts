@@ -15,11 +15,15 @@ export type Action =
 /** Fixed English greetings (SPEC §11: only these words, nothing typed by pupils). */
 export const GREETINGS = ['Hi!', 'Hello!', 'Hey!', 'Good morning!', 'How are you?'] as const;
 
+/** At most this share of the villagers may stand on the plaza at the same time (SPEC §11). */
+export const PLAZA_SHARE_MAX = 0.4;
+
 /**
  * Chooses the next action for a villager standing on node `from`.
  * Weights: wander 50 %, bench 20 %, fountain 10 %, board 10 %, another home 10 %.
+ * When `plazaFull` is true, the fountain and board goals become wandering goals instead.
  */
-export function nextAction(rng: Rng, graph: WalkGraph, from: number): Action {
+export function nextAction(rng: Rng, graph: WalkGraph, from: number, plazaFull = false): Action {
   const roll = rng();
   let goal: number;
   if (roll < 0.5) {
@@ -30,9 +34,9 @@ export function nextAction(rng: Rng, graph: WalkGraph, from: number): Action {
     if (path.length > 0) return { kind: 'walk', path: path.concat() };
     goal = from;
   } else if (roll < 0.8) {
-    goal = pick(rng, graph.fountains, -1);
+    goal = plazaFull ? pick(rng, graph.wander, from) : pick(rng, graph.fountains, -1);
   } else if (roll < 0.9) {
-    goal = graph.board;
+    goal = plazaFull ? pick(rng, graph.wander, from) : graph.board;
   } else {
     goal = pick(rng, graph.homes, -1);
   }
