@@ -97,6 +97,7 @@ function buildFigure(nickname: string, own: boolean): THREE.Group {
   sign.position.y = 2.0;
   sign.renderOrder = 10;
   g.add(sign);
+  g.userData.sign = sign; // hidden when the camera is far away (SPEC §10.9)
 
   if (own) {
     // marker: a small arrow over the own figure
@@ -186,6 +187,17 @@ export class Crowd {
 
   wave(v: Villager): void {
     v.waveTimer = 2;
+  }
+
+  /** Figure names only within about 28 m of the camera. */
+  updateLabels(cam: THREE.Camera): void {
+    const p = new THREE.Vector3();
+    for (const v of this.villagers) {
+      const sign = v.group.userData.sign as THREE.Sprite | undefined;
+      if (!sign) continue;
+      v.group.getWorldPosition(p);
+      sign.visible = p.distanceTo(cam.position) < 28;
+    }
   }
 
   update(dt: number): void {

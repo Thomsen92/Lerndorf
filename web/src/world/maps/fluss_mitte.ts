@@ -57,6 +57,18 @@ export const FLUSS_MITTE: MapDef = {
       { x: -26, z: 4 },
       { x: -34, z: 22 },
     ],
+    // connector: no dead end
+    [
+      { x: -58, z: -18 },
+      { x: -54, z: -24 },
+      { x: -52, z: -30 },
+    ],
+    // connector: no dead end
+    [
+      { x: 56, z: -18 },
+      { x: 44, z: -12 },
+      { x: 38, z: -14 },
+    ],
   ],
   boardAngle: 4.7,
   benchAngles: [0.8, 2.4, 3.9, 5.5],

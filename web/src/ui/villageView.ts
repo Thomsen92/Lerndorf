@@ -340,6 +340,8 @@ export async function mountVillage(
     }
     crowd.update(dt);
     (village.userData.animate as ((t: number) => void) | undefined)?.(performance.now() / 1000);
+    (village.userData.labelUpdate as ((c: THREE.Camera) => void) | undefined)?.(camera);
+    crowd.updateLabels(camera);
     controls.update();
     gl.render(scene, camera);
   });

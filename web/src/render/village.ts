@@ -208,6 +208,7 @@ function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): TH
   if (member) {
     const tag = nameTag(member.nickname, own);
     tag.position.set(0, 4.6, -p.d / 2 + 1.5);
+    tag.userData = { house: true, own };
     g.add(tag);
   }
   if (own) {
@@ -325,6 +326,18 @@ export function buildVillage(
   root.add(buildVegetation(layout));
   root.add(buildLandmarks(layout));
   // animation hook: the village calls it every frame (water waves, fountain)
+  // name labels: own house always, others only when the camera is near (SPEC §10.9)
+  const houseTags: THREE.Sprite[] = [];
+  root.traverse((o) => {
+    if (o instanceof THREE.Sprite && o.userData.house) houseTags.push(o);
+  });
+  root.userData.labelUpdate = (cam: THREE.Camera): void => {
+    const near = new THREE.Vector3();
+    for (const tag of houseTags) {
+      tag.getWorldPosition(near);
+      tag.visible = Boolean(tag.userData.own) || near.distanceTo(cam.position) < 28;
+    }
+  };
   root.userData.animate = (t: number): void => {
     const wave = river.userData.waterMap as THREE.Texture;
     wave.offset.set(t * 0.012, t * 0.005);

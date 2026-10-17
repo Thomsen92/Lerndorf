@@ -56,6 +56,24 @@ export const BACH_NORDEN: MapDef = {
       { x: 28, z: -8 },
       { x: 40, z: -16 },
     ],
+    // connector: no dead end
+    [
+      { x: 60, z: 8 },
+      { x: 52, z: 14 },
+      { x: 46, z: 16 },
+    ],
+    // connector: no dead end
+    [
+      { x: 40, z: -16 },
+      { x: 24, z: -30 },
+      { x: 8, z: -34 },
+    ],
+    // connector: no dead end
+    [
+      { x: -56, z: 8 },
+      { x: -48, z: 6 },
+      { x: -42, z: 2 },
+    ],
   ],
   boardAngle: 2.6,
   benchAngles: [0.4, 2.0, 3.6, 5.2],

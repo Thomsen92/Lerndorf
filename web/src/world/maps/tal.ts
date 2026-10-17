@@ -75,6 +75,24 @@ export const TAL: MapDef = {
       { x: -12, z: -36 },
       { x: 2, z: -40 },
     ],
+    // connector: no dead end
+    [
+      { x: -42, z: -42 },
+      { x: -24, z: -44 },
+      { x: 2, z: -44 },
+    ],
+    // connector: no dead end
+    [
+      { x: 56, z: 4 },
+      { x: 54, z: 16 },
+      { x: 46, z: 28 },
+    ],
+    // connector: no dead end
+    [
+      { x: -58, z: 12 },
+      { x: -50, z: 26 },
+      { x: -36, z: 34 },
+    ],
   ],
   boardAngle: 1.1,
   benchAngles: [0.2, 2.1, 3.65, 5.0],
