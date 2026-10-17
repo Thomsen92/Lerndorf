@@ -342,6 +342,7 @@ export function buildLayout(layoutSeed: number, plotCount: number, mapId = 'tal'
     c.getSpacedPoints(Math.ceil(c.getLength() / 1.2)).forEach((v) => laneSamples.push({ x: v.x, z: v.z }));
   }
 
+  terrain.setPaths(laneSamples);
   const plots = scatterPlots(rng, plotCount, terrain, laneSamples, plaza);
   for (const p of plots) orientPlot(p, rng, laneSamples);
   const bridges = findBridges(terrain, laneCurves);

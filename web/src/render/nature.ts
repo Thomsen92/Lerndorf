@@ -24,7 +24,8 @@ const TRUNK = '#6b4a2f';
 const CROWNS = ['#2f7d5b', '#5fa04c', '#c9a23e', '#3f8f8a', '#8aa84a', '#d4893a', '#4d9a5d', '#b9b24a'];
 // pines stay dark and cool
 const PINES = ['#2c6e57', '#2f6e5a', '#3a7f66', '#2a5f6b'];
-const BLOSSOM = '#d98cc5';
+// cherry blossom: white to pink, some in orchard patches and some single trees (LOOK §8)
+const BLOSSOMS = ['#f4a6c8', '#f7c6d9', '#ef8fb5', '#fbd9e6', '#ffffff'];
 
 /** Soft radial gradient for the light pools on the ground (LOOK §7). */
 function poolTexture(): THREE.CanvasTexture {
@@ -82,9 +83,11 @@ function treeGroup(trees: Tree[], kind: Tree['kind']): THREE.Group {
   const palette = kind === 'pine' ? PINES : CROWNS;
   const colour = (i: number): THREE.Color => {
     const t = list[i];
-    // a fixed colour per tree; about one in nine is a rare pink blossom tree (LOOK §8)
+    // a fixed colour per tree; round trees in the orchard patches and some single ones bloom
     const h = Math.abs(Math.floor(t.x * 7 + t.z * 3));
-    return new THREE.Color(h % 9 === 0 ? BLOSSOM : palette[h % palette.length]);
+    const orchard = Math.sin(t.x * 0.045 + 1.3) * Math.cos(t.z * 0.05 - 0.7) > 0.4;
+    const bloom = kind === 'round' && (orchard || h % 13 === 0);
+    return new THREE.Color(bloom ? BLOSSOMS[h % BLOSSOMS.length] : palette[h % palette.length]);
   };
   if (kind === 'pine') {
     const crown = new THREE.ConeGeometry(1.2, 1.8, 7);
