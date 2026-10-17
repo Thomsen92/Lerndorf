@@ -210,7 +210,8 @@ export async function mountVillage(
   const labels = members
     .filter((m) => m.plotIndex !== null)
     .map((m) => ({ plotIndex: m.plotIndex as number, nickname: m.nickname }));
-  scene.add(buildVillage(layout, labels, ownPlot));
+  const village = buildVillage(layout, labels, ownPlot);
+  scene.add(village);
   // decorations of the whole class (PLAN 4.5), one instanced mesh per item type
   const plotOf = new Map(
     members.filter((m) => m.plotIndex !== null).map((m) => [m.id, m.plotIndex as number]),
@@ -338,6 +339,7 @@ export async function mountVillage(
       }
     }
     crowd.update(dt);
+    (village.userData.animate as ((t: number) => void) | undefined)?.(performance.now() / 1000);
     controls.update();
     gl.render(scene, camera);
   });

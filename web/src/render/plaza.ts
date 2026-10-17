@@ -179,6 +179,36 @@ export function buildPlaza(layout: Layout): THREE.Group {
   const f = fountain(layout);
   f.position.set(layout.plaza.x, 0, layout.plaza.z);
   root.add(f);
+  // water jet and droplets (animated each frame, see userData.animate)
+  const jetMat = new THREE.MeshStandardMaterial({
+    color: '#8fd3f0',
+    emissive: '#2a6f9a',
+    emissiveIntensity: 0.6,
+    roughness: 0.1,
+  });
+  const jet = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.12, 1, 6), jetMat);
+  jet.position.set(layout.plaza.x, layout.plazaHeight + 2.1, layout.plaza.z);
+  root.add(jet);
+  const DROPS = 14;
+  const dropMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.07, 5, 4), jetMat, DROPS);
+  dropMesh.frustumCulled = false;
+  root.add(dropMesh);
+  const m = new THREE.Matrix4();
+  root.userData.animate = (t: number): void => {
+    // the jet pulses in height; the droplets rise, arc outwards and fall into the basin
+    const pulse = 0.85 + 0.15 * Math.sin(t * 4);
+    jet.scale.set(1, 0.9 * pulse, 1);
+    jet.position.y = layout.plazaHeight + 2.1 + 0.25 * pulse;
+    for (let i = 0; i < DROPS; i++) {
+      const phase = (t * 0.7 + i / DROPS) % 1;
+      const a = (i / DROPS) * Math.PI * 2;
+      const r = phase * 0.9;
+      const h = layout.plazaHeight + 2.3 + Math.sin(phase * Math.PI) * 0.9 - phase * 0.4;
+      m.makeTranslation(layout.plaza.x + Math.cos(a) * r, h, layout.plaza.z + Math.sin(a) * r);
+      dropMesh.setMatrixAt(i, m);
+    }
+    dropMesh.instanceMatrix.needsUpdate = true;
+  };
 
   const b = board(layout);
   b.position.set(layout.board.x, 0, layout.board.z);

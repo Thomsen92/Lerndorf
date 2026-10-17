@@ -108,7 +108,10 @@ function setView(name: string): void {
 /** Lets the residents walk for `seconds` so the picture shows a living village. */
 function step(seconds: number): void {
   const dt = 0.1;
-  for (let t = 0; t < seconds; t += dt) crowd.update(dt);
+  for (let t = 0; t < seconds; t += dt) {
+    crowd.update(dt);
+    (village.userData.animate as ((t: number) => void) | undefined)?.(t);
+  }
 }
 
 /** Draw calls: whole picture, and the world without the residents. */

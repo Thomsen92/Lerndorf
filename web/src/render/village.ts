@@ -11,7 +11,7 @@ import { buildNature, buildVegetation } from './nature';
 import { buildPlaza } from './plaza';
 import { buildBridge } from './bridges';
 import { bakeStatic } from './merge';
-import { dirtTexture, grassTexture, skyTexture } from './textures';
+import { dirtTexture, grassTexture, skyTexture, waterTexture } from './textures';
 import { chimney, fenceGeometry, gableRoof, gardenPathGeometry } from './house';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -117,13 +117,15 @@ function terrainMesh(layout: Layout): THREE.Mesh {
 
 function riverMesh(river: Point2[]): THREE.Mesh {
   // width changes between 5.6 and 8.8 m along the course (LOOK §4)
-  return ribbon(
+  const wave = waterTexture();
+  const mesh = ribbon(
     river,
     (i) => 7.2 + 1.6 * Math.sin(i * 0.09),
     () => -0.55,
     // water reflects the evening sky (cheap environment map, no second render pass)
     new THREE.MeshStandardMaterial({
       color: '#5fb3d9',
+      map: wave,
       roughness: 0.12,
       metalness: 0.45,
       envMap: skyTexture(),
@@ -131,6 +133,8 @@ function riverMesh(river: Point2[]): THREE.Mesh {
       side: THREE.DoubleSide,
     }),
   );
+  mesh.userData = { waterMap: wave };
+  return mesh;
 }
 
 export interface VillageMember {
@@ -275,7 +279,8 @@ export function buildVillage(
   const root = new THREE.Group();
   const byPlot = new Map(members.map((m) => [m.plotIndex, m]));
   root.add(terrainMesh(layout));
-  root.add(riverMesh(layout.terrain.river));
+  const river = riverMesh(layout.terrain.river);
+  root.add(river);
 
   // lanes: a thin dirt strip on the ground (1.6 m), textured, lifted 5 cm; the colour in the
   // terrain (see terrainMesh) underneath matches, so the edge is soft
@@ -300,7 +305,8 @@ export function buildVillage(
   }
 
   // plaza: paving, fountain, quest board, stalls, benches (render/plaza.ts)
-  root.add(buildPlaza(layout));
+  const plaza = buildPlaza(layout);
+  root.add(plaza);
 
   for (const b of layout.bridges) root.add(buildBridge(b, MAT.wood));
 
@@ -316,5 +322,11 @@ export function buildVillage(
   root.add(gardenMesh);
   root.add(buildNature(layout));
   root.add(buildVegetation(layout));
+  // animation hook: the village calls it every frame (water waves, fountain)
+  root.userData.animate = (t: number): void => {
+    const wave = river.userData.waterMap as THREE.Texture;
+    wave.offset.set(t * 0.012, t * 0.005);
+    (plaza.userData.animate as ((t: number) => void) | undefined)?.(t);
+  };
   return bakeStatic(root);
 }

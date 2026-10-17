@@ -114,6 +114,7 @@ function treeGroup(trees: Tree[], kind: Tree['kind']): THREE.Group {
       ),
     );
   }
+  g.children.forEach((c) => (c.castShadow = true)); // trees cast shadows (LOOK §3)
   return g;
 }
 

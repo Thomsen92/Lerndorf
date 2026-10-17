@@ -120,3 +120,25 @@ export const skyTexture = (): THREE.CanvasTexture => {
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 };
+
+/** Water: soft wave bands, tiled and scrolled over the river so it looks like it moves. */
+export const waterTexture = (): THREE.CanvasTexture => {
+  const tex = canvasTexture(256, (cx, rnd) => {
+    cx.fillStyle = '#c9dfe8';
+    cx.fillRect(0, 0, 256, 256);
+    for (let i = 0; i < 26; i++) {
+      const y = rnd() * 256;
+      cx.strokeStyle = rnd() < 0.5 ? 'rgba(255,255,255,0.35)' : 'rgba(30,70,100,0.18)';
+      cx.lineWidth = 2 + rnd() * 3;
+      cx.beginPath();
+      for (let x = 0; x <= 256; x += 8) {
+        const yy = y + Math.sin((x / 256) * Math.PI * 4 + i) * 4;
+        if (x === 0) cx.moveTo(x, yy);
+        else cx.lineTo(x, yy);
+      }
+      cx.stroke();
+    }
+  });
+  tex.repeat.set(6, 3);
+  return tex;
+};
