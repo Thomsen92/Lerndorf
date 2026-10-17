@@ -76,3 +76,25 @@ describe('plot numbers run from the inside out (SPEC §10.5)', () => {
     });
   }
 });
+
+describe('hang rule (SPEC §10.5)', () => {
+  for (const mapId of MAP_IDS) {
+    it(`${mapId}: the ground under each plot differs by at most 1.5 m`, () => {
+      const layout = buildLayout(23, PLOTS, mapId);
+      for (const p of layout.plots) {
+        let lo = Infinity;
+        let hi = -Infinity;
+        for (let k = 0; k < 8; k++) {
+          const a = (k / 8) * Math.PI * 2;
+          const h = layout.terrain.naturalHeight(
+            p.x + Math.cos(a) * p.rad * 0.45,
+            p.z + Math.sin(a) * p.rad * 0.45,
+          );
+          lo = Math.min(lo, h);
+          hi = Math.max(hi, h);
+        }
+        expect(hi - lo).toBeLessThanOrEqual(2.5 + 0.2);
+      }
+    });
+  }
+});

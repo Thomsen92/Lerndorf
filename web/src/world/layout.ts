@@ -115,6 +115,18 @@ function scatterPlots(rng: Rng, nPlots: number, terrain: Terrain, samples: Point
     if (terrain.riverDistance(x, z) < rad + 5) continue;
     if (Math.hypot(x - plaza.x, z - plaza.z) < PLAZA_RADIUS + rad + 4) continue;
     if (nearPath(samples, x, z, rad + 0.6)) continue;
+    // hang rule (SPEC §10.5): the ground under a plot may differ by at most 1.5 m
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (let k = 0; k < 8; k++) {
+      const a = (k / 8) * Math.PI * 2;
+      const h = terrain.naturalHeight(x + Math.cos(a) * rad * 0.45, z + Math.sin(a) * rad * 0.45);
+      lo = Math.min(lo, h);
+      hi = Math.max(hi, h);
+    }
+    // after 8000 tries the rule is relaxed to 2.5 m, so that all 34 plots still fit (see PLAN L.5)
+    const maxRange = tries < 8000 ? 1.5 : 2.5;
+    if (hi - lo > maxRange) continue;
     const minGap = (2.5 + rng() * 3.8) * relax; // more space between neighbours, but the valley must still hold 34 plots
     if (plots.some((p) => Math.hypot(p.x - x, p.z - z) < p.rad + rad + minGap)) continue;
     plots.push({ x, z, w, d, rad, big });

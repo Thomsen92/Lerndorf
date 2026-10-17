@@ -154,7 +154,38 @@ function nameTag(text: string, own: boolean): THREE.Sprite {
   return sprite;
 }
 
+/**
+ * A free plot (SPEC §10.5): lawn with four wooden stakes and a small sign "frei". No house and no
+ * fence, so an empty plot does not look like a ghost house.
+ */
+function freeLot(p: Plot): THREE.Group {
+  const g = new THREE.Group();
+  g.position.set(p.x, p.h, p.z);
+  g.rotation.y = p.face;
+  const lawn = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.1, p.d), MAT.grass);
+  lawn.position.y = 0.02;
+  lawn.receiveShadow = true;
+  g.add(lawn);
+  for (const [sx, sz] of [
+    [-1, -1],
+    [1, -1],
+    [-1, 1],
+    [1, 1],
+  ]) {
+    const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.6, 6), MAT.wood);
+    stake.position.set((sx * p.w) / 2 - sx * 0.2, 0.3, (sz * p.d) / 2 - sz * 0.2);
+    stake.castShadow = true;
+    g.add(stake);
+  }
+  const sign = nameTag('frei', false);
+  sign.scale.set(1.4, 0.36, 1);
+  sign.position.set(0, 1.4, -p.d / 2 + 0.6);
+  g.add(sign);
+  return g;
+}
+
 function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): THREE.Group {
+  if (!member) return freeLot(p);
   const g = new THREE.Group();
   g.position.set(p.x, p.h, p.z);
   g.rotation.y = p.face;
