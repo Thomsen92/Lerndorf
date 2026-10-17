@@ -19,6 +19,8 @@ import { buildLayout } from '../world/layout';
 import { PLAZA } from '../world/constants';
 import { buildVillage } from '../render/village';
 import { Crowd } from '../render/crowd';
+import { openShop } from './shopView';
+import { openTaskBoard } from './taskBoardView';
 import {
   AUTO_MEASURE_SECONDS,
   decideAuto,
@@ -35,6 +37,7 @@ export interface VillageHandle {
 interface Loaded {
   profile: MyProfile;
   layoutSeed: number;
+  shopOpen: boolean;
   members: Member[];
 }
 
@@ -42,7 +45,7 @@ async function load(supabase: SupabaseClient): Promise<Loaded> {
   const profile = await loadMyProfile(supabase);
   const cls = await loadClass(supabase, profile.classId);
   const members = await loadMembers(supabase);
-  return { profile, layoutSeed: cls.layoutSeed, members };
+  return { profile, layoutSeed: cls.layoutSeed, shopOpen: cls.shopOpen, members };
 }
 
 /** Shows the village. Calls `onLogout` after a manual or automatic logout. */
@@ -60,6 +63,8 @@ export async function mountVillage(
         <button type="button" data-q="high" aria-pressed="false">Hoch</button>
         <button type="button" data-q="low" aria-pressed="false">Niedrig</button>
       </div>
+      <button type="button" id="taskBoard">Aufgaben</button>
+      <button type="button" id="shop">Shop</button>
       <button type="button" id="toMarket">Marktplatz</button>
       <button type="button" id="toHouse">Mein Haus</button>
       <button type="button" id="logout" class="primary">Abmelden</button>
@@ -76,6 +81,7 @@ export async function mountVillage(
   let choice: QualityChoice = 'auto';
 
   const stop = (): void => {
+    document.querySelectorAll('.overlay').forEach((el) => el.remove());
     autoLogout.stop();
     running = false;
     renderer?.setAnimationLoop(null);
@@ -114,11 +120,33 @@ export async function mountVillage(
     return { dispose: stop };
   }
 
-  const { profile, layoutSeed, members } = loaded;
+  const { profile, layoutSeed, shopOpen, members } = loaded;
   const who = root.querySelector<HTMLSpanElement>('#who');
   const coins = root.querySelector<HTMLSpanElement>('#coins');
   if (who) who.textContent = profile.nickname;
-  if (coins) coins.textContent = `${profile.coins} Münzen`;
+  let coinsNow = profile.coins;
+  const showCoins = (): void => {
+    if (coins) coins.textContent = `${coinsNow} Münzen`;
+  };
+  showCoins();
+
+  // shop and task board open as overlays above the village
+  const onCoins = (c: number): void => {
+    coinsNow = c;
+    showCoins();
+  };
+  root
+    .querySelector<HTMLButtonElement>('#shop')
+    ?.addEventListener(
+      'click',
+      () => void openShop({ supabase, shopOpen, coins: coinsNow, onCoins, onClose: () => undefined }),
+    );
+  root
+    .querySelector<HTMLButtonElement>('#taskBoard')
+    ?.addEventListener(
+      'click',
+      () => void openTaskBoard({ supabase, coins: coinsNow, onCoins, onClose: () => undefined }),
+    );
 
   const stage = document.createElement('div');
   stage.className = 'stage';
