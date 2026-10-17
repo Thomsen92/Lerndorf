@@ -60,8 +60,8 @@ export const BACH_NORDEN: MapDef = {
   boardAngle: 2.6,
   benchAngles: [0.4, 2.0, 3.6, 5.2],
   landmarks: [
-    { kind: 'muehle', x: -44, z: -6 },
-    { kind: 'obstwiese', x: 44, z: 26 },
+    { kind: 'muehle', x: -42, z: 2 },
+    { kind: 'obstwiese', x: 46, z: 16 },
     { kind: 'aussicht', x: -32, z: 42 },
   ],
 };

@@ -11,6 +11,7 @@ import { buildNature, buildVegetation } from './nature';
 import { buildPlaza } from './plaza';
 import { buildBridge } from './bridges';
 import { bakeStatic } from './merge';
+import { buildLandmarks } from './landmarks';
 import { dirtTexture, grassTexture, skyTexture, waterTexture } from './textures';
 import { chimney, fenceGeometry, gableRoof, gardenPathGeometry } from './house';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -322,6 +323,7 @@ export function buildVillage(
   root.add(gardenMesh);
   root.add(buildNature(layout));
   root.add(buildVegetation(layout));
+  root.add(buildLandmarks(layout));
   // animation hook: the village calls it every frame (water waves, fountain)
   root.userData.animate = (t: number): void => {
     const wave = river.userData.waterMap as THREE.Texture;

@@ -37,7 +37,7 @@ export interface Bridge {
   y: number;
 }
 
-export type NodeTag = 'path' | 'plaza' | 'bench' | 'board' | 'fountain' | 'gate' | 'home';
+export type NodeTag = 'path' | 'plaza' | 'bench' | 'board' | 'fountain' | 'gate' | 'home' | 'landmark';
 
 export interface WalkNode extends Point2 {
   tag: NodeTag;
@@ -55,6 +55,8 @@ export interface WalkGraph {
   board: number;
   /** Nodes on the lanes; villagers wander between them. */
   wander: number[];
+  /** Landmarks of the map (SPEC §10.6): walkers visit them. */
+  landmarks: number[];
 }
 
 export interface Layout {
@@ -232,7 +234,7 @@ function buildGraph(plots: Plot[], map: MapDef, laneCurves: THREE.CatmullRomCurv
   laneNodes.forEach((ids) => {
     [ids[0], ids[ids.length - 1]].forEach((e) => {
       const j = nearest(nodes[e], (o, i) => i !== e && o.tag === 'path' && !ids.includes(i));
-      if (j >= 0 && dist(nodes[j], nodes[e]) < 4.5) link(e, j);
+      if (j >= 0 && dist(nodes[j], nodes[e]) < 9) link(e, j); // lane ends join a nearby path (no dead ends)
     });
   });
   const wander = laneNodes.flat();
@@ -280,7 +282,15 @@ function buildGraph(plots: Plot[], map: MapDef, laneCurves: THREE.CatmullRomCurv
     return home;
   });
 
-  return { nodes, adj, homes, benches, fountains, board, wander };
+  // landmarks are destinations at the end of a path (SPEC §10.6)
+  const landmarks = map.landmarks.map((lm) => {
+    const id = add({ x: lm.x, z: lm.z }, 'landmark');
+    const j = nearest(nodes[id], (o, i) => i !== id && o.tag === 'path');
+    if (j >= 0 && dist(nodes[j], nodes[id]) < 14) link(id, j);
+    return id;
+  });
+
+  return { nodes, adj, homes, benches, fountains, board, wander, landmarks };
 }
 
 /** Steps (edges) from `from` to every node; Infinity if unreachable. */
