@@ -4,6 +4,7 @@
  * Placeholder models (boxes and spheres). Real animated figures come in Stufe 2.
  */
 import * as THREE from 'three';
+import { bakeStatic } from './merge';
 import { createRng, type Rng } from '../world/rng';
 import type { Layout } from '../world/layout';
 import { walkHeight } from '../world/walk';
@@ -107,7 +108,7 @@ function buildFigure(nickname: string, own: boolean): THREE.Group {
     arrow.rotation.x = Math.PI;
     g.add(arrow);
   }
-  return g;
+  return bakeStatic(g);
 }
 
 /** Speech bubble with one fixed greeting, shown for a short time. */
@@ -194,6 +195,7 @@ export class Crowd {
         v.walker.advance(dt);
         const p = v.walker.position();
         v.group.position.set(p.x, walkHeight(this.layout, p), p.z);
+        v.group.userData.baseY = v.group.position.y;
         v.group.rotation.y = p.heading;
         if (v.walker.done) {
           const last = this.lastNodeOf(v);
@@ -218,6 +220,7 @@ export class Crowd {
 
   private placeAt(v: Villager, node: { x: number; z: number }): void {
     v.group.position.set(node.x, walkHeight(this.layout, node), node.z);
+    v.group.userData.baseY = v.group.position.y;
   }
 
   private lastNodeOf(v: Villager): number {
@@ -239,10 +242,10 @@ export class Crowd {
     }
   }
 
+  /** Waving: the figure hops on the spot (the arms are merged into the body, see bakeStatic). */
   private animateArm(v: Villager): void {
-    const arm = v.group.getObjectByName('armR');
-    if (!arm) return;
-    arm.rotation.x = v.waveTimer > 0 ? -2.2 + Math.sin(this.clock * 12) * 0.4 : 0;
+    const hop = v.waveTimer > 0 ? Math.abs(Math.sin(this.clock * 9)) * 0.18 : 0;
+    v.group.position.y = ((v.group.userData.baseY as number | undefined) ?? v.group.position.y) + hop;
   }
 
   /** Two villagers close to each other: one of them says a fixed greeting. */

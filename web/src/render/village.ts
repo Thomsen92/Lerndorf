@@ -10,6 +10,7 @@ import { laneDistance } from '../world/scatter';
 import { buildNature, buildVegetation } from './nature';
 import { buildPlaza } from './plaza';
 import { buildBridge } from './bridges';
+import { bakeStatic } from './merge';
 import { dirtTexture, grassTexture } from './textures';
 import { chimney, fenceGeometry, gableRoof, gardenPathGeometry } from './house';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -307,5 +308,5 @@ export function buildVillage(
   root.add(gardenMesh);
   root.add(buildNature(layout));
   root.add(buildVegetation(layout));
-  return root;
+  return bakeStatic(root);
 }
