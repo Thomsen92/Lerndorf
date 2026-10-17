@@ -18,6 +18,9 @@ import {
 import { buildLayout } from '../world/layout';
 import { PLAZA } from '../world/constants';
 import { buildVillage } from '../render/village';
+import { buildPlacements } from '../render/placements';
+import { loadClassPlacements, loadGrid, type ClassPlacement } from '../api/build';
+import type { GridSize } from '../build/grid';
 import { Crowd } from '../render/crowd';
 import { openShop } from './shopView';
 import { openTaskBoard } from './taskBoardView';
@@ -42,13 +45,25 @@ interface Loaded {
   shopOpen: boolean;
   buildOpen: boolean;
   members: Member[];
+  placements: ClassPlacement[];
+  grid: GridSize;
 }
 
 async function load(supabase: SupabaseClient): Promise<Loaded> {
   const profile = await loadMyProfile(supabase);
   const cls = await loadClass(supabase, profile.classId);
   const members = await loadMembers(supabase);
-  return { profile, layoutSeed: cls.layoutSeed, shopOpen: cls.shopOpen, buildOpen: cls.buildOpen, members };
+  const placements = await loadClassPlacements(supabase);
+  const grid = await loadGrid(supabase);
+  return {
+    profile,
+    layoutSeed: cls.layoutSeed,
+    shopOpen: cls.shopOpen,
+    buildOpen: cls.buildOpen,
+    members,
+    placements,
+    grid,
+  };
 }
 
 /** Shows the village. Calls `onLogout` after a manual or automatic logout. */
@@ -126,7 +141,7 @@ export async function mountVillage(
     return { dispose: stop };
   }
 
-  const { profile, layoutSeed, shopOpen, buildOpen, members } = loaded;
+  const { profile, layoutSeed, shopOpen, buildOpen, members, placements, grid } = loaded;
   const who = root.querySelector<HTMLSpanElement>('#who');
   const coins = root.querySelector<HTMLSpanElement>('#coins');
   if (who) who.textContent = profile.nickname;
@@ -195,6 +210,11 @@ export async function mountVillage(
     .filter((m) => m.plotIndex !== null)
     .map((m) => ({ plotIndex: m.plotIndex as number, nickname: m.nickname }));
   scene.add(buildVillage(layout, labels, ownPlot));
+  // decorations of the whole class (PLAN 4.5), one instanced mesh per item type
+  const plotOf = new Map(
+    members.filter((m) => m.plotIndex !== null).map((m) => [m.id, m.plotIndex as number]),
+  );
+  scene.add(buildPlacements(layout, placements, plotOf, grid));
 
   const crowd = new Crowd(
     scene,

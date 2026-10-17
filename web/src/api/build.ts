@@ -100,3 +100,43 @@ export async function removePlacement(supabase: SupabaseClient, id: number): Pro
   if (error) return { ok: false, message: explain(error.message) };
   return { ok: true, value: true };
 }
+
+/** One placed decoration of any classmate, with its size after rotation (SPEC §10, PLAN 4.5). */
+export interface ClassPlacement {
+  playerId: string;
+  itemId: string;
+  x: number;
+  z: number;
+  rot: number;
+  w: number;
+  d: number;
+}
+
+/** Placements of the whole class (RLS: same class only). Sizes come from the catalogue. */
+export async function loadClassPlacements(supabase: SupabaseClient): Promise<ClassPlacement[]> {
+  const [placements, items] = await Promise.all([
+    supabase.from('placements').select('player_id, item_id, cell_x, cell_z, rot'),
+    supabase.from('items').select('id, footprint'),
+  ]);
+  if (placements.error || items.error || !placements.data || !items.data) return [];
+  const fp = new Map<string, number[]>(items.data.map((i) => [i.id as string, i.footprint as number[]]));
+  return placements.data.map((p) => {
+    const base = fp.get(p.item_id) ?? [1, 1];
+    const turned = p.rot % 2 === 1;
+    return {
+      playerId: p.player_id,
+      itemId: p.item_id,
+      x: p.cell_x,
+      z: p.cell_z,
+      rot: p.rot,
+      w: turned ? base[1] : base[0],
+      d: turned ? base[0] : base[1],
+    };
+  });
+}
+
+/** Grid size of a plot from the settings (same for all plots). */
+export async function loadGrid(supabase: SupabaseClient): Promise<GridSize> {
+  const { data } = await supabase.from('settings').select('plot_cols, plot_rows').eq('id', 1).single();
+  return { cols: data?.plot_cols ?? 7, rows: data?.plot_rows ?? 6 };
+}

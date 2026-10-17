@@ -167,3 +167,5 @@ Ziel: Schüler kaufen Deko und gestalten ihr Grundstück; Mitschüler sehen es.
 | 17.10.2026 | 1.10 Rest Seed-Auswahl | Lehrer-Bereich: Seed einer Klasse setzen, mit Warnung vor dem Verschieben der Grundstücke |
 | 17.10.2026 | 3.1 Schema und 3.7 Anleitung | `content/schema.json` beschreibt die Wochendatei. Anleitung hat den Abschnitt „Neue Aufgabenwoche einspielen“ |
 | 17.10.2026 | Offen Stufe 3 | Echte Aufgabenwoche aus dem Wochenplan-Projekt, Service-Key als GitHub-Secret für den Import, Abnahme (3.8) |
+| 17.10.2026 | 4.5 Platzierungen aller Mitschüler | `render/placements.ts`: eine InstancedMesh je Gegenstandstyp, auf dem Grundstück des jeweiligen Schülers. Daten über `loadClassPlacements` (RLS: nur eigene Klasse). Umrechnung getestet. Im Browser geprüft: die Deko liegt an der berechneten Stelle, nur nicht im Ausschnitt der Kamera. Frustum-Culling für Instancing abgeschaltet |
+| 17.10.2026 | Stufe 4 offen | Abnahme (4.6), echte Modelle für den Katalog, Prüfung mit echten Konten |
