@@ -1,122 +1,122 @@
 {
   "tal_11_overview": {
-    "total": 412,
-    "world": 243
+    "total": 574,
+    "world": 405
   },
   "tal_11_topdown": {
-    "total": 398,
-    "world": 227
+    "total": 554,
+    "world": 383
   },
   "tal_11_marketplace": {
-    "total": 213,
-    "world": 70
+    "total": 310,
+    "world": 167
   },
   "tal_11_plot": {
-    "total": 227,
-    "world": 91
+    "total": 333,
+    "world": 197
   },
   "tal_11_bridge": {
     "total": 38,
     "world": 24
   },
   "tal_23_overview": {
-    "total": 403,
-    "world": 226
+    "total": 554,
+    "world": 377
   },
   "tal_23_topdown": {
-    "total": 406,
-    "world": 229
+    "total": 560,
+    "world": 383
   },
   "tal_23_marketplace": {
-    "total": 228,
-    "world": 78
+    "total": 324,
+    "world": 174
   },
   "tal_23_plot": {
-    "total": 96,
-    "world": 61
+    "total": 118,
+    "world": 83
   },
   "tal_23_bridge": {
-    "total": 39,
-    "world": 31
+    "total": 45,
+    "world": 37
   },
   "fluss_mitte_11_overview": {
-    "total": 450,
-    "world": 272
+    "total": 623,
+    "world": 445
   },
   "fluss_mitte_11_topdown": {
-    "total": 447,
-    "world": 276
+    "total": 622,
+    "world": 451
   },
   "fluss_mitte_11_marketplace": {
-    "total": 237,
-    "world": 87
+    "total": 345,
+    "world": 195
   },
   "fluss_mitte_11_plot": {
-    "total": 126,
-    "world": 120
+    "total": 166,
+    "world": 160
   },
   "fluss_mitte_11_bridge": {
-    "total": 189,
-    "world": 52
+    "total": 284,
+    "world": 147
   },
   "fluss_mitte_23_overview": {
-    "total": 446,
-    "world": 269
+    "total": 615,
+    "world": 438
   },
   "fluss_mitte_23_topdown": {
-    "total": 439,
-    "world": 269
+    "total": 612,
+    "world": 442
   },
   "fluss_mitte_23_marketplace": {
-    "total": 241,
-    "world": 85
+    "total": 346,
+    "world": 190
   },
   "fluss_mitte_23_plot": {
-    "total": 223,
-    "world": 88
+    "total": 328,
+    "world": 193
   },
   "fluss_mitte_23_bridge": {
-    "total": 188,
-    "world": 46
+    "total": 277,
+    "world": 135
   },
   "bach_norden_11_overview": {
-    "total": 403,
-    "world": 230
+    "total": 562,
+    "world": 389
   },
   "bach_norden_11_topdown": {
-    "total": 425,
-    "world": 252
+    "total": 591,
+    "world": 418
   },
   "bach_norden_11_marketplace": {
-    "total": 250,
-    "world": 110
+    "total": 361,
+    "world": 221
   },
   "bach_norden_11_plot": {
-    "total": 36,
-    "world": 36
+    "total": 45,
+    "world": 45
   },
   "bach_norden_11_bridge": {
-    "total": 146,
-    "world": 53
+    "total": 236,
+    "world": 143
   },
   "bach_norden_23_overview": {
-    "total": 399,
-    "world": 224
+    "total": 551,
+    "world": 376
   },
   "bach_norden_23_topdown": {
-    "total": 425,
-    "world": 250
+    "total": 584,
+    "world": 409
   },
   "bach_norden_23_marketplace": {
-    "total": 266,
-    "world": 105
+    "total": 376,
+    "world": 215
   },
   "bach_norden_23_plot": {
-    "total": 145,
-    "world": 96
+    "total": 188,
+    "world": 139
   },
   "bach_norden_23_bridge": {
-    "total": 155,
-    "world": 55
+    "total": 245,
+    "world": 145
   }
 }

@@ -3,11 +3,13 @@
  * Placeholder models only (boxes and cones). The comic models come in Stufe 2.
  */
 import * as THREE from 'three';
-import { PLAZA_RADIUS, MAP_SIZE } from '../world/constants';
+import { MAP_SIZE } from '../world/constants';
 import type { Layout, Plot } from '../world/layout';
 import type { Point2 } from '../world/geometry';
 import { laneDistance } from '../world/scatter';
 import { buildNature } from './nature';
+import { buildPlaza } from './plaza';
+import { grassTexture } from './textures';
 
 const MAT = {
   ground: new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.9 }),
@@ -95,7 +97,15 @@ function terrainMesh(layout: Layout): THREE.Mesh {
   }
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geo.computeVertexNormals();
-  const mesh = new THREE.Mesh(geo, MAT.ground);
+  // grass: grain texture times the vertex colours; smooth shading, so the land is not faceted
+  const grass = grassTexture();
+  grass.repeat.set((MAP_SIZE + 30) / 9, (MAP_SIZE + 30) / 9);
+  const ground = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    map: grass,
+    roughness: 0.95,
+  });
+  const mesh = new THREE.Mesh(geo, ground);
   mesh.receiveShadow = true;
   return mesh;
 }
@@ -179,6 +189,22 @@ function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): TH
   walls.castShadow = true;
   walls.receiveShadow = true;
   house.add(walls);
+  // door towards the gate, two glowing windows on the front (LOOK §6: #ffad42, MeshBasic)
+  const front = bd / 2 + 0.02;
+  const door = new THREE.Mesh(
+    new THREE.BoxGeometry(0.7, 1.2, 0.08),
+    new THREE.MeshStandardMaterial({ color: '#5a3a26', roughness: 0.8 }),
+  );
+  door.position.set(0, 0.6, front);
+  house.add(door);
+  for (const wx of [-bw * 0.3, bw * 0.3]) {
+    const win = new THREE.Mesh(
+      new THREE.BoxGeometry(0.55, 0.55, 0.08),
+      new THREE.MeshBasicMaterial({ color: '#ffad42' }),
+    );
+    win.position.set(wx, bh * 0.55, front);
+    house.add(win);
+  }
   const roofMat = new THREE.MeshStandardMaterial({
     color: ROOF_COLORS[p.index % ROOF_COLORS.length],
     flatShading: true,
@@ -223,24 +249,8 @@ export function buildVillage(
 
   // paths are painted into the terrain (see terrainMesh), so they need no floating strips
 
-  // plaza: a flat disc with a fountain
-  const plazaDisc = new THREE.Mesh(
-    new THREE.CylinderGeometry(PLAZA_RADIUS, PLAZA_RADIUS + 0.4, 0.4, 40),
-    MAT.path,
-  );
-  plazaDisc.position.set(layout.plaza.x, layout.plazaHeight - 0.2, layout.plaza.z);
-  plazaDisc.receiveShadow = true;
-  root.add(plazaDisc);
-  const fountain = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 2.0, 0.8, 16), MAT.wood);
-  fountain.position.set(layout.plaza.x, layout.plazaHeight + 0.4, layout.plaza.z);
-  root.add(fountain);
-
-  // quest board
-  const board = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.0, 0.2), MAT.wood);
-  board.position.set(layout.board.x, layout.plazaHeight + 2.2, layout.board.z);
-  board.lookAt(layout.plaza.x, layout.plazaHeight + 2.2, layout.plaza.z);
-  board.userData = { kind: 'board' };
-  root.add(board);
+  // plaza: paving, fountain, quest board, stalls, benches (render/plaza.ts)
+  root.add(buildPlaza(layout));
 
   for (const b of layout.bridges) {
     const len = Math.hypot(b.b.x - b.a.x, b.b.z - b.a.z) + 1.2;
