@@ -31,6 +31,8 @@ export interface Villager {
   action: Action | null;
   timer: number;
   waveTimer: number;
+  /** Seconds left with the name shown, after a tap on the figure (SPEC §10.9). */
+  nameTimer: number;
   bubbleTimer: number;
   rng: Rng;
 }
@@ -172,6 +174,7 @@ export class Crowd {
         action: null,
         timer: rng() * 3,
         waveTimer: 0,
+        nameTimer: 0,
         bubbleTimer: 0,
         rng,
       };
@@ -194,6 +197,7 @@ export class Crowd {
 
   wave(v: Villager): void {
     v.waveTimer = 2;
+    v.nameTimer = 3;
   }
 
   /** Figure names only within about 28 m of the camera. */
@@ -203,7 +207,7 @@ export class Crowd {
       const sign = v.group.userData.sign as THREE.Sprite | undefined;
       if (!sign) continue;
       v.group.getWorldPosition(p);
-      sign.visible = p.distanceTo(cam.position) < 28;
+      sign.visible = v.nameTimer > 0 || p.distanceTo(cam.position) < 28;
     }
   }
 
@@ -228,6 +232,7 @@ export class Crowd {
         if (v.timer <= 0) this.startNext(v);
       }
       if (v.waveTimer > 0) v.waveTimer -= dt;
+      if (v.nameTimer > 0) v.nameTimer -= dt;
       if (v.bubbleTimer > 0) {
         v.bubbleTimer -= dt;
         if (v.bubbleTimer <= 0) this.removeBubble(v);
