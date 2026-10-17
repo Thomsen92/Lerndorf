@@ -141,3 +141,42 @@ Vorsicht: Das Löschen entfernt Konto, Haus und alle Münzen unwiderruflich. Sch
 | Schüler kann sich nicht anmelden | Spitzname und Passwort prüfen (Groß- und Kleinschreibung, Umlaute). Passwort zurücksetzen. |
 | Seite lädt nicht, „Keine Verbindung“ | Kurz warten und neu laden. Wenn es bleibt: Supabase-Projekt im Dashboard prüfen (es könnte pausiert sein, dann **Restore project** anklicken). |
 | Ein GitHub-Ablauf ist rot | Name des Ablaufs und Fehlermeldung an Claude Code schicken. |
+
+---
+
+## Neue Aufgabenwoche einspielen
+
+Die Aufgaben einer Woche kommen als eine Datei in den Ordner `content/tasks/`. Die Datei heißt wie der **Montag** der Woche, zum Beispiel `2026-11-09.json`. Die Schüler sehen die Aufgaben ab diesem Montag.
+
+1. Die Datei für die Woche erstellen. Vorlage: `content/schema.json` zeigt den Aufbau. Ein Beispiel für jede Aufgabenart:
+
+```json
+{
+  "week": "2026-11-09",
+  "class": null,
+  "tasks": [
+    { "id": "v01", "type": "choice", "reward": 5, "prompt": "What is 'Fahrkarte'?",
+      "options": ["ticket", "card", "map", "fare"], "solution": "ticket" },
+    { "id": "g01", "type": "gap", "reward": 10, "prompt": "Yesterday we ___ to Brooklyn.",
+      "solution": ["went"] },
+    { "id": "m01", "type": "match", "reward": 15, "prompt": "Ordne zu.",
+      "pairs": [["subway", "U-Bahn"], ["sidewalk", "Gehweg"], ["block", "Häuserblock"]] },
+    { "id": "o01", "type": "order", "reward": 10, "prompt": "Bring the words in order.",
+      "solution": ["I", "went", "home"] }
+  ]
+}
+```
+
+2. Die Regeln:
+   - `reward` ist 5, 10 oder 15 Münzen (leicht, mittel, schwer).
+   - `class` ist `null` für beide Klassen oder `"8a"` bzw. `"8b"`.
+   - Die Lösungen stehen in der Datei und werden nie an die Schüler geschickt.
+   - Die Datei muss ein gültiges JSON sein. Kommas am Ende sind nicht erlaubt.
+
+3. Die Datei nach `content/tasks/` legen und auf GitHub hochladen (Commit auf `main`).
+
+4. Im Repository auf **Actions** prüfen, ob der Ablauf **import-content** grün ist. Bei einem Fehler zeigt er die Zeile und die Stelle an, zum Beispiel „tasks[2].reward: 5, 10 oder 15“. Die Datei korrigieren und erneut hochladen.
+
+5. Nach dem Lauf erscheinen die Aufgaben in der Aufgabentafel der Schüler.
+
+Ergebnisse sieht man im Lehrer-Bereich unter **Aufgaben-Statistik**: Zu jeder Aufgabe steht, wie viele Antworten es gab und wie hoch der Anteil richtiger Antworten ist.

@@ -161,3 +161,9 @@ Ziel: Schüler kaufen Deko und gestalten ihr Grundstück; Mitschüler sehen es.
 | 17.10.2026 | 4.4 Baumodus (Oberfläche) | `render/buildMode.ts`, `build/grid.ts`, `api/build.ts`: Kamera auf dem eigenen Grundstück, Raster grün/rot, Inventarleiste mit freien Stücken, Drehen, Setzen, Entfernen. Nur das eigene Grundstück reagiert auf Tipps. 161 Vitest-Tests grün |
 | 17.10.2026 | Grundstücksgrenze geprüft | Am echten Projekt in einem Block mit Rücknahme: Platzierung gehört dem Aufrufer; eine andere Schülerin kann sie weder entfernen noch auf dem Grundstück setzen. Die Funktion `place_item` hat keinen Parameter für ein fremdes Grundstück |
 | 17.10.2026 | Nicht geprüft | Baumodus nur im Build und ohne echte Konten. Platzierungen von Mitschülern sieht man im Dorf noch nicht (4.5) |
+| 17.10.2026 | 3.5 Kontoauszug | `ui/ledgerView.ts`: die letzten 30 Buchungen aus `coin_ledger` (eigene Zeilen, RLS), Notiz nur bei Korrekturen der Lehrkraft. Knopf „Konto“ im Dorf |
+| 17.10.2026 | 3.4 Rest | Tafel im Dorf antippen öffnet die Aufgaben. Bei Gewinn erscheint „+N“ neben den Münzen |
+| 17.10.2026 | 3.6 Aufgaben-Statistik (Anzeige) | Lehrer-Bereich: Woche wählen, Antworten und Anteil richtig je Aufgabe (`task_stats`) |
+| 17.10.2026 | 1.10 Rest Seed-Auswahl | Lehrer-Bereich: Seed einer Klasse setzen, mit Warnung vor dem Verschieben der Grundstücke |
+| 17.10.2026 | 3.1 Schema und 3.7 Anleitung | `content/schema.json` beschreibt die Wochendatei. Anleitung hat den Abschnitt „Neue Aufgabenwoche einspielen“ |
+| 17.10.2026 | Offen Stufe 3 | Echte Aufgabenwoche aus dem Wochenplan-Projekt, Service-Key als GitHub-Secret für den Import, Abnahme (3.8) |

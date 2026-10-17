@@ -12,6 +12,9 @@ import {
   loadPupils,
   loadStampedIds,
   isTeacherSession,
+  loadTaskStats,
+  setLayoutSeed,
+  type TaskStat,
   setClassFlags,
   signInTeacher,
   type Pupil,
@@ -116,11 +119,15 @@ async function renderTeacherArea(root: HTMLElement, supabase: SupabaseClient): P
       ${accountSection(list, classId)}
       ${coinSection(list)}
       ${switchSection(flags.value)}
+      ${layoutSection(flags.value)}
+      ${statsSection()}
       <p id="status" role="status" class="status"></p>`;
     wireStamps();
     wireAccounts(list, classId);
     wireCoins();
     wireSwitches(classId);
+    wireLayout(classId);
+    wireStats();
   };
 
   const status = (text: string, isError = false): void => {
@@ -288,6 +295,36 @@ async function renderTeacherArea(root: HTMLElement, supabase: SupabaseClient): P
     });
   };
 
+  const wireLayout = (cls: ClassId): void => {
+    const form = root.querySelector<HTMLFormElement>('#layoutForm');
+    form?.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const seed = Number(new FormData(form).get('seed'));
+      if (!Number.isInteger(seed) || seed < 1 || seed > 99999) {
+        return status('Seed: eine Zahl von 1 bis 99999', true);
+      }
+      if (!window.confirm(`Dorf der Klasse ${cls} neu festlegen? Alle Grundstücke wandern.`)) return;
+      const res = await setLayoutSeed(supabase, cls, seed);
+      status(res.ok ? 'Dorf-Layout gespeichert.' : res.message, !res.ok);
+      void drawClass();
+    });
+  };
+
+  const wireStats = (): void => {
+    const week = root.querySelector<HTMLInputElement>('#statWeek');
+    const out = root.querySelector<HTMLElement>('#statOut');
+    if (!week || !out) return;
+    const load = async (): Promise<void> => {
+      const monday = mondayOf(week.value);
+      if (!monday) return;
+      week.value = monday;
+      const res = await loadTaskStats(supabase, monday);
+      out.innerHTML = res.ok ? taskStatsTable(res.value) : `<p class="error">${esc(res.message)}</p>`;
+    };
+    week.addEventListener('change', () => void load());
+    void load();
+  };
+
   void drawClass();
 }
 
@@ -361,6 +398,35 @@ function coinSection(list: Pupil[]): string {
       <input name="note" placeholder="Notiz (Pflicht)" required />
       <button type="submit">Buchen</button>
     </form></section>`;
+}
+
+function layoutSection(flags: { layoutSeed: number }): string {
+  return `<section><h2>Dorf-Layout</h2>
+    <p class="hint">Der Seed bestimmt Gelände, Wege und Grundstücke. Ein neuer Wert verschiebt alle Grundstücke der Klasse.</p>
+    <form id="layoutForm" class="row">
+      <label>Seed <input name="seed" type="number" min="1" max="99999" value="${flags.layoutSeed}" /></label>
+      <button type="submit">Speichern</button>
+    </form></section>`;
+}
+
+function statsSection(): string {
+  const monday = mondayOf(new Date().toISOString().slice(0, 10)) ?? '';
+  return `<section><h2>Aufgaben-Statistik</h2>
+    <label>Woche (Montag) <input type="date" id="statWeek" value="${monday}" /></label>
+    <div id="statOut"></div></section>`;
+}
+
+function taskStatsTable(rows: TaskStat[]): string {
+  if (rows.length === 0) return '<p>Keine Aufgaben in dieser Woche.</p>';
+  const body = rows
+    .map(
+      (r) =>
+        `<tr><td>${esc(r.prompt)}</td><td class="num">${r.answers}</td><td class="num">${
+          r.share === null ? '–' : `${r.share} %`
+        }</td></tr>`,
+    )
+    .join('');
+  return `<table><thead><tr><th>Aufgabe</th><th class="num">Antworten</th><th class="num">richtig</th></tr></thead><tbody>${body}</tbody></table>`;
 }
 
 function switchSection(flags: { shopOpen: boolean; buildOpen: boolean }): string {

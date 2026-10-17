@@ -14,6 +14,7 @@ export interface Pupil {
 export interface ClassFlags {
   shopOpen: boolean;
   buildOpen: boolean;
+  layoutSeed: number;
 }
 
 export type Result<T> = { ok: true; value: T } | { ok: false; message: string };
@@ -62,11 +63,14 @@ export async function loadPupils(supabase: SupabaseClient, classId: string): Pro
 export async function loadClassFlags(supabase: SupabaseClient, classId: string): Promise<Result<ClassFlags>> {
   const { data, error } = await supabase
     .from('classes')
-    .select('shop_open, build_open')
+    .select('shop_open, build_open, layout_seed')
     .eq('id', classId)
     .single();
   if (error || !data) return fail('Klasse nicht gefunden');
-  return { ok: true, value: { shopOpen: data.shop_open, buildOpen: data.build_open } };
+  return {
+    ok: true,
+    value: { shopOpen: data.shop_open, buildOpen: data.build_open, layoutSeed: data.layout_seed },
+  };
 }
 
 /** Pupils already stamped for this week (from the ledger, reason 'stamp'). */
@@ -113,7 +117,7 @@ export async function adjustCoins(
 export async function setClassFlags(
   supabase: SupabaseClient,
   classId: string,
-  flags: ClassFlags,
+  flags: Pick<ClassFlags, 'shopOpen' | 'buildOpen'>,
 ): Promise<Result<true>> {
   const { error } = await supabase.rpc('set_class_flags', {
     p_class_id: classId,
@@ -146,4 +150,41 @@ export async function isTeacherSession(supabase: SupabaseClient): Promise<boolea
   if (!uid) return false;
   const { data } = await supabase.from('profiles').select('role').eq('id', uid).maybeSingle();
   return data?.role === 'teacher';
+}
+
+/** Layout seed of a class (SPEC §10). A new seed moves every plot of the class. */
+export async function setLayoutSeed(
+  supabase: SupabaseClient,
+  classId: string,
+  seed: number,
+): Promise<Result<true>> {
+  const { error } = await supabase.rpc('set_layout_seed', { p_class_id: classId, p_seed: seed });
+  if (error) return fail(error.message);
+  return { ok: true, value: true };
+}
+
+export interface TaskStat {
+  taskId: string;
+  prompt: string;
+  answers: number;
+  correct: number;
+  share: number | null;
+}
+
+/** Share of correct answers per task of one week (SPEC §9, PLAN 3.6). */
+export async function loadTaskStats(supabase: SupabaseClient, week: string): Promise<Result<TaskStat[]>> {
+  const { data, error } = await supabase.rpc('task_stats', { p_week: week });
+  if (error) return fail(error.message);
+  return {
+    ok: true,
+    value: (data ?? []).map(
+      (r: { task_id: string; prompt: string; answers: number; correct: number; share: string | null }) => ({
+        taskId: r.task_id,
+        prompt: r.prompt,
+        answers: Number(r.answers),
+        correct: Number(r.correct),
+        share: r.share === null ? null : Number(r.share),
+      }),
+    ),
+  };
 }

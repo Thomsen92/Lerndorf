@@ -358,3 +358,31 @@ button:disabled {
   margin: 0;
   color: var(--muted);
 }
+
+/* coin gain label next to the coins */
+.gain {
+  align-self: center;
+  color: var(--leaf, #7fcf8f);
+  font-weight: 700;
+  animation: gain-rise 1.4s ease-out forwards;
+}
+
+@keyframes gain-rise {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+}
+
+/* ledger table */
+table.ledger td.plus {
+  color: var(--leaf, #7fcf8f);
+}
+
+table.ledger td.minus {
+  color: var(--warn);
+}

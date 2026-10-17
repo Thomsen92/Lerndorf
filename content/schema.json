@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Lerndorf: Aufgaben einer Woche",
+  "description": "Eine Datei pro Woche, Dateiname = Montag, z. B. 2026-11-09.json. Die Prüfung im Import (web/scripts/content.ts) ist die verbindliche Quelle; dieses Schema beschreibt dasselbe für Editoren.",
+  "type": "object",
+  "required": ["week", "class", "tasks"],
+  "additionalProperties": false,
+  "properties": {
+    "week": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Montag der Woche, im Format JJJJ-MM-TT. Ab diesem Tag sichtbar (Europe/Berlin)."
+    },
+    "class": {
+      "description": "null = beide Klassen, sonst nur diese Klasse.",
+      "enum": [null, "8a", "8b"]
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": { "$ref": "#/$defs/task" }
+    }
+  },
+  "$defs": {
+    "task": {
+      "type": "object",
+      "required": ["id", "type", "reward", "prompt"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{0,30}$",
+          "description": "Eindeutig innerhalb der Woche. Wird mit dem Datum vorangestellt."
+        },
+        "type": { "enum": ["choice", "gap", "match", "order"] },
+        "reward": {
+          "enum": [5, 10, 15],
+          "description": "Münzen: leicht 5, mittel 10, schwer 15."
+        },
+        "prompt": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "const": "choice" } } },
+          "then": {
+            "required": ["options", "solution"],
+            "properties": {
+              "options": { "type": "array", "minItems": 2, "items": { "type": "string", "minLength": 1 } },
+              "solution": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "gap" } } },
+          "then": {
+            "required": ["solution"],
+            "properties": {
+              "solution": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "match" } } },
+          "then": {
+            "required": ["pairs"],
+            "properties": {
+              "pairs": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "type": { "const": "order" } } },
+          "then": {
+            "required": ["solution"],
+            "properties": {
+              "solution": { "type": "array", "minItems": 2, "items": { "type": "string", "minLength": 1 } }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

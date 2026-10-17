@@ -245,6 +245,7 @@ export function buildVillage(
   const board = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.0, 0.2), MAT.wood);
   board.position.set(layout.board.x, layout.plazaHeight + 2.2, layout.board.z);
   board.lookAt(PLAZA.x, layout.plazaHeight + 2.2, PLAZA.z);
+  board.userData = { kind: 'board' };
   root.add(board);
 
   for (const b of layout.bridges) {

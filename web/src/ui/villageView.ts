@@ -21,6 +21,7 @@ import { buildVillage } from '../render/village';
 import { Crowd } from '../render/crowd';
 import { openShop } from './shopView';
 import { openTaskBoard } from './taskBoardView';
+import { openLedger } from './ledgerView';
 import { BuildMode } from '../render/buildMode';
 import {
   AUTO_MEASURE_SECONDS,
@@ -66,6 +67,7 @@ export async function mountVillage(
         <button type="button" data-q="low" aria-pressed="false">Niedrig</button>
       </div>
       <button type="button" id="taskBoard">Aufgaben</button>
+      <button type="button" id="ledger">Konto</button>
       <button type="button" id="shop">Shop</button>
       <button type="button" id="build">Bauen</button>
       <button type="button" id="toMarket">Marktplatz</button>
@@ -136,8 +138,18 @@ export async function mountVillage(
 
   // shop and task board open as overlays above the village
   const onCoins = (c: number): void => {
+    if (c > coinsNow) showGain(c - coinsNow);
     coinsNow = c;
     showCoins();
+  };
+  // short '+10' next to the coins, so the pupil sees what the answer or the shop changed
+  const showGain = (amount: number): void => {
+    if (!coins?.parentElement) return;
+    const tag = document.createElement('span');
+    tag.className = 'gain';
+    tag.textContent = `+${amount}`;
+    coins.parentElement.appendChild(tag);
+    window.setTimeout(() => tag.remove(), 1400);
   };
   root
     .querySelector<HTMLButtonElement>('#shop')
@@ -145,6 +157,9 @@ export async function mountVillage(
       'click',
       () => void openShop({ supabase, shopOpen, coins: coinsNow, onCoins, onClose: () => undefined }),
     );
+  root
+    .querySelector<HTMLButtonElement>('#ledger')
+    ?.addEventListener('click', () => void openLedger(supabase, () => undefined));
   root
     .querySelector<HTMLButtonElement>('#taskBoard')
     ?.addEventListener(
@@ -247,7 +262,14 @@ export async function mountVillage(
     raycaster.setFromCamera(pointer, camera);
     const hit = raycaster.intersectObjects(scene.children, true)[0];
     const v = hit ? crowd.findByObject(hit.object) : null;
-    if (v) crowd.wave(v);
+    if (v) {
+      crowd.wave(v);
+      return;
+    }
+    // the task board: tap the board in the market
+    if (hit && hit.object.userData.kind === 'board' && !buildMode?.isActive) {
+      void openTaskBoard({ supabase, coins: coinsNow, onCoins, onClose: () => undefined });
+    }
   });
 
   // build mode: only on the own plot; the camera comes back when the pupil is done
