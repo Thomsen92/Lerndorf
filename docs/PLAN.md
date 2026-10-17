@@ -145,3 +145,5 @@ Ziel: Schüler kaufen Deko und gestalten ihr Grundstück; Mitschüler sehen es.
 | 17.10.2026 | Edge Function deployed | `admin-accounts` aktiv; ohne Anmeldung 401 |
 | 17.10.2026 | Sicherheitsberater | Verbleibende Hinweise sind gewollt: Policy-Helper (`current_class`, `is_teacher`) sind für anon und angemeldete Nutzer ausführbar, weil RLS sie braucht; die Teacher-RPCs prüfen die Rolle selbst |
 | 17.10.2026 | Offen (Lehrkraft) | Öffentliche Registrierung in Supabase abschalten; Lehrkonto anlegen und Profil-Zeile setzen (Anleitung Teil 1) |
+| 17.10.2026 | 1.4 erledigt (Platzhalter) | Wegsuche und Gehhöhe (`world/walk.ts`), Verhalten (`avatars/behaviour.ts`: Ziele, Bank, Brunnen, Tafel, Grüßen mit festen Wörtern), Figuren im Dorf (`render/crowd.ts`), Tippen lässt winken, Qualitätsstufen Auto/Hoch/Niedrig (`render/quality.ts`), Knöpfe „Marktplatz“ und „Mein Haus“. 99 Tests grün. Modelle sind noch Platzhalter (Stufe 2) |
+| 17.10.2026 | Nicht geprüft | Dorf mit Figuren und Knöpfen ist nur im Build und ohne Konten geprüft; ein Blick mit echten Konten steht aus |

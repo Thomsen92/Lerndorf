@@ -1,6 +1,7 @@
 /**
- * The village screen for a logged-in pupil: 3D village, own house marked, classmates labelled,
- * HUD with nickname and coins, logout and automatic logout after 15 minutes.
+ * The village screen for a logged-in pupil: 3D village, villagers, own house marked,
+ * HUD with nickname and coins, quality choice, camera buttons, logout and automatic
+ * logout after 15 minutes.
  */
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -15,7 +16,17 @@ import {
   type MyProfile,
 } from '../api/village';
 import { buildLayout } from '../world/layout';
+import { PLAZA } from '../world/constants';
 import { buildVillage } from '../render/village';
+import { Crowd } from '../render/crowd';
+import {
+  AUTO_MEASURE_SECONDS,
+  decideAuto,
+  effectiveLevel,
+  settingsFor,
+  type QualityChoice,
+  type QualityLevel,
+} from '../render/quality';
 
 export interface VillageHandle {
   dispose(): void;
@@ -44,12 +55,25 @@ export async function mountVillage(
     <div class="village-hud">
       <span class="coins" id="coins"></span>
       <span class="who" id="who"></span>
+      <div class="seg" role="group" aria-label="Grafik-Qualität">
+        <button type="button" data-q="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-q="high" aria-pressed="false">Hoch</button>
+        <button type="button" data-q="low" aria-pressed="false">Niedrig</button>
+      </div>
+      <button type="button" id="toMarket">Marktplatz</button>
+      <button type="button" id="toHouse">Mein Haus</button>
       <button type="button" id="logout" class="primary">Abmelden</button>
     </div>
     <p class="notice" id="notice" hidden></p>
   `;
   const notice = root.querySelector<HTMLParagraphElement>('#notice');
   const logoutBtn = root.querySelector<HTMLButtonElement>('#logout');
+
+  let renderer: THREE.WebGLRenderer | null = null;
+  let running = true;
+  let frames: number[] = [];
+  let autoResult: QualityLevel | null = null;
+  let choice: QualityChoice = 'auto';
 
   const stop = (): void => {
     autoLogout.stop();
@@ -66,8 +90,7 @@ export async function mountVillage(
   const autoLogout = new AutoLogout(AUTO_LOGOUT_MS, () => void logout());
   const activity = ['pointerdown', 'keydown', 'touchstart'] as const;
   const onActivity = (): void => autoLogout.touch();
-  let running = true;
-  let renderer: THREE.WebGLRenderer | null = null;
+  const cameraRef = new THREE.PerspectiveCamera(38, 1, 0.1, 400);
   const resize = (): void => {
     if (!renderer) return;
     const w = window.innerWidth;
@@ -76,7 +99,6 @@ export async function mountVillage(
     cameraRef.aspect = w / h;
     cameraRef.updateProjectionMatrix();
   };
-  const cameraRef = new THREE.PerspectiveCamera(38, 1, 0.1, 400);
 
   logoutBtn?.addEventListener('click', () => void logout());
 
@@ -103,12 +125,11 @@ export async function mountVillage(
   root.appendChild(stage);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   stage.appendChild(renderer.domElement);
+  const gl = renderer;
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#33405e');
@@ -128,27 +149,94 @@ export async function mountVillage(
     .map((m) => ({ plotIndex: m.plotIndex as number, nickname: m.nickname }));
   scene.add(buildVillage(layout, labels, ownPlot));
 
-  // start the camera on the pupil's own house
+  const crowd = new Crowd(
+    scene,
+    layout,
+    members.map((m) => ({ nickname: m.nickname, own: m.id === profile.id })),
+  );
+
+  // quality: applied now, and again when Auto has measured
+  const applyQuality = (): void => {
+    const level = effectiveLevel(choice, autoResult);
+    const s = settingsFor(level);
+    gl.shadowMap.enabled = s.shadows;
+    sun.castShadow = s.shadows;
+    gl.setPixelRatio(Math.min(window.devicePixelRatio, s.maxPixelRatio));
+    resize();
+    root
+      .querySelectorAll<HTMLButtonElement>('[data-q]')
+      .forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.q === choice)));
+  };
+  root.querySelectorAll<HTMLButtonElement>('[data-q]').forEach((b) =>
+    b.addEventListener('click', () => {
+      choice = b.dataset.q as QualityChoice;
+      applyQuality();
+    }),
+  );
+
+  // camera: start on the own house, buttons jump to the market or the house
   const home = ownPlot !== null ? layout.plots[ownPlot] : undefined;
-  const target = home ? new THREE.Vector3(home.x, home.h, home.z) : new THREE.Vector3(-2, 0, 2);
+  const homeTarget = home ? new THREE.Vector3(home.x, home.h, home.z) : new THREE.Vector3(-2, 0, 2);
+  const marketTarget = new THREE.Vector3(PLAZA.x, layout.plazaHeight, PLAZA.z);
   const camera = cameraRef;
-  camera.position.copy(target).add(new THREE.Vector3(14, 22, 26));
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.target.copy(target);
+  camera.position.copy(homeTarget).add(new THREE.Vector3(14, 22, 26));
+  const controls = new OrbitControls(camera, gl.domElement);
+  controls.target.copy(homeTarget);
   controls.enableDamping = true;
   controls.minDistance = 12;
   controls.maxDistance = 110;
   controls.maxPolarAngle = 1.2;
+  const jumpTo = (t: THREE.Vector3): void => {
+    const offset = camera.position.clone().sub(controls.target);
+    controls.target.copy(t);
+    camera.position.copy(t).add(offset);
+  };
+  root.querySelector<HTMLButtonElement>('#toMarket')?.addEventListener('click', () => jumpTo(marketTarget));
+  root.querySelector<HTMLButtonElement>('#toHouse')?.addEventListener('click', () => jumpTo(homeTarget));
   controls.update();
 
-  window.addEventListener('resize', resize);
-  resize();
+  // tap a villager: it waves. A drag (camera move) is not a tap.
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  let down: { x: number; y: number } | null = null;
+  gl.domElement.addEventListener('pointerdown', (ev) => (down = { x: ev.clientX, y: ev.clientY }));
+  gl.domElement.addEventListener('pointerup', (ev) => {
+    if (!down || Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > 8) return;
+    const rect = gl.domElement.getBoundingClientRect();
+    pointer.set(
+      ((ev.clientX - rect.left) / rect.width) * 2 - 1,
+      -((ev.clientY - rect.top) / rect.height) * 2 + 1,
+    );
+    raycaster.setFromCamera(pointer, camera);
+    const hit = raycaster.intersectObjects(scene.children, true)[0];
+    const v = hit ? crowd.findByObject(hit.object) : null;
+    if (v) crowd.wave(v);
+  });
 
-  const r = renderer;
-  r.setAnimationLoop(() => {
+  window.addEventListener('resize', resize);
+  applyQuality();
+
+  // animation loop: frames for Auto, then Auto decides once
+  let last = performance.now();
+  let elapsed = 0;
+  gl.setAnimationLoop(() => {
     if (!running) return;
+    const now = performance.now();
+    const dt = Math.min(0.1, (now - last) / 1000);
+    const frameMs = now - last;
+    last = now;
+    if (autoResult === null) {
+      elapsed += dt;
+      frames.push(frameMs);
+      if (elapsed >= AUTO_MEASURE_SECONDS) {
+        autoResult = decideAuto(frames);
+        frames = [];
+        applyQuality();
+      }
+    }
+    crowd.update(dt);
     controls.update();
-    r.render(scene, camera);
+    gl.render(scene, camera);
   });
 
   for (const ev of activity) window.addEventListener(ev, onActivity, { passive: true });
