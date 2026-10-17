@@ -89,7 +89,7 @@ export async function openLedger(supabase: SupabaseClient, onClose: () => void):
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-label', 'Kontoauszug');
   overlay.innerHTML = `
-    <section class="panel">
+    <section class="panel wide">
       <header class="panel-head">
         <h2>Kontoauszug</h2>
         <button type="button" id="close">Schließen</button>
