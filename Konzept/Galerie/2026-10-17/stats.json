@@ -38,5 +38,85 @@
   "tal_23_bridge": {
     "total": 35,
     "world": 27
+  },
+  "fluss_mitte_11_overview": {
+    "total": 449,
+    "world": 271
+  },
+  "fluss_mitte_11_topdown": {
+    "total": 446,
+    "world": 275
+  },
+  "fluss_mitte_11_marketplace": {
+    "total": 236,
+    "world": 86
+  },
+  "fluss_mitte_11_plot": {
+    "total": 125,
+    "world": 119
+  },
+  "fluss_mitte_11_bridge": {
+    "total": 188,
+    "world": 51
+  },
+  "fluss_mitte_23_overview": {
+    "total": 445,
+    "world": 268
+  },
+  "fluss_mitte_23_topdown": {
+    "total": 438,
+    "world": 268
+  },
+  "fluss_mitte_23_marketplace": {
+    "total": 240,
+    "world": 84
+  },
+  "fluss_mitte_23_plot": {
+    "total": 222,
+    "world": 87
+  },
+  "fluss_mitte_23_bridge": {
+    "total": 187,
+    "world": 45
+  },
+  "bach_norden_11_overview": {
+    "total": 402,
+    "world": 229
+  },
+  "bach_norden_11_topdown": {
+    "total": 424,
+    "world": 251
+  },
+  "bach_norden_11_marketplace": {
+    "total": 249,
+    "world": 109
+  },
+  "bach_norden_11_plot": {
+    "total": 30,
+    "world": 30
+  },
+  "bach_norden_11_bridge": {
+    "total": 145,
+    "world": 52
+  },
+  "bach_norden_23_overview": {
+    "total": 398,
+    "world": 223
+  },
+  "bach_norden_23_topdown": {
+    "total": 424,
+    "world": 249
+  },
+  "bach_norden_23_marketplace": {
+    "total": 265,
+    "world": 104
+  },
+  "bach_norden_23_plot": {
+    "total": 142,
+    "world": 93
+  },
+  "bach_norden_23_bridge": {
+    "total": 153,
+    "world": 53
   }
 }

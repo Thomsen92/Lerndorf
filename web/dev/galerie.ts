@@ -5,7 +5,6 @@ import * as THREE from 'three';
 import { buildLayout } from '../src/world/layout';
 import { buildVillage } from '../src/render/village';
 import { Crowd } from '../src/render/crowd';
-import { PLAZA } from '../src/world/constants';
 
 const params = new URLSearchParams(location.search);
 const seed = Number(params.get('seed') ?? 11);
@@ -62,8 +61,8 @@ Object.assign(sun.shadow.camera, { left: -62, right: 62, top: 62, bottom: -62, n
 sun.shadow.mapSize.set(2048, 2048);
 scene.add(sun);
 
-// map: only the first map exists until L.2; the parameter is already part of the URL
-const layout = buildLayout(seed, PLOTS);
+// the map template of this picture (SPEC §10.1)
+const layout = buildLayout(seed, PLOTS, map);
 const members = Array.from({ length: RESIDENTS }, (_, i) => ({
   plotIndex: (i * 7) % PLOTS, // spread over the village
   nickname: NAMES[i % NAMES.length],
@@ -81,7 +80,7 @@ const VIEWS: Record<string, { target: THREE.Vector3; offset: THREE.Vector3 }> = 
   overview: { target: new THREE.Vector3(-2, 0, 2), offset: new THREE.Vector3(34, 46, 62) },
   topdown: { target: new THREE.Vector3(0, 0, 0), offset: new THREE.Vector3(0, 110, 1) },
   marketplace: {
-    target: new THREE.Vector3(PLAZA.x, layout.plazaHeight, PLAZA.z),
+    target: new THREE.Vector3(layout.plaza.x, layout.plazaHeight, layout.plaza.z),
     offset: new THREE.Vector3(14, 22, 26),
   },
   plot: {

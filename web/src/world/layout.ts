@@ -1,13 +1,14 @@
 /**
  * Deterministic village layout for one class: plots, bridges and the walking graph.
- * Same seed + same plot count => identical result on every device.
+ * Same map + same seed + same plot count => identical result on every device.
  * No rendering here; the 3D code reads this data.
  */
 import * as THREE from 'three';
 import { createRng, type Rng } from './rng';
-import { dist, segmentDistance, yawTo, type Point2 } from './geometry';
-import { Terrain, RIVER_POINTS } from './terrain';
-import { BENCH_ANGLES, BOARD_ANGLE, LANES, PLAZA, PLAZA_RADIUS, VALLEY_RADIUS } from './constants';
+import { dist, yawTo, type Point2 } from './geometry';
+import { Terrain, riverCenterline } from './terrain';
+import { PLAZA_RADIUS, VALLEY_RADIUS } from './constants';
+import { getMap, type MapDef } from './maps';
 
 export interface Plot {
   index: number;
@@ -59,6 +60,8 @@ export interface WalkGraph {
 export interface Layout {
   seed: number;
   plotCount: number;
+  /** Map template this layout was built from. */
+  map: MapDef;
   plaza: Point2;
   plazaHeight: number;
   plots: Plot[];
@@ -71,19 +74,21 @@ export interface Layout {
   board: Point2;
 }
 
-const laneCurves = LANES.map(
-  (pts) =>
-    new THREE.CatmullRomCurve3(
-      pts.map((p) => new THREE.Vector3(p.x, 0, p.z)),
-      false,
-      'centripetal',
-    ),
-);
-
-const plazaPoint = (angle: number, r: number): Point2 => ({
-  x: PLAZA.x + Math.cos(angle) * r,
-  z: PLAZA.z + Math.sin(angle) * r,
+const plazaPoint = (plaza: Point2, angle: number, r: number): Point2 => ({
+  x: plaza.x + Math.cos(angle) * r,
+  z: plaza.z + Math.sin(angle) * r,
 });
+
+function laneCurvesOf(map: MapDef): THREE.CatmullRomCurve3[] {
+  return map.lanes.map(
+    (pts) =>
+      new THREE.CatmullRomCurve3(
+        pts.map((p) => new THREE.Vector3(p.x, 0, p.z)),
+        false,
+        'centripetal',
+      ),
+  );
+}
 
 function nearPath(samples: Point2[], x: number, z: number, r: number): boolean {
   for (const s of samples) {
@@ -152,7 +157,7 @@ function orientPlot(plot: Plot, rng: Rng, samples: Point2[]): void {
   plot.door = toWorld(0, -plot.d / 2 + 2.5);
 }
 
-function findBridges(terrain: Terrain): Bridge[] {
+function findBridges(terrain: Terrain, laneCurves: THREE.CatmullRomCurve3[]): Bridge[] {
   const bridges: Bridge[] = [];
   for (const curve of laneCurves) {
     const pts = curve.getSpacedPoints(Math.ceil(curve.getLength() / 0.5));
@@ -170,7 +175,8 @@ function findBridges(terrain: Terrain): Bridge[] {
   return bridges;
 }
 
-function buildGraph(plots: Plot[], plaza: Point2): WalkGraph {
+function buildGraph(plots: Plot[], map: MapDef, laneCurves: THREE.CatmullRomCurve3[]): WalkGraph {
+  const plaza = map.plaza;
   const nodes: WalkNode[] = [];
   const adj: number[][] = [];
   const add = (p: Point2, tag: NodeTag, face?: number): number => {
@@ -222,7 +228,7 @@ function buildGraph(plots: Plot[], plaza: Point2): WalkGraph {
   // plaza ring
   const ring: number[] = [];
   for (let k = 0; k < 14; k++) {
-    const p = plazaPoint((k / 14) * Math.PI * 2, PLAZA_RADIUS - 1.6);
+    const p = plazaPoint(plaza, (k / 14) * Math.PI * 2, PLAZA_RADIUS - 1.6);
     ring.push(add(p, 'plaza'));
   }
   ring.forEach((id, k) => link(id, ring[(k + 1) % ring.length]));
@@ -234,20 +240,20 @@ function buildGraph(plots: Plot[], plaza: Point2): WalkGraph {
   });
   wander.push(...ring);
 
-  const benches = BENCH_ANGLES.map((a) => {
-    const p = plazaPoint(a, PLAZA_RADIUS - 1.3);
-    const seat = plazaPoint(a, PLAZA_RADIUS - 0.4);
+  const benches = map.benchAngles.map((a) => {
+    const p = plazaPoint(plaza, a, PLAZA_RADIUS - 1.3);
+    const seat = plazaPoint(plaza, a, PLAZA_RADIUS - 0.4);
     const id = add(p, 'bench', yawTo(seat, plaza));
     link(id, nearestPlaza(p));
     return id;
   });
 
-  const boardPos = plazaPoint(BOARD_ANGLE, 6.0);
-  const board = add(boardPos, 'board', yawTo(boardPos, plazaPoint(BOARD_ANGLE, 4.4)));
+  const boardPos = plazaPoint(plaza, map.boardAngle, 6.0);
+  const board = add(boardPos, 'board', yawTo(boardPos, plazaPoint(plaza, map.boardAngle, 4.4)));
   link(board, nearestPlaza(boardPos));
 
   const fountains = [0.2, 3.6].map((a) => {
-    const p = plazaPoint(a, 3.4);
+    const p = plazaPoint(plaza, a, 3.4);
     const id = add(p, 'fountain', yawTo(p, plaza));
     link(id, nearestPlaza(p));
     return id;
@@ -281,48 +287,38 @@ export function reachableFrom(graph: WalkGraph, from: number): Set<number> {
   return seen;
 }
 
-/** Builds the full layout for one class. */
-export function buildLayout(layoutSeed: number, plotCount: number): Layout {
+/** Builds the full layout for one class from a map template and a seed. */
+export function buildLayout(layoutSeed: number, plotCount: number, mapId = 'tal'): Layout {
+  const map = getMap(mapId);
   const rng = createRng(1000 + layoutSeed * 7919);
-  const terrain = new Terrain(layoutSeed * 1.7);
+  const terrain = new Terrain(layoutSeed * 1.7, riverCenterline(map.river));
+  const laneCurves = laneCurvesOf(map);
+  const plaza = { ...map.plaza };
 
-  const plazaHeight = Math.max(0.6, terrain.naturalHeight(PLAZA.x, PLAZA.z));
-  terrain.flats.push({
-    x: PLAZA.x,
-    z: PLAZA.z,
-    r: PLAZA_RADIUS + 1.5,
-    h: plazaHeight,
-  });
+  const plazaHeight = Math.max(0.6, terrain.naturalHeight(plaza.x, plaza.z));
+  terrain.flats.push({ x: plaza.x, z: plaza.z, r: PLAZA_RADIUS + 1.5, h: plazaHeight });
 
   const laneSamples: Point2[] = [];
   for (const c of laneCurves) {
     c.getSpacedPoints(Math.ceil(c.getLength() / 1.2)).forEach((v) => laneSamples.push({ x: v.x, z: v.z }));
   }
 
-  const plots = scatterPlots(rng, plotCount, terrain, laneSamples, PLAZA);
+  const plots = scatterPlots(rng, plotCount, terrain, laneSamples, plaza);
   for (const p of plots) orientPlot(p, rng, laneSamples);
-  const bridges = findBridges(terrain);
-  const graph = buildGraph(plots, PLAZA);
+  const bridges = findBridges(terrain, laneCurves);
+  const graph = buildGraph(plots, { ...map, plaza }, laneCurves);
 
   return {
     seed: layoutSeed,
     plotCount,
-    plaza: { ...PLAZA },
+    map,
+    plaza,
     plazaHeight,
     plots,
     bridges,
     terrain,
     graph,
     laneSamples,
-    board: plazaPoint(BOARD_ANGLE, 4.4),
+    board: plazaPoint(plaza, map.boardAngle, 4.4),
   };
-}
-
-/** Shortest distance from a point to the river, for other modules that need it. */
-export function distanceToRiver(p: Point2): number {
-  let d = Infinity;
-  for (let i = 1; i < RIVER_POINTS.length; i++) {
-    d = Math.min(d, segmentDistance(p.x, p.z, RIVER_POINTS[i - 1], RIVER_POINTS[i]));
-  }
-  return d;
 }

@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
 
-const MAPS = ['tal'];
+const MAPS = ['tal', 'fluss_mitte', 'bach_norden']; // all templates (SPEC §10.1)
 const SEEDS = [11, 23];
 const VIEWS = ['overview', 'topdown', 'marketplace', 'plot', 'bridge'];
 const PORT = 5174;

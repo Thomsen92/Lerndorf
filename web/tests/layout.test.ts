@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildLayout, distanceToRiver, reachableFrom } from '../src/world/layout';
+import { buildLayout, reachableFrom } from '../src/world/layout';
 import { createRng } from '../src/world/rng';
 
 const SEEDS = [1, 2, 7, 42, 99];
@@ -57,7 +57,7 @@ describe('plot placement', () => {
       it(`seed ${seed}, ${count} plots: no plot in the river`, () => {
         const layout = buildLayout(seed, count);
         for (const p of layout.plots) {
-          expect(distanceToRiver({ x: p.x, z: p.z })).toBeGreaterThanOrEqual(p.rad + 5);
+          expect(layout.terrain.riverDistance(p.x, p.z)).toBeGreaterThanOrEqual(p.rad + 5);
         }
       });
     }

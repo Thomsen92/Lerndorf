@@ -16,7 +16,6 @@ import {
   type MyProfile,
 } from '../api/village';
 import { buildLayout } from '../world/layout';
-import { PLAZA } from '../world/constants';
 import { buildVillage } from '../render/village';
 import { buildPlacements } from '../render/placements';
 import { loadClassPlacements, loadGrid, type ClassPlacement } from '../api/build';
@@ -42,6 +41,7 @@ export interface VillageHandle {
 interface Loaded {
   profile: MyProfile;
   layoutSeed: number;
+  mapId: string;
   shopOpen: boolean;
   buildOpen: boolean;
   members: Member[];
@@ -58,6 +58,7 @@ async function load(supabase: SupabaseClient): Promise<Loaded> {
   return {
     profile,
     layoutSeed: cls.layoutSeed,
+    mapId: cls.mapId,
     shopOpen: cls.shopOpen,
     buildOpen: cls.buildOpen,
     members,
@@ -141,7 +142,7 @@ export async function mountVillage(
     return { dispose: stop };
   }
 
-  const { profile, layoutSeed, shopOpen, buildOpen, members, placements, grid } = loaded;
+  const { profile, layoutSeed, mapId, shopOpen, buildOpen, members, placements, grid } = loaded;
   const who = root.querySelector<HTMLSpanElement>('#who');
   const coins = root.querySelector<HTMLSpanElement>('#coins');
   if (who) who.textContent = profile.nickname;
@@ -204,7 +205,7 @@ export async function mountVillage(
   sun.shadow.mapSize.set(2048, 2048);
   scene.add(sun);
 
-  const layout = buildLayout(layoutSeed, PLOT_COUNT);
+  const layout = buildLayout(layoutSeed, PLOT_COUNT, mapId);
   const ownPlot = profile.plotIndex;
   const labels = members
     .filter((m) => m.plotIndex !== null)
@@ -244,7 +245,7 @@ export async function mountVillage(
   // camera: start on the own house, buttons jump to the market or the house
   const home = ownPlot !== null ? layout.plots[ownPlot] : undefined;
   const homeTarget = home ? new THREE.Vector3(home.x, home.h, home.z) : new THREE.Vector3(-2, 0, 2);
-  const marketTarget = new THREE.Vector3(PLAZA.x, layout.plazaHeight, PLAZA.z);
+  const marketTarget = new THREE.Vector3(layout.plaza.x, layout.plazaHeight, layout.plaza.z);
   const camera = cameraRef;
   camera.position.copy(homeTarget).add(new THREE.Vector3(14, 22, 26));
   const controls = new OrbitControls(camera, gl.domElement);

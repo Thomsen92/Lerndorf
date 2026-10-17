@@ -18,6 +18,7 @@ export interface MyProfile {
 export interface ClassSettings {
   id: string;
   layoutSeed: number;
+  mapId: string;
   shopOpen: boolean;
   buildOpen: boolean;
 }
@@ -53,13 +54,14 @@ export async function loadMyProfile(supabase: SupabaseClient): Promise<MyProfile
 export async function loadClass(supabase: SupabaseClient, classId: string): Promise<ClassSettings> {
   const { data, error } = await supabase
     .from('classes')
-    .select('id, layout_seed, shop_open, build_open')
+    .select('id, layout_seed, map_id, shop_open, build_open')
     .eq('id', classId)
     .single();
   if (error || !data) throw new VillageLoadError('class not found');
   return {
     id: data.id,
     layoutSeed: data.layout_seed,
+    mapId: data.map_id,
     shopOpen: data.shop_open,
     buildOpen: data.build_open,
   };

@@ -3,8 +3,7 @@
  * Placeholder models only (boxes and cones). The comic models come in Stufe 2.
  */
 import * as THREE from 'three';
-import { RIVER_POINTS } from '../world/terrain';
-import { PLAZA, PLAZA_RADIUS, MAP_SIZE, LANES } from '../world/constants';
+import { PLAZA_RADIUS, MAP_SIZE } from '../world/constants';
 import type { Layout, Plot } from '../world/layout';
 import type { Point2 } from '../world/geometry';
 
@@ -101,8 +100,8 @@ function terrainMesh(layout: Layout): THREE.Mesh {
   return mesh;
 }
 
-function riverMesh(): THREE.Mesh {
-  return ribbon(RIVER_POINTS, 7, () => -0.55, MAT.water);
+function riverMesh(river: Point2[]): THREE.Mesh {
+  return ribbon(river, 7, () => -0.55, MAT.water);
 }
 
 export interface VillageMember {
@@ -214,10 +213,10 @@ export function buildVillage(
   const root = new THREE.Group();
   const byPlot = new Map(members.map((m) => [m.plotIndex, m]));
   root.add(terrainMesh(layout));
-  root.add(riverMesh());
+  root.add(riverMesh(layout.terrain.river));
 
   // lanes: each lane is a Catmull-Rom curve through its control points
-  for (const pts of LANES) {
+  for (const pts of layout.map.lanes) {
     const curve = new THREE.CatmullRomCurve3(
       pts.map((p) => new THREE.Vector3(p.x, 0, p.z)),
       false,
@@ -234,17 +233,17 @@ export function buildVillage(
     new THREE.CylinderGeometry(PLAZA_RADIUS, PLAZA_RADIUS + 0.4, 0.4, 40),
     MAT.path,
   );
-  plazaDisc.position.set(PLAZA.x, layout.plazaHeight - 0.2, PLAZA.z);
+  plazaDisc.position.set(layout.plaza.x, layout.plazaHeight - 0.2, layout.plaza.z);
   plazaDisc.receiveShadow = true;
   root.add(plazaDisc);
   const fountain = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 2.0, 0.8, 16), MAT.wood);
-  fountain.position.set(PLAZA.x, layout.plazaHeight + 0.4, PLAZA.z);
+  fountain.position.set(layout.plaza.x, layout.plazaHeight + 0.4, layout.plaza.z);
   root.add(fountain);
 
   // quest board
   const board = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.0, 0.2), MAT.wood);
   board.position.set(layout.board.x, layout.plazaHeight + 2.2, layout.board.z);
-  board.lookAt(PLAZA.x, layout.plazaHeight + 2.2, PLAZA.z);
+  board.lookAt(layout.plaza.x, layout.plazaHeight + 2.2, layout.plaza.z);
   board.userData = { kind: 'board' };
   root.add(board);
 

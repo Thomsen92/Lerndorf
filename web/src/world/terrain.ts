@@ -1,10 +1,9 @@
 /**
  * Height field of the valley: hills, a carved river bed and levelled plots.
- * Pure math, no rendering, so it can be unit-tested in Node.
+ * Pure math, no rendering, so it can be unit-tested in Node. The river comes from the map template.
  */
 import * as THREE from 'three';
 import { lerp, segmentDistance, smooth, type Point2 } from './geometry';
-import { RIVER_CONTROL } from './constants';
 
 export interface Flat {
   x: number;
@@ -13,26 +12,32 @@ export interface Flat {
   h: number;
 }
 
-const riverCurve = new THREE.CatmullRomCurve3(
-  RIVER_CONTROL.map((p) => new THREE.Vector3(p.x, 0, p.z)),
-  false,
-  'centripetal',
-);
-/** River centre line as 2D points, shared by all layouts (the river never changes). */
-export const RIVER_POINTS: Point2[] = riverCurve.getSpacedPoints(220).map((v) => ({ x: v.x, z: v.z }));
+/** River centre line: centripetal Catmull-Rom through the control points, sampled evenly. */
+export function riverCenterline(control: Point2[]): Point2[] {
+  const curve = new THREE.CatmullRomCurve3(
+    control.map((p) => new THREE.Vector3(p.x, 0, p.z)),
+    false,
+    'centripetal',
+  );
+  return curve.getSpacedPoints(220).map((v) => ({ x: v.x, z: v.z }));
+}
 
 export class Terrain {
   /** Levelled areas (plaza, plots). Added while a layout is being built. */
   readonly flats: Flat[] = [];
 
-  constructor(private readonly hillPhase: number) {}
+  constructor(
+    private readonly hillPhase: number,
+    /** River centre line of this map. */
+    readonly river: Point2[],
+  ) {}
 
   /** Distance to the river centre line. */
   riverDistance(x: number, z: number): number {
     let d = Infinity;
-    for (let i = 1; i < RIVER_POINTS.length; i++) {
-      const a = RIVER_POINTS[i - 1];
-      const b = RIVER_POINTS[i];
+    for (let i = 1; i < this.river.length; i++) {
+      const a = this.river[i - 1];
+      const b = this.river[i];
       if (Math.abs(a.x - x) > 12) continue; // cheap reject, the river is far from most points
       d = Math.min(d, segmentDistance(x, z, a, b));
     }
