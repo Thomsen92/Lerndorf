@@ -15,10 +15,18 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
 const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
+// The website (GitHub Pages) calls this function from the browser, so CORS headers are needed.
+// The token check below still decides who may act.
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
+
 const json = (status: number, body: unknown): Response =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', ...CORS },
   });
 
 type Action =
@@ -29,6 +37,8 @@ type Action =
   | { action: 'delete'; user_id: string };
 
 Deno.serve(async (req: Request): Promise<Response> => {
+  // browser pre-flight check before the real call
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS });
   if (req.method !== 'POST') return json(405, { error: 'POST only' });
 
   // 1. who is calling? Their own token, checked by Supabase Auth.
