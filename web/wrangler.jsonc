@@ -1,0 +1,11 @@
+{
+  // Cloudflare Workers with static assets: serves the Vite build (SPEC §17).
+  // The Worker has no code of its own; only the files in dist/ are served.
+  "name": "lerndorf",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}
