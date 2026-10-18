@@ -9,13 +9,14 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { AutoLogout, AUTO_LOGOUT_MS } from '../auth/autoLogout';
 import {
   PLOT_COUNT,
+  claimPlot,
   loadClass,
   loadMembers,
   loadMyProfile,
   type Member,
   type MyProfile,
 } from '../api/village';
-import { buildLayout } from '../world/layout';
+import { buildLayout, type Plot } from '../world/layout';
 import { buildVillage } from '../render/village';
 import { buildPlacements } from '../render/placements';
 import { loadClassPlacements, loadGrid, type ClassPlacement } from '../api/build';
@@ -68,6 +69,18 @@ async function load(supabase: SupabaseClient): Promise<Loaded> {
 }
 
 /** Shows the village. Calls `onLogout` after a manual or automatic logout. */
+/** The free plot under a point on the ground, if any. Lots are not separate meshes, so the point decides. */
+function freePlotAt(plots: Plot[], occupied: Set<number>, p: THREE.Vector3): Plot | undefined {
+  return plots.find((q) => {
+    if (occupied.has(q.index)) return false;
+    const dx = p.x - q.x;
+    const dz = p.z - q.z;
+    const lx = dx * Math.cos(q.face) - dz * Math.sin(q.face);
+    const lz = dx * Math.sin(q.face) + dz * Math.cos(q.face);
+    return Math.abs(lx) <= q.w / 2 && Math.abs(lz) <= q.d / 2;
+  });
+}
+
 export async function mountVillage(
   root: HTMLElement,
   supabase: SupabaseClient,
@@ -210,6 +223,29 @@ export async function mountVillage(
 
   const layout = buildLayout(layoutSeed, PLOT_COUNT, mapId);
   const ownPlot = profile.plotIndex;
+  const occupied = new Set(members.filter((m) => m.plotIndex !== null).map((m) => m.plotIndex as number));
+  // a pupil without a plot chooses one of the free lots (SPEC §10.5)
+  const chooseLot = async (index: number): Promise<void> => {
+    if (!window.confirm('Hier dein Haus bauen? Die Wahl gilt dauerhaft.')) return;
+    const r = await claimPlot(supabase, index);
+    if (!r.ok) {
+      window.alert(
+        r.message.includes('taken')
+          ? 'Dieses Grundstück ist schon vergeben.'
+          : 'Das hat nicht geklappt. Bitte versuche es noch einmal.',
+      );
+      return;
+    }
+    window.location.reload();
+  };
+  if (ownPlot === null) {
+    const hint = document.createElement('div');
+    hint.textContent =
+      'Wähle ein freies Grundstück: tippe auf eine Wiese mit Pflöcken. Die Wahl gilt dauerhaft.';
+    hint.style.cssText =
+      'position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:5;background:#fff;color:#222;padding:8px 14px;border-radius:10px;font-size:14px;max-width:90vw;text-align:center;';
+    root.appendChild(hint);
+  }
   const labels = members
     .filter((m) => m.plotIndex !== null)
     .map((m) => ({ plotIndex: m.plotIndex as number, nickname: m.nickname }));
@@ -290,6 +326,14 @@ export async function mountVillage(
     if (v) {
       crowd.wave(v);
       return;
+    }
+    // a pupil without a plot: tap a free lot to build there
+    if (hit && ownPlot === null) {
+      const lot = freePlotAt(layout.plots, occupied, hit.point);
+      if (lot) {
+        void chooseLot(lot.index);
+        return;
+      }
     }
     // the task board: tap the board in the market
     if (hit && hit.object.userData.kind === 'board' && !buildMode?.isActive) {

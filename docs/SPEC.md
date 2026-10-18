@@ -261,7 +261,7 @@ Münzstände anderer Schüler sind für Schüler **nicht** sichtbar.
 
 **Antwortprüfung** (`submit_answer`): Vergleich nach Normalisierung – trimmen, Kleinschreibung, mehrfache Leerzeichen zusammenfassen, typografische Apostrophe → `'`. `gap` erlaubt mehrere richtige Lösungen (Array). Kein Teilpunkt.
 
-**Edge Function `admin-accounts`** (nur Lehrkraft): `create` (nickname, password, class_id → nächster freier `plot_index` der Instanz), `reset_password`, `move_class` (Regeln §1a), `delete`. Bulk-Anlegen aus einer Liste (eine Zeile pro Schüler: `Spitzname;Passwort;Klasse`).
+**Edge Function `admin-accounts`** (nur Lehrkraft): `create` (nickname, password, class_id; der Schüler startet **ohne** Grundstück und wählt selbst, RPC `claim_plot`), `reset_password`, `move_class` (Regeln §1a), `delete`. Bulk-Anlegen aus einer Liste (eine Zeile pro Schüler: `Spitzname;Passwort;Klasse`).
 
 ## 9. Aufgaben-Inhalte
 
@@ -320,7 +320,7 @@ Grundsatz: **Das Layout (Positionen von allem) entsteht im Code in `world/`, det
 - **Hangregel:** Höhenunterschied des natürlichen Geländes unter dem Grundstück ≤ 1,5 m; Einebnung mit kurzer, weicher Böschung (≤ 2 m), keine Erdwände.
 - Ausrichtung: Haus und Tor zeigen zum nächsten Weg; **Gartenweg** vom Tor zum Weg wird gezeichnet und ist im Wegegraph.
 - Aufbau: Rasenfläche, Zaun aus Pfosten + Latten mit Tor vorn (keine geschlossene Wand), Haus mit Tür, 2–4 Fenstern (leuchtend), Satteldach mit Dachüberstand, das innerhalb des Grundstücks bleibt; Briefkasten am Tor. Hausgröße und Farben variieren deterministisch.
-- **Freie Plätze** (ohne Schüler): kein Haus, sondern Bauplatz-Optik (Wiese, Holzpflöcke an den Ecken, kleines Schild „frei“). Wird ein Schüler angelegt, erscheint dort sein Haus.
+- **Freie Plätze** (ohne Schüler): kein Haus, sondern Bauplatz-Optik (Wiese, Holzpflöcke an den Ecken, kleines Schild „frei“). Die Häuser sind nur Platzhalter. Ein Schüler ohne Grundstück wählt einen freien Platz, indem er auf die Wiese tippt (Bestätigung). Die Wahl gilt dauerhaft (RPC `claim_plot(p_index)`, nur solange kein Platz gewählt ist, Platz 0 bis 33). Am Anfang sind alle Plätze frei.
 - Baumodus-Raster: `plot_cols × plot_rows` Zellen à 1 m (aus `classes`, §1a); Hausbereich hinten gesperrt, Tor und Gartenweg vorne mittig frei (§8 `place_item`).
 - Wechsel von Vorlage oder Seed nach dem Start nur mit Warnung im Lehrer-Bereich: Grundstücke bleiben über `plot_index` erhalten, ihre Lage ändert sich.
 

@@ -87,7 +87,7 @@ async function createOne(
   if (pErr) return json(400, { error: pErr });
   if (!isClassId(classId)) return json(400, { error: 'Klasse muss 8a oder 8b sein' });
 
-  const plot = await nextPlotIndex(admin, classId);
+  // a new pupil has no plot yet: the pupil chooses a free one (RPC claim_plot, SPEC §10.5)
   const { data: created, error } = await admin.auth.admin.createUser({
     email: loginEmail(nickname),
     password,
@@ -103,14 +103,14 @@ async function createOne(
     nickname,
     role: 'student',
     class_id: classId,
-    plot_index: plot,
+    plot_index: null,
   });
   if (profErr) {
     // roll back the auth user so that no account exists without a profile
     await admin.auth.admin.deleteUser(created.user.id);
     return json(409, { error: 'Spitzname schon vergeben' });
   }
-  return json(200, { ok: true, user_id: created.user.id, plot_index: plot });
+  return json(200, { ok: true, user_id: created.user.id, plot_index: null });
 }
 
 async function createBulk(admin: ReturnType<typeof createClient>, text: string): Promise<Response> {

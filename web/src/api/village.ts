@@ -31,6 +31,16 @@ export interface Member {
 
 export class VillageLoadError extends Error {}
 
+/** The pupil chooses a free plot as building site (RPC claim_plot). The choice is final. */
+export async function claimPlot(
+  supabase: SupabaseClient,
+  index: number,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { error } = await supabase.rpc('claim_plot', { p_index: index });
+  if (error) return { ok: false, message: error.message };
+  return { ok: true };
+}
+
 export async function loadMyProfile(supabase: SupabaseClient): Promise<MyProfile> {
   const { data: auth } = await supabase.auth.getUser();
   const uid = auth.user?.id;
