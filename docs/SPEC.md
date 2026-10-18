@@ -18,7 +18,7 @@ Tablet (Browser)                         Supabase (EU)
 │  Lehrer-Bereich          │            │ Edge Function admin-accounts  │
 └──────────────────────────┘            └───────────────────────────────┘
         ▲ ausgeliefert von                        ▲
-GitHub Pages (Repo „Lerndorf“)          GitHub Actions: Deploy, Aufgaben-
+Cloudflare Pages (Projekt „lerndorf“)          GitHub Actions: Deploy, Aufgaben-
                                          Import, Weck-Anfrage
 ```
 
@@ -88,7 +88,7 @@ Lerndorf/
 | Bereich | Wahl | Hinweis |
 | --- | --- | --- |
 | Sprache | TypeScript (strict) | UI-Texte Deutsch, Code/Kommentare Englisch |
-| Build | Vite | `base: '/Lerndorf/'` für GitHub Pages |
+| Build | Vite | `base: '/'` für Cloudflare Pages (Wurzel der Domain) |
 | 3D | three.js **0.170.x** (fest gepinnt) | wie im Prototyp |
 | UI | Vanilla TS + CSS (kein Framework nötig); Preact nur falls UI-Umfang es erfordert | |
 | Daten | `@supabase/supabase-js` v2 | |
@@ -436,7 +436,7 @@ Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3
 
 ## 17. Deploy und Betrieb
 
-- `deploy.yml`: bei Push auf `main` → Tests → Vite-Build → GitHub Pages.
+- `deploy.yml`: bei Push auf `main` → Tests → Vite-Build → Cloudflare Pages (`wrangler-action`, Secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`).
 - Supabase-Migrationen über Supabase CLI (`supabase db push`), lokal mit `supabase start` testbar.
 - Secrets (von der Lehrkraft einzutragen, Anleitung in `docs/ANLEITUNG_LEHRKRAFT.md`): `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`.
 - Die Lehrkraft muss anlegen: GitHub-Repo `Lerndorf`, Supabase-Projekt (Region `eu-west-1`, Irland – so von der Lehrkraft gewählt). Schritte dafür als einfache Anleitung mit Screenshots-Beschreibung.

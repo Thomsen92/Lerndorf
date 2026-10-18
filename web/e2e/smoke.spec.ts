@@ -7,7 +7,7 @@ test('pupil page loads without uncaught errors and shows no village before login
   const errors: string[] = [];
   page.on('pageerror', (err) => errors.push(err.message));
 
-  await page.goto('/Lerndorf/');
+  await page.goto('/');
   // Without configuration the page shows a message, with configuration the login form.
   const body = page.locator('#app');
   await expect(body).not.toBeEmpty();
@@ -20,7 +20,7 @@ test('teacher page loads and shows a message or the login form', async ({ page }
   const errors: string[] = [];
   page.on('pageerror', (err) => errors.push(err.message));
 
-  await page.goto('/Lerndorf/lehrer/');
+  await page.goto('/lehrer/');
   await expect(page.locator('#app')).not.toBeEmpty();
   expect(errors).toEqual([]);
 });

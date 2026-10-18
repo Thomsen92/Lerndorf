@@ -60,9 +60,13 @@ Im Repository auf GitHub: **Settings** → **Secrets and variables** → **Actio
 
 Den Namen genau so schreiben, Groß- und Kleinschreibung zählen.
 
-### 6. GitHub Pages aktivieren
+### 6. Cloudflare Pages einrichten
 
-Im Repository: **Settings** → **Pages** → bei **Source** den Eintrag **GitHub Actions** auswählen.
+1. Kostenloses Konto auf https://dash.cloudflare.com anlegen.
+2. **Workers & Pages** → **Create** → **Pages** → **Upload assets** (Direct Upload). Projektname: `lerndorf`. Hochladen ist nicht nötig, der Workflow macht das. Einfach einen Platzhalter hochladen und das Projekt anlegen.
+3. Einen API-Token erstellen: **My Profile** → **API Tokens** → **Create Token** → Vorlage **Edit Cloudflare Workers** oder Recht **Account → Cloudflare Pages → Edit**.
+4. Die **Account ID** steht im Dashboard rechts auf der Startseite.
+5. In GitHub unter **Settings → Secrets and variables → Actions** die beiden Secrets `CLOUDFLARE_API_TOKEN` und `CLOUDFLARE_ACCOUNT_ID` eintragen.
 
 ### 7. Ersten Lauf starten
 
@@ -76,8 +80,8 @@ Falls ein Ablauf rot wird, schick den Namen des Ablaufs und die Fehlermeldung an
 
 Wenn alle grün sind, sind die Adressen:
 
-- Schülerseite: `https://thomsen92.github.io/Lerndorf/`
-- Lehrer-Bereich: `https://thomsen92.github.io/Lerndorf/lehrer/`
+- Schülerseite: Adresse des Cloudflare-Projekts `lerndorf` (z.B. `https://lerndorf.pages.dev/`)
+- Lehrer-Bereich: `…/lehrer/` an dieser Adresse
 
 ---
 

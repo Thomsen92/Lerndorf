@@ -11,7 +11,7 @@ const SEEDS = [11, 23];
 const VIEWS = ['overview', 'topdown', 'marketplace', 'plot', 'bridge'];
 const PORT = 5174;
 // Vite serves everything below the base path of the app (SPEC §17)
-const BASE = `http://localhost:${PORT}/Lerndorf/dev/galerie.html`;
+const BASE = `http://localhost:${PORT}/dev/galerie.html`;
 
 const date = new Date().toISOString().slice(0, 10);
 const outDirPath = fileURLToPath(new URL(`../../Konzept/Galerie/${date}/`, import.meta.url));

@@ -48,7 +48,7 @@ Schüler sind 13–14 Jahre alt; teils schwächere Lesekompetenz. Oberfläche au
 
 ## Randbedingungen
 
-- **Kosten:** 0 € (Supabase Free, GitHub Pages, Open Source, CC0-Modelle).
+- **Kosten:** 0 € (Supabase Free, Cloudflare Pages, Open Source, CC0-Modelle).
 - **Datenschutz:** nur Spitznamen; Zuordnung zu echten Namen nur auf Papier bei der Lehrkraft. Daten in der EU (Supabase Frankfurt). Kein Tracking, keine Werbung.
 - **Geräte:** muss auf dem ältesten Schul-Tablet flüssig laufen (Ziel 30 Bilder/s). Der Prototyp lief dort gut.
 - **Betrieb:** Lehrkraft ist kein Entwickler. Laufender Aufwand max. ca. 10 Min./Woche (Stempel eintragen). Kein Eingreifen nach Ferien nötig.

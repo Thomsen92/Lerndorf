@@ -4,7 +4,7 @@ import { defineConfig } from 'vite';
 // GitHub Pages serves the repo under /Lerndorf/.
 // Two pages: the pupil app (index.html) and the teacher area (lehrer/index.html).
 export default defineConfig({
-  base: '/Lerndorf/',
+  base: '/',
   build: {
     target: 'es2022',
     sourcemap: false,
