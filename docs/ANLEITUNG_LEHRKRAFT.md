@@ -63,10 +63,14 @@ Den Namen genau so schreiben, Groß- und Kleinschreibung zählen.
 ### 6. Cloudflare Pages einrichten
 
 1. Kostenloses Konto auf https://dash.cloudflare.com anlegen.
-2. **Workers & Pages** → **Create** → **Pages** → **Upload assets** (Direct Upload). Projektname: `lerndorf`. Hochladen ist nicht nötig, der Workflow macht das. Einfach einen Platzhalter hochladen und das Projekt anlegen.
-3. Einen API-Token erstellen: **My Profile** → **API Tokens** → **Create Token** → Vorlage **Edit Cloudflare Workers** oder Recht **Account → Cloudflare Pages → Edit**.
-4. Die **Account ID** steht im Dashboard rechts auf der Startseite.
-5. In GitHub unter **Settings → Secrets and variables → Actions** die beiden Secrets `CLOUDFLARE_API_TOKEN` und `CLOUDFLARE_ACCOUNT_ID` eintragen.
+2. **Workers & Pages** → **Create** → **Pages** → **Connect to Git**. Das GitHub-Repo `Lerndorf` auswählen.
+3. Einstellungen:
+   - Projektname: `lerndorf`
+   - Root directory: `web`
+   - Build command: `npm ci && npm run build`
+   - Build output directory: `dist`
+4. Unter **Environment variables** die beiden Werte eintragen: `VITE_SUPABASE_URL` und `VITE_SUPABASE_ANON_KEY` (dieselben Werte wie in den GitHub-Secrets).
+5. **Save and Deploy**. Danach baut Cloudflare die Seite bei jedem Push auf `main` neu.
 
 ### 7. Ersten Lauf starten
 

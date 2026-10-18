@@ -436,7 +436,7 @@ Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3
 
 ## 17. Deploy und Betrieb
 
-- `deploy.yml`: bei Push auf `main` → Tests → Vite-Build → Cloudflare Pages (`wrangler-action`, Secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`).
+- `deploy.yml`: bei Push auf `main` nur Tests. Cloudflare Pages baut und veröffentlicht die Seite selbst (Git-Integration, Root `web`, Build `npm ci && npm run build`, Ausgabe `dist`, Variablen `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` im Cloudflare-Projekt).
 - Supabase-Migrationen über Supabase CLI (`supabase db push`), lokal mit `supabase start` testbar.
 - Secrets (von der Lehrkraft einzutragen, Anleitung in `docs/ANLEITUNG_LEHRKRAFT.md`): `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`.
 - Die Lehrkraft muss anlegen: GitHub-Repo `Lerndorf`, Supabase-Projekt (Region `eu-west-1`, Irland – so von der Lehrkraft gewählt). Schritte dafür als einfache Anleitung mit Screenshots-Beschreibung.
