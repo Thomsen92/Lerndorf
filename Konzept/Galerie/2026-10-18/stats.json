@@ -1,0 +1,122 @@
+{
+  "tal_11_overview": {
+    "total": 111,
+    "world": 57
+  },
+  "tal_11_topdown": {
+    "total": 108,
+    "world": 54
+  },
+  "tal_11_marketplace": {
+    "total": 72,
+    "world": 38
+  },
+  "tal_11_plot": {
+    "total": 52,
+    "world": 32
+  },
+  "tal_11_bridge": {
+    "total": 24,
+    "world": 24
+  },
+  "tal_23_overview": {
+    "total": 112,
+    "world": 58
+  },
+  "tal_23_topdown": {
+    "total": 105,
+    "world": 55
+  },
+  "tal_23_marketplace": {
+    "total": 79,
+    "world": 37
+  },
+  "tal_23_plot": {
+    "total": 59,
+    "world": 30
+  },
+  "tal_23_bridge": {
+    "total": 42,
+    "world": 25
+  },
+  "fluss_mitte_11_overview": {
+    "total": 118,
+    "world": 60
+  },
+  "fluss_mitte_11_topdown": {
+    "total": 114,
+    "world": 57
+  },
+  "fluss_mitte_11_marketplace": {
+    "total": 90,
+    "world": 36
+  },
+  "fluss_mitte_11_plot": {
+    "total": 46,
+    "world": 31
+  },
+  "fluss_mitte_11_bridge": {
+    "total": 79,
+    "world": 31
+  },
+  "fluss_mitte_23_overview": {
+    "total": 117,
+    "world": 58
+  },
+  "fluss_mitte_23_topdown": {
+    "total": 113,
+    "world": 54
+  },
+  "fluss_mitte_23_marketplace": {
+    "total": 84,
+    "world": 35
+  },
+  "fluss_mitte_23_plot": {
+    "total": 58,
+    "world": 33
+  },
+  "fluss_mitte_23_bridge": {
+    "total": 82,
+    "world": 30
+  },
+  "bach_norden_11_overview": {
+    "total": 114,
+    "world": 57
+  },
+  "bach_norden_11_topdown": {
+    "total": 113,
+    "world": 56
+  },
+  "bach_norden_11_marketplace": {
+    "total": 93,
+    "world": 38
+  },
+  "bach_norden_11_plot": {
+    "total": 62,
+    "world": 31
+  },
+  "bach_norden_11_bridge": {
+    "total": 25,
+    "world": 25
+  },
+  "bach_norden_23_overview": {
+    "total": 105,
+    "world": 53
+  },
+  "bach_norden_23_topdown": {
+    "total": 106,
+    "world": 54
+  },
+  "bach_norden_23_marketplace": {
+    "total": 83,
+    "world": 39
+  },
+  "bach_norden_23_plot": {
+    "total": 58,
+    "world": 35
+  },
+  "bach_norden_23_bridge": {
+    "total": 27,
+    "world": 25
+  }
+}
