@@ -6,6 +6,8 @@ import { bridgeHeight, buildLayout } from '../src/world/layout';
 import { buildVillage } from '../src/render/village';
 import { Crowd } from '../src/render/crowd';
 import { setupScene } from '../src/render/scene';
+import { grassReady } from '../src/render/grass';
+import { kenneyReady } from '../src/render/kenney';
 import { MODEL_IDS } from '../src/render/plotAssets';
 import type { SlotMap } from '../src/api/build';
 
@@ -169,7 +171,7 @@ setView(viewName);
 step(20);
 renderer.render(scene, camera);
 // the picture is ready once the sky panorama is loaded
-void rig.skyReady.then((sky) => {
+void Promise.all([rig.skyReady, grassReady(), kenneyReady().then(() => new Promise((r) => setTimeout(r, 0)))]).then(([sky]) => {
   if (sky) (village.userData.setSky as ((t: THREE.Texture) => void) | undefined)?.(sky);
   renderer.render(scene, camera);
   window.galerie.ready = true;

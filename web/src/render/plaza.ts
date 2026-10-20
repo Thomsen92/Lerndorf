@@ -4,6 +4,7 @@
  * Placeholder models built from boxes, cylinders and tori with the colours of the prototype.
  */
 import * as THREE from 'three';
+import { instancedModel, kenneyModel, type KenneyModel } from './kenney';
 import type { Layout } from '../world/layout';
 import { PLAZA_RADIUS } from '../world/constants';
 import { pavingTexture } from './textures';
@@ -37,24 +38,64 @@ function part(
   return mesh;
 }
 
-function fountain(layout: Layout): THREE.Group {
+const WATER = (): THREE.MeshStandardMaterial =>
+  new THREE.MeshStandardMaterial({
+    color: '#6fc3e6',
+    roughness: 0.15,
+    emissive: '#2a6f9a',
+    emissiveIntensity: 0.45,
+  });
+
+/** The stone fountain of the prototype: placeholder until the Kenney fountain has loaded. */
+function placeholderFountain(layout: Layout): THREE.Group {
   const g = new THREE.Group();
   const y = layout.plazaHeight;
   part(new THREE.CylinderGeometry(2.0, 2.2, 0.6, 16), mat(STONE), 0, y + 0.3, 0, g);
   part(new THREE.CylinderGeometry(0.35, 0.45, 1.4, 10), mat(STONE), 0, y + 1.2, 0, g);
   part(new THREE.CylinderGeometry(0.8, 0.6, 0.25, 14), mat(STONE), 0, y + 1.95, 0, g);
   // water: a flat disc in the basin, softly glowing (LOOK §5)
-  const water = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.75, 1.75, 0.1, 20),
-    new THREE.MeshStandardMaterial({
-      color: '#6fc3e6',
-      roughness: 0.15,
-      emissive: '#2a6f9a',
-      emissiveIntensity: 0.45,
-    }),
-  );
+  const water = new THREE.Mesh(new THREE.CylinderGeometry(1.75, 1.75, 0.1, 20), WATER());
   water.position.set(0, y + 0.62, 0);
   g.add(water);
+  // replaced later: keep it out of the static merge (render/merge.ts)
+  g.traverse((o) => {
+    if (o instanceof THREE.Mesh) o.userData.kind = 'live';
+  });
+  return g;
+}
+
+/** Scale of the Kenney fountain (2 m wide, 0.48 m high) on the plaza. */
+const FOUNTAIN_W = 2.3;
+const FOUNTAIN_H = 2.0;
+
+/**
+ * Fountain: Kenney's round fountain with a raised inner bowl (Fantasy Town Kit, CC0), its water
+ * glowing softly (LOOK §5). `onTop` receives the height of the inner water once it is known.
+ */
+function fountain(layout: Layout, onTop: (innerWater: number, outerWater: number) => void): THREE.Group {
+  const g = new THREE.Group();
+  const placeholder = placeholderFountain(layout);
+  g.add(placeholder);
+  void kenneyModel('town', 'fountain-round-detail').then((model) => {
+    if (!model) return;
+    const y = layout.plazaHeight;
+    const stone = new THREE.Mesh(model.geometry, model.material);
+    stone.scale.set(FOUNTAIN_W, FOUNTAIN_H, FOUNTAIN_W);
+    stone.position.y = y;
+    stone.castShadow = true;
+    stone.receiveShadow = true;
+    stone.userData.kind = 'live';
+    g.remove(placeholder);
+    g.add(stone);
+    if (model.plain) {
+      const water = new THREE.Mesh(model.plain, WATER());
+      water.scale.copy(stone.scale);
+      water.position.y = y + 0.01;
+      g.add(water);
+    }
+    // inner bowl water at 0.38 m, outer basin at 0.14 m (model units)
+    onTop(y + 0.38 * FOUNTAIN_H, y + 0.14 * FOUNTAIN_H);
+  });
   return g;
 }
 
@@ -94,12 +135,28 @@ function board(layout: Layout): THREE.Group {
 }
 
 /** A market stall with counter, posts and a striped awning. Front faces the plaza. */
-function stall(layout: Layout, angle: number, radius: number, stripe: string, goods: string[]): THREE.Group {
-  const x = layout.plaza.x + Math.cos(angle) * radius;
-  const z = layout.plaza.z + Math.sin(angle) * radius;
+/** What a stall sells: Kenney Food Kit model, its size and where the pieces lie on the counter. */
+type Goods = 'apples' | 'pumpkins' | 'bread';
+const GOODS: Record<Goods, { name: string; scale: number; spots: Array<[number, number]> }> = {
+  apples: {
+    name: 'apple',
+    scale: 1.7,
+    spots: [-0.95, -0.65, -0.35, 0.35, 0.65, 0.95].flatMap((x) => [
+      [x, 0.1],
+      [x + 0.15, 0.42],
+    ]) as Array<[number, number]>,
+  },
+  pumpkins: { name: 'pumpkin', scale: 1.5, spots: [[-0.85, 0.15], [-0.4, 0.4], [0.45, 0.15], [0.9, 0.4]] },
+  bread: { name: 'loaf-round', scale: 0.7, spots: [[-0.8, 0.2], [-0.4, 0.45], [0.4, 0.2], [0.85, 0.45]] },
+};
+/** Kenney stall (Fantasy Town Kit, 1 m) scaled to the size of the prototype stall. */
+const STALL_SCALE = 2.3;
+const COUNTER = 0.35 * STALL_SCALE;
+
+/** The prototype stall: placeholder until the Kenney models have loaded. */
+function placeholderStall(stripe: string, colours: string[]): THREE.Group {
   const g = new THREE.Group();
-  g.position.set(x, layout.plazaHeight, z);
-  g.rotation.y = Math.atan2(layout.plaza.x - x, layout.plaza.z - z);
+
   part(new THREE.BoxGeometry(2.4, 0.9, 1.1), mat(WOOD), 0, 0.45, 0, g);
   for (const [px, pz] of [
     [-1.1, -0.5],
@@ -121,9 +178,54 @@ function stall(layout: Layout, angle: number, radius: number, stripe: string, go
     );
     strip.rotation.x = 0.18;
   }
-  goods.forEach((col, k) => {
+  colours.forEach((col, k) => {
     part(new THREE.SphereGeometry(0.17, 6, 5), mat(col), -0.8 + k * 0.32, 1.0, 0.1 + (k % 2) * 0.2, g);
   });
+    g.traverse((o) => {
+    if (o instanceof THREE.Mesh) o.userData.kind = 'live'; // replaced later: not merged
+  });
+  return g;
+}
+
+/**
+ * Market stall facing the plaza centre: Kenney stall with its awning in the stall colour
+ * (the green roof is recoloured like the tree crowns) and Kenney food on the counter.
+ */
+function stall(
+  layout: Layout,
+  angle: number,
+  radius: number,
+  stripe: string,
+  colours: string[],
+  goods: Goods,
+): THREE.Group {
+  const x = layout.plaza.x + Math.cos(angle) * radius;
+  const z = layout.plaza.z + Math.sin(angle) * radius;
+  const g = new THREE.Group();
+  g.position.set(x, layout.plazaHeight, z);
+  g.rotation.y = Math.atan2(layout.plaza.x - x, layout.plaza.z - z);
+  const placeholder = placeholderStall(stripe, colours);
+  g.add(placeholder);
+  const what = GOODS[goods];
+  void Promise.all([kenneyModel('town', 'stall-green'), kenneyModel('food', what.name)]).then(
+    ([stallModel, food]) => {
+      if (!stallModel || !food) return;
+      // the long side of the counter faces the plaza (the model's long side runs along z)
+      const m = new THREE.Matrix4()
+        .makeRotationY(Math.PI / 2)
+        .scale(new THREE.Vector3(STALL_SCALE, STALL_SCALE, STALL_SCALE));
+      const body = instancedModel(stallModel, [m], [new THREE.Color(stripe)]);
+      const pieces = what.spots.map(([px, pz], k) =>
+        new THREE.Matrix4()
+          .makeRotationY(k * 1.7)
+          .scale(new THREE.Vector3(what.scale, what.scale, what.scale))
+          .setPosition(px, COUNTER, pz),
+      );
+      const wares = instancedModel(food, pieces);
+      g.remove(placeholder);
+      g.add(body, wares);
+    },
+  );
   return g;
 }
 
@@ -142,6 +244,8 @@ function bench(layout: Layout, angle: number): THREE.Group {
   return g;
 }
 
+const TUB_FLOWERS = ['flower_redA', 'flower_purpleB', 'flower_yellowA'];
+
 function tub(layout: Layout, angle: number): THREE.Group {
   const r = PLAZA_RADIUS - 1.2;
   const x = layout.plaza.x + Math.cos(angle) * r;
@@ -150,7 +254,21 @@ function tub(layout: Layout, angle: number): THREE.Group {
   g.position.set(x, layout.plazaHeight, z);
   part(new THREE.CylinderGeometry(0.5, 0.42, 0.7, 10), mat(WOOD), 0, 0.35, 0, g);
   part(new THREE.SphereGeometry(0.45, 8, 6), mat('#5d8f3e'), 0, 0.85, 0, g);
-  part(new THREE.SphereGeometry(0.13, 5, 4), mat('#d98cc5'), 0.25, 1.0, 0.1, g);
+  // three Nature Kit flowers on the shrub; until they have loaded the pink blossom stands in
+  const blossom = part(new THREE.SphereGeometry(0.13, 5, 4), mat('#d98cc5'), 0.25, 1.0, 0.1, g);
+  blossom.userData.kind = 'live';
+  void Promise.all(TUB_FLOWERS.map((n) => kenneyModel('nature', n))).then((models) => {
+    if (models.some((m) => !m)) return;
+    g.remove(blossom);
+    models.forEach((m, k) => {
+      const a = k * 2.1 + angle;
+      const at = new THREE.Matrix4()
+        .makeRotationY(a)
+        .scale(new THREE.Vector3(2.4, 2.4, 2.4))
+        .setPosition(Math.cos(a) * 0.22, 1.12, Math.sin(a) * 0.22);
+      g.add(instancedModel(m as KenneyModel, [at]));
+    });
+  });
   return g;
 }
 
@@ -176,10 +294,16 @@ export function buildPlaza(layout: Layout): THREE.Group {
     root.add(ring);
   }
 
-  const f = fountain(layout);
+  // water jet and droplets (animated each frame, see userData.animate); the heights follow the
+  // fountain model once it has loaded
+  let inner = layout.plazaHeight + 2.0;
+  let outer = layout.plazaHeight + 0.62;
+  const f = fountain(layout, (i, o) => {
+    inner = i;
+    outer = o;
+  });
   f.position.set(layout.plaza.x, 0, layout.plaza.z);
   root.add(f);
-  // water jet and droplets (animated each frame, see userData.animate)
   const jetMat = new THREE.MeshStandardMaterial({
     color: '#8fd3f0',
     emissive: '#2a6f9a',
@@ -187,23 +311,25 @@ export function buildPlaza(layout: Layout): THREE.Group {
     roughness: 0.1,
   });
   const jet = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.12, 1, 6), jetMat);
-  jet.position.set(layout.plaza.x, layout.plazaHeight + 2.1, layout.plaza.z);
+  jet.position.set(layout.plaza.x, inner + 0.5, layout.plaza.z);
   root.add(jet);
-  const DROPS = 14;
+  const DROPS = 18;
   const dropMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.07, 5, 4), jetMat, DROPS);
   dropMesh.frustumCulled = false;
   root.add(dropMesh);
   const m = new THREE.Matrix4();
   root.userData.animate = (t: number): void => {
-    // the jet pulses in height; the droplets rise, arc outwards and fall into the basin
+    // the jet pulses in height; the droplets rise from its top, arc outwards and fall into the
+    // outer basin
     const pulse = 0.85 + 0.15 * Math.sin(t * 4);
     jet.scale.set(1, 0.9 * pulse, 1);
-    jet.position.y = layout.plazaHeight + 2.1 + 0.25 * pulse;
+    jet.position.y = inner + 0.45 * pulse;
+    const top = inner + 0.9 * pulse;
     for (let i = 0; i < DROPS; i++) {
       const phase = (t * 0.7 + i / DROPS) % 1;
       const a = (i / DROPS) * Math.PI * 2;
-      const r = phase * 0.9;
-      const h = layout.plazaHeight + 2.3 + Math.sin(phase * Math.PI) * 0.9 - phase * 0.4;
+      const r = phase * 1.5;
+      const h = top + Math.sin(phase * Math.PI) * 0.5 - phase * (top - outer);
       m.makeTranslation(layout.plaza.x + Math.cos(a) * r, h, layout.plaza.z + Math.sin(a) * r);
       dropMesh.setMatrixAt(i, m);
     }
@@ -216,12 +342,14 @@ export function buildPlaza(layout: Layout): THREE.Group {
   root.add(b);
 
   // stalls and benches away from the board (angles relative to the board)
-  const stalls: Array<[number, string, string[]]> = [
-    [layout.map.boardAngle + 1.4, '#5a62b8', ['#eb5757', '#f2c94c', '#eb5757', '#6fcf97']],
-    [layout.map.boardAngle + 2.6, '#3f8f88', ['#bb6bd9', '#f2a7d0', '#56ccf2']],
-    [layout.map.boardAngle + 3.8, '#d08a3c', ['#f2994a', '#6fcf97', '#f2994a']],
+  const stalls: Array<[number, string, string[], Goods]> = [
+    [layout.map.boardAngle + 1.4, '#5a62b8', ['#eb5757', '#f2c94c', '#eb5757', '#6fcf97'], 'apples'],
+    [layout.map.boardAngle + 2.6, '#3f8f88', ['#bb6bd9', '#f2a7d0', '#56ccf2'], 'bread'],
+    [layout.map.boardAngle + 3.8, '#d08a3c', ['#f2994a', '#6fcf97', '#f2994a'], 'pumpkins'],
   ];
-  for (const [angle, stripe, goods] of stalls) root.add(stall(layout, angle, 5.0, stripe, goods));
+  for (const [angle, stripe, colours, goods] of stalls) {
+    root.add(stall(layout, angle, 5.0, stripe, colours, goods));
+  }
   for (const angle of layout.map.benchAngles) root.add(bench(layout, angle));
   root.add(tub(layout, layout.map.benchAngles[0] + 0.7));
   root.add(tub(layout, layout.map.benchAngles[2] - 0.6));

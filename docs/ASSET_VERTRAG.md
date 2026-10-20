@@ -64,7 +64,7 @@ Fassung 2 (20.10.2026): vier Deko-Sockel 3 × 3 statt zwei Sockeln 3 × 5 [W].
  z=8           3   3   3   W   W   4   4   4   C   C   C
  z=9           3   3   3   W   W   4   4   4   E   E   E
  z=10 vorne    3   3   3   W   W   4   4   4   E   E   E
-               ───────────[Tor]──────────────[Einfahrt offen]─  Zaun (0,7 m Rasen davor)
+               ───────────[Tor]──────────────[Einfahrtstor]───  Zaun (0,7 m Rasen davor)
                                Straße / Weg
 ```
 
@@ -100,7 +100,7 @@ Bilder des Plans (nur Klötze in Maximalgröße, keine Modelle): `docs/img/grund
 | Deko 3 | x = −4,0 · z = +4,0 | +Z | vom Weg W und vom Gang |
 | Deko 4 | x = +1,0 · z = +4,0 | +Z | vom Weg W und vom Gang |
 | Weg W | x = −1,5 · z = +2,0 | – | Tor im Zaun bei x 3–4 |
-| Einfahrt | x = +4,0 · z = +2,0 | – | Zaun bei x 8–10 offen |
+| Einfahrt | x = +4,0 · z = +2,0 | – | Zaun bei x 8–10 mit geschlossenem Doppeltor (Änderung 21.10.2026) |
 
 ### A.4 Was frei bleiben muss [V]
 
@@ -279,3 +279,9 @@ Wenn Meshy erlaubt wird [O], dann gilt die Arbeitsteilung:
 | 8 | Budgets für Garage (2.000) und Auto (2.500 Dreiecke)? | ja |
 | 9 | Meshy trotz Lizenz-Konflikt? Oder nur CC0-Pakete (z. B. Kenney) plus eigene Blender-Modelle? | erst CC0/eigene; Meshy nur, wenn die Projektregel bewusst geändert wird |
 | 10 | Lootbox in den Umfang aufnehmen (nur mit verdienten Münzen, Chancen sichtbar)? | später entscheiden, erst Shop mit Slots fertig machen |
+
+## Änderung 21.10.2026 (Lehrkraft)
+
+- Keine Zufahrt mehr vom Grundstück zum Weg: das Erdband zwischen Einfahrt und Weg entfällt; die Einfahrt im Zaun wird mit einem geschlossenen Tor abgeschlossen (Kenney Fantasy Town `fence-gate`, 3 m breit).
+- Weg vom Gartentor zur Haustür und die Einfahrt (Autofläche) sind gepflastert (Steine in warmen Grautönen, vom Dorf-Code gezeichnet). Lage und Maße aller Bereiche bleiben unverändert.
+- Der Zuweg vom Gartentor zum Feldweg besteht aus Trittsteinen (Nature Kit `path_stone`).

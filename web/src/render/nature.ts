@@ -11,6 +11,9 @@ import {
   placeFlowers,
   placeHedges,
   placeLamps,
+  placeLaneEdgeTufts,
+  placeLaneStones,
+  placeStepStones,
   placeMeadows,
   placeReeds,
   placeRocks,
@@ -20,6 +23,8 @@ import {
   type Lamp,
   type Tree,
 } from '../world/scatter';
+import { buildGrass } from './grass';
+import { instancedModel, kenneyModel, kenneyScatter, type Variant } from './kenney';
 
 const TRUNK = '#6b4a2f';
 // round crowns: greens with warm and teal accents, so the valley is not one green (LOOK §8)
@@ -76,8 +81,8 @@ function instanced(
   return mesh;
 }
 
-function treeGroup(trees: Tree[], kind: Tree['kind']): THREE.Group {
-  const list = trees.filter((t) => t.kind === kind);
+/** The procedural trees of the prototype: placeholder until the Kenney models have loaded. */
+function placeholderTrees(list: Tree[], kind: Tree['kind']): THREE.Group {
   const g = new THREE.Group();
   if (list.length === 0) return g;
   const trunkMat = new THREE.MeshStandardMaterial({ color: TRUNK, flatShading: true, roughness: 0.9 });
@@ -93,15 +98,7 @@ function treeGroup(trees: Tree[], kind: Tree['kind']): THREE.Group {
         .setPosition(t.x, t.y, t.z);
     }),
   );
-  const palette = kind === 'pine' ? PINES : CROWNS;
-  const colour = (i: number): THREE.Color => {
-    const t = list[i];
-    // a fixed colour per tree; round trees in the orchard patches and some single ones bloom
-    const h = Math.abs(Math.floor(t.x * 7 + t.z * 3));
-    const orchard = Math.sin(t.x * 0.045 + 1.3) * Math.cos(t.z * 0.05 - 0.7) > 0.6;
-    const bloom = kind === 'round' && (orchard || h % 13 === 0);
-    return new THREE.Color(bloom ? BLOSSOMS[h % BLOSSOMS.length] : palette[h % palette.length]);
-  };
+  const colour = (i: number): THREE.Color => crownColour(list[i], kind);
   // two-tier crowns as in the prototype: two stacked cones, or two offset icosahedra
   const crown =
     kind === 'pine'
@@ -131,27 +128,103 @@ function treeGroup(trees: Tree[], kind: Tree['kind']): THREE.Group {
   return g;
 }
 
+/** Fixed hash of a tree position (picks model and colour). */
+const treeHash = (t: Tree): number => Math.abs(Math.floor(t.x * 7 + t.z * 3));
+
+/** Crown colour of a tree; round trees in the orchard patches and some single ones bloom. */
+function crownColour(t: Tree, kind: Tree['kind']): THREE.Color {
+  const h = treeHash(t);
+  const orchard = Math.sin(t.x * 0.045 + 1.3) * Math.cos(t.z * 0.05 - 0.7) > 0.6;
+  const bloom = kind === 'round' && (orchard || h % 13 === 0);
+  const palette = kind === 'pine' ? PINES : CROWNS;
+  return new THREE.Color(bloom ? BLOSSOMS[h % BLOSSOMS.length] : palette[h % palette.length]);
+}
+
+// Kenney models (render/kenney.ts): layered pines from all three kits, autumn pines from the
+// Survival Kit (keep their orange), and the round tree of the Fantasy Town Kit, widened
+const PINE_MODELS: Variant[] = [
+  { pack: 'forests', name: 'tree-high', height: 3.5 },
+  { pack: 'forests', name: 'tree', height: 3.0 },
+  { pack: 'town', name: 'tree-high', height: 3.6 },
+  { pack: 'survival', name: 'tree-tall', height: 3.4 },
+  { pack: 'town', name: 'tree-high-crooked', height: 3.4 },
+  { pack: 'forests', name: 'tree-high', height: 3.2 },
+  { pack: 'survival', name: 'tree-autumn-tall', height: 3.3 },
+];
+const AUTUMN_PINE = 6;
+const ROUND_MODELS: Variant[] = [{ pack: 'town', name: 'tree-high-round', height: 3.4 }];
+
+function treeGroup(trees: Tree[], kind: Tree['kind']): THREE.Group {
+  const list = trees.filter((t) => t.kind === kind);
+  const variants = kind === 'pine' ? PINE_MODELS : ROUND_MODELS;
+  const pick = (t: Tree): number => Math.floor(treeHash(t) / 3) % variants.length;
+  const g = kenneyScatter(
+    list,
+    variants,
+    pick,
+    (t, _i, unit, m) => {
+      // round crowns: wider than the slim model, a little different per tree
+      const wide = kind === 'round' ? 1.3 + (treeHash(t) % 5) * 0.08 : 1.7;
+      const s = unit * t.scale;
+      m.makeRotationY(t.rot)
+        .scale(new THREE.Vector3(s * wide, s, s * wide))
+        .setPosition(t.x, t.y - 0.05, t.z);
+    },
+    {
+      tint: (t) => (kind === 'pine' && pick(t) === AUTUMN_PINE ? null : crownColour(t, kind)),
+      shadows: true, // trees cast shadows (LOOK §3)
+      placeholder: placeholderTrees(list, kind),
+    },
+  );
+  return g;
+}
+
+/** Lantern height (top of the cap) and its glass, in metres above the ground (LOOK §7). */
+const LANTERN_HEIGHT = 2.4;
+// in the Kenney lantern (1.56 m) the glass sits between the plate at 1.27 and the cap at 1.50
+const GLASS_LOW = (1.27 / 1.56) * LANTERN_HEIGHT;
+const GLASS_HIGH = (1.5 / 1.56) * LANTERN_HEIGHT;
+
 function lampGroup(lamps: Lamp[]): THREE.Group {
   const g = new THREE.Group();
   if (lamps.length === 0) return g;
   const mast = new THREE.CylinderGeometry(0.07, 0.09, 2.2, 6);
   mast.translate(0, 1.1, 0);
-  g.add(
-    instanced(
-      mast,
-      new THREE.MeshStandardMaterial({ color: '#2b2b33', roughness: 0.8 }),
-      lamps.length,
-      (i, m) => m.makeTranslation(lamps[i].x, lamps[i].y, lamps[i].z),
-    ),
+  const mastMesh = instanced(
+    mast,
+    new THREE.MeshStandardMaterial({ color: '#2b2b33', roughness: 0.8 }),
+    lamps.length,
+    (i, m) => m.makeTranslation(lamps[i].x, lamps[i].y, lamps[i].z),
   );
+  g.add(mastMesh);
   // glowing head (MeshBasic: it shines without a light source, LOOK §3)
   const head = new THREE.BoxGeometry(0.35, 0.4, 0.35);
   head.translate(0, 2.35, 0);
-  g.add(
-    instanced(head, new THREE.MeshBasicMaterial({ color: '#ffc56b' }), lamps.length, (i, m) =>
-      m.makeTranslation(lamps[i].x, lamps[i].y, lamps[i].z),
-    ),
+  const headMat = new THREE.MeshBasicMaterial({ color: '#ffc56b' });
+  const headMesh = instanced(head, headMat, lamps.length, (i, m) =>
+    m.makeTranslation(lamps[i].x, lamps[i].y, lamps[i].z),
   );
+  g.add(headMesh);
+  // Kenney lantern (Fantasy Town Kit): post, plate and cap from the model, the glass between
+  // plate and cap glows; until it has loaded the placeholder mast and head stay
+  void kenneyModel('town', 'lantern').then((model) => {
+    if (!model) return;
+    const box = model.geometry.boundingBox as THREE.Box3;
+    const unit = LANTERN_HEIGHT / (box.max.y - box.min.y);
+    const posts = lamps.map((l) => {
+      const m = new THREE.Matrix4().makeRotationY(l.face).scale(new THREE.Vector3(unit, unit, unit));
+      return m.setPosition(l.x, l.y - 0.03, l.z);
+    });
+    const post = instancedModel(model, posts);
+    post.castShadow = true;
+    const glass = new THREE.BoxGeometry(0.26, GLASS_HIGH - GLASS_LOW, 0.26);
+    glass.translate(0, (GLASS_LOW + GLASS_HIGH) / 2, 0);
+    const glassMesh = instanced(glass, headMat, lamps.length, (i, m) =>
+      m.makeRotationY(lamps[i].face).setPosition(lamps[i].x, lamps[i].y - 0.03, lamps[i].z),
+    );
+    g.remove(mastMesh, headMesh);
+    g.add(post, glassMesh);
+  });
   // light pool on the ground: additive, depth-free, one instanced mesh for all lanterns
   const pool = new THREE.PlaneGeometry(7, 7);
   pool.rotateX(-Math.PI / 2);
@@ -182,10 +255,36 @@ export function buildNature(layout: Layout): THREE.Group {
   return root;
 }
 
-const BUSH = ['#3f8f5a', '#4d9a5d', '#2f7d5b', '#5d8f3e'];
+const BUSH = ['#3f8f5a', '#4d9a5d', '#2f7d5b', '#5d8f3e', '#6a9c4a'];
 const FLOWER = ['#f2c94c', '#eb5757', '#f2a7d0', '#ffffff', '#bb6bd9'];
-const TUFT = ['#4a7a40', '#5f9150', '#6e9d55', '#55853f'];
-const HEDGE = ['#2f6e4f', '#3a7d55', '#2c6a52'];
+// FLOWER index → model colour group (0 red, 1 purple, 2 yellow)
+const FLOWER_GROUP = [2, 0, 1, 2, 1];
+const FLOWER_MODELS: Variant[] = ['red', 'purple', 'yellow'].flatMap((c) =>
+  ['A', 'B', 'C'].map((f) => ({ pack: 'nature' as const, name: `flower_${c}${f}`, height: 0.5 })),
+);
+const HEDGE = ['#3f8a55', '#4d9a5d', '#3a7d55'];
+const BUSH_MODELS: Variant[] = [{ pack: 'town', name: 'tree-high-round', height: 1.5 }];
+// heights here are the model heights (the flat stones are a few centimetres thick)
+const LANE_STONE_MODELS: Variant[] = [
+  { pack: 'nature', name: 'stone_smallFlatA', height: 0.07 },
+  { pack: 'nature', name: 'stone_smallFlatB', height: 0.07 },
+  { pack: 'nature', name: 'stone_smallFlatC', height: 0.07 },
+];
+const STEP_MODELS: Variant[] = [{ pack: 'nature', name: 'path_stone', height: 0.06 }];
+const ROCK_MODELS: Variant[] = [
+  { pack: 'town', name: 'rock-small', height: 0.9 },
+  { pack: 'town', name: 'rock-wide', height: 0.8 },
+  { pack: 'survival', name: 'rock-b', height: 0.55 },
+  { pack: 'town', name: 'rock-large', height: 1.0 },
+  { pack: 'survival', name: 'rock-c', height: 0.6 },
+];
+const SHORE_MODELS: Variant[] = [
+  { pack: 'survival', name: 'rock-a', height: 0.45 },
+  { pack: 'survival', name: 'rock-b', height: 0.4 },
+  { pack: 'town', name: 'rock-wide', height: 0.4 },
+  { pack: 'survival', name: 'rock-c', height: 0.5 },
+  { pack: 'town', name: 'rock-small', height: 0.6 },
+];
 
 /** Shrubs, rocks, reeds and flower patches (SPEC §10.6), all as instanced meshes. */
 export function buildVegetation(layout: Layout): THREE.Group {
@@ -195,51 +294,122 @@ export function buildVegetation(layout: Layout): THREE.Group {
   const bushes = placeBushes(layout);
   const bushGeo = new THREE.IcosahedronGeometry(0.6, 0);
   bushGeo.translate(0, 0.45, 0);
+  const bushPlaceholder = instanced(
+    bushGeo,
+    new THREE.MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 0.85 }),
+    bushes.length,
+    (i, m) => {
+      const b = bushes[i];
+      m.makeRotationY(b.rot)
+        .scale(new THREE.Vector3(b.scale, b.scale * 0.8, b.scale))
+        .setPosition(b.x, b.y - 0.08, b.z);
+    },
+    (i) => pick(BUSH, i),
+  );
+  // shrub groups: three round crowns of the Fantasy Town tree each (one large, two smaller at its
+  // side), squashed and sunk so the trunk stays under ground, in two or three greens
+  const crowns: Array<{ x: number; y: number; z: number; s: number; c: number; r: number }> = [];
+  bushes.forEach((b, i) => {
+    const parts: Array<[number, number, number]> = [
+      [0, 0, 1],
+      [0.75, 0.5, 0.72],
+      [0.65, 2.6, 0.6],
+    ];
+    parts.forEach(([d, a, k], j) => {
+      const x = b.x + Math.cos(b.rot + a) * d * b.scale;
+      const z = b.z + Math.sin(b.rot + a) * d * b.scale;
+      crowns.push({ x, y: layout.terrain.groundHeight(x, z), z, s: b.scale * k, c: i + j, r: b.rot + j * 1.9 });
+    });
+  });
   root.add(
-    instanced(
-      bushGeo,
-      new THREE.MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 0.85 }),
-      bushes.length,
-      (i, m) => {
-        const b = bushes[i];
-        m.makeRotationY(b.rot)
-          .scale(new THREE.Vector3(b.scale, b.scale * 0.8, b.scale))
-          .setPosition(b.x, b.y - 0.08, b.z);
+    kenneyScatter(
+      crowns,
+      BUSH_MODELS,
+      () => 0,
+      (c, _i, unit, m) => {
+        const s = unit * c.s;
+        m.makeRotationY(c.r)
+          .scale(new THREE.Vector3(s * 2.0, s, s * 2.0))
+          .setPosition(c.x, c.y - 0.48 * c.s, c.z);
       },
-      (i) => pick(BUSH, i),
+      { tint: (c) => pick(BUSH, c.c), placeholder: bushPlaceholder, shadows: true },
     ),
+  );
+
+  // flat stones on the lanes and stepping stones on the garden paths (Nature Kit)
+  const laneStones = placeLaneStones(layout);
+  root.add(
+    kenneyScatter(laneStones, LANE_STONE_MODELS, (_s, i) => i, (st, _i, unit, m) => {
+      const s = unit * st.scale;
+      m.makeRotationY(st.rot)
+        .scale(new THREE.Vector3(s, s, s))
+        .setPosition(st.x, st.y + 0.13, st.z); // on top of the lane strip (0.11 m)
+    }),
+  );
+  const steps = placeStepStones(layout);
+  root.add(
+    kenneyScatter(steps, STEP_MODELS, () => 0, (st, _i, unit, m) => {
+      // the model is 1.0 wide and 0.58 deep: across the walking direction
+      m.makeRotationY(st.rot)
+        .scale(new THREE.Vector3(unit * 1.15, unit * 1.15, unit * 1.15))
+        .setPosition(st.x, st.y + 0.05, st.z);
+    }),
   );
 
   const rocks = placeRocks(layout);
   const rockGeo = new THREE.DodecahedronGeometry(0.5, 0);
+  const rockPlaceholder = instanced(
+    rockGeo,
+    new THREE.MeshStandardMaterial({ color: '#8f8d86', flatShading: true, roughness: 0.95 }),
+    rocks.length,
+    (i, m) => {
+      const r = rocks[i];
+      // half sunk into the ground (LOOK §4)
+      m.makeRotationFromEuler(new THREE.Euler(r.rot, r.rot * 0.7, r.rot * 0.3))
+        .scale(new THREE.Vector3(r.scale, r.scale * 0.8, r.scale))
+        .setPosition(r.x, r.y - r.scale * 0.1, r.z);
+    },
+  );
   root.add(
-    instanced(
-      rockGeo,
-      new THREE.MeshStandardMaterial({ color: '#8f8d86', flatShading: true, roughness: 0.95 }),
-      rocks.length,
-      (i, m) => {
-        const r = rocks[i];
-        // half sunk into the ground (LOOK §4)
-        m.makeRotationFromEuler(new THREE.Euler(r.rot, r.rot * 0.7, r.rot * 0.3))
-          .scale(new THREE.Vector3(r.scale, r.scale * 0.8, r.scale))
-          .setPosition(r.x, r.y - r.scale * 0.1, r.z);
+    kenneyScatter(
+      rocks,
+      ROCK_MODELS,
+      (_r, i) => i,
+      (r, _i, unit, m) => {
+        const s = unit * (0.5 + r.scale);
+        m.makeRotationY(r.rot * 3)
+          .scale(new THREE.Vector3(s, s, s))
+          .setPosition(r.x, r.y - 0.06 * s, r.z);
       },
+      { placeholder: rockPlaceholder, shadows: true },
     ),
   );
 
-  // stones on the river banks (LOOK §4)
+  // stones on the river banks in small groups, some flat ones at the waterline (LOOK §4)
   const stones = placeShoreStones(layout);
+  const stonePlaceholder = instanced(
+    rockGeo,
+    new THREE.MeshStandardMaterial({ color: '#a39f94', flatShading: true, roughness: 0.95 }),
+    stones.length,
+    (i, m) => {
+      const r = stones[i];
+      m.makeRotationY(r.rot)
+        .scale(new THREE.Vector3(r.scale, r.scale * 0.7, r.scale))
+        .setPosition(r.x, r.y - r.scale * 0.1, r.z);
+    },
+  );
   root.add(
-    instanced(
-      rockGeo,
-      new THREE.MeshStandardMaterial({ color: '#a39f94', flatShading: true, roughness: 0.95 }),
-      stones.length,
-      (i, m) => {
-        const r = stones[i];
+    kenneyScatter(
+      stones,
+      SHORE_MODELS,
+      (_r, i) => i,
+      (r, _i, unit, m) => {
+        const s = unit * (0.6 + r.scale * 1.6);
         m.makeRotationY(r.rot)
-          .scale(new THREE.Vector3(r.scale, r.scale * 0.7, r.scale))
-          .setPosition(r.x, r.y - r.scale * 0.1, r.z);
+          .scale(new THREE.Vector3(s, s, s))
+          .setPosition(r.x, r.y - 0.08 * s, r.z);
       },
+      { placeholder: stonePlaceholder },
     ),
   );
 
@@ -273,45 +443,44 @@ export function buildVegetation(layout: Layout): THREE.Group {
       blobs.push({ x, y: layout.terrain.groundHeight(x, z), z, s: 0.62 + wobble * 0.1, c: i });
     }
   });
+  const hedgePlaceholder = instanced(
+    bushGeo,
+    new THREE.MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 0.85 }),
+    blobs.length,
+    (i, m) => {
+      const b = blobs[i];
+      m.makeRotationY(i * 0.9)
+        .scale(new THREE.Vector3(b.s * 1.15, b.s * 0.95, b.s * 1.15))
+        .setPosition(b.x, b.y - 0.08, b.z);
+    },
+    (i) => pick(HEDGE, blobs[i].c),
+  );
+  // hedgerows: overlapping round crowns (the bush model), sunk to their lower half
   root.add(
-    instanced(
-      bushGeo,
-      new THREE.MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 0.85 }),
-      blobs.length,
-      (i, m) => {
-        const b = blobs[i];
+    kenneyScatter(
+      blobs,
+      [BUSH_MODELS[0]],
+      () => 0,
+      (b, i, unit, m) => {
+        const s = unit * b.s * 1.5;
         m.makeRotationY(i * 0.9)
-          .scale(new THREE.Vector3(b.s * 1.15, b.s * 0.95, b.s * 1.15))
-          .setPosition(b.x, b.y - 0.08, b.z);
+          .scale(new THREE.Vector3(s * 2.3, s, s * 2.3))
+          .setPosition(b.x, b.y - 0.45 * b.s * 1.5, b.z);
       },
-      (i) => pick(HEDGE, blobs[i].c),
+      { tint: (b) => pick(HEDGE, b.c), placeholder: hedgePlaceholder },
     ),
   );
+
 
   // blossom meadows are painted into the ground (render/village.ts); only their flowers stand here
   const meadows = placeMeadows(layout);
 
-  // grass tufts: three thin blades each, two greens; every seventh tuft carries a wild flower
+  // grass tufts: Kenney grass silhouettes on crossed cards (render/grass.ts), one draw call
   const tufts = placeTufts(layout);
-  const blade = (ax: number, az: number, h: number): THREE.BufferGeometry =>
-    new THREE.ConeGeometry(0.06, h, 3).translate(ax, h / 2, az);
-  const tuftGeo = mergeGeometries([blade(0, 0, 0.42), blade(0.1, 0.05, 0.32), blade(-0.08, 0.07, 0.36)]);
-  root.add(
-    instanced(
-      tuftGeo,
-      new THREE.MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 0.9 }),
-      tufts.length,
-      (i, m) => {
-        const t = tufts[i];
-        m.makeRotationY(t.rot)
-          .scale(new THREE.Vector3(t.scale, t.scale, t.scale))
-          .setPosition(t.x, t.y - 0.03, t.z);
-      },
-      (i) => pick(TUFT, i),
-    ),
-  );
+  root.add(buildGrass(tufts, placeLaneEdgeTufts(layout)));
 
-  // flower patches: five small blossoms around each patch centre
+  // flower patches: five flowers around each patch centre; every 19th grass tuft and the
+  // blossom meadows carry flowers too. y is the ground under the flower.
   const patches = placeFlowers(layout);
   const blossoms: Array<{ x: number; y: number; z: number; colour: number }> = [];
   patches.forEach((p, i) => {
@@ -319,25 +488,39 @@ export function buildVegetation(layout: Layout): THREE.Group {
       const a = (k / 5) * Math.PI * 2 + i;
       blossoms.push({
         x: p.x + Math.cos(a) * 0.35,
-        y: p.y + 0.22,
+        y: p.y,
         z: p.z + Math.sin(a) * 0.35,
         colour: (i + k) % FLOWER.length,
       });
     }
   });
   tufts.forEach((t, i) => {
-    if (i % 7 === 0) blossoms.push({ x: t.x + 0.05, y: t.y + 0.25, z: t.z, colour: i % FLOWER.length });
+    if (i % 19 === 0) blossoms.push({ x: t.x + 0.05, y: t.y, z: t.z, colour: i % FLOWER.length });
   });
   for (const w of meadows) {
-    for (const f of w.flowers) blossoms.push({ x: f.x, y: f.y + 0.22, z: f.z, colour: f.colour });
+    for (const f of w.flowers) blossoms.push({ x: f.x, y: f.y, z: f.z, colour: f.colour });
   }
+  const blossomPlaceholder = instanced(
+    new THREE.SphereGeometry(0.12, 5, 4),
+    new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.7 }),
+    blossoms.length,
+    (i, m) => m.makeTranslation(blossoms[i].x, blossoms[i].y + 0.22, blossoms[i].z),
+    (i) => pick(FLOWER, blossoms[i].colour),
+  );
+  // Nature Kit flowers: the colour picks red, purple or yellow (pink → purple, white → yellow
+  // with a white heart), the position picks one of three shapes
   root.add(
-    instanced(
-      new THREE.SphereGeometry(0.12, 5, 4),
-      new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.7 }),
-      blossoms.length,
-      (i, m) => m.makeTranslation(blossoms[i].x, blossoms[i].y, blossoms[i].z),
-      (i) => pick(FLOWER, blossoms[i].colour),
+    kenneyScatter(
+      blossoms,
+      FLOWER_MODELS,
+      (b) => FLOWER_GROUP[b.colour] * 3 + (Math.abs(Math.floor(b.x * 13 + b.z * 7)) % 3),
+      (b, i, unit, m) => {
+        const s = unit * (0.85 + ((i * 7) % 5) * 0.08);
+        m.makeRotationY(i * 2.4)
+          .scale(new THREE.Vector3(s, s, s))
+          .setPosition(b.x, b.y, b.z);
+      },
+      { placeholder: blossomPlaceholder },
     ),
   );
   return root;

@@ -3,6 +3,7 @@
  * Placeholder models only (boxes and cones). The comic models come in Stufe 2.
  */
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { MAP_SIZE, WATER_LEVEL } from '../world/constants';
 import {
   DRIVEWAY_X,
@@ -24,9 +25,10 @@ import { buildPlaza } from './plaza';
 import { buildBridge } from './bridges';
 import { bakeStatic } from './merge';
 import { buildLandmarks } from './landmarks';
-import { dirtTexture, rippleNormalTexture, skyTexture } from './textures';
-import { fenceGeometry, gardenPathGeometry } from './house';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { rippleNormalTexture, skyTexture } from './textures';
+import { fenceGeometry } from './house';
+import { buildLanes } from './lanes';
+import { instancedModel, kenneyModel } from './kenney';
 
 const MAT = {
   ground: new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.9 }),
@@ -55,45 +57,8 @@ const MAT = {
   mailbox: new THREE.MeshStandardMaterial({ color: '#3c4a7a', roughness: 0.7 }),
   lotLawn: new THREE.MeshStandardMaterial({ color: '#729f5c', roughness: 1, flatShading: true }),
   rope: new THREE.MeshStandardMaterial({ color: '#e8d9b0', roughness: 0.9 }),
-  footpath: new THREE.MeshStandardMaterial({ color: '#cbb894', roughness: 0.95, flatShading: true }),
-  driveway: new THREE.MeshStandardMaterial({ color: '#a89a80', roughness: 0.95, flatShading: true }),
   signBoard: new THREE.MeshStandardMaterial({ color: '#a0703f', roughness: 0.9 }),
 };
-
-/** Vertical ribbon on the ground (lanes, river) following a list of 2D points. */
-function ribbon(
-  points: Point2[],
-  width: number | ((i: number) => number),
-  heightAt: (x: number, z: number) => number,
-  mat: THREE.Material,
-): THREE.Mesh {
-  const verts: number[] = [];
-  const idx: number[] = [];
-  points.forEach((p, i) => {
-    const w = typeof width === 'number' ? width : width(i);
-    const prev = points[Math.max(0, i - 1)];
-    const next = points[Math.min(points.length - 1, i + 1)];
-    const tx = next.x - prev.x;
-    const tz = next.z - prev.z;
-    const l = Math.hypot(tx, tz) || 1;
-    const nx = -tz / l;
-    const nz = tx / l;
-    const hL = heightAt(p.x + (nx * w) / 2, p.z + (nz * w) / 2) + 0.06;
-    const hR = heightAt(p.x - (nx * w) / 2, p.z - (nz * w) / 2) + 0.06;
-    verts.push(p.x + (nx * w) / 2, hL, p.z + (nz * w) / 2, p.x - (nx * w) / 2, hR, p.z - (nz * w) / 2);
-    if (i > 0) {
-      const a = (i - 1) * 2;
-      idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
-    }
-  });
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-  g.setIndex(idx);
-  g.computeVertexNormals();
-  const m = new THREE.Mesh(g, mat);
-  m.receiveShadow = true;
-  return m;
-}
 
 function terrainMesh(layout: Layout): THREE.Mesh {
   // low-poly ground with visible facets, coloured per vertex (prototype, LOOK §3/§4)
@@ -107,7 +72,8 @@ function terrainMesh(layout: Layout): THREE.Mesh {
   const mid = new THREE.Color('#5f8f52');
   const high = new THREE.Color('#7aa35c');
   const bank = new THREE.Color('#a99b72');
-  const pathCol = new THREE.Color('#b59f78');
+  const pathCol = new THREE.Color('#c99a78');
+  const trampled = new THREE.Color('#8c9a58');
   const meadowCol = new THREE.Color('#93c26a');
   const tmp = new THREE.Color();
   const t = layout.terrain;
@@ -129,9 +95,11 @@ function terrainMesh(layout: Layout): THREE.Mesh {
       const d = Math.hypot(x - m.x, z - m.z);
       if (d < m.radius + 1) tmp.lerp(meadowCol, smoothstep(m.radius + 1, m.radius - 0.6, d) * 0.8);
     }
-    // the lane ribbon lies on top; a slightly darker trampled seam under its edge hides the border
+    // the lane strip lies on top and fades out at its sides (render/lanes.ts): under the fade
+    // the lawn is trampled and dry, under the solid core it is earth
     const ld = laneDistance(layout, x, z);
-    tmp.lerp(pathCol, smoothstep(1.6, 0.9, ld) * 0.9);
+    tmp.lerp(trampled, smoothstep(1.9, 0.8, ld) * 0.45);
+    tmp.lerp(pathCol, smoothstep(0.7, 0.3, ld) * 0.9);
     // gentle large and small noise, so no field is one flat colour (LOOK §2.1)
     const n = Math.sin(x * 1.7) * Math.cos(z * 1.3) * 0.025 + Math.sin(x * 0.21 + z * 0.17) * 0.03;
     col[i * 3] = tmp.r + n;
@@ -367,6 +335,87 @@ function surface(
   g.add(m);
 }
 
+// paving stones in warm greys (Kenney style), on a dark bed that shows as the joints
+const PAVING = [
+  new THREE.MeshStandardMaterial({ color: '#c7c0b3', roughness: 0.9, flatShading: true }),
+  new THREE.MeshStandardMaterial({ color: '#b3ac9f', roughness: 0.9, flatShading: true }),
+  new THREE.MeshStandardMaterial({ color: '#d4cdbf', roughness: 0.9, flatShading: true }),
+];
+const PAVING_BED = new THREE.MeshStandardMaterial({ color: '#7d766b', roughness: 1, flatShading: true });
+
+/**
+ * A paved strip in plot-local coordinates: rows of slightly irregular flat stones (about 0.4 m),
+ * every other row shifted by half a stone, on a dark bed. One mesh per stone colour, so the
+ * static merge (render/merge.ts) folds them into the village.
+ */
+function paving(g: THREE.Group, lx: number, z0: number, z1: number, w: number, seed: number): void {
+  surface(g, lx, z0, z1, w, PAVING_BED, 0.07);
+  const parts: THREE.BufferGeometry[][] = PAVING.map(() => []);
+  const rows = Math.max(1, Math.round((z1 - z0) / 0.42));
+  const rowD = (z1 - z0) / rows;
+  let h = seed * 9973 + 17;
+  const rnd = (): number => {
+    h = (h * 16807) % 2147483647;
+    return h / 2147483647;
+  };
+  for (let r = 0; r < rows; r++) {
+    const shift = r % 2 ? 0.5 : 0;
+    const cols = Math.max(1, Math.round(w / 0.45));
+    const colW = w / cols;
+    for (let c = -1; c < cols; c++) {
+      let a = (c + shift) * colW;
+      let b = a + colW;
+      a = Math.max(a, 0);
+      b = Math.min(b, w);
+      if (b - a < 0.12) continue;
+      const sw = b - a - 0.06 - rnd() * 0.04;
+      const sd = rowD - 0.06 - rnd() * 0.04;
+      const stone = new THREE.BoxGeometry(sw, 0.05 + rnd() * 0.02, sd);
+      stone.rotateY((rnd() - 0.5) * 0.08);
+      stone.translate(lx - w / 2 + (a + b) / 2, 0.11, z0 + (r + 0.5) * rowD);
+      parts[Math.floor(rnd() * PAVING.length)].push(stone);
+    }
+  }
+  parts.forEach((list, k) => {
+    if (list.length === 0) return;
+    const m = new THREE.Mesh(mergeGeometries(list), PAVING[k]);
+    m.receiveShadow = true;
+    g.add(m);
+  });
+}
+
+/** Width of the driveway gate (the opening in the front fence). */
+const DRIVE_GATE = 3.0;
+
+/**
+ * Closed double gates in front of the car stands of all occupied plots: Kenney Fantasy Town
+ * fence-gate (a 1 m fence tile along z with a door in the middle, 0.38 m high), turned along the
+ * front fence; one InstancedMesh.
+ */
+function driveGates(plots: Plot[]): THREE.Group {
+  const g = new THREE.Group();
+  if (plots.length === 0) return g;
+  void kenneyModel('town', 'fence-gate').then((model) => {
+    if (!model) return;
+    const mats = plots.map((p) => {
+      // the model is a fence tile: its posts stand on the tile edge at x = 0.46, so centre it first
+      const local = new THREE.Matrix4()
+        .makeTranslation(DRIVEWAY_X, 0.02, p.d / 2)
+        .multiply(new THREE.Matrix4().makeRotationY(Math.PI / 2))
+        .multiply(new THREE.Matrix4().makeScale(DRIVE_GATE, 2.2, DRIVE_GATE))
+        .multiply(new THREE.Matrix4().makeTranslation(-0.46, 0, 0));
+      return new THREE.Matrix4()
+        .makeRotationY(p.face)
+        .setPosition(p.x, p.h, p.z)
+        .multiply(local);
+    });
+    const gates = instancedModel(model, mats);
+    gates.castShadow = true;
+    g.add(gates);
+  });
+  return g;
+}
+
 /**
  * Contents of an occupied plot after the fixed plan (world/plotPlan.ts): house, garage, driveway
  * with car pedestal, footpath, four decoration pedestals (green lawn while empty), fence with a gate
@@ -379,11 +428,12 @@ function plotContents(p: Plot, slots: SlotMap): THREE.Group {
   lawn.receiveShadow = true;
   g.add(lawn);
 
-  // footpath from the gate to the front door, and the driveway from the garage to the street
-  surface(g, PATH_X, HOUSE_FRONT_Z, p.d / 2, 2.0, MAT.footpath, 0.08);
+  // paved footpath from the garden gate to the front door, and the paved car stand in front of
+  // the garage (the plot ends at its fence: no driveway out to the lane, the gate stays shut)
+  paving(g, PATH_X, HOUSE_FRONT_Z, p.d / 2, 2.0, p.index * 2 + 1);
   const garage = SLOTS.find((s) => s.id === 'garage') as SlotDef;
   const driveStart = garage.z + garage.d - PLOT_ROWS / 2;
-  surface(g, DRIVEWAY_X, driveStart, p.d / 2, 3.0, MAT.driveway, 0.08);
+  paving(g, DRIVEWAY_X, driveStart, p.d / 2, 3.0, p.index * 2 + 2);
   for (const side of [-1.55, 1.55]) surface(g, DRIVEWAY_X + side, driveStart, p.d / 2, 0.12, MAT.stone, 0.1);
 
   const tint = tintFor(p.index);
@@ -403,11 +453,12 @@ function plotContents(p: Plot, slots: SlotMap): THREE.Group {
   box.position.set(PATH_X + 1.4, 0.95, p.d / 2 - 0.3);
   g.add(post, box);
 
-  // post-and-rail fence: gate on the footpath, opening for the driveway (LOOK §6)
+  // post-and-rail fence: open gateway on the footpath (the residents walk through) and an opening
+  // in front of the car stand that is closed by a double gate (driveGates, one mesh per village)
   const fence = new THREE.Mesh(
     fenceGeometry(p.w, p.d, [
       [PATH_X - 1.0, PATH_X + 1.0],
-      [DRIVEWAY_X - 1.5, DRIVEWAY_X + 1.5],
+      [DRIVEWAY_X - DRIVE_GATE / 2, DRIVEWAY_X + DRIVE_GATE / 2],
     ]),
     MAT.wood,
   );
@@ -465,27 +516,9 @@ export function buildVillage(
   const river = riverMesh(layout.terrain.river);
   root.add(river);
 
-  // lanes: a thin dirt strip on the ground (1.6 m), textured, lifted 5 cm; the colour in the
-  // terrain (see terrainMesh) underneath matches, so the edge is soft
-  const dirt = new THREE.MeshStandardMaterial({
-    map: dirtTexture(),
-    color: '#b8a07a',
-    roughness: 0.95,
-    polygonOffset: true,
-    polygonOffsetFactor: -2,
-    polygonOffsetUnits: -4,
-  });
-  for (const pts of layout.map.lanes) {
-    const curve = new THREE.CatmullRomCurve3(
-      pts.map((p) => new THREE.Vector3(p.x, 0, p.z)),
-      false,
-      'centripetal',
-    );
-    const samples = curve
-      .getSpacedPoints(Math.ceil(curve.getLength() / 0.7))
-      .map((v) => ({ x: v.x, z: v.z }));
-    root.add(ribbon(samples, 1.6, (x, z) => layout.terrain.groundHeight(x, z) + 0.05, dirt));
-  }
+  // lanes: one soft-edged mesh (render/lanes.ts); the garden paths from the gates are stepping
+  // stones (render/nature.ts); plots have no driveway out to the lane
+  root.add(buildLanes(layout));
 
   // plaza: paving, fountain, quest board, stalls, benches (render/plaza.ts)
   const plaza = buildPlaza(layout);
@@ -499,6 +532,7 @@ export function buildVillage(
     if (p.index === ownPlotIndex) ownGroup = g;
     root.add(g);
   }
+  root.add(driveGates(layout.plots.filter((p) => byPlot.has(p.index))));
   // the build mode swaps the contents of the own plot without rebuilding the village
   root.userData.updateOwnPlot = (slots: SlotMap): void => {
     const plot = ownPlotIndex === null ? undefined : layout.plots[ownPlotIndex];
@@ -509,15 +543,6 @@ export function buildVillage(
     fresh.name = 'contents';
     ownGroup.add(fresh);
   };
-  // garden paths from each gate to its lane, and the driveways of occupied plots: one merged mesh
-  const ground = (x: number, z: number): number => layout.terrain.groundHeight(x, z);
-  const gardens = layout.plots.map((p) => gardenPathGeometry(p.gate, p.link, 1.4, ground));
-  for (const p of layout.plots) {
-    if (byPlot.has(p.index)) gardens.push(gardenPathGeometry(p.drive, p.link, 2.6, ground));
-  }
-  const gardenMesh = new THREE.Mesh(mergeGeometries(gardens), dirt);
-  gardenMesh.receiveShadow = true;
-  root.add(gardenMesh);
   root.add(buildNature(layout));
   root.add(buildVegetation(layout));
   root.add(buildLandmarks(layout));

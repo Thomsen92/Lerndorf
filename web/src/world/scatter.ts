@@ -6,7 +6,7 @@
 import { createRng } from './rng';
 import { segmentDistance } from './geometry';
 import type { Layout } from './layout';
-import { PLAZA_RADIUS, VALLEY_RADIUS } from './constants';
+import { PLAZA_RADIUS, VALLEY_RADIUS, WATER_LEVEL } from './constants';
 
 export interface Tree {
   x: number;
@@ -32,6 +32,13 @@ export function laneDistance(layout: Layout, x: number, z: number): number {
     const d = Math.hypot(s.x - x, s.z - z);
     if (d < best) best = d;
   }
+  return best;
+}
+
+/** Distance to the nearest garden path (gate of a plot to its lane). */
+export function gardenPathDistance(layout: Layout, x: number, z: number): number {
+  let best = Infinity;
+  for (const p of layout.plots) best = Math.min(best, segmentDistance(x, z, p.gate, p.link));
   return best;
 }
 
@@ -137,20 +144,22 @@ export interface Scatter {
 }
 
 /** Shrubs and rocks in the valley, off paths, plaza, bridges and water; shrubs may stand next to plots. */
-export function placeBushes(layout: Layout, maxBushes = 130): Scatter[] {
+export function placeBushes(layout: Layout, maxBushes = 34): Scatter[] {
   const rng = createRng(layout.seed * 151 + 11);
   const out: Scatter[] = [];
   const span = VALLEY_RADIUS;
+  // few shrub groups (each drawn as three crowns), well apart and never on a garden path
   for (let tries = 0; tries < 6000 && out.length < maxBushes; tries++) {
     const x = (rng() - 0.5) * span * 2;
     const z = (rng() - 0.5) * span * 2;
-    if (!freeForNature(layout, x, z, 2.0)) continue;
-    if (out.some((b) => Math.hypot(b.x - x, b.z - z) < 1.8)) continue;
+    if (!freeForNature(layout, x, z, 2.2)) continue;
+    if (gardenPathDistance(layout, x, z) < 2.0) continue;
+    if (out.some((b) => Math.hypot(b.x - x, b.z - z) < 7)) continue;
     out.push({
       x,
       z,
       y: layout.terrain.groundHeight(x, z),
-      scale: 0.6 + rng() * 0.6,
+      scale: 0.75 + rng() * 0.45,
       rot: rng() * Math.PI * 2,
     });
   }
@@ -197,27 +206,39 @@ export function placeReeds(layout: Layout, maxReeds = 120): Scatter[] {
 }
 
 /** Stones on the river banks, 4.6 to 5.8 m from the centre line, sunk halfway (LOOK §4). */
-export function placeShoreStones(layout: Layout, maxStones = 120): Scatter[] {
+export function placeShoreStones(layout: Layout, maxStones = 220): Scatter[] {
   const rng = createRng(layout.seed * 239 + 31);
   const river = layout.terrain.river;
   const out: Scatter[] = [];
-  for (let tries = 0; tries < 5000 && out.length < maxStones; tries++) {
+  // small groups of 2–5 stones on the bank, the nearest ones at the waterline
+  for (let tries = 0; tries < 2500 && out.length < maxStones; tries++) {
     const p = river[Math.floor(rng() * river.length)];
+    if (Math.hypot(p.x, p.z) > VALLEY_RADIUS + 6) continue; // only where the village can see them
     const a = rng() * Math.PI * 2;
-    const d = 4.6 + rng() * 1.2;
-    const x = p.x + Math.cos(a) * d;
-    const z = p.z + Math.sin(a) * d;
-    if (nearBridge(layout, x, z, 2.5)) continue;
-    const rd = layout.terrain.riverDistance(x, z);
-    if (rd < 4.6 || rd > 5.8) continue;
-    if (Math.hypot(x - layout.plaza.x, z - layout.plaza.z) < PLAZA_RADIUS + 2) continue;
-    out.push({
-      x,
-      z,
-      y: layout.terrain.groundHeight(x, z),
-      scale: 0.25 + rng() * 0.35,
-      rot: rng() * Math.PI * 2,
-    });
+    const d = 4.2 + rng() * 1.2;
+    const cx = p.x + Math.cos(a) * d;
+    const cz = p.z + Math.sin(a) * d;
+    const size = 2 + Math.floor(rng() * 4);
+    for (let k = 0; k < size && out.length < maxStones; k++) {
+      const ka = rng() * Math.PI * 2;
+      const kr = k === 0 ? 0 : 0.4 + rng() * 0.9;
+      const x = cx + Math.cos(ka) * kr;
+      const z = cz + Math.sin(ka) * kr;
+      if (nearBridge(layout, x, z, 2.5)) continue;
+      const rd = layout.terrain.riverDistance(x, z);
+      if (rd < 4.0 || rd > 5.8) continue;
+      // where the river is wider, 4 m from its centre can still be water
+      if (layout.terrain.groundHeight(x, z) < WATER_LEVEL + 0.08) continue;
+      if (Math.hypot(x - layout.plaza.x, z - layout.plaza.z) < PLAZA_RADIUS + 2) continue;
+      if (laneDistance(layout, x, z) < 1.4) continue;
+      out.push({
+        x,
+        z,
+        y: layout.terrain.groundHeight(x, z),
+        scale: (k === 0 ? 0.35 : 0.15) + rng() * 0.3,
+        rot: rng() * Math.PI * 2,
+      });
+    }
   }
   return out;
 }
@@ -256,13 +277,13 @@ export interface Hedge extends Scatter {
  * Hedges along the lanes (LOOK §8): about every 3.6 m of lane, on one side, 1.6 m from the centre line.
  * Half of the spots stay empty, so the hedges come in short rows.
  */
-export function placeHedges(layout: Layout, maxHedges = 70): Hedge[] {
+export function placeHedges(layout: Layout, maxHedges = 18): Hedge[] {
   const rng = createRng(layout.seed * 223 + 23);
   const s = layout.laneSamples;
   const out: Hedge[] = [];
   const step = 3;
   for (let i = 4; i < s.length - 4 && out.length < maxHedges; i += step) {
-    if (rng() < 0.5) continue;
+    if (rng() < 0.8) continue; // only now and then: hedges are an accent, not a wall
     const a = s[i - 1];
     const b = s[i + 1];
     const tx = b.x - a.x;
@@ -273,6 +294,7 @@ export function placeHedges(layout: Layout, maxHedges = 70): Hedge[] {
     const x = s[i].x - (tz / l) * off * side;
     const z = s[i].z + (tx / l) * off * side;
     if (!freeForNature(layout, x, z, 1.4)) continue;
+    if (gardenPathDistance(layout, x, z) < 2.0) continue;
     out.push({
       x,
       z,
@@ -329,25 +351,106 @@ export function placeMeadows(layout: Layout, maxMeadows = 30): Meadow[] {
 }
 
 /**
- * Grass tufts and wild flowers on open ground (LOOK §2.1 "nie leer"): many tiny instances, so the
- * large lawns between the plots get texture without a texture image.
+ * Grass tufts and wild flowers on open ground (LOOK §2.1 "nie leer"): many small instances in
+ * loose clumps of 3–8, so the lawns between the plots get texture without a texture image.
  */
-export function placeTufts(layout: Layout, maxTufts = 1100): Scatter[] {
+export function placeTufts(layout: Layout, maxTufts = 5500): Scatter[] {
   const rng = createRng(layout.seed * 257 + 37);
   const out: Scatter[] = [];
   const span = VALLEY_RADIUS + 10;
   for (let tries = 0; tries < 9000 && out.length < maxTufts; tries++) {
-    const x = (rng() - 0.5) * span * 2;
-    const z = (rng() - 0.5) * span * 2;
-    if (Math.hypot(x, z) > span) continue;
-    if (!freeForNature(layout, x, z, 1.2)) continue;
-    out.push({
-      x,
-      z,
-      y: layout.terrain.groundHeight(x, z),
-      scale: 0.6 + rng() * 0.7,
-      rot: rng() * Math.PI * 2,
-    });
+    const cx = (rng() - 0.5) * span * 2;
+    const cz = (rng() - 0.5) * span * 2;
+    if (Math.hypot(cx, cz) > span) continue;
+    if (!freeForNature(layout, cx, cz, 1.2)) continue;
+    const size = 3 + Math.floor(rng() * 6);
+    for (let k = 0; k < size && out.length < maxTufts; k++) {
+      const a = rng() * Math.PI * 2;
+      const r = k === 0 ? 0 : 0.25 + rng() * 1.1;
+      const x = cx + Math.cos(a) * r;
+      const z = cz + Math.sin(a) * r;
+      if (k > 0 && !freeForNature(layout, x, z, 1.0)) continue;
+      out.push({
+        x,
+        z,
+        y: layout.terrain.groundHeight(x, z),
+        scale: 0.8 + rng() * 0.7,
+        rot: rng() * Math.PI * 2,
+      });
+    }
   }
+  return out;
+}
+
+/**
+ * Grass along the lanes: small tufts right on the soft edge of the dirt strip, some reaching onto
+ * it, so the border between path and lawn is hidden (LOOK §5). Uses the lane samples in order;
+ * a long jump between two samples is the start of the next lane and is skipped.
+ */
+export function placeLaneEdgeTufts(layout: Layout, perMetre = 3): Scatter[] {
+  const rng = createRng(layout.seed * 263 + 41);
+  const out: Scatter[] = [];
+  const s = layout.laneSamples;
+  for (let i = 0; i + 1 < s.length; i++) {
+    const a = s[i];
+    const b = s[i + 1];
+    const len = Math.hypot(b.x - a.x, b.z - a.z);
+    if (len < 0.01 || len > 2) continue;
+    const nx = -(b.z - a.z) / len;
+    const nz = (b.x - a.x) / len;
+    const count = Math.floor(len * perMetre + rng());
+    for (let k = 0; k < count; k++) {
+      const t = rng();
+      const side = rng() < 0.5 ? -1 : 1;
+      const off = side * (0.55 + rng() * 0.55); // the solid path ends at about 0.5–0.7 m
+      const x = a.x + (b.x - a.x) * t + nx * off;
+      const z = a.z + (b.z - a.z) * t + nz * off;
+      if (!freeForNature(layout, x, z, 0.52)) continue;
+      out.push({ x, z, y: layout.terrain.groundHeight(x, z), scale: 0.55 + rng() * 0.45, rot: rng() * Math.PI * 2 });
+    }
+  }
+  return out;
+}
+
+/** Small flat stones lying on the lanes, about one every three metres, off the centre line. */
+export function placeLaneStones(layout: Layout): Scatter[] {
+  const rng = createRng(layout.seed * 271 + 43);
+  const out: Scatter[] = [];
+  const s = layout.laneSamples;
+  for (let i = 0; i + 1 < s.length; i++) {
+    const a = s[i];
+    const b = s[i + 1];
+    const len = Math.hypot(b.x - a.x, b.z - a.z);
+    if (len < 0.01 || len > 2 || rng() > 0.4) continue;
+    const off = (rng() - 0.5) * 1.1;
+    const x = a.x + (-(b.z - a.z) / len) * off;
+    const z = a.z + ((b.x - a.x) / len) * off;
+    if (layout.terrain.riverDistance(x, z) < 5) continue; // not on the bridges
+    if (Math.hypot(x - layout.plaza.x, z - layout.plaza.z) < PLAZA_RADIUS + 0.5) continue;
+    out.push({ x, z, y: layout.terrain.groundHeight(x, z), scale: 0.6 + rng() * 0.6, rot: rng() * Math.PI * 2 });
+  }
+  return out;
+}
+
+/**
+ * Stepping stones from each garden gate towards its lane, about every 0.8 m; `rot` is the walking
+ * direction. The last stone stops short of the lane.
+ */
+export function placeStepStones(layout: Layout): Scatter[] {
+  const out: Scatter[] = [];
+  layout.plots.forEach((p, pi) => {
+    const dx = p.link.x - p.gate.x;
+    const dz = p.link.z - p.gate.z;
+    const len = Math.hypot(dx, dz);
+    if (len < 0.5) return;
+    const n = Math.max(1, Math.floor((len - 0.6) / 0.8));
+    for (let k = 0; k < n; k++) {
+      const t = (0.4 + k * 0.8) / len;
+      const wobble = ((pi * 7 + k * 3) % 5) * 0.04 - 0.08;
+      const x = p.gate.x + dx * t + (-dz / len) * wobble;
+      const z = p.gate.z + dz * t + (dx / len) * wobble;
+      out.push({ x, z, y: layout.terrain.groundHeight(x, z), scale: 1, rot: Math.atan2(dx, dz) + wobble });
+    }
+  });
   return out;
 }

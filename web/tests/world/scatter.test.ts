@@ -9,6 +9,7 @@ import {
   placeTrees,
 } from '../../src/world/scatter';
 import { MAP_IDS } from '../../src/world/maps';
+import { WATER_LEVEL } from '../../src/world/constants';
 
 for (const mapId of MAP_IDS) {
   describe(`vegetation and lanterns on ${mapId}`, () => {
@@ -93,9 +94,11 @@ for (const mapId of MAP_IDS) {
       const stones = placeShoreStones(layout);
       expect(stones.length).toBeGreaterThan(0);
       for (const s of stones) {
+        // on the bank down to the waterline, never in the water
         const rd = layout.terrain.riverDistance(s.x, s.z);
-        expect(rd).toBeGreaterThanOrEqual(4.6);
+        expect(rd).toBeGreaterThanOrEqual(4.0);
         expect(rd).toBeLessThanOrEqual(5.8);
+        expect(layout.terrain.groundHeight(s.x, s.z)).toBeGreaterThan(WATER_LEVEL);
       }
     });
 
