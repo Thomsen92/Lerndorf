@@ -350,6 +350,95 @@ function bench(g: THREE.Object3D, x: number, z: number, rotY = 0): void {
 }
 
 const DECO: Record<string, () => THREE.Group> = {
+  deco_cat_sign: () => {
+    const g = new THREE.Group();
+    const wood = solid(WOOD);
+    const cat = solid('#d08a3c');
+    const cream = solid('#f3e2cf');
+    const dark = solid('#2b2b33');
+
+    // The greeting is a compact 5×7 block font built into one geometry (no texture or extra draw calls).
+    const boardX = -0.27;
+    const boardZ = -0.25;
+    const boardWidth = 2.35;
+    const boardHeight = 0.62;
+    const boardDepth = 0.14;
+    const boardBottom = 1.04;
+    box(g, boardWidth, boardHeight, boardDepth, wood, boardX, boardBottom, boardZ);
+    for (const x of [boardX - 0.72, boardX + 0.72]) {
+      box(g, 0.12, 1.4, 0.12, wood, x, 0, boardZ - 0.01);
+    }
+
+    const glyphs: Record<string, string[]> = {
+      H: ['10001', '10001', '10001', '11111', '10001', '10001', '10001'],
+      a: ['00000', '01110', '00001', '01111', '10001', '10011', '01101'],
+      l: ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+      o: ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+      M: ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
+      i: ['00100', '00000', '01100', '00100', '00100', '00100', '01110'],
+      k: ['10001', '10010', '10100', '11000', '10100', '10010', '10001'],
+      '!': ['00100', '00100', '00100', '00100', '00100', '00000', '00100'],
+    };
+    const phrase = 'Hallo Malik!';
+    const cellW = 0.032;
+    const cellH = 0.055;
+    const advance = 0.18;
+    const space = 0.1;
+    const phraseWidth =
+      phrase.split('').reduce((width, char) => width + (char === ' ' ? space : advance), 0) -
+      (phrase.endsWith('!') ? advance - cellW * 5 : 0);
+    let cursorX = boardX - phraseWidth / 2;
+    const positions: number[] = [];
+    const indices: number[] = [];
+    let vertex = 0;
+    const faceZ = boardZ + boardDepth / 2 + 0.008;
+    for (const char of phrase) {
+      if (char === ' ') {
+        cursorX += space;
+        continue;
+      }
+      const rows = glyphs[char];
+      for (let row = 0; row < rows.length; row++) {
+        for (let col = 0; col < rows[row].length; col++) {
+          if (rows[row][col] !== '1') continue;
+          const x0 = cursorX + col * cellW;
+          const x1 = x0 + cellW * 0.82;
+          const y0 = boardBottom + (boardHeight - cellH * 7) / 2 + (6 - row) * cellH;
+          const y1 = y0 + cellH * 0.82;
+          positions.push(x0, y0, faceZ, x1, y0, faceZ, x1, y1, faceZ, x0, y1, faceZ);
+          indices.push(vertex, vertex + 1, vertex + 2, vertex, vertex + 2, vertex + 3);
+          vertex += 4;
+        }
+      }
+      cursorX += advance;
+    }
+    const lettering = new THREE.BufferGeometry();
+    lettering.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    lettering.setIndex(indices);
+    lettering.computeVertexNormals();
+    add(g, lettering, cream, 0, 0, 0);
+
+    // Seated cat beside the sign: compact body, head, ears, paws, face, and a curved tail silhouette.
+    const catX = 0.93;
+    const catZ = 0.08;
+    blob(g, 0.23, cat, catX, 0.3, catZ, 0);
+    blob(g, 0.17, cat, catX, 0.64, catZ + 0.06, 0);
+    for (const side of [-1, 1]) {
+      add(g, new THREE.ConeGeometry(0.075, 0.18, 4), cat, catX + side * 0.105, 0.83, catZ + 0.04);
+      box(g, 0.1, 0.12, 0.17, cat, catX + side * 0.12, 0, catZ + 0.19);
+      blob(g, 0.023, dark, catX + side * 0.065, 0.665, catZ + 0.205, 0);
+      blob(g, 0.035, cream, catX + side * 0.04, 0.59, catZ + 0.22, 0);
+    }
+    blob(g, 0.018, dark, catX, 0.615, catZ + 0.245, 0);
+    for (const [x, y, z] of [
+      [catX - 0.2, 0.27, catZ - 0.08],
+      [catX - 0.3, 0.35, catZ - 0.12],
+      [catX - 0.27, 0.46, catZ - 0.13],
+    ]) {
+      blob(g, 0.065, cat, x, y, z, 0);
+    }
+    return g;
+  },
   deco_mailbox: () => {
     const g = new THREE.Group();
     box(g, 0.14, 1.1, 0.14, solid('#6b4a2f'), 0, 0, 0);

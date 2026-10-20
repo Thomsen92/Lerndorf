@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#202944" />
+    <title>Lernbox · Lerndorf Vorschau</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --sky: #202944;
+        --sky-soft: #2d3a67;
+        --wood: #8a5a36;
+        --wood-light: #bd8650;
+        --grass: #52744a;
+        --grass-light: #71985b;
+        --stone: #d8ccb1;
+        --cream: #f5edda;
+        --ink: #262b35;
+        --lantern: #ffc56b;
+        --rare: #71c0b2;
+        --line: rgb(245 237 218 / 16%);
+        font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        color: var(--cream);
+        background:
+          radial-gradient(ellipse at 48% 28%, rgb(81 102 143 / 40%), transparent 40rem),
+          linear-gradient(155deg, #29395d 0%, var(--sky) 55%, #182337 100%);
+      }
+
+      button { font: inherit; }
+
+      .page {
+        width: min(1100px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 28px 0 34px;
+      }
+
+      .topline {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 30px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff7e5;
+        font: 700 1.1rem Georgia, "Times New Roman", serif;
+        letter-spacing: .015em;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 38px;
+        aspect-ratio: 1;
+        place-items: center;
+        color: var(--ink);
+        background: var(--lantern);
+        border: 2px solid rgb(255 255 255 / 30%);
+        border-radius: 12px 12px 12px 4px;
+        box-shadow: 0 0 25px rgb(255 197 107 / 25%);
+        font-size: 1.25rem;
+      }
+
+      .demo-tag {
+        padding: 8px 12px;
+        color: #f6dfae;
+        background: rgb(255 255 255 / 7%);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        font-size: .78rem;
+        letter-spacing: .04em;
+      }
+
+      .sound-toggle {
+        padding: 8px 12px;
+        color: #f6e7c5;
+        background: rgb(255 255 255 / 7%);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: .78rem;
+      }
+
+      .sound-toggle[aria-pressed="false"] { color: #b5c0d1; background: rgb(7 13 25 / 22%); }
+
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1.55fr) minmax(265px, .75fr);
+        gap: 20px;
+        align-items: stretch;
+      }
+
+      .scene-card, .chance-card {
+        overflow: hidden;
+        border: 1px solid rgb(255 255 255 / 13%);
+        border-radius: 24px;
+        background: linear-gradient(145deg, rgb(46 60 91 / 92%), rgb(29 40 63 / 96%));
+        box-shadow: 0 24px 70px rgb(9 15 29 / 28%);
+      }
+
+      .scene-card { position: relative; min-height: 610px; }
+
+      .scene-heading {
+        position: relative;
+        z-index: 2;
+        padding: 27px 30px 0;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--lantern);
+        font-size: .73rem;
+        font-weight: 800;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+      }
+
+      h1, h2, p { margin-top: 0; }
+
+      h1 {
+        margin-bottom: 8px;
+        color: #fff7e7;
+        font: 500 clamp(2rem, 4vw, 2.8rem)/1.05 Georgia, "Times New Roman", serif;
+        letter-spacing: -.03em;
+      }
+
+      .subheading { max-width: 490px; margin-bottom: 0; color: #cad2df; line-height: 1.5; }
+
+      .stage {
+        position: relative;
+        display: grid;
+        min-height: 360px;
+        place-items: center;
+        margin: 0 22px;
+        isolation: isolate;
+      }
+
+      .stage::before {
+        position: absolute;
+        z-index: -2;
+        right: 4%;
+        bottom: 26px;
+        left: 4%;
+        height: 136px;
+        content: "";
+        background:
+          radial-gradient(ellipse at center, rgb(255 199 117 / 22%) 0 18%, transparent 65%),
+          linear-gradient(170deg, #6e9457 0 42%, #557849 42% 100%);
+        border: 1px solid rgb(255 255 255 / 10%);
+        border-radius: 50% 48% 27px 27px;
+        box-shadow: inset 0 8px 0 rgb(255 255 255 / 5%), 0 18px 35px rgb(11 21 30 / 28%);
+        transform: perspective(420px) rotateX(12deg);
+      }
+
+      .stars { position: absolute; inset: 10px 0 auto; height: 200px; pointer-events: none; }
+      .star { position: absolute; width: 4px; height: 4px; background: #ffe6ad; border-radius: 50%; opacity: .72; box-shadow: 0 0 12px #ffc56b; }
+      .star:nth-child(1) { top: 28px; left: 17%; }
+      .star:nth-child(2) { top: 84px; left: 28%; width: 3px; height: 3px; }
+      .star:nth-child(3) { top: 40px; right: 20%; width: 5px; height: 5px; }
+      .star:nth-child(4) { top: 116px; right: 13%; width: 3px; height: 3px; }
+      .star:nth-child(5) { top: 20px; right: 37%; width: 3px; height: 3px; }
+
+      .chest-art {
+        position: absolute;
+        z-index: 2;
+        top: 42px;
+        width: min(310px, 72%);
+        overflow: visible;
+        transform-origin: 50% 78%;
+        filter: drop-shadow(0 24px 13px rgb(11 18 24 / 35%));
+      }
+
+      .chest-art .lid { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .42s cubic-bezier(.2,.8,.25,1); }
+      .chest-art .glow { opacity: 0; transition: opacity .3s ease; }
+      .stage.opening .chest-art { animation: chest-wiggle .56s ease-in-out 2; }
+      .stage.opened .chest-art .lid { transform: rotateX(68deg) translateY(-7px); }
+      .stage.opened .chest-art .glow { opacity: 1; }
+
+      .ticket-run {
+        position: absolute;
+        z-index: 3;
+        top: 100px;
+        display: flex;
+        gap: 9px;
+        width: min(460px, 90%);
+        overflow: hidden;
+        padding: 7px;
+        opacity: 0;
+        pointer-events: none;
+        mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+      }
+
+      .ticket {
+        flex: 0 0 72px;
+        display: grid;
+        height: 58px;
+        place-items: center;
+        color: #f5dfb3;
+        background: #344564;
+        border: 1px solid rgb(255 255 255 / 18%);
+        border-radius: 11px;
+        font-size: 1.35rem;
+      }
+
+      .ticket:nth-child(3n) { background: #435f4c; }
+      .ticket:nth-child(4n) { background: #76543b; }
+      .ticket:last-child { color: #293044; background: var(--lantern); }
+      .stage.rolling .ticket-run { opacity: .92; }
+      .stage.rolling .ticket-run > div { animation: ticket-roll 1.2s cubic-bezier(.12,.75,.18,1) both; }
+
+      .prize-art {
+        position: absolute;
+        z-index: 4;
+        top: 30px;
+        width: min(240px, 60%);
+        opacity: 0;
+        transform: translateY(85px) scale(.6) rotate(-7deg);
+        filter: drop-shadow(0 15px 17px rgb(14 20 29 / 42%));
+        pointer-events: none;
+      }
+
+      .stage.revealed .prize-art { animation: prize-arrive .78s cubic-bezier(.17,1.35,.28,1) .08s both; }
+
+      .prize-caption {
+        position: absolute;
+        z-index: 5;
+        top: 222px;
+        left: 50%;
+        width: max-content;
+        max-width: calc(100% - 40px);
+        padding: 9px 14px;
+        color: #fff6de;
+        background: rgb(32 41 68 / 92%);
+        border: 1px solid rgb(255 197 107 / 42%);
+        border-radius: 999px;
+        opacity: 0;
+        transform: translate(-50%, 8px);
+        transition: opacity .25s ease, transform .25s ease;
+        font-size: .88rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .stage.revealed .prize-caption { opacity: 1; transform: translate(-50%, 0); transition-delay: .35s; }
+      .stage.revealed .chest-art { transform: translateY(28px) scale(.78); transition: transform .38s ease; }
+
+      .stage-status {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        margin: 0;
+        color: #c7d0df;
+        text-align: center;
+        font-size: .92rem;
+      }
+
+      .stage.revealed .stage-status { color: #e7d4ac; }
+
+      .actions {
+        position: relative;
+        z-index: 6;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        min-height: 54px;
+        margin: 7px 20px 25px;
+      }
+
+      .primary, .skip {
+        min-height: 48px;
+        padding: 0 22px;
+        border: 0;
+        border-radius: 14px;
+        cursor: pointer;
+        font-weight: 800;
+        transition: transform .16s ease, filter .16s ease, background .16s ease;
+      }
+
+      .primary { color: #332b1d; background: linear-gradient(#ffda8d, #ffc56b); box-shadow: 0 5px 0 #b47c3d, 0 11px 24px rgb(255 197 107 / 17%); }
+      .primary:hover:not(:disabled), .skip:hover { filter: brightness(1.08); transform: translateY(-2px); }
+      .primary:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #b47c3d; }
+      .primary:disabled { cursor: default; opacity: .65; }
+      .skip { display: none; color: #f3e7cb; background: rgb(255 255 255 / 9%); border: 1px solid var(--line); }
+      .skip.visible { display: inline-block; }
+      button:focus-visible { outline: 3px solid #fff2c8; outline-offset: 4px; }
+
+      .fair-note {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        margin: 0 25px 24px;
+        padding: 12px 14px;
+        color: #d5deeb;
+        background: rgb(10 18 33 / 22%);
+        border: 1px solid rgb(255 255 255 / 8%);
+        border-radius: 13px;
+        font-size: .8rem;
+        line-height: 1.45;
+      }
+
+      .fair-note strong { color: #ffe0a0; }
+      .fair-icon { flex: none; font-size: 1rem; }
+
+      .chance-card { padding: 26px 23px; }
+      .chance-card h2 { margin: 0 0 7px; color: #fff5df; font: 500 1.42rem Georgia, "Times New Roman", serif; }
+      .chance-intro { margin-bottom: 22px; color: #bdc8d8; font-size: .86rem; line-height: 1.5; }
+      .chance-list { display: grid; gap: 15px; margin: 0; padding: 0; list-style: none; }
+      .chance-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px 12px; }
+      .chance-name { display: flex; gap: 9px; align-items: center; color: #e9e5d8; font-size: .91rem; }
+      .chance-value { color: #fff5df; font-variant-numeric: tabular-nums; font-weight: 800; }
+      .rarity-dot { width: 10px; height: 10px; border-radius: 3px; transform: rotate(45deg); }
+      .common { background: #b4c58e; }
+      .rare { background: #71c0b2; }
+      .epic { background: #9d83d1; }
+      .legendary { background: #f1b95b; }
+      .meter { grid-column: 1 / -1; height: 7px; overflow: hidden; background: rgb(255 255 255 / 9%); border-radius: 99px; }
+      .meter span { display: block; width: var(--chance); height: 100%; background: var(--meter); border-radius: inherit; }
+      .divider { height: 1px; margin: 24px 0 20px; background: var(--line); }
+      .guarantee { display: flex; gap: 11px; align-items: flex-start; color: #c9d4dd; font-size: .83rem; line-height: 1.5; }
+      .guarantee strong { display: block; margin-bottom: 3px; color: #f6e7c5; }
+      .guarantee-mark { display: grid; flex: none; width: 29px; height: 29px; place-items: center; color: #183b39; background: #8cc7aa; border-radius: 9px; font-weight: 900; }
+      .fine-print { margin: 23px 0 0; color: #9eabc0; font-size: .74rem; line-height: 1.5; }
+
+      .sound-samples { margin-top: 22px; }
+      .sound-samples-label { margin: 0 0 10px; color: #e5d9bf; font-size: .76rem; font-weight: 700; }
+      .sample-buttons { display: flex; flex-wrap: wrap; gap: 7px; }
+      .sample-button {
+        padding: 7px 9px;
+        color: #dce4eb;
+        background: rgb(255 255 255 / 7%);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        cursor: pointer;
+        font-size: .73rem;
+      }
+      .sample-button:hover { background: rgb(255 255 255 / 13%); }
+      .sample-button:focus-visible, .sound-toggle:focus-visible { outline: 3px solid #fff2c8; outline-offset: 3px; }
+
+      .footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 17px; color: #aab7c9; font-size: .75rem; }
+      .footer span:last-child { text-align: right; }
+
+      @keyframes chest-wiggle {
+        0%, 100% { transform: rotate(0); }
+        20% { transform: rotate(-3deg) translateY(-3px); }
+        45% { transform: rotate(3deg) translateY(0); }
+        70% { transform: rotate(-2deg) translateY(-2px); }
+      }
+      @keyframes ticket-roll { from { transform: translateX(58px); } to { transform: translateX(-115px); } }
+      @keyframes prize-arrive {
+        0% { opacity: 0; transform: translateY(85px) scale(.56) rotate(-7deg); }
+        68% { opacity: 1; transform: translateY(-9px) scale(1.07) rotate(2deg); }
+        100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+      }
+
+      @media (max-width: 760px) {
+        .page { width: min(620px, calc(100% - 24px)); padding-top: 16px; }
+        .topline { margin-bottom: 17px; }
+        main { grid-template-columns: 1fr; gap: 14px; }
+        .scene-card { min-height: 570px; }
+        .scene-heading { padding: 22px 22px 0; }
+        .stage { min-height: 325px; margin: 0 12px; }
+        .chest-art { top: 37px; width: min(280px, 70%); }
+        .ticket-run { top: 82px; }
+        .prize-art { top: 22px; width: min(215px, 57%); }
+        .prize-caption { top: 202px; }
+        .chance-card { padding: 22px; }
+        .chance-list { grid-template-columns: 1fr 1fr; column-gap: 20px; }
+        .fine-print { margin-top: 19px; }
+      }
+
+      @media (max-width: 430px) {
+        .demo-tag { padding: 7px 9px; font-size: .68rem; }
+        .brand { font-size: .97rem; }
+        .topline { align-items: flex-start; }
+        .topline > div { justify-content: flex-end; flex-wrap: wrap; }
+        .sound-toggle { padding: 7px 9px; font-size: .68rem; }
+        .scene-card { min-height: 545px; }
+        .stage { min-height: 300px; }
+        .stage::before { bottom: 22px; height: 110px; }
+        .chest-art { top: 30px; width: 71%; }
+        .prize-art { top: 15px; width: 57%; }
+        .prize-caption { top: 178px; font-size: .78rem; }
+        .stage-status { font-size: .81rem; }
+        .fair-note { margin-right: 15px; margin-left: 15px; }
+        .actions { margin-right: 12px; margin-left: 12px; }
+        .primary, .skip { padding: 0 16px; }
+        .chance-list { gap: 13px; }
+        .chance-name, .chance-value { font-size: .8rem; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topline">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">✦</span><span>Lerndorf <span style="color:#ffc56b">·</span> Marktplatz</span></div>
+        <div style="display:flex;align-items:center;gap:8px"><button class="sound-toggle" id="soundToggle" type="button" aria-pressed="true" aria-label="Ton ausschalten">♫ Ton: an</button><span class="demo-tag">VORSCHAU · NICHT IM SPIEL</span></div>
+      </header>
+
+      <main>
+        <section class="scene-card" aria-labelledby="page-title">
+          <div class="scene-heading">
+            <p class="eyebrow">Eine kleine Überraschung</p>
+            <h1 id="page-title">Die Lernbox</h1>
+            <p class="subheading">Ein Fund für dein Grundstück wartet schon. Was wohl in der Kiste steckt?</p>
+          </div>
+
+          <div class="stage" id="stage" aria-live="polite" aria-atomic="true">
+            <div class="stars" aria-hidden="true"><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i></div>
+            <div class="ticket-run" id="ticketRun" aria-hidden="true">
+              <div style="display:flex;gap:9px"><span class="ticket">✿</span><span class="ticket">⌂</span><span class="ticket">❋</span><span class="ticket">♧</span><span class="ticket">✦</span><span class="ticket">☼</span><span class="ticket">✿</span><span class="ticket">⌂</span><span class="ticket">♧</span></div>
+            </div>
+
+            <svg class="prize-art" viewBox="0 0 240 190" role="img" aria-label="Low-Poly-Gartenbank mit Laterne">
+              <ellipse cx="120" cy="164" rx="88" ry="15" fill="#172538" opacity=".3" />
+              <path d="M54 118 176 118 196 137 70 142Z" fill="#704727" />
+              <path d="M70 142 196 137 196 146 70 151Z" fill="#533920" />
+              <path d="M84 145 91 144 89 170 82 171Z" fill="#59412d" />
+              <path d="M180 139 188 139 192 164 184 165Z" fill="#59412d" />
+              <path d="M61 105 178 105 195 122 73 128Z" fill="#a87543" />
+              <path d="M73 128 195 122 195 132 73 138Z" fill="#80562f" />
+              <path d="M66 66 81 66 84 114 70 115Z" fill="#64452e" />
+              <path d="M177 62 192 62 196 113 182 114Z" fill="#64452e" />
+              <path d="M63 63 189 59 193 74 66 80Z" fill="#a87543" />
+              <path d="M66 80 193 74 194 88 68 94Z" fill="#80562f" />
+              <path d="M67 94 194 88 195 101 69 107Z" fill="#a87543" />
+              <path d="M203 53 210 53 211 111 204 112Z" fill="#3f433d" />
+              <path d="M198 49 215 49 219 64 194 64Z" fill="#343943" />
+              <path d="M198 42 214 42 218 51 196 51Z" fill="#ffc56b" />
+              <path d="M199 43 213 43 215 49 198 49Z" fill="#ffe3a1" />
+              <path d="M195 38 217 38 214 42 198 42Z" fill="#594a37" />
+              <circle cx="206" cy="56" r="23" fill="#ffc56b" opacity=".12" />
+              <path d="M35 122 47 118 55 123 48 132Z" fill="#7aa462" />
+              <path d="M38 117 43 104 48 118Z" fill="#d98cc5" />
+              <path d="M28 126 37 121 43 127 37 135Z" fill="#5f8f52" />
+              <path d="M31 120 33 108 39 120Z" fill="#ffc56b" />
+            </svg>
+
+            <svg class="chest-art" viewBox="0 0 320 250" aria-hidden="true">
+              <defs>
+                <linearGradient id="beam" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#ffc56b" stop-opacity=".05"/><stop offset="1" stop-color="#ffe2a0" stop-opacity=".65"/></linearGradient>
+              </defs>
+              <path class="glow" d="M126 131 66 9h188l-60 122Z" fill="url(#beam)" />
+              <ellipse cx="160" cy="217" rx="105" ry="16" fill="#1a2a35" opacity=".4" />
+              <path d="M54 184 265 184 247 217 75 217Z" fill="#8a5a36" />
+              <path d="M75 217 247 217 238 230 84 230Z" fill="#674328" />
+              <path d="M64 153 256 153 265 184 54 184Z" fill="#b27b47" />
+              <path d="M54 184 265 184 247 202 70 202Z" fill="#815532" />
+              <path d="M74 162 89 162 88 187 73 187Z" fill="#d2a064" />
+              <path d="M232 162 247 162 251 187 235 187Z" fill="#d2a064" />
+              <path d="M143 166 176 166 179 193 140 193Z" fill="#f4d38b" />
+              <path d="M149 168 170 168 169 194 150 194Z" fill="#704727" />
+              <path d="M63 148 256 148 256 161 63 161Z" fill="#d2a064" />
+              <g class="lid">
+                <path d="M62 146 77 111 241 111 258 146Z" fill="#a87442" />
+                <path d="M77 111 241 111 232 99 87 99Z" fill="#d0a065" />
+                <path d="M62 146 77 111 86 120 77 148Z" fill="#714b2e" />
+                <path d="M241 111 258 146 244 148 232 120Z" fill="#805331" />
+                <path d="M145 114 176 114 176 142 145 142Z" fill="#f3d28c" />
+                <path d="M153 119 168 119 168 145 153 145Z" fill="#78502e" />
+                <path d="M144 110 177 110 177 118 144 118Z" fill="#edc477" />
+              </g>
+              <path d="M53 181 266 181 262 190 57 190Z" fill="#553a26" opacity=".5" />
+            </svg>
+
+            <div class="prize-caption" id="prizeCaption">Bank am Abend · Selten</div>
+            <p class="stage-status" id="stageStatus">Die Kiste ist bereit für dich.</p>
+          </div>
+
+          <div class="actions">
+            <button class="primary" id="openButton" type="button">Lernbox öffnen</button>
+            <button class="skip" id="skipButton" type="button">Fund direkt zeigen</button>
+          </div>
+
+          <p class="fair-note"><span class="fair-icon" aria-hidden="true">✦</span><span><strong>Nur eine Vorschau:</strong> Hier werden keine Münzen verwendet. Im echten Spiel legt der Server den Fund fest, bevor die Animation beginnt.</span></p>
+        </section>
+
+        <aside class="chance-card" aria-labelledby="chance-title">
+          <p class="eyebrow">Offen und fair</p>
+          <h2 id="chance-title">Das sind die Chancen</h2>
+          <p class="chance-intro">Jede Box hat dieselben Wahrscheinlichkeiten. Du siehst sie schon vor dem Öffnen.</p>
+
+          <ul class="chance-list">
+            <li class="chance-row"><span class="chance-name"><i class="rarity-dot common"></i>Gewöhnlich</span><span class="chance-value">50 %</span><div class="meter"><span style="--chance:50%;--meter:#b4c58e"></span></div></li>
+            <li class="chance-row"><span class="chance-name"><i class="rarity-dot rare"></i>Selten</span><span class="chance-value">30 %</span><div class="meter"><span style="--chance:30%;--meter:#71c0b2"></span></div></li>
+            <li class="chance-row"><span class="chance-name"><i class="rarity-dot epic"></i>Episch</span><span class="chance-value">15 %</span><div class="meter"><span style="--chance:15%;--meter:#9d83d1"></span></div></li>
+            <li class="chance-row"><span class="chance-name"><i class="rarity-dot legendary"></i>Legendär</span><span class="chance-value">5 %</span><div class="meter"><span style="--chance:5%;--meter:#f1b95b"></span></div></li>
+          </ul>
+
+          <div class="divider"></div>
+          <div class="guarantee"><span class="guarantee-mark" aria-hidden="true">✓</span><span><strong>Mit Spielmünzen</strong>Für eine spätere Spielversion ist nur ein Einsatz von verdienten Münzen vorgesehen – kein echtes Geld.</span></div>
+          <div class="sound-samples">
+            <p class="sound-samples-label">Klangproben anhören</p>
+            <div class="sample-buttons" aria-label="Klangbeispiele nach Seltenheit">
+              <button class="sample-button" type="button" data-sound="rare">Selten</button>
+              <button class="sample-button" type="button" data-sound="epic">Episch</button>
+              <button class="sample-button" type="button" data-sound="legendary">Legendär</button>
+            </div>
+          </div>
+          <p class="fine-print">Die Chancen hier sind Beispielwerte aus der bisherigen Demo. Vor einer Einführung müssen Lehrkraft und Spielregeln sie gemeinsam festlegen.</p>
+        </aside>
+      </main>
+
+      <footer class="footer"><span>Ein kleiner Moment zum Freuen – ohne Kaufdruck.</span><span>Tablet-Vorschau · Standalone-Prototyp</span></footer>
+    </div>
+
+    <script>
+      const stage = document.querySelector('#stage');
+      const openButton = document.querySelector('#openButton');
+      const skipButton = document.querySelector('#skipButton');
+      const stageStatus = document.querySelector('#stageStatus');
+      const soundToggle = document.querySelector('#soundToggle');
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let timers = [];
+      let isOpening = false;
+      let isRevealed = false;
+      let soundEnabled = true;
+      let audioContext;
+
+      const soundPatterns = {
+        rare: [
+          { hz: 659.25, at: 0, length: .22, volume: .07 },
+          { hz: 880, at: .16, length: .42, volume: .055 },
+        ],
+        epic: [
+          { hz: 523.25, at: 0, length: .24, volume: .06 },
+          { hz: 659.25, at: .16, length: .25, volume: .055 },
+          { hz: 783.99, at: .34, length: .27, volume: .05 },
+          { hz: 1046.5, at: .54, length: .52, volume: .045 },
+        ],
+        legendary: [
+          { hz: 392, at: 0, length: .26, volume: .065 },
+          { hz: 523.25, at: .16, length: .28, volume: .06 },
+          { hz: 659.25, at: .34, length: .3, volume: .055 },
+          { hz: 783.99, at: .54, length: .32, volume: .05 },
+          { hz: 1046.5, at: .75, length: .75, volume: .045 },
+        ],
+      };
+
+      function prepareAudio() {
+        if (!soundEnabled) return;
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        audioContext ??= new AudioContextClass();
+        if (audioContext.state === 'suspended') void audioContext.resume();
+      }
+
+      function playRaritySound(rarity) {
+        if (!soundEnabled || !soundPatterns[rarity]) return;
+        prepareAudio();
+        if (!audioContext) return;
+        const now = audioContext.currentTime;
+        for (const note of soundPatterns[rarity]) {
+          const oscillator = audioContext.createOscillator();
+          const envelope = audioContext.createGain();
+          const start = now + note.at;
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(note.hz, start);
+          envelope.gain.setValueAtTime(.0001, start);
+          envelope.gain.exponentialRampToValueAtTime(note.volume, start + .025);
+          envelope.gain.exponentialRampToValueAtTime(.0001, start + note.length);
+          oscillator.connect(envelope);
+          envelope.connect(audioContext.destination);
+          oscillator.start(start);
+          oscillator.stop(start + note.length + .04);
+        }
+      }
+
+      function clearSequence() {
+        timers.forEach(window.clearTimeout);
+        timers = [];
+      }
+
+      function reveal() {
+        if (isRevealed) return;
+        clearSequence();
+        stage.classList.remove('opening', 'rolling');
+        stage.classList.add('opened', 'revealed');
+        isOpening = false;
+        isRevealed = true;
+        openButton.disabled = false;
+        openButton.textContent = 'Animation erneut ansehen';
+        skipButton.classList.remove('visible');
+        stageStatus.textContent = 'Du hast eine Bank am Abend gefunden. Sie passt auf deinen Deko-Sockel.';
+        playRaritySound('rare');
+      }
+
+      function playSequence() {
+        clearSequence();
+        isOpening = true;
+        isRevealed = false;
+        openButton.disabled = true;
+        openButton.textContent = 'Die Lernbox öffnet sich …';
+        prepareAudio();
+        skipButton.classList.add('visible');
+        stage.classList.remove('revealed', 'opened', 'rolling');
+        stage.classList.add('opening');
+        stageStatus.textContent = 'Die Kiste wackelt – gleich ist es so weit …';
+
+        if (prefersReducedMotion.matches) {
+          timers.push(window.setTimeout(reveal, 450));
+          return;
+        }
+
+        timers.push(window.setTimeout(() => {
+          stage.classList.remove('opening');
+          stage.classList.add('opened');
+          stageStatus.textContent = 'Ein warmes Licht leuchtet aus der Kiste.';
+        }, 1050));
+        timers.push(window.setTimeout(() => {
+          stage.classList.add('rolling');
+          stageStatus.textContent = 'Der Fund wird sichtbar …';
+        }, 1680));
+        timers.push(window.setTimeout(reveal, 3200));
+      }
+
+      openButton.addEventListener('click', () => {
+        if (isOpening) return;
+        if (isRevealed) {
+          playSequence();
+          return;
+        }
+        playSequence();
+      });
+
+      skipButton.addEventListener('click', reveal);
+
+      soundToggle.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundToggle.setAttribute('aria-pressed', String(soundEnabled));
+        soundToggle.setAttribute('aria-label', soundEnabled ? 'Ton ausschalten' : 'Ton einschalten');
+        soundToggle.textContent = soundEnabled ? '♫ Ton: an' : '♫ Ton: aus';
+        if (soundEnabled) prepareAudio();
+      });
+
+      document.querySelectorAll('[data-sound]').forEach((button) => {
+        button.addEventListener('click', () => playRaritySound(button.dataset.sound));
+      });
+    </script>
+  </body>
+</html>

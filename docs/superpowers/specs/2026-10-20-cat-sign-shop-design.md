@@ -8,7 +8,7 @@ Ein neues Deko-Asset soll im Lerndorf-Shop mit Spielmünzen kaufbar sein und auf
 
 ## Gestaltung und Asset-Regeln
 
-- Ein schlichtes Holzschild mit leerer Schildfläche und einer kleinen sitzenden Low-Poly-Katze daneben.
+- Ein schlichtes Holzschild mit der gut lesbaren Aufschrift „Hallo Malik!“ und einer kleinen sitzenden Low-Poly-Katze daneben.
 - Stil und Farben folgen `docs/LOOK.md` und den vorhandenen prozeduralen Deko-Modellen.
 - Das Asset ist eine kompakte, statische Three.js-Geometrie. Der große Demo-Boden der HTML-Datei wird nicht übernommen.
 - Kategorie `deco`; Maße höchstens 3 × 3 × 3 m; Pivot mittig auf Bodenhöhe; Vorderseite nach +Z; Drehung in 90°-Schritten.
@@ -29,7 +29,7 @@ Keine veränderbare Schildbeschriftung, keine Bildersuche im Spiel, keine Lootbo
 ## Abnahmekriterien
 
 1. Der aktive Katalog enthält `deco_cat_sign` als kaufbare Gartendeko zum vorgesehenen Preis.
-2. Die ID zeigt auf dem Grundstück ein Schild mit leerer Holzfläche und sitzender Katze, statt des neutralen Ersatzwürfels.
+2. Die ID zeigt auf dem Grundstück ein Holzschild mit gut lesbarer Aufschrift „Hallo Malik!“ und sitzender Katze, statt des neutralen Ersatzwürfels.
 3. Maße, Ursprung, Ausrichtung und Dreiecksbudget erfüllen den Asset-Vertrag; alle vier Deko-Sockel können das Modell wie andere Deko drehen.
 4. Der Shopkauf verwendet die bestehende `buy_item`-RPC; die Platzierung verwendet den bestehenden `place_in_slot`-Ablauf.
 
