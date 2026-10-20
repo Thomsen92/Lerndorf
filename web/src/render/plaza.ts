@@ -166,13 +166,13 @@ export function buildPlaza(layout: Layout): THREE.Group {
     new THREE.CylinderGeometry(PLAZA_RADIUS, PLAZA_RADIUS + 0.4, 0.45, 56),
     new THREE.MeshStandardMaterial({ map: paving, color: '#d9cbb0', roughness: 0.95 }),
   );
-  disc.position.set(layout.plaza.x, y - 0.2, layout.plaza.z);
+  disc.position.set(layout.plaza.x, y - 0.14, layout.plaza.z);
   disc.receiveShadow = true;
   root.add(disc);
   for (let r = 2.4; r < PLAZA_RADIUS - 0.5; r += 1.8) {
     const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.04, 4, 56), mat('#9d8d75'));
     ring.rotation.x = -Math.PI / 2;
-    ring.position.set(layout.plaza.x, y + 0.03, layout.plaza.z);
+    ring.position.set(layout.plaza.x, y + 0.09, layout.plaza.z);
     root.add(ring);
   }
 

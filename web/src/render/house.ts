@@ -60,26 +60,37 @@ function beam(
 }
 
 /**
- * Fence around a plot in plot-local coordinates: front side with the gate opening, back and sides
- * closed. Posts every 1.2 m and one rail at 0.5 m (LOOK §6: never a solid wall).
+ * Fence around a plot in plot-local coordinates: back and sides closed, the front open where
+ * `openings` say (local x ranges: gate, driveway). Posts every 1.2 m and one rail at 0.5 m
+ * (LOOK §6: never a solid wall).
  */
-export function fenceGeometry(w: number, d: number): THREE.BufferGeometry {
+export function fenceGeometry(
+  w: number,
+  d: number,
+  openings: Array<[number, number]> = [[-GATE_HALF, GATE_HALF]],
+): THREE.BufferGeometry {
   const runs: Array<[number, number, number, number]> = [
-    [-w / 2, d / 2, -GATE_HALF, d / 2], // front, left of the gate
-    [GATE_HALF, d / 2, w / 2, d / 2], // front, right of the gate
     [-w / 2, -d / 2, w / 2, -d / 2], // back
     [-w / 2, -d / 2, -w / 2, d / 2], // left side
     [w / 2, -d / 2, w / 2, d / 2], // right side
   ];
+  // front: the pieces between the openings
+  const cuts = [...openings].sort((a, b) => a[0] - b[0]);
+  let x = -w / 2;
+  for (const [a, b] of cuts) {
+    if (a - x > 0.3) runs.push([x, d / 2, a, d / 2]);
+    x = Math.max(x, b);
+  }
+  if (w / 2 - x > 0.3) runs.push([x, d / 2, w / 2, d / 2]);
   const parts: THREE.BufferGeometry[] = [];
   for (const [ax, az, bx, bz] of runs) {
     const len = Math.hypot(bx - ax, bz - az);
     const steps = Math.max(1, Math.round(len / POST_STEP));
     for (let i = 0; i <= steps; i++) {
       const t = i / steps;
-      const x = ax + (bx - ax) * t;
-      const z = az + (bz - az) * t;
-      parts.push(beam(x, z, x, z, 0.13, FENCE_HEIGHT, FENCE_HEIGHT / 2));
+      const px = ax + (bx - ax) * t;
+      const pz = az + (bz - az) * t;
+      parts.push(beam(px, pz, px, pz, 0.13, FENCE_HEIGHT, FENCE_HEIGHT / 2));
     }
     parts.push(beam(ax, az, bx, bz, 0.07, 0.08, 0.5));
   }

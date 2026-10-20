@@ -7,7 +7,8 @@ import * as THREE from 'three';
 import { createRng, type Rng } from './rng';
 import { dist, yawTo, type Point2 } from './geometry';
 import { Terrain, riverCenterline } from './terrain';
-import { PLAZA_RADIUS, VALLEY_RADIUS } from './constants';
+import { BRIDGE_MIN_END, PLAZA_RADIUS, VALLEY_RADIUS, WORLD_SCALE } from './constants';
+import { DRIVEWAY_X, HOUSE_FRONT_Z, PATH_X, PLOT_D, PLOT_W } from './plotPlan';
 import { getMap, type MapDef } from './maps';
 
 export interface Plot {
@@ -25,8 +26,10 @@ export interface Plot {
   face: number;
   /** Lane sample the plot is attached to. */
   link: Point2;
-  /** Front gate, world coordinates. */
+  /** Front gate, world coordinates (on the footpath line, just outside the fence). */
   gate: Point2;
+  /** Mouth of the driveway, world coordinates (just outside the fence). */
+  drive: Point2;
   /** Front door, world coordinates. */
   door: Point2;
 }
@@ -41,7 +44,7 @@ export interface Bridge {
 }
 
 /** How much the deck rises above the straight line between its ends (LOOK §9). */
-export const BRIDGE_ARCH = 0.8;
+export const BRIDGE_ARCH = 1.0;
 
 /** Deck height at t from 0 (bank a) to 1 (bank b). Used by the deck mesh and by walking figures. */
 export function bridgeHeight(b: Bridge, t: number): number {
@@ -111,20 +114,22 @@ function nearPath(samples: Point2[], x: number, z: number, r: number): boolean {
 }
 
 function scatterPlots(rng: Rng, nPlots: number, terrain: Terrain, samples: Point2[], plaza: Point2): Plot[] {
-  const plots: Array<Omit<Plot, 'h' | 'face' | 'link' | 'gate' | 'door' | 'index'>> = [];
+  const plots: Array<Omit<Plot, 'h' | 'face' | 'link' | 'gate' | 'drive' | 'door' | 'index'>> = [];
   let tries = 0;
   while (plots.length < nPlots && tries++ < 20000) {
     const relax = Math.max(0.25, 1 - tries / 6000); // loosen the rules if the valley fills up
     const s = samples[Math.floor(rng() * samples.length)];
     const ang = rng() * Math.PI * 2;
-    const dd = 6 + rng() * rng() * (18 + (1 - relax) * 8); // mostly close, sometimes far out
+    const big = rng() < 0.3; // big plots get the larger house (LOOK §6)
+    // every plot has the same fixed plan (world/plotPlan.ts)
+    const w = PLOT_W;
+    const d = PLOT_D;
+    const rad = Math.hypot(w, d) / 2;
+    // mostly close to the lane, sometimes far out
+    const dd = rad + 1.2 + rng() * rng() * (16 + (1 - relax) * 8) * WORLD_SCALE;
     const x = s.x + Math.cos(ang) * dd;
     const z = s.z + Math.sin(ang) * dd;
-    const big = rng() < 0.3;
-    const w = big ? 9.4 : 7.6 + rng() * 1.0; // plots are larger than the house (LOOK §6 keeps the house size)
-    const d = big ? 8.0 : 6.2 + rng() * 0.8;
-    const rad = Math.hypot(w, d) / 2;
-    if (Math.hypot(x, z) > VALLEY_RADIUS + (1 - relax) * 10) continue;
+    if (Math.hypot(x, z) > VALLEY_RADIUS + (1 - relax) * 6) continue;
     if (terrain.riverDistance(x, z) < rad + 5) continue;
     if (Math.hypot(x - plaza.x, z - plaza.z) < PLAZA_RADIUS + rad + 4) continue;
     if (nearPath(samples, x, z, rad + 0.6)) continue;
@@ -160,6 +165,7 @@ function scatterPlots(rng: Rng, nPlots: number, terrain: Terrain, samples: Point
       face: 0,
       link: { x: 0, z: 0 },
       gate: { x: 0, z: 0 },
+      drive: { x: 0, z: 0 },
       door: { x: 0, z: 0 },
     };
   });
@@ -184,8 +190,10 @@ function orientPlot(plot: Plot, rng: Rng, samples: Point2[]): void {
     x: plot.x + lx * cos + lz * sin,
     z: plot.z - lx * sin + lz * cos,
   });
-  plot.gate = toWorld(0, plot.d / 2 + 0.6);
-  plot.door = toWorld(0, -plot.d / 2 + 2.5);
+  // gate and front door line up on the footpath; the driveway has its own opening (plotPlan.ts)
+  plot.gate = toWorld(PATH_X, plot.d / 2 + 0.6);
+  plot.drive = toWorld(DRIVEWAY_X, plot.d / 2 + 0.6);
+  plot.door = toWorld(PATH_X, HOUSE_FRONT_Z + 0.5);
 }
 
 /**
@@ -208,15 +216,23 @@ function findBridges(terrain: Terrain, laneCurves: THREE.CatmullRomCurve3[]): Br
     const pts = curve.getSpacedPoints(Math.ceil(curve.getLength() / 0.5));
     let start: Point2 | null = null;
     pts.forEach((v, i) => {
-      const wet = terrain.riverDistance(v.x, v.z) < 5.2;
+      // the bridge spans the water and the low bank next to it, so its ends sit on dry ground
+      const rd = terrain.riverDistance(v.x, v.z);
+      const wet = rd < 5.2 || (rd < 10 && terrain.groundHeight(v.x, v.z) < BRIDGE_MIN_END);
       if (wet && !start) start = pts[Math.max(0, i - 1)];
       if (!wet && start) {
-        const ya = terrain.groundHeight(start.x, start.z) + 0.05;
-        const yb = terrain.groundHeight(v.x, v.z) + 0.05;
+        // never lower than half a metre above the water (review: bridge lay in the river)
+        const ya = Math.max(terrain.groundHeight(start.x, start.z) + 0.05, BRIDGE_MIN_END);
+        const yb = Math.max(terrain.groundHeight(v.x, v.z) + 0.05, BRIDGE_MIN_END);
         bridges.push({ a: start, b: { x: v.x, z: v.z }, ya, yb });
         start = null;
       }
     });
+  }
+  // a small levelled landing at each end: the lane meets the deck without a step
+  for (const b of bridges) {
+    terrain.flats.push({ x: b.a.x, z: b.a.z, r: 1.2, h: b.ya - 0.05, ramp: 3 });
+    terrain.flats.push({ x: b.b.x, z: b.b.z, r: 1.2, h: b.yb - 0.05, ramp: 3 });
   }
   return bridges;
 }
@@ -266,7 +282,7 @@ function buildGraph(plots: Plot[], map: MapDef, laneCurves: THREE.CatmullRomCurv
   laneNodes.forEach((ids) => {
     [ids[0], ids[ids.length - 1]].forEach((e) => {
       const j = nearest(nodes[e], (o, i) => i !== e && o.tag === 'path' && !ids.includes(i));
-      if (j >= 0 && dist(nodes[j], nodes[e]) < 9) link(e, j); // lane ends join a nearby path (no dead ends)
+      if (j >= 0 && dist(nodes[j], nodes[e]) < 9 * WORLD_SCALE) link(e, j); // lane ends join a nearby path (no dead ends)
     });
   });
   const wander = laneNodes.flat();
@@ -281,7 +297,7 @@ function buildGraph(plots: Plot[], map: MapDef, laneCurves: THREE.CatmullRomCurv
   const nearestPlaza = (p: Point2): number => nearest(p, (o) => o.tag === 'plaza');
   laneNodes.forEach((ids) => {
     [ids[0], ids[ids.length - 1]].forEach((e) => {
-      if (dist(nodes[e], plaza) < PLAZA_RADIUS + 6) link(e, nearestPlaza(nodes[e]));
+      if (dist(nodes[e], plaza) < PLAZA_RADIUS + 7) link(e, nearestPlaza(nodes[e]));
     });
   });
   wander.push(...ring);
@@ -318,7 +334,7 @@ function buildGraph(plots: Plot[], map: MapDef, laneCurves: THREE.CatmullRomCurv
   const landmarks = map.landmarks.map((lm) => {
     const id = add({ x: lm.x, z: lm.z }, 'landmark');
     const j = nearest(nodes[id], (o, i) => i !== id && o.tag === 'path');
-    if (j >= 0 && dist(nodes[j], nodes[id]) < 14) link(id, j);
+    if (j >= 0 && dist(nodes[j], nodes[id]) < 14 * WORLD_SCALE) link(id, j);
     return id;
   });
 
@@ -367,7 +383,7 @@ export function buildLayout(layoutSeed: number, plotCount: number, mapId = 'tal'
   const plaza = { ...map.plaza };
 
   const plazaHeight = Math.max(0.6, terrain.naturalHeight(plaza.x, plaza.z));
-  terrain.flats.push({ x: plaza.x, z: plaza.z, r: PLAZA_RADIUS + 1.5, h: plazaHeight });
+  terrain.flats.push({ x: plaza.x, z: plaza.z, r: PLAZA_RADIUS + 2.5, h: plazaHeight, ramp: 6 });
 
   const laneSamples: Point2[] = [];
   for (const c of laneCurves) {

@@ -119,7 +119,7 @@ create table classes (
   stamp_reward int not null default 100,
   daily_task_cap int not null default 60,
   max_attempts int not null default 3,
-  plot_cols int not null default 7, plot_rows int not null default 6,
+  plot_cols int not null default 10, plot_rows int not null default 10,
   created_at timestamptz default now()
 );
 
@@ -202,7 +202,7 @@ create table settings (                -- eine Zeile: Standardwerte für NEUE In
   stamp_reward int not null default 100,
   daily_task_cap int not null default 60,
   max_attempts int not null default 3,
-  plot_cols int not null default 7, plot_rows int not null default 6
+  plot_cols int not null default 10, plot_rows int not null default 10
 );
 
 create table class_items (             -- optional: Gegenstand in einer Instanz sperren
@@ -321,7 +321,8 @@ Grundsatz: **Das Layout (Positionen von allem) entsteht im Code in `world/`, det
 - Ausrichtung: Haus und Tor zeigen zum nächsten Weg; **Gartenweg** vom Tor zum Weg wird gezeichnet und ist im Wegegraph.
 - Aufbau: Rasenfläche, Zaun aus Pfosten + Latten mit Tor vorn (keine geschlossene Wand), Haus mit Tür, 2–4 Fenstern (leuchtend), Satteldach mit Dachüberstand, das innerhalb des Grundstücks bleibt; Briefkasten am Tor. Hausgröße und Farben variieren deterministisch.
 - **Freie Plätze** (ohne Schüler): kein Haus, sondern Bauplatz-Optik (Wiese, Holzpflöcke an den Ecken, kleines Schild „frei“). Die Häuser sind nur Platzhalter. Ein Schüler ohne Grundstück wählt einen freien Platz, indem er auf die Wiese tippt (Bestätigung). Die Wahl gilt dauerhaft (RPC `claim_plot(p_index)`, nur solange kein Platz gewählt ist, Platz 0 bis 33). Am Anfang sind alle Plätze frei.
-- Baumodus-Raster: `plot_cols × plot_rows` Zellen à 1 m (aus `classes`, §1a); Hausbereich hinten gesperrt, Tor und Gartenweg vorne mittig frei (§8 `place_item`).
+- **Grundstücksplan (fest, für alle gleich):** 11 × 11 Zellen à 1 m plus 0,7 m Rasen ringsum (12,4 × 12,4 m). Sieben Slots: Haus 6×4, Garage 3×4, Auto-Sockel 3×5 in der Einfahrt, vier Deko-Sockel 3×3; Weg vom Tor zur Haustür und Einfahrt bleiben frei. Maße, Höchstgrößen, Ausrichtung und Regeln: `docs/ASSET_VERTRAG.md`; Code: `world/plotPlan.ts`. Platzieren nur per RPC `place_in_slot` / `clear_slot` (Migration 0013). Haus und Garage sind nie leer (Starter-Haus „Fachwerkhaus“, Starter-Garage „Holzgarage“), leere Deko-Sockel bleiben Wiese.
+- Kartengröße: Die Vorlagen in `world/maps/` sind im Maßstab 1 gezeichnet und werden mit `WORLD_SCALE = 1,65` gestreckt, damit 34 Grundstücke à 12,4 m Platz haben; der Marktplatz bleibt gleich groß.
 - Wechsel von Vorlage oder Seed nach dem Start nur mit Warnung im Lehrer-Bereich: Grundstücke bleiben über `plot_index` erhalten, ihre Lage ändert sich.
 
 ### 10.6 Wahrzeichen und Details

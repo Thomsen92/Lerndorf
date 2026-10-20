@@ -5,6 +5,9 @@ import * as THREE from 'three';
 import { bridgeHeight, buildLayout } from '../src/world/layout';
 import { buildVillage } from '../src/render/village';
 import { Crowd } from '../src/render/crowd';
+import { setupScene } from '../src/render/scene';
+import { MODEL_IDS } from '../src/render/plotAssets';
+import type { SlotMap } from '../src/api/build';
 
 const params = new URLSearchParams(location.search);
 const seed = Number(params.get('seed') ?? 11);
@@ -52,24 +55,31 @@ renderer.toneMappingExposure = 1.05;
 app.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#33405e');
-scene.fog = new THREE.Fog('#33405e', 80, 170);
-scene.add(new THREE.HemisphereLight('#a9b8e8', '#3a5a3a', 1.15));
-const sun = new THREE.DirectionalLight('#ffd2a1', 1.6);
-sun.position.set(-40, 55, 25);
-sun.castShadow = true;
-Object.assign(sun.shadow.camera, { left: -62, right: 62, top: 62, bottom: -62, near: 1, far: 180 });
-sun.shadow.mapSize.set(2048, 2048);
-sun.shadow.bias = -0.0006; // LOOK §3: no shadow acne on the grass
-sun.shadow.normalBias = 0.04;
-scene.add(sun);
+const rig = setupScene(scene);
 
 // the map template of this picture (SPEC §10.1)
 const layout = buildLayout(seed, PLOTS, map);
-const members = Array.from({ length: RESIDENTS }, (_, i) => ({
-  plotIndex: (i * 7) % PLOTS, // spread over the village
-  nickname: NAMES[i % NAMES.length],
-}));
+// sample plots: different houses, garages, cars and decorations, so the pictures show the slot plan
+const HOUSES = ['house_fachwerk', 'house_fachwerk', 'house_landhaus', 'house_villa'];
+const GARAGES = ['garage_holz', 'garage_stein'];
+const CARS = [null, 'car_kleinwagen', null, 'car_camper'];
+const DECOS = MODEL_IDS.deco;
+const members = Array.from({ length: RESIDENTS }, (_, i) => {
+  const slots: SlotMap = {
+    house: { itemId: HOUSES[i % HOUSES.length], rot: 0 },
+    garage: { itemId: GARAGES[(i >> 1) % GARAGES.length], rot: 0 },
+  };
+  const car = CARS[i % CARS.length];
+  if (car) slots.car = { itemId: car, rot: 0 };
+  (['deco_1', 'deco_2', 'deco_3', 'deco_4'] as const).forEach((id, k) => {
+    if ((i + k) % 3 !== 0) slots[id] = { itemId: DECOS[(i * 5 + k * 3) % DECOS.length], rot: (i + k) % 4 };
+  });
+  return {
+    plotIndex: (i * 7) % PLOTS, // spread over the village
+    nickname: NAMES[i % NAMES.length],
+    slots,
+  };
+});
 const village = buildVillage(layout, members, null);
 scene.add(village);
 const crowd = new Crowd(
@@ -85,6 +95,11 @@ const VIEWS: Record<string, { target: THREE.Vector3; offset: THREE.Vector3 }> = 
   marketplace: {
     target: new THREE.Vector3(layout.plaza.x, layout.plazaHeight, layout.plaza.z),
     offset: new THREE.Vector3(14, 22, 26),
+  },
+  // low view towards the valley wall: shows the sky panorama and the fog at the horizon
+  horizon: {
+    target: new THREE.Vector3(layout.plaza.x, layout.plazaHeight + 4, layout.plaza.z),
+    offset: new THREE.Vector3(30, 9, 44),
   },
   plot: {
     target: new THREE.Vector3(layout.plots[0].x, layout.plots[0].h, layout.plots[0].z),
@@ -106,6 +121,7 @@ function setView(name: string): void {
   const v = VIEWS[name] ?? VIEWS.overview;
   camera.position.copy(v.target).add(v.offset);
   camera.lookAt(v.target);
+  rig.follow(v.target);
 }
 
 /** Lets the residents walk for `seconds` so the picture shows a living village. */
@@ -145,10 +161,16 @@ window.galerie = {
   setView,
   step,
   drawCalls,
-  ready: true,
+  ready: false,
 };
 
 // first picture: the requested view after the residents have walked for a while
 setView(viewName);
 step(20);
 renderer.render(scene, camera);
+// the picture is ready once the sky panorama is loaded
+void rig.skyReady.then((sky) => {
+  if (sky) (village.userData.setSky as ((t: THREE.Texture) => void) | undefined)?.(sky);
+  renderer.render(scene, camera);
+  window.galerie.ready = true;
+});

@@ -1,6 +1,6 @@
 # Lerndorf – Stil-Leitfaden (So soll das Dorf aussehen)
 
-Stand: 17.10.2026 · **Verbindlich für alles in `render/`.** Gilt schon jetzt für die Platzhalter (Stufe 1b) und später für die Blender-Modelle (Stufe 2).
+Stand: 20.10.2026 · **Verbindlich für alles in `render/`.** Gilt schon jetzt für die Platzhalter (Stufe 1b) und später für die Blender-Modelle (Stufe 2).
 
 **Maßstab ist der Prototyp** (`Prototyp/index.html`). Er ist nicht „nur ein Test“, sondern das Soll-Bild, das die Lehrkraft freigegeben hat. Wenn eine Entscheidung zur Optik offen ist: so machen wie im Prototyp. Die Werte unten sind direkt aus seinem Code übernommen.
 
@@ -27,7 +27,7 @@ Ein **gemütliches Low-Poly-Comicdorf am frühen Abend**: kühler blau-violetter
 | Element | Wert |
 | --- | --- |
 | Renderer | `ACESFilmicToneMapping`, Belichtung `1.05`, `SRGBColorSpace`, Schatten `PCFSoftShadowMap`, PixelRatio max. 1,5 (Hoch) / 1 (Niedrig) |
-| Himmel + Nebel | `#33405e`, `Fog(#33405e, 80, 170)` |
+| Himmel + Nebel | Panorama „Skyboxes night“ von Kenney (CC0, `web/public/sky/skybox-night.jpg`, equirektangular); Nebel in der Horizontfarbe `#2d3a67`, Beginn 42 %, Ende 105 % der Kartengröße (`render/scene.ts`). Ohne Bild bleibt `#2d3a67` als Hintergrund |
 | Hemisphere-Licht | Himmel `#a9b8e8`, Boden `#3a5a3a`, Intensität `1.15` |
 | Sonne | `#ffd2a1`, Intensität `1.6`, Position `(-40, 55, 25)`, Schattenbereich ±62, `bias -0.0006`, `normalBias 0.04`, Map 2048 |
 | Standard-Material | `MeshStandardMaterial`, `vertexColors`, `flatShading: true`, `roughness 0.88` |

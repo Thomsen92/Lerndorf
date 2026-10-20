@@ -87,6 +87,12 @@ export const TAL: MapDef = {
       { x: 54, z: 16 },
       { x: 46, z: 28 },
     ],
+    // connector: south-east lane to the orchard (no dead end)
+    [
+      { x: 22, z: -42 },
+      { x: 12, z: -47 },
+      { x: 2, z: -44 },
+    ],
     // connector: no dead end
     [
       { x: -58, z: 12 },

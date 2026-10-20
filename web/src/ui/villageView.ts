@@ -18,10 +18,9 @@ import {
 } from '../api/village';
 import { buildLayout, type Plot } from '../world/layout';
 import { buildVillage } from '../render/village';
-import { buildPlacements } from '../render/placements';
-import { loadClassPlacements, loadGrid, type ClassPlacement } from '../api/build';
-import type { GridSize } from '../build/grid';
+import { loadClassSlots, type SlotMap } from '../api/build';
 import { Crowd } from '../render/crowd';
+import { setupScene } from '../render/scene';
 import { openShop } from './shopView';
 import { openTaskBoard } from './taskBoardView';
 import { openLedger } from './ledgerView';
@@ -46,16 +45,15 @@ interface Loaded {
   shopOpen: boolean;
   buildOpen: boolean;
   members: Member[];
-  placements: ClassPlacement[];
-  grid: GridSize;
+  /** Slots of every classmate, by player id. */
+  slots: Map<string, SlotMap>;
 }
 
 async function load(supabase: SupabaseClient): Promise<Loaded> {
   const profile = await loadMyProfile(supabase);
   const cls = await loadClass(supabase, profile.classId);
   const members = await loadMembers(supabase);
-  const placements = await loadClassPlacements(supabase);
-  const grid = await loadGrid(supabase);
+  const slots = await loadClassSlots(supabase);
   return {
     profile,
     layoutSeed: cls.layoutSeed,
@@ -63,8 +61,7 @@ async function load(supabase: SupabaseClient): Promise<Loaded> {
     shopOpen: cls.shopOpen,
     buildOpen: cls.buildOpen,
     members,
-    placements,
-    grid,
+    slots,
   };
 }
 
@@ -155,7 +152,7 @@ export async function mountVillage(
     return { dispose: stop };
   }
 
-  const { profile, layoutSeed, mapId, shopOpen, buildOpen, members, placements, grid } = loaded;
+  const { profile, layoutSeed, mapId, shopOpen, buildOpen, members, slots } = loaded;
   const who = root.querySelector<HTMLSpanElement>('#who');
   const coins = root.querySelector<HTMLSpanElement>('#coins');
   if (who) who.textContent = profile.nickname;
@@ -209,17 +206,9 @@ export async function mountVillage(
   const gl = renderer;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#33405e');
-  scene.fog = new THREE.Fog('#33405e', 80, 170);
-  scene.add(new THREE.HemisphereLight('#a9b8e8', '#3a5a3a', 1.15));
-  const sun = new THREE.DirectionalLight('#ffd2a1', 1.6);
-  sun.position.set(-40, 55, 25);
-  sun.castShadow = true;
-  Object.assign(sun.shadow.camera, { left: -62, right: 62, top: 62, bottom: -62, near: 1, far: 180 });
-  sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.bias = -0.0006; // LOOK §3: no shadow acne on the grass
-  sun.shadow.normalBias = 0.04;
-  scene.add(sun);
+  // sky panorama, fog and light (LOOK §3, render/scene.ts)
+  const rig = setupScene(scene);
+  const sun = rig.sun;
 
   const layout = buildLayout(layoutSeed, PLOT_COUNT, mapId);
   const ownPlot = profile.plotIndex;
@@ -248,14 +237,13 @@ export async function mountVillage(
   }
   const labels = members
     .filter((m) => m.plotIndex !== null)
-    .map((m) => ({ plotIndex: m.plotIndex as number, nickname: m.nickname }));
+    .map((m) => ({ plotIndex: m.plotIndex as number, nickname: m.nickname, slots: slots.get(m.id) ?? {} }));
   const village = buildVillage(layout, labels, ownPlot);
   scene.add(village);
-  // decorations of the whole class (PLAN 4.5), one instanced mesh per item type
-  const plotOf = new Map(
-    members.filter((m) => m.plotIndex !== null).map((m) => [m.id, m.plotIndex as number]),
-  );
-  scene.add(buildPlacements(layout, placements, plotOf, grid));
+  // the river reflects the sky panorama once it has loaded
+  void rig.skyReady.then((sky) => {
+    if (sky) (village.userData.setSky as ((t: THREE.Texture) => void) | undefined)?.(sky);
+  });
 
   const crowd = new Crowd(
     scene,
@@ -292,7 +280,7 @@ export async function mountVillage(
   controls.target.copy(homeTarget);
   controls.enableDamping = true;
   controls.minDistance = 12;
-  controls.maxDistance = 110;
+  controls.maxDistance = 150;
   controls.maxPolarAngle = 1.2;
   const jumpTo = (t: THREE.Vector3): void => {
     const offset = camera.position.clone().sub(controls.target);
@@ -348,7 +336,14 @@ export async function mountVillage(
     jumpTo(homeTarget);
   };
   if (home) {
-    buildMode = new BuildMode({ scene, plot: home, supabase, uid: profile.id, onChange: () => exitBuild() });
+    buildMode = new BuildMode({
+      scene,
+      plot: home,
+      supabase,
+      uid: profile.id,
+      onSlots: (s) => (village.userData.updateOwnPlot as ((s: SlotMap) => void) | undefined)?.(s),
+      onDone: () => exitBuild(),
+    });
   }
   root.querySelector<HTMLButtonElement>('#build')?.addEventListener('click', async () => {
     if (!buildMode) return showNotice('Du hast noch kein Grundstück.');
@@ -390,6 +385,7 @@ export async function mountVillage(
     (village.userData.labelUpdate as ((c: THREE.Camera) => void) | undefined)?.(camera);
     crowd.updateLabels(camera);
     controls.update();
+    rig.follow(controls.target);
     gl.render(scene, camera);
   });
 

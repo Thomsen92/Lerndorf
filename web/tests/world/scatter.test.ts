@@ -18,7 +18,7 @@ for (const mapId of MAP_IDS) {
 
     it('places a useful number of trees, never more than asked', () => {
       expect(trees.length).toBeGreaterThan(60);
-      expect(trees.length).toBeLessThanOrEqual(200);
+      expect(trees.length).toBeLessThanOrEqual(480);
     });
 
     it('keeps trees off paths, plaza and water', () => {
@@ -40,7 +40,7 @@ for (const mapId of MAP_IDS) {
     it('places lanterns along the lanes and around the plaza', () => {
       // SPEC §10.6 asks for 20 to 30; the shortest template has fewer lane metres (see PLAN L.3)
       expect(lamps.length).toBeGreaterThanOrEqual(15);
-      expect(lamps.length).toBeLessThanOrEqual(60);
+      expect(lamps.length).toBeLessThanOrEqual(90);
       for (const l of lamps.slice(0, -4)) {
         expect(layout.terrain.riverDistance(l.x, l.z)).toBeGreaterThanOrEqual(6);
       }

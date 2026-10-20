@@ -462,8 +462,9 @@ function instanceSection(
       <label>Stempel <input name="stamp" type="number" min="0" max="1000" value="${r.stampReward}" /></label>
       <label>Tageslimit <input name="cap" type="number" min="0" max="1000" value="${r.dailyTaskCap}" /></label>
       <label>Versuche <input name="attempts" type="number" min="1" max="10" value="${r.maxAttempts}" /></label>
-      <label>Raster Spalten <input name="cols" type="number" min="3" max="12" value="${r.plotCols}" /></label>
-      <label>Raster Zeilen <input name="rows" type="number" min="4" max="12" value="${r.plotRows}" /></label>
+      <!-- the plot plan is fixed (docs/ASSET_VERTRAG.md): 11 x 11, not changeable per class -->
+      <input name="cols" type="hidden" value="${r.plotCols}" />
+      <input name="rows" type="hidden" value="${r.plotRows}" />
       <button type="submit">Regeln speichern</button>
     </form>
     <h3>Shop: verkaufte Sachen</h3>

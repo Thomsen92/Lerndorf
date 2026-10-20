@@ -58,11 +58,12 @@ function freeForNature(layout: Layout, x: number, z: number, pathClear: number):
  * Trees: a dense forest belt towards the valley wall, scattered groups in the valley.
  * The target count keeps the draw calls low (instanced meshes).
  */
-export function placeTrees(layout: Layout, maxTrees = 200): Tree[] {
+export function placeTrees(layout: Layout, maxTrees = 480): Tree[] {
   const rng = createRng(layout.seed * 131 + 7);
   const trees: Tree[] = [];
-  const span = VALLEY_RADIUS + 14;
-  for (let tries = 0; tries < 9000 && trees.length < maxTrees; tries++) {
+  // up to the rim of the map, so the valley wall is forest and the ridge is not a bare line
+  const span = VALLEY_RADIUS + 26;
+  for (let tries = 0; tries < 16000 && trees.length < maxTrees; tries++) {
     const x = (rng() - 0.5) * span * 2;
     const z = (rng() - 0.5) * span * 2;
     const r = Math.hypot(x, z);
@@ -72,11 +73,22 @@ export function placeTrees(layout: Layout, maxTrees = 200): Tree[] {
     if (rng() > density) continue;
     if (!freeForNature(layout, x, z, 2.2)) continue;
     if (trees.some((t) => Math.hypot(t.x - x, t.z - z) < 1.6)) continue;
+    const scale = 0.9 + rng() * 0.9;
+    // stand on the lowest point under the trunk, so no tree floats on a slope
+    const g = layout.terrain;
+    const rr = 0.3 * scale;
+    const y = Math.min(
+      g.groundHeight(x, z),
+      g.groundHeight(x + rr, z),
+      g.groundHeight(x - rr, z),
+      g.groundHeight(x, z + rr),
+      g.groundHeight(x, z - rr),
+    );
     trees.push({
       x,
       z,
-      y: layout.terrain.groundHeight(x, z),
-      scale: 0.9 + rng() * 0.9,
+      y,
+      scale,
       kind: rng() < 0.5 ? 'pine' : 'round',
       rot: rng() * Math.PI * 2,
     });
@@ -125,7 +137,7 @@ export interface Scatter {
 }
 
 /** Shrubs and rocks in the valley, off paths, plaza, bridges and water; shrubs may stand next to plots. */
-export function placeBushes(layout: Layout, maxBushes = 50): Scatter[] {
+export function placeBushes(layout: Layout, maxBushes = 130): Scatter[] {
   const rng = createRng(layout.seed * 151 + 11);
   const out: Scatter[] = [];
   const span = VALLEY_RADIUS;
@@ -146,7 +158,7 @@ export function placeBushes(layout: Layout, maxBushes = 50): Scatter[] {
 }
 
 /** Rocks: sunk halfway into the ground, anywhere free. */
-export function placeRocks(layout: Layout, maxRocks = 30): Scatter[] {
+export function placeRocks(layout: Layout, maxRocks = 70): Scatter[] {
   const rng = createRng(layout.seed * 173 + 13);
   const out: Scatter[] = [];
   for (let tries = 0; tries < 6000 && out.length < maxRocks; tries++) {
@@ -165,7 +177,7 @@ export function placeRocks(layout: Layout, maxRocks = 30): Scatter[] {
 }
 
 /** Reeds along the river banks, 4.2 to 5.6 m from the centre line, not at bridges. */
-export function placeReeds(layout: Layout, maxReeds = 80): Scatter[] {
+export function placeReeds(layout: Layout, maxReeds = 120): Scatter[] {
   const rng = createRng(layout.seed * 191 + 17);
   const river = layout.terrain.river;
   const out: Scatter[] = [];
@@ -185,7 +197,7 @@ export function placeReeds(layout: Layout, maxReeds = 80): Scatter[] {
 }
 
 /** Stones on the river banks, 4.6 to 5.8 m from the centre line, sunk halfway (LOOK §4). */
-export function placeShoreStones(layout: Layout, maxStones = 90): Scatter[] {
+export function placeShoreStones(layout: Layout, maxStones = 120): Scatter[] {
   const rng = createRng(layout.seed * 239 + 31);
   const river = layout.terrain.river;
   const out: Scatter[] = [];
@@ -244,7 +256,7 @@ export interface Hedge extends Scatter {
  * Hedges along the lanes (LOOK §8): about every 3.6 m of lane, on one side, 1.6 m from the centre line.
  * Half of the spots stay empty, so the hedges come in short rows.
  */
-export function placeHedges(layout: Layout, maxHedges = 60): Hedge[] {
+export function placeHedges(layout: Layout, maxHedges = 70): Hedge[] {
   const rng = createRng(layout.seed * 223 + 23);
   const s = layout.laneSamples;
   const out: Hedge[] = [];
@@ -283,7 +295,7 @@ export interface Meadow {
 }
 
 /** Meadows on free ground away from paths, plots and water. Flowers stay inside the radius. */
-export function placeMeadows(layout: Layout, maxMeadows = 14): Meadow[] {
+export function placeMeadows(layout: Layout, maxMeadows = 30): Meadow[] {
   const rng = createRng(layout.seed * 229 + 29);
   const out: Meadow[] = [];
   for (let tries = 0; tries < 4000 && out.length < maxMeadows; tries++) {
@@ -312,6 +324,30 @@ export function placeMeadows(layout: Layout, maxMeadows = 14): Meadow[] {
     }
     if (flowers.length < 4) continue;
     out.push({ x, z, y: layout.terrain.groundHeight(x, z), radius, flowers });
+  }
+  return out;
+}
+
+/**
+ * Grass tufts and wild flowers on open ground (LOOK §2.1 "nie leer"): many tiny instances, so the
+ * large lawns between the plots get texture without a texture image.
+ */
+export function placeTufts(layout: Layout, maxTufts = 1100): Scatter[] {
+  const rng = createRng(layout.seed * 257 + 37);
+  const out: Scatter[] = [];
+  const span = VALLEY_RADIUS + 10;
+  for (let tries = 0; tries < 9000 && out.length < maxTufts; tries++) {
+    const x = (rng() - 0.5) * span * 2;
+    const z = (rng() - 0.5) * span * 2;
+    if (Math.hypot(x, z) > span) continue;
+    if (!freeForNature(layout, x, z, 1.2)) continue;
+    out.push({
+      x,
+      z,
+      y: layout.terrain.groundHeight(x, z),
+      scale: 0.6 + rng() * 0.7,
+      rot: rng() * Math.PI * 2,
+    });
   }
   return out;
 }

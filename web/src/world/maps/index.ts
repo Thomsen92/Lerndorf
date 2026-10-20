@@ -6,6 +6,7 @@ import type { Point2 } from '../geometry';
 import { TAL } from './tal';
 import { FLUSS_MITTE } from './fluss_mitte';
 import { BACH_NORDEN } from './bach_norden';
+import { WORLD_SCALE } from '../constants';
 
 export interface Landmark {
   /** Kind of landmark (SPEC §10.6): viewpoint, footbridge, mill, orchard, hut. */
@@ -30,15 +31,39 @@ export interface MapDef {
   landmarks: Landmark[];
 }
 
+/** A template stretched by WORLD_SCALE (rivers, lanes, plaza and landmarks move apart). */
+function scaled(map: MapDef, k: number): MapDef {
+  const pt = (p: Point2): Point2 => ({ x: p.x * k, z: p.z * k });
+  const plaza = pt(map.plaza);
+  // lane points at the plaza keep their distance to it (the plaza does not grow), so the lanes still
+  // end at its edge
+  const lanePt = (p: Point2): Point2 => {
+    const dx = p.x - map.plaza.x;
+    const dz = p.z - map.plaza.z;
+    const d = Math.hypot(dx, dz);
+    if (d >= 14) return pt(p);
+    const t = Math.max(0, (d - 11) / 3); // 0 at the plaza edge, 1 from 14 m on
+    const f = 1 + (k - 1) * t;
+    return { x: plaza.x + dx * f, z: plaza.z + dz * f };
+  };
+  return {
+    ...map,
+    plaza,
+    river: map.river.map(pt),
+    lanes: map.lanes.map((lane) => lane.map(lanePt)),
+    landmarks: map.landmarks.map((l) => ({ ...l, x: l.x * k, z: l.z * k })),
+  };
+}
+
 export const MAPS: Record<string, MapDef> = {
-  [TAL.id]: TAL,
-  [FLUSS_MITTE.id]: FLUSS_MITTE,
-  [BACH_NORDEN.id]: BACH_NORDEN,
+  [TAL.id]: scaled(TAL, WORLD_SCALE),
+  [FLUSS_MITTE.id]: scaled(FLUSS_MITTE, WORLD_SCALE),
+  [BACH_NORDEN.id]: scaled(BACH_NORDEN, WORLD_SCALE),
 };
 
 export const MAP_IDS = Object.keys(MAPS);
 
 /** The map with this id. Unknown ids fall back to 'tal' (the first template). */
 export function getMap(id: string): MapDef {
-  return MAPS[id] ?? TAL;
+  return MAPS[id] ?? MAPS[TAL.id];
 }

@@ -8,7 +8,7 @@ import { chromium } from '@playwright/test';
 
 const MAPS = ['tal', 'fluss_mitte', 'bach_norden']; // all templates (SPEC §10.1)
 const SEEDS = [11, 23];
-const VIEWS = ['overview', 'topdown', 'marketplace', 'plot', 'bridge'];
+const VIEWS = ['overview', 'topdown', 'marketplace', 'plot', 'bridge', 'horizon'];
 const PORT = 5174;
 // Vite serves everything below the base path of the app (SPEC §17)
 const BASE = `http://localhost:${PORT}/dev/galerie.html`;

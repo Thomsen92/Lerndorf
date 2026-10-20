@@ -6,7 +6,7 @@ import type { TaskType, TaskView } from '../tasks/answer';
 
 export interface CatalogItem {
   id: string;
-  kind: 'deco' | 'avatar';
+  kind: 'deco' | 'avatar' | 'house' | 'garage' | 'car';
   slot: string | null;
   nameDe: string;
   price: number;

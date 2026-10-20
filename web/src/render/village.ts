@@ -3,18 +3,29 @@
  * Placeholder models only (boxes and cones). The comic models come in Stufe 2.
  */
 import * as THREE from 'three';
-import { MAP_SIZE } from '../world/constants';
+import { MAP_SIZE, WATER_LEVEL } from '../world/constants';
+import {
+  DRIVEWAY_X,
+  HOUSE_FRONT_Z,
+  PATH_X,
+  PLOT_ROWS,
+  SLOTS,
+  rectCentre,
+  type SlotDef,
+} from '../world/plotPlan';
+import { plotAsset, tintFor } from './plotAssets';
+import { shownItem, type SlotMap } from '../api/build';
 import type { Layout, Plot } from '../world/layout';
 import type { Point2 } from '../world/geometry';
 import { createRng } from '../world/rng';
-import { laneDistance } from '../world/scatter';
+import { laneDistance, placeMeadows } from '../world/scatter';
 import { buildNature, buildVegetation } from './nature';
 import { buildPlaza } from './plaza';
 import { buildBridge } from './bridges';
 import { bakeStatic } from './merge';
 import { buildLandmarks } from './landmarks';
-import { dirtTexture, grassTexture, skyTexture, waterTexture } from './textures';
-import { chimney, fenceGeometry, gableRoof, gardenPathGeometry } from './house';
+import { dirtTexture, rippleNormalTexture, skyTexture } from './textures';
+import { fenceGeometry, gardenPathGeometry } from './house';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const MAT = {
@@ -34,10 +45,20 @@ const MAT = {
   wood: new THREE.MeshStandardMaterial({ color: '#8a5a36', roughness: 0.9 }),
   wall: new THREE.MeshStandardMaterial({ color: '#efe6d6', roughness: 0.9 }),
   roof: new THREE.MeshStandardMaterial({ color: '#c4574b', roughness: 0.8, flatShading: true }),
-  grass: new THREE.MeshStandardMaterial({ color: '#5f8f52', roughness: 1 }),
+  grass: new THREE.MeshStandardMaterial({ color: '#5f8f52', roughness: 1, flatShading: true }),
+  grass2: new THREE.MeshStandardMaterial({ color: '#6a9c58', roughness: 1, flatShading: true }),
+  stone: new THREE.MeshStandardMaterial({ color: '#8f8d86', roughness: 0.95, flatShading: true }),
+  timber: new THREE.MeshStandardMaterial({ color: '#6b4a35', roughness: 0.9 }),
+  door: new THREE.MeshStandardMaterial({ color: '#5a3a26', roughness: 0.8 }),
+  window: new THREE.MeshBasicMaterial({ color: '#ffad42' }),
+  trunk: new THREE.MeshStandardMaterial({ color: '#6b4a2f', roughness: 0.9 }),
+  mailbox: new THREE.MeshStandardMaterial({ color: '#3c4a7a', roughness: 0.7 }),
+  lotLawn: new THREE.MeshStandardMaterial({ color: '#729f5c', roughness: 1, flatShading: true }),
+  rope: new THREE.MeshStandardMaterial({ color: '#e8d9b0', roughness: 0.9 }),
+  footpath: new THREE.MeshStandardMaterial({ color: '#cbb894', roughness: 0.95, flatShading: true }),
+  driveway: new THREE.MeshStandardMaterial({ color: '#a89a80', roughness: 0.95, flatShading: true }),
+  signBoard: new THREE.MeshStandardMaterial({ color: '#a0703f', roughness: 0.9 }),
 };
-
-const ROOF_COLORS = ['#c4574b', '#3f8f88', '#5a62b8', '#d08a3c', '#8c5aa8', '#4f8f5f'];
 
 /** Vertical ribbon on the ground (lanes, river) following a list of 2D points. */
 function ribbon(
@@ -75,72 +96,126 @@ function ribbon(
 }
 
 function terrainMesh(layout: Layout): THREE.Mesh {
-  const seg = 140; // about 1 vertex per metre in the valley (SPEC §10.2)
-  const geo = new THREE.PlaneGeometry(MAP_SIZE + 30, MAP_SIZE + 30, seg, seg);
+  // low-poly ground with visible facets, coloured per vertex (prototype, LOOK §3/§4)
+  const size = MAP_SIZE + 40;
+  const seg = 170;
+  const geo = new THREE.PlaneGeometry(size, size, seg, seg);
   geo.rotateX(-Math.PI / 2);
   const pos = geo.attributes.position;
   const col = new Float32Array(pos.count * 3);
   const low = new THREE.Color('#4e7a45');
+  const mid = new THREE.Color('#5f8f52');
   const high = new THREE.Color('#7aa35c');
   const bank = new THREE.Color('#a99b72');
-  // darker, earthier path colour; paths are narrower than before (cozy citybuilder look)
-  const pathCol = new THREE.Color('#a8926c');
-  const trampled = new THREE.Color('#8a9a5c');
+  const pathCol = new THREE.Color('#b59f78');
+  const meadowCol = new THREE.Color('#93c26a');
   const tmp = new THREE.Color();
   const t = layout.terrain;
+  const meadows = placeMeadows(layout);
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
     const z = pos.getZ(i);
     const h = t.groundHeight(x, z);
     pos.setY(i, h);
-    tmp.copy(low).lerp(high, Math.min(1, Math.max(0, (h - 1) / 8)));
+    tmp
+      .copy(low)
+      .lerp(mid, smoothstep(-0.5, 2.5, h))
+      .lerp(high, smoothstep(3, 9, h));
+    // sandy bank only right at the water (no brown slopes)
     const rd = t.riverDistance(x, z);
-    tmp.lerp(bank, Math.min(1, Math.max(0, (6.5 - rd) / 2.5)) * 0.85);
-    // paths painted into the ground: soft edge, no floating strip (review befund 4)
-    const onPath = Math.min(1, Math.max(0, (1.7 - laneDistance(layout, x, z)) / 0.8));
-    tmp.lerp(pathCol, onPath);
-    // trampled grass at the very edge of the path, and a little brightness noise so no area is one colour
-    tmp.lerp(trampled, (1 - Math.abs(2 * onPath - 1)) * 0.35 * (onPath > 0 ? 1 : 0));
-    const noise = Math.sin(x * 12.9898 + z * 78.233) * 43758.5453;
-    tmp.multiplyScalar(1 + (noise - Math.floor(noise) - 0.5) * 0.12);
-    col[i * 3] = tmp.r;
-    col[i * 3 + 1] = tmp.g;
-    col[i * 3 + 2] = tmp.b;
+    tmp.lerp(bank, smoothstep(5.6, 3.8, rd) * 0.85);
+    // blossom meadows are painted into the grass, so they follow every slope
+    for (const m of meadows) {
+      const d = Math.hypot(x - m.x, z - m.z);
+      if (d < m.radius + 1) tmp.lerp(meadowCol, smoothstep(m.radius + 1, m.radius - 0.6, d) * 0.8);
+    }
+    // the lane ribbon lies on top; a slightly darker trampled seam under its edge hides the border
+    const ld = laneDistance(layout, x, z);
+    tmp.lerp(pathCol, smoothstep(1.6, 0.9, ld) * 0.9);
+    // gentle large and small noise, so no field is one flat colour (LOOK §2.1)
+    const n = Math.sin(x * 1.7) * Math.cos(z * 1.3) * 0.025 + Math.sin(x * 0.21 + z * 0.17) * 0.03;
+    col[i * 3] = tmp.r + n;
+    col[i * 3 + 1] = tmp.g + n * 1.2;
+    col[i * 3 + 2] = tmp.b + n * 0.6;
   }
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geo.computeVertexNormals();
-  // grass: grain texture times the vertex colours; smooth shading, so the land is not faceted
-  const grass = grassTexture();
-  grass.repeat.set((MAP_SIZE + 30) / 9, (MAP_SIZE + 30) / 9);
-  const ground = new THREE.MeshStandardMaterial({
-    vertexColors: true,
-    map: grass,
-    roughness: 0.88,
-  });
-  const mesh = new THREE.Mesh(geo, ground);
+  const mesh = new THREE.Mesh(
+    geo,
+    new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.88 }),
+  );
   mesh.receiveShadow = true;
+  mesh.userData.kind = 'ground'; // stays its own mesh (taps on the ground find free plots)
   return mesh;
 }
 
+function smoothstep(e0: number, e1: number, x: number): number {
+  const k = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+  return k * k * (3 - 2 * k);
+}
+
+/**
+ * River surface (LOOK §4): four vertices across, so the water is light at the banks and deep blue in
+ * the middle, with two blues alternating along the course. Ripples come from a scrolling normal map;
+ * the sky panorama is reflected in it once it has loaded (userData.setSky).
+ */
 function riverMesh(river: Point2[]): THREE.Mesh {
-  // width changes between 5.6 and 8.8 m along the course (LOOK §4)
-  const wave = waterTexture();
-  const mesh = ribbon(
-    river,
-    (i) => 7.2 + 1.6 * Math.sin(i * 0.09),
-    () => -0.55,
-    // water reflects the evening sky (cheap environment map, no second render pass)
-    new THREE.MeshStandardMaterial({
-      color: '#5fb3d9',
-      map: wave,
-      roughness: 0.12,
-      metalness: 0.45,
-      envMap: skyTexture(),
-      envMapIntensity: 1.1,
-      side: THREE.DoubleSide,
-    }),
-  );
-  mesh.userData = { waterMap: wave };
+  const shallow = new THREE.Color('#7cc4dc');
+  const blueA = new THREE.Color('#3f8fbf');
+  const blueB = new THREE.Color('#2f78ab');
+  const across = [-1, -0.45, 0.45, 1];
+  const verts: number[] = [];
+  const cols: number[] = [];
+  const uvs: number[] = [];
+  const idx: number[] = [];
+  const tmp = new THREE.Color();
+  let along = 0;
+  river.forEach((p, i) => {
+    const half = 3.6 + 0.8 * Math.sin(i * 0.09); // width 5.6 to 8.8 m
+    const prev = river[Math.max(0, i - 1)];
+    const next = river[Math.min(river.length - 1, i + 1)];
+    const tx = next.x - prev.x;
+    const tz = next.z - prev.z;
+    const l = Math.hypot(tx, tz) || 1;
+    if (i > 0) along += Math.hypot(p.x - prev.x, p.z - prev.z);
+    const deep = tmp.copy(blueA).lerp(blueB, 0.5 + 0.5 * Math.sin(along * 0.08));
+    across.forEach((k) => {
+      verts.push(p.x + (-tz / l) * half * k, WATER_LEVEL, p.z + (tx / l) * half * k);
+      const c = Math.abs(k) === 1 ? shallow : deep;
+      cols.push(c.r, c.g, c.b);
+      uvs.push((k * half) / 6, along / 6);
+    });
+    if (i > 0) {
+      const a0 = (i - 1) * 4;
+      const b0 = i * 4;
+      for (let k = 0; k < 3; k++) {
+        idx.push(a0 + k, b0 + k, a0 + k + 1, a0 + k + 1, b0 + k, b0 + k + 1);
+      }
+    }
+  });
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  const ripples = rippleNormalTexture();
+  const mat = new THREE.MeshStandardMaterial({
+    color: '#ffffff',
+    vertexColors: true,
+    normalMap: ripples,
+    normalScale: new THREE.Vector2(0.35, 0.35),
+    roughness: 0.06,
+    metalness: 0.3,
+    envMap: skyTexture(), // replaced by the sky panorama (setSky)
+    envMapIntensity: 0.9,
+    emissive: '#1d4f73',
+    emissiveIntensity: 0.25,
+    side: THREE.DoubleSide,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.receiveShadow = true;
+  mesh.userData = { ripples, material: mat };
   return mesh;
 }
 
@@ -148,6 +223,8 @@ export interface VillageMember {
   /** Plot index in the class village (profiles.plot_index). */
   plotIndex: number;
   nickname: string;
+  /** What stands in the slots of the plot (house and garage fall back to the starters). */
+  slots?: SlotMap;
 }
 
 /** Floating name label above a house. Canvas texture, so no HTML inside the 3D scene. */
@@ -183,25 +260,52 @@ function freeLot(p: Plot): THREE.Group {
   const g = new THREE.Group();
   g.position.set(p.x, p.h, p.z);
   g.rotation.y = p.face;
-  const lawn = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.1, p.d), MAT.grass);
+  const lawn = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.1, p.d), MAT.lotLawn);
   lawn.position.y = 0.02;
   lawn.receiveShadow = true;
   g.add(lawn);
-  for (const [sx, sz] of [
-    [-1, -1],
-    [1, -1],
-    [-1, 1],
-    [1, 1],
-  ]) {
-    const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.6, 6), MAT.wood);
-    stake.position.set((sx * p.w) / 2 - sx * 0.2, 0.3, (sz * p.d) / 2 - sz * 0.2);
+  // building site: stakes at the corners and in the middle of each side, a rope between them
+  const hw = p.w / 2 - 0.2;
+  const hd = p.d / 2 - 0.2;
+  const ring: Array<[number, number]> = [
+    [-hw, -hd],
+    [0, -hd],
+    [hw, -hd],
+    [hw, 0],
+    [hw, hd],
+    [0, hd],
+    [-hw, hd],
+    [-hw, 0],
+  ];
+  ring.forEach(([x, z], i) => {
+    const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 0.7, 5), MAT.wood);
+    stake.position.set(x, 0.35, z);
     stake.castShadow = true;
     g.add(stake);
-  }
+    const [nx, nz] = ring[(i + 1) % ring.length];
+    const len = Math.hypot(nx - x, nz - z);
+    const rope = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.035, len), MAT.rope);
+    rope.position.set((x + nx) / 2, 0.55, (z + nz) / 2);
+    rope.rotation.y = Math.atan2(nx - x, nz - z);
+    g.add(rope);
+  });
+  // a wooden sign at the front and a small pile of planks: here a house can be built
+  const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.3, 0.12), MAT.trunk);
+  post.position.set(-1.6, 0.65, hd - 0.4);
+  const board = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.6, 0.08), MAT.signBoard);
+  board.position.set(-1.6, 1.2, hd - 0.33);
+  g.add(post, board);
   const sign = nameTag('frei', false);
-  sign.scale.set(1.4, 0.36, 1);
-  sign.position.set(0, 1.4, -p.d / 2 + 0.6);
+  sign.scale.set(1.1, 0.28, 1);
+  sign.position.set(-1.6, 1.2, hd - 0.25);
   g.add(sign);
+  for (let k = 0; k < 4; k++) {
+    const plank = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.12, 0.3), k % 2 ? MAT.wood : MAT.timber);
+    plank.position.set(hw - 1.6, 0.13 + Math.floor(k / 2) * 0.13, -hd + 1.2 + (k % 2) * 0.34);
+    plank.rotation.y = 0.12 * (k - 1.5);
+    plank.castShadow = true;
+    g.add(plank);
+  }
   plantFreeLot(g, p);
   return g;
 }
@@ -217,7 +321,7 @@ function plantFreeLot(g: THREE.Group, p: Plot): void {
   const rng = createRng(p.index * 97 + 5);
   const bush = new THREE.IcosahedronGeometry(0.55, 0);
   bush.translate(0, 0.4, 0);
-  for (let k = 0; k < 3; k++) {
+  for (let k = 0; k < 5; k++) {
     const m = new THREE.Mesh(
       bush,
       new THREE.MeshStandardMaterial({
@@ -226,13 +330,15 @@ function plantFreeLot(g: THREE.Group, p: Plot): void {
         roughness: 0.85,
       }),
     );
-    m.position.set((rng() - 0.5) * p.w * 0.55, 0.05, (rng() - 0.5) * p.d * 0.5);
+    // along the side edges, so the middle of the site stays open
+    const side = k % 2 ? 1 : -1;
+    m.position.set(side * (p.w / 2 - 0.9 - rng() * 0.6), 0.05, (rng() - 0.5) * p.d * 0.7);
     m.scale.set(0.8 + rng() * 0.5, 0.7 + rng() * 0.3, 0.8 + rng() * 0.5);
     m.rotation.y = rng() * Math.PI * 2;
     g.add(m);
   }
   const blossom = new THREE.SphereGeometry(0.1, 5, 4);
-  for (let k = 0; k < 6; k++) {
+  for (let k = 0; k < 14; k++) {
     const m = new THREE.Mesh(
       blossom,
       new THREE.MeshStandardMaterial({
@@ -245,73 +351,102 @@ function plantFreeLot(g: THREE.Group, p: Plot): void {
   }
 }
 
+/** Flat surface strip in plot-local coordinates (path, driveway). */
+function surface(
+  g: THREE.Group,
+  lx: number,
+  z0: number,
+  z1: number,
+  w: number,
+  mat: THREE.Material,
+  y: number,
+): void {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, z1 - z0), mat);
+  m.position.set(lx, y, (z0 + z1) / 2);
+  m.receiveShadow = true;
+  g.add(m);
+}
+
+/**
+ * Contents of an occupied plot after the fixed plan (world/plotPlan.ts): house, garage, driveway
+ * with car pedestal, footpath, four decoration pedestals (green lawn while empty), fence with a gate
+ * on the footpath and an opening for the driveway, mailbox at the gate.
+ */
+function plotContents(p: Plot, slots: SlotMap): THREE.Group {
+  const g = new THREE.Group();
+  const lawn = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.1, p.d), p.index % 2 ? MAT.grass : MAT.grass2);
+  lawn.position.y = 0.02;
+  lawn.receiveShadow = true;
+  g.add(lawn);
+
+  // footpath from the gate to the front door, and the driveway from the garage to the street
+  surface(g, PATH_X, HOUSE_FRONT_Z, p.d / 2, 2.0, MAT.footpath, 0.08);
+  const garage = SLOTS.find((s) => s.id === 'garage') as SlotDef;
+  const driveStart = garage.z + garage.d - PLOT_ROWS / 2;
+  surface(g, DRIVEWAY_X, driveStart, p.d / 2, 3.0, MAT.driveway, 0.08);
+  for (const side of [-1.55, 1.55]) surface(g, DRIVEWAY_X + side, driveStart, p.d / 2, 0.12, MAT.stone, 0.1);
+
+  const tint = tintFor(p.index);
+  for (const slot of SLOTS) {
+    const content = shownItem(slots, slot.id, slot.kind);
+    if (!content) continue; // empty pedestal: green lawn
+    const model = plotAsset(slot.kind, content.itemId, tint);
+    const c = rectCentre(slot);
+    model.position.set(c.lx, 0.07, c.lz);
+    model.rotation.y = (content.rot * Math.PI) / 2;
+    g.add(model);
+  }
+
+  const post = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.9, 0.1), MAT.trunk);
+  post.position.set(PATH_X + 1.4, 0.45, p.d / 2 - 0.3);
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.3, 0.3), MAT.mailbox);
+  box.position.set(PATH_X + 1.4, 0.95, p.d / 2 - 0.3);
+  g.add(post, box);
+
+  // post-and-rail fence: gate on the footpath, opening for the driveway (LOOK §6)
+  const fence = new THREE.Mesh(
+    fenceGeometry(p.w, p.d, [
+      [PATH_X - 1.0, PATH_X + 1.0],
+      [DRIVEWAY_X - 1.5, DRIVEWAY_X + 1.5],
+    ]),
+    MAT.wood,
+  );
+  fence.castShadow = true;
+  g.add(fence);
+  return g;
+}
+
+/** Marks every mesh of a group so that bakeStatic leaves it alone (the own plot changes live). */
+function keepLive(g: THREE.Object3D): void {
+  g.traverse((o) => {
+    if (o instanceof THREE.Mesh) o.userData.kind = o.userData.kind ?? 'live';
+  });
+}
+
 function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): THREE.Group {
   if (!member) return freeLot(p);
   const g = new THREE.Group();
   g.position.set(p.x, p.h, p.z);
   g.rotation.y = p.face;
-
-  if (member) {
-    const tag = nameTag(member.nickname, own);
-    tag.position.set(0, 4.6, -p.d / 2 + 1.5);
-    tag.userData = { house: true, own };
-    g.add(tag);
-  }
+  const house = rectCentre(SLOTS[0]);
+  const tag = nameTag(member.nickname, own);
+  tag.position.set(house.lx, 7.2, house.lz);
+  tag.userData = { house: true, own };
+  g.add(tag);
   if (own) {
     // marker: a small yellow cone above the own house
     const marker = new THREE.Mesh(
       new THREE.ConeGeometry(0.35, 0.7, 8),
       new THREE.MeshBasicMaterial({ color: '#ffd23f' }),
     );
-    marker.position.set(0, 5.6, -p.d / 2 + 1.5);
+    marker.position.set(house.lx, 8.2, house.lz);
     marker.rotation.x = Math.PI;
     g.add(marker);
   }
-
-  // lawn
-  const lawn = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.1, p.d), MAT.grass);
-  lawn.position.y = 0.02;
-  lawn.receiveShadow = true;
-  g.add(lawn);
-
-  // house: sized and coloured per plot
-  const bw = (p.big ? 4.2 : 3.0) + ((p.index * 37) % 7) * 0.09;
-  const bh = p.big ? 3.2 : 2.2;
-  const bd = (p.big ? 3.2 : 2.5) + ((p.index * 17) % 5) * 0.06;
-  const house = new THREE.Group();
-  house.position.set(0, 0, -p.d / 2 + bd / 2 + 0.6);
-  const walls = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), MAT.wall);
-  walls.position.y = bh / 2;
-  walls.castShadow = true;
-  walls.receiveShadow = true;
-  house.add(walls);
-  // door towards the gate, two glowing windows on the front (LOOK §6: #ffad42, MeshBasic)
-  const front = bd / 2 + 0.02;
-  const door = new THREE.Mesh(
-    new THREE.BoxGeometry(0.7, 1.2, 0.08),
-    new THREE.MeshStandardMaterial({ color: '#5a3a26', roughness: 0.8 }),
-  );
-  door.position.set(0, 0.6, front);
-  house.add(door);
-  for (const wx of [-bw * 0.3, bw * 0.3]) {
-    const win = new THREE.Mesh(
-      new THREE.BoxGeometry(0.55, 0.55, 0.08),
-      new THREE.MeshBasicMaterial({ color: '#ffad42' }),
-    );
-    win.position.set(wx, bh * 0.55, front);
-    house.add(win);
-  }
-  const roof = gableRoof(bw, bd, 1.3 + ((p.index * 13) % 5) * 0.1, ROOF_COLORS[p.index % ROOF_COLORS.length]);
-  roof.position.y = bh;
-  house.add(roof);
-  house.add(chimney(bw, bh, 1.3));
-  g.add(house);
-
-  // post-and-rail fence with a 1.6 m gate in front, merged into one mesh (LOOK §6)
-  const fence = new THREE.Mesh(fenceGeometry(p.w, p.d), MAT.wood);
-  fence.castShadow = true;
-  g.add(fence);
-
+  const contents = plotContents(p, member.slots ?? {});
+  contents.name = 'contents';
+  if (own) keepLive(contents);
+  g.add(contents);
   return g;
 }
 
@@ -358,13 +493,28 @@ export function buildVillage(
 
   for (const b of layout.bridges) root.add(buildBridge(b, MAT.wood));
 
+  let ownGroup: THREE.Group | null = null;
   for (const p of layout.plots) {
-    root.add(plotGroup(p, byPlot.get(p.index), p.index === ownPlotIndex));
+    const g = plotGroup(p, byPlot.get(p.index), p.index === ownPlotIndex);
+    if (p.index === ownPlotIndex) ownGroup = g;
+    root.add(g);
   }
-  // garden paths from each gate to its lane: one merged mesh for the whole village
-  const gardens = layout.plots.map((p) =>
-    gardenPathGeometry(p.gate, p.link, 1.0, (x, z) => layout.terrain.groundHeight(x, z)),
-  );
+  // the build mode swaps the contents of the own plot without rebuilding the village
+  root.userData.updateOwnPlot = (slots: SlotMap): void => {
+    const plot = ownPlotIndex === null ? undefined : layout.plots[ownPlotIndex];
+    if (!ownGroup || !plot) return;
+    const old = ownGroup.getObjectByName('contents');
+    if (old) ownGroup.remove(old);
+    const fresh = plotContents(plot, slots);
+    fresh.name = 'contents';
+    ownGroup.add(fresh);
+  };
+  // garden paths from each gate to its lane, and the driveways of occupied plots: one merged mesh
+  const ground = (x: number, z: number): number => layout.terrain.groundHeight(x, z);
+  const gardens = layout.plots.map((p) => gardenPathGeometry(p.gate, p.link, 1.4, ground));
+  for (const p of layout.plots) {
+    if (byPlot.has(p.index)) gardens.push(gardenPathGeometry(p.drive, p.link, 2.6, ground));
+  }
   const gardenMesh = new THREE.Mesh(mergeGeometries(gardens), dirt);
   gardenMesh.receiveShadow = true;
   root.add(gardenMesh);
@@ -384,9 +534,17 @@ export function buildVillage(
       tag.visible = Boolean(tag.userData.own) || near.distanceTo(cam.position) < 28;
     }
   };
+  root.userData.setSky = (sky: THREE.Texture): void => {
+    const mat = river.userData.material as THREE.MeshStandardMaterial;
+    mat.envMap = sky;
+    mat.needsUpdate = true;
+  };
   root.userData.animate = (t: number): void => {
-    const wave = river.userData.waterMap as THREE.Texture;
-    wave.offset.set(t * 0.012, t * 0.005);
+    // ripples drift downstream and pulse a little (LOOK §4: slow, about 0.9 rad/s)
+    const ripples = river.userData.ripples as THREE.Texture;
+    ripples.offset.set(t * 0.01, t * 0.03);
+    const mat = river.userData.material as THREE.MeshStandardMaterial;
+    mat.emissiveIntensity = 0.25 + 0.05 * Math.sin(t * 0.9);
     (plaza.userData.animate as ((t: number) => void) | undefined)?.(t);
   };
   return bakeStatic(root);

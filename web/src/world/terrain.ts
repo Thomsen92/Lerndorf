@@ -4,6 +4,7 @@
  */
 import * as THREE from 'three';
 import { lerp, segmentDistance, smooth, type Point2 } from './geometry';
+import { WORLD_SCALE } from './constants';
 
 export interface Flat {
   x: number;
@@ -52,6 +53,9 @@ export class Terrain {
   /** Natural hills before carving. */
   private baseHeight(x: number, z: number): number {
     const p = this.hillPhase;
+    // the hills are stretched with the valley, so they keep their shape on the larger map
+    x /= WORLD_SCALE;
+    z /= WORLD_SCALE;
     let h =
       2.6 * Math.sin(x * 0.055 + 1 + p) * Math.cos(z * 0.048 - p * 0.7) +
       1.6 * Math.sin(x * 0.11 - z * 0.08 + p * 1.3) +
@@ -123,10 +127,21 @@ export class Terrain {
   /** Height at (x, z) including levelled areas. */
   groundHeight(x: number, z: number): number {
     let v = this.pathBlend(x, z, this.carvedHeight(x, z));
-    for (const f of this.flats) {
+    let levelled = false;
+    // backwards: the plaza is added first and must win over the embankments of nearby plots
+    for (let i = this.flats.length - 1; i >= 0; i--) {
+      const f = this.flats[i];
       const d = Math.hypot(x - f.x, z - f.z);
       const ramp = f.ramp ?? 4;
-      if (d < f.r + ramp) v = lerp(v, f.h, smooth(f.r + ramp, f.r, d));
+      if (d < f.r + ramp) {
+        v = lerp(v, f.h, smooth(f.r + ramp, f.r, d));
+        levelled = true;
+      }
+    }
+    if (levelled) {
+      // an embankment must never fill the river bed, or the water disappears under the grass
+      const rd = this.riverDistance(x, z);
+      if (rd < 6.5) v = lerp(v, Math.min(v, this.carvedHeight(x, z)), smooth(6.5, 4.6, rd));
     }
     return v;
   }

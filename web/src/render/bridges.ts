@@ -19,26 +19,6 @@ function deckPoint(b: Bridge, t: number): { x: number; y: number; z: number; nx:
   return { x, y, z, nx: -(b.b.z - b.a.z) / len, nz: (b.b.x - b.a.x) / len };
 }
 
-/** Deck: a curved strip of planks, drawn as a ribbon over the arch. */
-function deckGeometry(b: Bridge): THREE.BufferGeometry {
-  const verts: number[] = [];
-  const idx: number[] = [];
-  for (let i = 0; i <= SEGMENTS; i++) {
-    const p = deckPoint(b, i / SEGMENTS);
-    const hw = DECK_WIDTH / 2;
-    verts.push(p.x + p.nx * hw, p.y, p.z + p.nz * hw, p.x - p.nx * hw, p.y, p.z - p.nz * hw);
-    if (i > 0) {
-      const a = (i - 1) * 2;
-      idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
-    }
-  }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-  geo.setIndex(idx);
-  geo.computeVertexNormals();
-  return geo;
-}
-
 /** Thin box between two points, used for rail posts and rails. */
 function stick(
   ax: number,
@@ -81,10 +61,73 @@ function railGeometry(b: Bridge): THREE.BufferGeometry {
   return mergeGeometries(parts);
 }
 
-/** One arched bridge: deck plus slim rails. */
+/**
+ * Planks with thickness: one box per segment, tilted along the arch, with a small gap between them,
+ * plus two beams underneath along the edges. The deck reads as wood from the side, not as a ribbon.
+ */
+function plankGeometry(b: Bridge): THREE.BufferGeometry {
+  const parts: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < SEGMENTS; i++) {
+    const p = deckPoint(b, i / SEGMENTS);
+    const q = deckPoint(b, (i + 1) / SEGMENTS);
+    const len = Math.hypot(q.x - p.x, q.y - p.y, q.z - p.z);
+    const plank = new THREE.BoxGeometry(DECK_WIDTH, 0.14, Math.max(0.05, len - 0.05));
+    // explicit basis: x across the deck (horizontal), z along the arch, y perpendicular to both.
+    // A plain "rotate z onto the direction" quaternion would also roll the plank (review 20.10.).
+    const along = new THREE.Vector3(q.x - p.x, q.y - p.y, q.z - p.z).normalize();
+    const across = new THREE.Vector3(p.nx, 0, p.nz).normalize();
+    const up = new THREE.Vector3().crossVectors(along, across).normalize();
+    if (up.y < 0) {
+      up.negate();
+      across.negate();
+    }
+    plank.applyMatrix4(new THREE.Matrix4().makeBasis(across, up, along));
+    plank.translate(
+      (p.x + q.x) / 2 - up.x * 0.07,
+      (p.y + q.y) / 2 - up.y * 0.07,
+      (p.z + q.z) / 2 - up.z * 0.07,
+    );
+    parts.push(plank);
+  }
+  // beams under both edges, and a post pair at each end standing down into the bank
+  for (const side of [-0.8, 0.8]) {
+    for (let i = 0; i < SEGMENTS; i++) {
+      const p = deckPoint(b, i / SEGMENTS);
+      const q = deckPoint(b, (i + 1) / SEGMENTS);
+      parts.push(
+        stick(
+          p.x + p.nx * side,
+          p.y - 0.22,
+          p.z + p.nz * side,
+          q.x + q.nx * side,
+          q.y - 0.22,
+          q.z + q.nz * side,
+          0.16,
+        ),
+      );
+    }
+    for (const t of [0, 1]) {
+      const p = deckPoint(b, t);
+      parts.push(
+        stick(
+          p.x + p.nx * side,
+          p.y - 1.2,
+          p.z + p.nz * side,
+          p.x + p.nx * side,
+          p.y,
+          p.z + p.nz * side,
+          0.2,
+        ),
+      );
+    }
+  }
+  return mergeGeometries(parts);
+}
+
+/** One arched bridge: planked deck, beams and slim rails. */
 export function buildBridge(b: Bridge, wood: THREE.Material): THREE.Group {
   const g = new THREE.Group();
-  const deck = new THREE.Mesh(deckGeometry(b), wood);
+  const deck = new THREE.Mesh(plankGeometry(b), wood);
   deck.castShadow = true;
   deck.receiveShadow = true;
   g.add(deck);

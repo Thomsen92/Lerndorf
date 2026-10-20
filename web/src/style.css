@@ -244,6 +244,38 @@ button:disabled {
   grid-row: 1 / span 2;
 }
 
+.item.confirm {
+  grid-template-columns: 1fr;
+  background: rgba(255, 210, 63, 0.08);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.item.confirm .confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* the generic `.item button` placement must not stack both buttons in one cell */
+.item.confirm .confirm-actions button {
+  grid-column: auto;
+  grid-row: auto;
+  min-height: 44px;
+  min-width: 120px;
+}
+
+.shop-group {
+  margin: 14px 0 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.status.error {
+  color: #ff9b8a;
+}
+
 .items .item[data-row] > span:first-child {
   font-weight: 700;
 }

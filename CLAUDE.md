@@ -36,4 +36,4 @@ Eine Englisch-Lehrkraft, kein Entwickler. Erkläre Schritte, die sie selbst ausf
 
 ## Arbeitsreihenfolge
 
-Arbeitspakete laut `docs/PLAN.md`, Stufe 1 → 1b → 2 → 3 → 4 → 5. **Als Nächstes: Stufe 1b Dorf-Layout** (siehe `docs/REVIEW_2026-10-17_Dorflayout.md`); zuerst die Layout-Galerie (L.1), damit jede Änderung sichtbar geprüft wird. Nach jeder Stufe auf die Abnahme der Lehrkraft warten. Innerhalb von Stufe 2 zuerst der Stil-Test zur Abnahme durch die Lehrkraft, bevor alle Assets gebaut werden. Offene Punkte (SPEC §19) mit dem Standardwert umsetzen und konfigurierbar halten.
+Arbeitspakete laut `docs/PLAN.md`, Stufe 1 → 1b → 2 → 3 → 4 → 5. **Stand 20.10.2026:** Stufe 1b ist umgesetzt, Optik am Prototyp nachgezogen, Abnahme durch die Lehrkraft (L.11) steht aus. Als Nächstes Stufe 2 (Stil-Test mit CC0-Modellen und Blender-Pipeline). Jede Änderung an Welt oder Rendering mit der Galerie prüfen. Nach jeder Stufe auf die Abnahme der Lehrkraft warten. Innerhalb von Stufe 2 zuerst der Stil-Test zur Abnahme durch die Lehrkraft, bevor alle Assets gebaut werden. Offene Punkte (SPEC §19) mit dem Standardwert umsetzen und konfigurierbar halten.

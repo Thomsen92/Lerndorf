@@ -140,24 +140,48 @@ export const skyTexture = (): THREE.CanvasTexture => {
   return tex;
 };
 
-/** Water: soft wave bands, tiled and scrolled over the river so it looks like it moves. */
-export const waterTexture = (): THREE.CanvasTexture => {
-  const tex = canvasTexture(256, (cx, rnd) => {
-    cx.fillStyle = '#c9dfe8';
-    cx.fillRect(0, 0, 256, 256);
-    for (let i = 0; i < 26; i++) {
-      const y = rnd() * 256;
-      cx.strokeStyle = rnd() < 0.5 ? 'rgba(255,255,255,0.35)' : 'rgba(30,70,100,0.18)';
-      cx.lineWidth = 2 + rnd() * 3;
-      cx.beginPath();
-      for (let x = 0; x <= 256; x += 8) {
-        const yy = y + Math.sin((x / 256) * Math.PI * 4 + i) * 4;
-        if (x === 0) cx.moveTo(x, yy);
-        else cx.lineTo(x, yy);
-      }
-      cx.stroke();
+/**
+ * Ripple normal map for the river: a tileable height field (sums of sines with whole periods),
+ * turned into normals. It bends the sky reflection into small glittering ripples.
+ */
+export const rippleNormalTexture = (): THREE.CanvasTexture => {
+  const size = 256;
+  const cv = document.createElement('canvas');
+  cv.width = size;
+  cv.height = size;
+  const cx = cv.getContext('2d');
+  const h = new Float32Array(size * size);
+  const TAU = Math.PI * 2;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const u = x / size;
+      const v = y / size;
+      h[y * size + x] =
+        Math.sin(TAU * (u * 3 + v * 1)) * 0.5 +
+        Math.sin(TAU * (u * -2 + v * 5) + 1.3) * 0.35 +
+        Math.sin(TAU * (u * 7 + v * 4) + 2.1) * 0.18 +
+        Math.sin(TAU * (u * 11 - v * 9) + 0.4) * 0.1;
     }
-  });
-  tex.repeat.set(6, 3);
+  }
+  if (cx) {
+    const img = cx.createImageData(size, size);
+    const at = (x: number, y: number): number => h[((y + size) % size) * size + ((x + size) % size)];
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const dx = (at(x + 1, y) - at(x - 1, y)) * 2.2;
+        const dy = (at(x, y + 1) - at(x, y - 1)) * 2.2;
+        const len = Math.hypot(dx, dy, 1);
+        const i = (y * size + x) * 4;
+        img.data[i] = ((-dx / len) * 0.5 + 0.5) * 255;
+        img.data[i + 1] = ((-dy / len) * 0.5 + 0.5) * 255;
+        img.data[i + 2] = ((1 / len) * 0.5 + 0.5) * 255;
+        img.data[i + 3] = 255;
+      }
+    }
+    cx.putImageData(img, 0, 0);
+  }
+  const tex = new THREE.CanvasTexture(cv);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
   return tex;
 };

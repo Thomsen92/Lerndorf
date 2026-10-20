@@ -4,6 +4,7 @@
  * Placeholder models with the colours and sizes of the prototype.
  */
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { Layout } from '../world/layout';
 import {
   placeBushes,
@@ -14,6 +15,7 @@ import {
   placeReeds,
   placeRocks,
   placeShoreStones,
+  placeTufts,
   placeTrees,
   type Lamp,
   type Tree,
@@ -21,7 +23,17 @@ import {
 
 const TRUNK = '#6b4a2f';
 // round crowns: greens with warm and teal accents, so the valley is not one green (LOOK §8)
-const CROWNS = ['#2f7d5b', '#5fa04c', '#c9a23e', '#3f8f8a', '#8aa84a', '#d4893a', '#4d9a5d', '#b9b24a'];
+const CROWNS = [
+  '#2f7d5b',
+  '#3a8f63',
+  '#4d9a5d',
+  '#5d8f3e',
+  '#2c6e57',
+  '#5fa04c',
+  '#c9a23e',
+  '#3f8f8a',
+  '#d4893a',
+];
 // pines stay dark and cool
 const PINES = ['#2c6e57', '#2f6e5a', '#3a7f66', '#2a5f6b'];
 // cherry blossom: white to pink, some in orchard patches and some single trees (LOOK §8)
@@ -70,8 +82,9 @@ function treeGroup(trees: Tree[], kind: Tree['kind']): THREE.Group {
   if (list.length === 0) return g;
   const trunkMat = new THREE.MeshStandardMaterial({ color: TRUNK, flatShading: true, roughness: 0.9 });
   const crownMat = new THREE.MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 0.8 });
-  const trunk = new THREE.CylinderGeometry(0.18, 0.25, 1.2, 6);
-  trunk.translate(0, 0.6, 0);
+  // the trunk reaches well into the crown and a little into the ground: nothing floats (LOOK §8)
+  const trunk = new THREE.CylinderGeometry(0.18, 0.25, 1.5, 6);
+  trunk.translate(0, 0.55, 0);
   g.add(
     instanced(trunk, trunkMat, list.length, (i, m) => {
       const t = list[i];
@@ -85,45 +98,35 @@ function treeGroup(trees: Tree[], kind: Tree['kind']): THREE.Group {
     const t = list[i];
     // a fixed colour per tree; round trees in the orchard patches and some single ones bloom
     const h = Math.abs(Math.floor(t.x * 7 + t.z * 3));
-    const orchard = Math.sin(t.x * 0.045 + 1.3) * Math.cos(t.z * 0.05 - 0.7) > 0.4;
+    const orchard = Math.sin(t.x * 0.045 + 1.3) * Math.cos(t.z * 0.05 - 0.7) > 0.6;
     const bloom = kind === 'round' && (orchard || h % 13 === 0);
     return new THREE.Color(bloom ? BLOSSOMS[h % BLOSSOMS.length] : palette[h % palette.length]);
   };
-  if (kind === 'pine') {
-    const crown = new THREE.ConeGeometry(1.2, 1.8, 7);
-    crown.translate(0, 1.7 + 0.9, 0);
-    g.add(
-      instanced(
-        crown,
-        crownMat,
-        list.length,
-        (i, m) => {
-          const t = list[i];
-          m.makeRotationY(t.rot)
-            .scale(new THREE.Vector3(t.scale, t.scale, t.scale))
-            .setPosition(t.x, t.y, t.z);
-        },
-        colour,
-      ),
-    );
-  } else {
-    const crown = new THREE.IcosahedronGeometry(1.1, 0);
-    crown.translate(0, 1.9 + 0.5, 0);
-    g.add(
-      instanced(
-        crown,
-        crownMat,
-        list.length,
-        (i, m) => {
-          const t = list[i];
-          m.makeRotationY(t.rot)
-            .scale(new THREE.Vector3(t.scale, t.scale, t.scale))
-            .setPosition(t.x, t.y, t.z);
-        },
-        colour,
-      ),
-    );
-  }
+  // two-tier crowns as in the prototype: two stacked cones, or two offset icosahedra
+  const crown =
+    kind === 'pine'
+      ? mergeGeometries([
+          new THREE.ConeGeometry(1.2, 1.8, 7).translate(0, 1.7, 0),
+          new THREE.ConeGeometry(0.9, 1.4, 7).translate(0, 2.5, 0),
+        ])
+      : mergeGeometries([
+          new THREE.IcosahedronGeometry(1.1, 0).translate(0, 1.85, 0),
+          new THREE.IcosahedronGeometry(0.8, 0).translate(0.5, 2.35, 0.2),
+        ]);
+  g.add(
+    instanced(
+      crown,
+      crownMat,
+      list.length,
+      (i, m) => {
+        const t = list[i];
+        m.makeRotationY(t.rot)
+          .scale(new THREE.Vector3(t.scale, t.scale, t.scale))
+          .setPosition(t.x, t.y, t.z);
+      },
+      colour,
+    ),
+  );
   g.children.forEach((c) => (c.castShadow = true)); // trees cast shadows (LOOK §3)
   return g;
 }
@@ -181,7 +184,8 @@ export function buildNature(layout: Layout): THREE.Group {
 
 const BUSH = ['#3f8f5a', '#4d9a5d', '#2f7d5b', '#5d8f3e'];
 const FLOWER = ['#f2c94c', '#eb5757', '#f2a7d0', '#ffffff', '#bb6bd9'];
-const MEADOW = ['#a9d17a', '#93c26a', '#b8d98a'];
+const TUFT = ['#4a7a40', '#5f9150', '#6e9d55', '#55853f'];
+const HEDGE = ['#2f6e4f', '#3a7d55', '#2c6a52'];
 
 /** Shrubs, rocks, reeds and flower patches (SPEC §10.6), all as instanced meshes. */
 export function buildVegetation(layout: Layout): THREE.Group {
@@ -200,7 +204,7 @@ export function buildVegetation(layout: Layout): THREE.Group {
         const b = bushes[i];
         m.makeRotationY(b.rot)
           .scale(new THREE.Vector3(b.scale, b.scale * 0.8, b.scale))
-          .setPosition(b.x, b.y, b.z);
+          .setPosition(b.x, b.y - 0.08, b.z);
       },
       (i) => pick(BUSH, i),
     ),
@@ -256,39 +260,54 @@ export function buildVegetation(layout: Layout): THREE.Group {
     ),
   );
 
-  // hedges: clipped rows beside the lanes (LOOK §8)
+  // hedgerows beside the lanes: a short row of overlapping round shrubs, not a box (LOOK §2.3)
   const hedges = placeHedges(layout);
-  const hedgeGeo = new THREE.BoxGeometry(1, 1, 1);
-  hedgeGeo.translate(0, 0.5, 0);
+  const blobs: Array<{ x: number; y: number; z: number; s: number; c: number }> = [];
+  hedges.forEach((h, i) => {
+    const n = Math.max(3, Math.round(h.len / 0.75));
+    for (let k = 0; k < n; k++) {
+      const off = (k / (n - 1) - 0.5) * h.len;
+      const x = h.x + Math.sin(h.rot) * off;
+      const z = h.z + Math.cos(h.rot) * off;
+      const wobble = Math.sin(i * 3.1 + k * 1.7);
+      blobs.push({ x, y: layout.terrain.groundHeight(x, z), z, s: 0.62 + wobble * 0.1, c: i });
+    }
+  });
   root.add(
     instanced(
-      hedgeGeo,
+      bushGeo,
       new THREE.MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 0.85 }),
-      hedges.length,
+      blobs.length,
       (i, m) => {
-        const h = hedges[i];
-        m.makeRotationY(h.rot)
-          .scale(new THREE.Vector3(0.6, 0.9, h.len))
-          .setPosition(h.x, h.y, h.z);
+        const b = blobs[i];
+        m.makeRotationY(i * 0.9)
+          .scale(new THREE.Vector3(b.s * 1.15, b.s * 0.95, b.s * 1.15))
+          .setPosition(b.x, b.y - 0.08, b.z);
       },
-      (i) => pick(BUSH, i),
+      (i) => pick(HEDGE, blobs[i].c),
     ),
   );
 
-  // blossom meadows: a flat patch of lighter grass with flowers on it
+  // blossom meadows are painted into the ground (render/village.ts); only their flowers stand here
   const meadows = placeMeadows(layout);
+
+  // grass tufts: three thin blades each, two greens; every seventh tuft carries a wild flower
+  const tufts = placeTufts(layout);
+  const blade = (ax: number, az: number, h: number): THREE.BufferGeometry =>
+    new THREE.ConeGeometry(0.06, h, 3).translate(ax, h / 2, az);
+  const tuftGeo = mergeGeometries([blade(0, 0, 0.42), blade(0.1, 0.05, 0.32), blade(-0.08, 0.07, 0.36)]);
   root.add(
     instanced(
-      new THREE.CircleGeometry(1, 14),
-      new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.95 }),
-      meadows.length,
+      tuftGeo,
+      new THREE.MeshStandardMaterial({ color: '#ffffff', flatShading: true, roughness: 0.9 }),
+      tufts.length,
       (i, m) => {
-        const w = meadows[i];
-        m.makeRotationX(-Math.PI / 2)
-          .scale(new THREE.Vector3(w.radius, w.radius, 1))
-          .setPosition(w.x, w.y + 0.04, w.z);
+        const t = tufts[i];
+        m.makeRotationY(t.rot)
+          .scale(new THREE.Vector3(t.scale, t.scale, t.scale))
+          .setPosition(t.x, t.y - 0.03, t.z);
       },
-      (i) => pick(MEADOW, i),
+      (i) => pick(TUFT, i),
     ),
   );
 
@@ -305,6 +324,9 @@ export function buildVegetation(layout: Layout): THREE.Group {
         colour: (i + k) % FLOWER.length,
       });
     }
+  });
+  tufts.forEach((t, i) => {
+    if (i % 7 === 0) blossoms.push({ x: t.x + 0.05, y: t.y + 0.25, z: t.z, colour: i % FLOWER.length });
   });
   for (const w of meadows) {
     for (const f of w.flowers) blossoms.push({ x: f.x, y: f.y + 0.22, z: f.z, colour: f.colour });
