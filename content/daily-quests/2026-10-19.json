@@ -1,0 +1,61 @@
+{
+  "week": "2026-10-19",
+  "days": [
+    {
+      "date": "2026-10-19",
+      "quests": [
+        { "id": "mon-1", "type": "choice", "prompt": "What is 'Hund' in English?", "hint": "This animal says woof.", "reward": 5, "options": ["dog", "cat", "bird"], "solution": "dog" },
+        { "id": "mon-2", "type": "gap", "prompt": "My name ___ Sam.", "hint": "Use a form of 'be'.", "reward": 5, "solution": ["is"] },
+        { "id": "mon-3", "type": "choice", "prompt": "Which word is a colour?", "hint": "Look at the sky.", "reward": 5, "options": ["blue", "table", "run"], "solution": "blue" }
+      ]
+    },
+    {
+      "date": "2026-10-20",
+      "quests": [
+        { "id": "tue-1", "type": "choice", "prompt": "What is 'Straße' in English?", "hint": "Cars drive on it.", "reward": 5, "options": ["street", "river", "bridge"], "solution": "street" },
+        { "id": "tue-2", "type": "gap", "prompt": "I ___ fourteen years old.", "hint": "Use a form of 'be' for 'I'.", "reward": 5, "solution": ["am", "'m"] },
+        { "id": "tue-3", "type": "listening", "prompt": "Listen. What does Mia like?", "hint": "Listen for a food.", "reward": 5, "speak": "Hi, I'm Mia. I like pizza, but I don't like fish.", "mode": "choice", "options": ["pizza", "fish", "pasta"], "solution": "pizza" }
+      ]
+    },
+    {
+      "date": "2026-10-21",
+      "quests": [
+        { "id": "wed-1", "type": "choice", "prompt": "What is 'Brücke' in English?", "hint": "You walk over it to cross a river.", "reward": 5, "options": ["bridge", "street", "park", "shop"], "solution": "bridge" },
+        { "id": "wed-2", "type": "gap", "prompt": "Tom is as tall ___ his brother.", "hint": "Think of the rule 'as … as'.", "reward": 5, "solution": ["as"] },
+        { "id": "wed-3", "type": "listening", "prompt": "Listen. Where is the boy going?", "hint": "Listen for a place.", "reward": 5, "speak": "The boy is going to the park with his dog.", "mode": "choice", "options": ["to the park", "to school", "to the station"], "solution": "to the park" }
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "quests": [
+        { "id": "thu-1", "type": "match", "prompt": "Match the words.", "hint": "Think of things in a city.", "reward": 5, "pairs": [["subway", "U-Bahn"], ["sidewalk", "Gehweg"], ["store", "Laden"]] },
+        { "id": "thu-2", "type": "order", "prompt": "Put the words in order.", "hint": "Compare two people with 'than'.", "reward": 5, "solution": ["my", "dad", "is", "taller", "than", "me"] },
+        { "id": "thu-3", "type": "listening", "prompt": "Listen. The bus leaves at ___ o'clock.", "hint": "Listen for a number.", "reward": 5, "speak": "Hurry up! The bus leaves at eight o'clock.", "mode": "gap", "solution": ["eight", "8"] }
+      ]
+    },
+    {
+      "date": "2026-10-23",
+      "quests": [
+        { "id": "fri-1", "type": "choice", "prompt": "American English: 'cookie'. British English: ?", "hint": "You can eat it with tea.", "reward": 5, "options": ["biscuit", "cake", "bread"], "solution": "biscuit" },
+        { "id": "fri-2", "type": "gap", "prompt": "London is ___ than my town. (big)", "hint": "Short adjective: change the end.", "reward": 5, "solution": ["bigger"] },
+        { "id": "fri-3", "type": "choice", "prompt": "What is 'Wochenende' in English?", "hint": "Saturday and Sunday.", "reward": 5, "options": ["weekend", "week", "holiday"], "solution": "weekend" }
+      ]
+    },
+    {
+      "date": "2026-10-24",
+      "quests": [
+        { "id": "sat-1", "type": "choice", "prompt": "What is 'Fluss' in English?", "hint": "There is water in it.", "reward": 5, "options": ["river", "road", "tree"], "solution": "river" },
+        { "id": "sat-2", "type": "gap", "prompt": "We ___ football every Saturday.", "hint": "What do you do with a ball?", "reward": 5, "solution": ["play"] },
+        { "id": "sat-3", "type": "listening", "prompt": "Listen. What is the weather like?", "hint": "Listen to the first sentence.", "reward": 5, "speak": "It's sunny today, so we can go to the beach.", "mode": "choice", "options": ["sunny", "rainy", "cold"], "solution": "sunny" }
+      ]
+    },
+    {
+      "date": "2026-10-25",
+      "quests": [
+        { "id": "sun-1", "type": "match", "prompt": "Match the words.", "hint": "Days of the week.", "reward": 5, "pairs": [["Monday", "Montag"], ["Friday", "Freitag"], ["Sunday", "Sonntag"]] },
+        { "id": "sun-2", "type": "order", "prompt": "Put the words in order.", "hint": "Start with the person.", "reward": 5, "solution": ["she", "lives", "in", "New", "York"] },
+        { "id": "sun-3", "type": "choice", "prompt": "What is 'Apfel' in English?", "hint": "It is a red or green fruit.", "reward": 5, "options": ["apple", "pear", "orange"], "solution": "apple" }
+      ]
+    }
+  ]
+}
