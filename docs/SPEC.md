@@ -13,7 +13,7 @@ Tablet (Browser)                         Supabase (EU)
 ┌──────────────────────────┐   HTTPS    ┌───────────────────────────────┐
 │ web/ (Vite-Build)        │──────────▶│ Auth (E-Mail/Passwort,        │
 │  Three.js-Dorf           │            │   Pseudo-Adressen)            │
-│  Aufgabentafel, Shop,    │            │ Postgres + Row Level Security │
+│  Daily Quests, Shop,     │            │ Postgres + Row Level Security │
 │  Baumodus, Avatar-Editor │──RPC─────▶│ RPC-Funktionen (Spiellogik)   │
 │  Lehrer-Bereich          │            │ Edge Function admin-accounts  │
 └──────────────────────────┘            └───────────────────────────────┘
@@ -67,7 +67,7 @@ Lerndorf/
       world/       terrain.ts, river.ts, paths.ts, plots.ts, layout.ts (deterministisch)
       render/      scene.ts, lighting.ts, quality.ts, assets.ts (GLB-Laden)
       avatars/     avatar.ts (Rezept → Modell), behaviour.ts, crowd.ts
-      ui/          hud, Aufgabentafel, Shop, Inventar, Baumodus, Editor, Toasts
+      ui/          hud, Daily Quests, Shop, Inventar, Baumodus, Editor, Toasts
       teacher/     Lehrer-Bereich
     public/assets/ GLB-Modelle, Texturen (komprimiert)
     tests/
@@ -75,7 +75,8 @@ Lerndorf/
     migrations/    SQL (Schema, RLS, Funktionen, Seed)
     functions/admin-accounts/   Edge Function
   content/
-    tasks/         Aufgaben pro Woche: 2026-11-09.json …
+    daily-quests/  Daily Quests pro Woche: 2026-11-09.json …, FORMAT.md (§9)
+    tasks/         alte Wochenaufgaben (nicht mehr eingelesen)
     items.json     Shop-Katalog
   blender/
     scripts/       Headless-Pipeline (Python)
@@ -162,6 +163,8 @@ create table placements (
   rot smallint not null default 0 check (rot in (0,1,2,3))  -- ×90°
 );
 
+-- tasks, task_solutions, task_results (und task_attempts aus 0008): alte Wochenaufgaben.
+-- Seit den Daily Quests (§9) nur noch Geschichte: nicht gelöscht, nicht mehr befüllt, nicht angezeigt.
 create table tasks (
   id text primary key,                 -- '2026-11-09-v03'
   week date not null,                  -- Montag der Woche
@@ -191,8 +194,8 @@ create table coin_ledger (
   id bigint generated always as identity primary key,
   player_id uuid references profiles on delete cascade,
   delta int not null,
-  reason text not null check (reason in ('task','stamp','purchase','refund','teacher')),
-  ref text,                            -- task_id, item_id, Woche …
+  reason text not null check (reason in ('task','stamp','purchase','refund','teacher','quest')),
+  ref text,                            -- task_id, item_id, Woche, Quest-Schlüssel …
   created_by uuid,                     -- Lehrkraft bei stamp/teacher
   created_at timestamptz default now()
 );
@@ -211,9 +214,48 @@ create table class_items (             -- optional: Gegenstand in einer Instanz 
   enabled boolean not null default true,
   primary key (class_id, item_id)
 );
+
+-- Daily Quests (§9), Migrationen 0015–0017. Gleiches Paket für alle Klassen (kein class_id).
+create table daily_quests (
+  key text primary key,                -- '2026-11-10-tue-2' (Tag + id aus der Datei)
+  week date not null,                  -- Montag der Woche
+  day date not null,
+  slot smallint not null check (slot between 1 and 3),
+  qid text not null,                   -- id in der Wochendatei
+  type text not null check (type in ('choice','gap','match','order','listening')),
+  prompt text not null,
+  hint text not null default '',       -- nur nach falscher Antwort an den Schüler
+  data jsonb not null default '{}',    -- öffentlicher Teil (Optionen, Wörter, Vorlesetext), OHNE Lösung
+  reward int not null check (reward between 1 and 20),
+  active boolean not null default true -- false: bei erneutem Import aus der Datei entfernt
+);
+
+create table daily_quest_solutions (   -- für Clients NICHT lesbar, auch nicht für die Lehrkraft direkt
+  quest_key text primary key references daily_quests on delete cascade,
+  solution jsonb not null
+);
+
+create table daily_quest_results (     -- eine Zeile je Schüler und Quest
+  player_id uuid not null references profiles on delete cascade,
+  quest_key text not null references daily_quests,
+  attempts int not null default 0,     -- zählt heute und beim Nachholen zusammen
+  solved_at timestamptz,
+  reward_paid int,                     -- 0, wenn erst nach den bezahlten Versuchen gelöst
+  primary key (player_id, quest_key)
+);
+
+create table quest_imports (           -- letzter Import je Woche, für den Lehrer-Bereich
+  week date primary key,
+  ok boolean not null,
+  holiday boolean not null default false,
+  errors text[] not null default '{}',
+  quest_count int not null default 0,
+  imported_at timestamptz not null default now()
+);
+-- coin_ledger: höchstens eine 'quest'-Buchung je Schüler und Quest (eindeutiger Index auf player_id, ref).
 ```
 
-Alle RPCs lesen Belohnung, Tageslimit, Versuche und Raster aus der Zeile der Instanz in `classes`, nicht aus `settings`.
+Alle RPCs lesen Belohnung, Tageslimit, Versuche und Raster aus der Zeile der Instanz in `classes`, nicht aus `settings`. `daily_task_cap` und `max_attempts` gelten nur für die alten Wochenaufgaben; die Daily Quests haben kein Tageslimit und eigene Regeln (§9).
 
 **Invariante:** `profiles.coins` = Summe von `coin_ledger.delta` des Spielers. Nur RPC-Funktionen schreiben beides in derselben Transaktion.
 
@@ -229,11 +271,15 @@ Alle RPCs lesen Belohnung, Tageslimit, Versuche und Raster aus der Zeile der Ins
 | tasks | aktive der eigenen Klasse, Woche ≤ heute | – | alles |
 | task_solutions | **nie** | – | über RPC/Import |
 | task_results | eigene | – | alles |
+| daily_quests | **nie** direkt (nur über `my_daily_quests`) | – | lesen; Vorschau über RPC |
+| daily_quest_solutions | **nie** | – | **nie direkt**, nur über `teacher_quest_preview` |
+| daily_quest_results | eigene | – | lesen |
+| quest_imports | – | – | lesen; Status über `quest_status` |
 | coin_ledger | eigene | – | alles |
 | settings | lesen | – | schreiben |
 | class_items | eigene Instanz | – | alles |
 
-Münzstände anderer Schüler sind für Schüler **nicht** sichtbar.
+Münzstände anderer Schüler sind für Schüler **nicht** sichtbar. Die alten Tabellen `tasks`, `task_solutions`, `task_results`, `task_attempts` bleiben mit ihren Regeln als Geschichte bestehen. In die Quest-Tabellen schreiben Clients nie; nur RPCs und der Import (Service-Key in GitHub Actions).
 
 ## 7. Avatar-Rezept
 
@@ -250,7 +296,14 @@ Münzstände anderer Schüler sind für Schüler **nicht** sichtbar.
 
 | Funktion | Wer | Prüft | Wirkung | Rückgabe |
 | --- | --- | --- | --- | --- |
-| `submit_answer(task_id text, answer jsonb)` | Schüler | Aufgabe aktiv, eigene Klasse, Woche ≤ heute; heute noch nicht gelöst; `attempts < max_attempts`; Tageslimit (Summe `task`-Buchungen heute + reward ≤ `daily_task_cap`) | `attempts+1`; bei richtig: `solved`, Buchung `+reward` | `{correct, coins, attempts_left, solution?}` – Lösung erst nach letztem Fehlversuch |
+| `my_daily_quests()` | Schüler (Lehrkonto wird abgelehnt: `only pupils`) | angemeldet, Rolle `student` | – | Liste: heutige Quests und gestrige ungelöste (Nachholen) mit `key, day, catch_up, type, prompt, data, reward, reward_left, solved, attempts`; **ohne** Tipp und Lösung |
+| `submit_quest_answer(p_key text, p_answer jsonb)` | Schüler | Rolle `student`; Quest aktiv und Tag = heute oder gestern (sonst `quest not available`); Ergebniszeile gesperrt (`for update`) | `attempts+1`; bei richtig `solved_at`; Buchung `quest` nur wenn `attempts ≤ quest_paid_attempts()`, höchstens einmal | `{correct, already_solved, coins, reward, reward_left, hint}` – `hint` nur bei falsch; nie die Lösung |
+| `quest_paid_attempts()` | intern | – | – | 3 (Anzahl bezahlter Versuche, D11; nur hier ändern) |
+| `quest_today()` | intern | – | – | heutiges Datum in Europe/Berlin |
+| `quest_status()` | Lehrkraft | Rolle | – | `{today, covered_until, today_missing, tomorrow_missing, imports[]}` |
+| `teacher_quest_preview(p_from date, p_days int)` | Lehrkraft | Rolle; 1–14 Tage | – | aktive Quests der Tage mit Tipp **und Lösung** |
+| `import_quest_week(…)`, `record_quest_import(…)` | nur `service_role` (Import-Workflow) | Montag; Ferienwoche ohne Quests; Lösungen nur zu Quests der Datei | ganze Woche in einer Transaktion (D4) bzw. Fehler protokollieren | Anzahl Quests |
+| `submit_answer(task_id text, answer jsonb)` *(alt: Wochenaufgaben, nicht mehr in der Oberfläche)* | Schüler | Aufgabe aktiv, eigene Klasse, Woche ≤ heute; heute noch nicht gelöst; `attempts < max_attempts`; Tageslimit (Summe `task`-Buchungen heute + reward ≤ `daily_task_cap`) | `attempts+1`; bei richtig: `solved`, Buchung `+reward` | `{correct, coins, attempts_left, solution?}` – Lösung erst nach letztem Fehlversuch |
 | `buy_item(item_id text)` | Schüler | Item aktiv, Shop der Klasse offen, genug Münzen | Buchung `-price`, Inventar +1 | `{coins, qty}` |
 | `place_item(item_id text, x int, z int, rot int)` | Schüler | Bau offen; freie Menge im Inventar (qty − platzierte); Footprint im Raster, nicht im Hausbereich, keine Überlappung | Zeile in `placements` | `placement_id` |
 | `remove_placement(id bigint)` | Schüler | gehört dem Spieler | löschen (Item geht ins Inventar zurück) | ok |
@@ -259,27 +312,39 @@ Münzstände anderer Schüler sind für Schüler **nicht** sichtbar.
 | `adjust_coins(player_id uuid, delta int, note text)` | Lehrkraft | Rolle; Ergebnis ≥ 0 | Buchung `teacher` | neuer Stand |
 | `set_class_flags(class_id, shop_open, build_open)` | Lehrkraft | Rolle | Update | ok |
 
-**Antwortprüfung** (`submit_answer`): Vergleich nach Normalisierung – trimmen, Kleinschreibung, mehrfache Leerzeichen zusammenfassen, typografische Apostrophe → `'`. `gap` erlaubt mehrere richtige Lösungen (Array). Kein Teilpunkt.
+**Antwortprüfung** (`submit_answer`; die Daily Quests nutzen über `quest_answer_matches` dieselbe Prüfung, `listening` wie sein `mode`): Vergleich nach Normalisierung – trimmen, Kleinschreibung, mehrfache Leerzeichen zusammenfassen, typografische Apostrophe → `'`. `gap` erlaubt mehrere richtige Lösungen (Array). Kein Teilpunkt.
 
 **Edge Function `admin-accounts`** (nur Lehrkraft): `create` (nickname, password, class_id; der Schüler startet **ohne** Grundstück und wählt selbst, RPC `claim_plot`), `reset_password`, `move_class` (Regeln §1a), `delete`. Bulk-Anlegen aus einer Liste (eine Zeile pro Schüler: `Spitzname;Passwort;Klasse`).
 
-## 9. Aufgaben-Inhalte
+## 9. Aufgaben-Inhalte: Daily Quests
 
-Datei `content/tasks/<Montag>.json`:
-```json
-{ "week": "2026-11-09", "class": null, "tasks": [
-  { "id": "v01", "type": "choice", "reward": 5,
-    "prompt": "What is 'Fahrkarte' in English?",
-    "options": ["ticket", "card", "map", "fare"], "solution": "ticket" },
-  { "id": "g01", "type": "gap", "reward": 10,
-    "prompt": "Yesterday we ___ (go) to Brooklyn.", "solution": ["went"] },
-  { "id": "m01", "type": "match", "reward": 15,
-    "pairs": [["subway","U-Bahn"],["sidewalk","Gehweg"],["block","Häuserblock"]] }
-]}
-```
-- Workflow `import-content.yml` (bei Push auf `content/**`): validiert JSON (Schema in `content/schema.json`), schreibt `tasks` (ohne Lösung) und `task_solutions` per Service-Key aus GitHub-Secret. IDs werden mit Woche präfixiert.
-- Aufgaben einer Woche werden ab Montag 00:00 (Europe/Berlin) sichtbar; ältere Wochen bleiben sichtbar (Wiederholung), bringen aber nur die halbe Belohnung **[OFFEN, Standard: halbe Belohnung]**.
-- Inhaltlich passend zu den Wochenplänen (Highlight 8, Unit 1 …); Erstellung durch Claude im Wochenplan-Projekt, nicht Teil dieser App.
+Seit 21.10.2026 ersetzen die **Daily Quests** die alten Wochenaufgaben. Produktregeln: `docs/superpowers/specs/2026-10-20-daily-quests-design.md`; Umsetzung: `docs/superpowers/plans/2026-10-21-daily-quests.md`; Arbeitspakete: PLAN „Zwischenpaket Q“.
+
+- **Paket:** eine Datei je Woche `content/daily-quests/<Montag>.json` mit 7 Tagen (Mo–So) × genau 3 Quests, gleiches Paket für alle Klassen. Format und Beispiele: `content/daily-quests/FORMAT.md`; Prüfer: `web/scripts/quests.ts` (`validatePackage`, deutsche Fehlermeldungen mit Pfad).
+- **Typen:** `choice`, `gap`, `match`, `order`, `listening`. Jede Quest hat `prompt`, einen kurzen englischen `hint` (nicht leer) und `reward` (1–20).
+- **Import:** Workflow `import-content.yml` bei Push auf `content/**` (`web/scripts/import-quests.ts`, Service-Key nur als GitHub-Secret). Der öffentliche Teil geht in `daily_quests`, die Lösungen in `daily_quest_solutions`.
+- **Freischaltung:** eine Quest ist an ihrem Kalendertag ab 00:00 Europe/Berlin offen (der Server entscheidet über `quest_today()`), am Folgetag noch als **Nachholen** zur halben Belohnung (aufgerundet), danach verfällt sie.
+- **Schüler:** der Knopf „Aufgaben“ (oder Antippen der Tafel am Marktplatz) öffnet den Bereich „Daily Quests“ (`web/src/ui/dailyQuestsView.ts`): „Heute“ und „Nachholen von gestern“, eine Quest aufgeklappt, keine Lösung, kein Versuchszähler. Eine falsche Antwort zeigt „Leider falsch. Tipp: …“.
+- **Lehrkraft:** Abschnitt „Daily Quests“ im Lehrer-Bereich (`web/src/teacher/questsView.ts`): Hinweise zur Abdeckung und zu Importfehlern, Vorschau der nächsten 7 Tage mit Tipp und Lösung.
+- **Alte Wochenaufgaben:** Tabellen bleiben als Geschichte; Aufgabentafel-Oberfläche, alter Import und `content/tasks/` werden nicht mehr benutzt. Die Aufgabentafel am Marktplatz (§10.7) bleibt stehen; Antippen öffnet die Daily Quests.
+
+### Entscheidungen (Standardwerte, konfigurierbar)
+
+| # | Frage | Entscheidung |
+| --- | --- | --- |
+| D1 | JSON-Format | festgelegt in `content/daily-quests/FORMAT.md` |
+| D2 | Hören | `listening` ist ein Reiz, keine eigene Antwortform: `type: "listening"` + `speak` (Vorlesetext) + `mode: "choice"` oder `"gap"` |
+| D3 | Grenzen der Belohnung | ganze Zahl 1–20 (`REWARD_MIN`/`REWARD_MAX` im Prüfer); es gibt keine Freigabe durch die Lehrkraft, deshalb enge Grenzen |
+| D4 | Erneuter Import einer Woche | die ganze Woche wird in einer Transaktion ersetzt: Quests nach Schlüssel aktualisiert, aus der Datei entfernte auf `active = false` (nie gelöscht); Ergebnisse und Buchungen bleiben; eine geänderte Belohnung gilt nur für künftige Buchungen. Ein fehlerhafter Re-Import lässt die alte Fassung online und zeigt den Fehler |
+| D5 | Alte Wochenaufgaben | Tabellen `tasks`, `task_solutions`, `task_results`, `task_attempts` bleiben unverändert als Geschichte; alte Tafel-Oberfläche, alter Import und `content/tasks` entfallen |
+| D6 | Ferien | Ferienwoche als Datei `{"week": "...", "holiday": true}`: keine Quests, keine Warnung (Entscheidung der Lehrkraft 21.10.2026) |
+| D7 | Inhaltskontrolle ohne Freigabe | der Lehrer-Bereich zeigt die nächsten 7 Tage mit Lösungen (nur lesen, kein Freigabeschritt) |
+| D8 | „Paket fehlt“ erkennen | live im Lehrer-Bereich aus den Daten (`quest_status()`), nicht im Workflow (der läuft nur beim Push) |
+| D9 | Mischen bei `order`/`match` | gesätes Mischen, das nie die Lösungsreihenfolge ergibt |
+| D10 | Stimme | zuerst `en-GB`, sonst irgendeine `en*`-Stimme, sonst sichtbarer Text („Dein Gerät kann nicht vorlesen. Lies den Text: …“) |
+| D11 | Versuche und Raten | **Entscheidung der Lehrkraft 21.10.2026:** Versuche unbegrenzt, Münzen nur, wenn die richtige Antwort unter den ersten **3** Versuchen dieses Schülers für diese Quest ist (heute und Nachholen zählen zusammen, die richtige Antwort zählt mit). Danach gilt die Quest als gelöst mit `reward_paid = 0`, ohne Buchung. Die Zahl steht nur in `public.quest_paid_attempts()`; wer sie ändert, muss auch die Zeile „Münzen gibt es bei den ersten 3 Versuchen.“ in `web/src/ui/dailyQuestsView.ts` anpassen. `my_daily_quests` und `submit_quest_answer` liefern zusätzlich `reward_left` (was eine richtige Antwort jetzt noch bringt) |
+
+Weitere Festlegungen aus der Umsetzung (PLAN, Fortschrittsnotizen 21.10.2026): Lehrkonten können keine Quests lösen (`my_daily_quests` lehnt ab, im Dorf erscheint „Nur Schülerkonten können Quests lösen.“); die Lösungstabelle ist auch für die Lehrkraft nicht direkt lesbar, nur über `teacher_quest_preview`; ein fehlerhafter Re-Import einer schon eingespielten Woche (auch einer Ferienwoche) zählt weiter als abgedeckt.
 
 ## 10. Dorf (Welt)
 
@@ -375,7 +440,7 @@ Grundsatz: **Das Layout (Positionen von allem) entsteht im Code in `world/`, det
 | --- | --- |
 | Login | Spitzname, Passwort, „Los geht's“; Fehlermeldung verständlich („Spitzname oder Passwort stimmt nicht“) |
 | Dorf (Haupt) | 3D-Ansicht; oben: Spitzname, Münzstand; unten: Knöpfe Aufgaben, Shop, Bauen, Mein Avatar, Abmelden |
-| Aufgabentafel | Liste der Aufgaben der Woche mit Belohnung und Status (offen/gelöst/gesperrt); Aufgabe lösen; Rückmeldung richtig/falsch, Versuche übrig; Tageslimit-Anzeige |
+| Daily Quests (Knopf „Aufgaben“) | „Heute“ und „Nachholen von gestern“ mit Belohnung bzw. „gelöst ✓“; eine Quest aufklappen und lösen; Rückmeldung richtig/falsch mit englischem Tipp; Hören mit „▶ Anhören“ oder sichtbarem Text; Regelzeile „Münzen gibt es bei den ersten 3 Versuchen.“ (§9) |
 | Shop | Kategorien Deko / Avatar; Preis, „Kaufen“ (mit eigener Bestätigung, kein `confirm()`); ausgegraut wenn zu teuer |
 | Bauen | Kamera fährt zum eigenen Grundstück; Inventar-Leiste; Teil wählen → Raster erscheint → Feld antippen → Drehen/Entfernen; grün/rot für frei/belegt |
 | Mein Avatar | Vorschau, Kategorien, Farbwähler (feste Palette), gesperrte Teile mit Preis |
@@ -393,16 +458,19 @@ Touch-Ziele mind. 44 px; einfache Sprache; keine Emojis als Bedienelemente.
 - Münzen korrigieren mit Notiz.
 - Schalter: Shop offen, Bauen offen (pro Klasse).
 - Dorf-Layout wählen: Kartenvorlage + Seed, mit Vorschaubild.
-- Aufgaben-Statistik pro Aufgabe (Anteil richtig) – hilft bei der Unterrichtsplanung.
+- **Daily Quests:** Hinweise (heute oder morgen fehlt ein Paket, „Daily Quests vorhanden bis So 15.11.“, Importfehler je Woche, Ferienwochen) und Vorschau der nächsten 7 Tage mit Tipp und Lösung (§9).
+- Aufgaben-Statistik pro Aufgabe (Anteil richtig) – zeigt die alten Wochenaufgaben.
 
 ## 14. Wirtschaft (Standardwerte; je Instanz in `classes` änderbar, Preise in `items`)
 
 | Größe | Standard |
 | --- | --- |
 | Stempel (vollständiger Wochenplan) | 100 Münzen |
-| Aufgabe | 5 / 10 / 15 Münzen (leicht/mittel/schwer) |
-| Tageslimit Aufgaben | 60 Münzen |
-| Versuche pro Aufgabe und Tag | 3 |
+| Daily Quest | 1–20 Münzen je Quest, Richtwert 5 / 10 / 15 (leicht/mittel/schwer); 3 Quests pro Tag |
+| Nachholen am Folgetag | halbe Belohnung, aufgerundet |
+| Versuche je Quest | unbegrenzt; Münzen nur bei richtiger Antwort in den ersten 3 Versuchen (`quest_paid_attempts()`) |
+| Tageslimit Daily Quests | keins (höchstens 3 Quests heute und 3 zum Nachholen) |
+| Alte Wochenaufgaben (Geschichte) | Tageslimit 60 Münzen, 3 Versuche pro Aufgabe und Tag (`classes`) |
 | Deko | 20–250 Münzen |
 | Avatar-Teile | 30–300 Münzen, seltene bis 500 |
 
@@ -457,7 +525,7 @@ Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3
 | 1 | Instanz-Trennung per SQL-Test belegt; Lehrkraft legt per Liste 5 Testkonten an, druckt Zugangskärtchen; Schüler-Login auf dem Tablet zeigt das Dorf der richtigen Klasse mit eigenem Haus; Auto-Logout funktioniert; Stempel buchen erhöht Münzstand; Weck-Auftrag läuft |
 | 1b | Layout-Galerie: alle Befunde aus `REVIEW_2026-10-17_Dorflayout.md` behoben; 8a/8b sichtbar verschieden; Welt < 60 Draw Calls; Lehrkraft gibt das Layout anhand der Galerie frei |
 | 2 | Stil-Test freigegeben; Dorf im Comic-Look; Avatar-Editor speichert; alle Figuren der Klasse laufen mit echten Animationen; ≥ 30 fps auf dem ältesten Tablet |
-| 3 | Aufgaben-JSON einer Woche wird per Push importiert; Lösen bringt Münzen; Limit und Versuche greifen; Lösungen nicht im Netzwerkverkehr vor dem Lösen sichtbar |
+| 3 | Aufgaben-JSON einer Woche wird per Push importiert; Lösen bringt Münzen; Limit und Versuche greifen; Lösungen nicht im Netzwerkverkehr vor dem Lösen sichtbar. Für die Daily Quests gelten die Kriterien aus `docs/superpowers/specs/2026-10-20-daily-quests-design.md` §8 (PLAN Q.10) |
 | 4 | Kaufen, Platzieren, Drehen, Entfernen funktionieren; andere Schüler sehen die Deko nach Neuladen; Sperr-Schalter wirken |
 | 5 | 1 Woche Probebetrieb in einer Klasse ohne Datenfehler; Lehrer-Anleitung vorhanden |
 
@@ -468,7 +536,7 @@ Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3
 | 1 | Klassengröße 8a / 8b | je 32 Plätze pro Instanz |
 | 2 | Münzbeträge, Tageslimit | §14 |
 | 3 | Aufgaben auch zu Hause? | ja, gleiche Regeln |
-| 4 | Ältere Wochen: Belohnung | halbe Belohnung |
+| 4 | Ältere Wochen: Belohnung | Daily Quests: Nachholen nur am Folgetag zur halben Belohnung (aufgerundet), §9 |
 | 5 | Ältestes Tablet-Modell | Qualität „Auto“ entscheidet |
 | 6 | Datenschutz-/Impressumstext | Platzhalter, mit Schulleitung klären |
 | 7 | Vorlage und Seed pro Klasse | 8a: Vorlage 1, 8b: Vorlage 2; Lehrkraft kann im Lehrer-Bereich wechseln |

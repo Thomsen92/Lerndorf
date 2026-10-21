@@ -108,9 +108,6 @@ Die Gutschrift muss idempotent sein: Für einen Schüler und eine Quest kann max
 
 ## 9. Noch vor Umsetzung festzulegen
 
-- Das vollständige JSON-Schema einschließlich Feldnamen, IDs und Antwortstruktur je Aufgabentyp.
-- Welche konkrete Browser-Stimme für `en-GB` genutzt wird, sofern mehrere Stimmen verfügbar sind; die in Abschnitt 4 beschriebene Fallback-Regel gilt als Startstandard.
-- Wie mit bereits importierten Wochen umgegangen wird, wenn eine spätere Änderung derselben Datei in den Hauptbranch gemergt wird (z. B. Korrektur einer Aufgabe oder eines Münzwerts nach Freischaltung).
-- Wie bereits vorhandene Wochenaufgaben-Ergebnisse historisch aufbewahrt werden, wenn das alte Aufgabenmodell später ersetzt wird.
+Erledigt (21.10.2026). Die offenen Punkte dieses Abschnitts (JSON-Schema, Stimme, erneuter Import einer Woche, Aufbewahrung der alten Wochenaufgaben) und die weiteren Festlegungen D1–D11 stehen jetzt in [`docs/SPEC.md` §9 „Entscheidungen“](../../SPEC.md#9-aufgaben-inhalte-daily-quests). Das Format steht in `content/daily-quests/FORMAT.md`.
 
-Diese offenen Punkte sind Implementierungsentscheidungen und ändern die bestätigten Produktregeln nicht.
+Ergänzung zu Abschnitt 5 (Entscheidung der Lehrkraft 21.10.2026, D11): Versuche bleiben unbegrenzt, Münzen gibt es aber nur, wenn die richtige Antwort unter den ersten 3 Versuchen ist. Ferienwochen werden mit einer Ferien-Datei markiert (D6).

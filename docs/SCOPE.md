@@ -21,12 +21,12 @@ Schüler sind 13–14 Jahre alt; teils schwächere Lesekompetenz. Oberfläche au
 2. **Klassendorf** pro Klasse: organisches Gelände (Hügel, Fluss, Brücken, geschwungene Wege, Wald, Wahrzeichen), Marktplatz in der Mitte, ein Grundstück mit Haus pro Schüler, verstreut und unterschiedlich weit auseinander. 8a und 8b sind **zwei getrennte Instanzen** mit eigenem Dorf (andere Kartenvorlage), eigenen Bewohnern, eigenen Spielregeln und ohne gegenseitige Sicht. Alle Schüler einer Klasse sehen dasselbe Dorf.
 3. **Avatare** aller Klassenmitglieder laufen selbständig und nicht steuerbar durchs Dorf (gehen, stehen, sitzen, winken, grüßen sich). Antippen lässt eine Figur winken.
 4. **Avatar-Editor**: Frisur, Farben, Kleidung, Accessoires. Grundausstattung gratis, weitere Teile im Shop.
-5. **Aufgabentafel** am Marktplatz: kurze Englisch-Aufgaben zum Stoff der Woche (Vokabeln, Irregular verbs, Grammatik). Richtige Antworten bringen Münzen. Prüfung nur auf dem Server, Tageslimit.
+5. **Daily Quests** (Knopf „Aufgaben“ oder Tafel am Marktplatz): jeden Tag 3 kurze Englisch-Aufgaben zum Stoff der Woche (Vokabeln, Irregular verbs, Grammatik, Hören), auch am Wochenende; gestrige ungelöste Quests lassen sich einen Tag lang zur halben Belohnung nachholen. Richtige Antworten bringen Münzen, aber nur innerhalb der ersten 3 Versuche (Entscheidung der Lehrkraft 21.10.2026). Prüfung nur auf dem Server; Lösungen erreichen nie den Browser. Ersetzt die frühere Aufgabentafel mit Wochenaufgaben (SPEC §9).
 6. **Münzkonto** mit nachvollziehbarem Kontoauszug.
 7. **Shop + Inventar**: Deko für das Grundstück, Teile für den Avatar.
 8. **Baumodus**: gekaufte Deko auf dem eigenen Grundstück auf ein Raster setzen, drehen, wieder entfernen.
 9. **Lehrer-Bereich**: Konten anlegen/zurücksetzen, Stempel buchen, Münzen korrigieren, Shop/Baumodus sperren, Übersicht pro Klasse.
-10. **Aufgaben-Pflege**: Aufgaben der Woche als JSON-Datei im Repository, automatisch in die Datenbank eingespielt.
+10. **Quest-Pflege**: eine JSON-Datei je Woche in `content/daily-quests/` (7 Tage × 3 Quests, Ferienwochen als kurze Ferien-Datei), automatisch geprüft und in die Datenbank eingespielt. Die Dateien schreibt Claude im Wochenplan-Projekt nach `content/daily-quests/FORMAT.md`. Der Lehrer-Bereich zeigt, bis wann Quests vorhanden sind, meldet Fehler und zeigt die nächsten 7 Tage mit Lösungen.
 
 ## Ausdrücklich NICHT im Umfang
 
@@ -70,7 +70,7 @@ Schüler sind 13–14 Jahre alt; teils schwächere Lesekompetenz. Oberfläche au
 | 1 | Fundament: Projekt-Setup, Supabase-Schema, Login, Lehrer-Bereich (Konten, Stempel), Deploy, Weck-Auftrag | Lehrkraft kann Konten anlegen, Schüler können sich anmelden und sehen ihr Dorf mit Platzhaltern |
 | 1b | Dorf-Layout: Kartenvorlagen je Klasse, Wege und Platz im Gelände, Vegetation, Marktplatz, Licht, Grundstücks-Regeln, Leistung – noch mit Platzhaltern | Dorf wirkt lebendig wie der Prototyp; Lehrkraft gibt Layout per Galerie frei |
 | 2 | Dorf + Avatare: Stil-Test mit CC0-Modellen, Blender-Pipeline, Avatar-Baukasten mit Animationen, Avatar-Editor | Dorf im Comic-Look, eigene Avatare |
-| 3 | Aufgaben: Aufgabentafel, Prüfung auf dem Server, Tageslimit, Aufgaben-JSON + Import | Münzen durch Aufgaben |
+| 3 | Aufgaben: Prüfung auf dem Server, Aufgaben-JSON + Import; seit 21.10.2026 als Daily Quests (Zwischenpaket Q) | Münzen durch Aufgaben |
 | 4 | Bauen: Shop, Inventar, Baumodus | Grundstücke werden gestaltet |
 | 5 | Abschluss: Tests auf Tablets, Feinschliff, Lehrer-Anleitung | Einsatz im Unterricht |
 

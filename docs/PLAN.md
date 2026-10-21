@@ -133,6 +133,23 @@ Spec: `docs/superpowers/specs/2026-10-21-tablet-ui-navigation-design.md`, Plan: 
 
 Nächstes: Zwischenpaket B – Bau-Feedback (`docs/superpowers/specs/2026-10-21-build-feedback-design.md`).
 
+## Zwischenpaket Q – Daily Quests
+
+Spec: `docs/superpowers/specs/2026-10-20-daily-quests-design.md`, Plan: `docs/superpowers/plans/2026-10-21-daily-quests.md`, Entscheidungen D1–D11: SPEC §9. Ersetzt die Wochenaufgaben (Aufgabentafel) durch 3 Quests pro Tag.
+
+| AP | Wer | Inhalt | Ergebnis |
+|---|---|---|---|
+| [x] Q.1 | CC | Paketformat, Prüfer und Umwandlung (`content/daily-quests/FORMAT.md`, `web/scripts/quests.ts`) | Tests grün |
+| [x] Q.2 | CC | Tabellen und Import-RPCs (Migration `0015_daily_quests.sql`) | SQL-Tests grün |
+| [x] Q.3 | CC | Schüler-RPCs mit Nachholen und einmaliger Buchung (`0016_daily_quests_rpc.sql`) | SQL-Tests grün |
+| [x] Q.4 | CC | Lehrer-RPCs Status und Vorschau (`0017_daily_quests_teacher.sql`) | SQL-Tests grün |
+| [x] Q.5 | CC | Import-Skript und Workflow `import-content`; alter Wochenimport entfernt | Tests grün |
+| [x] Q.6 | CC | Client-API, Antworten, Vorlesen (`api/quests.ts`, `quests/speech.ts`) | Tests grün |
+| [x] Q.7 | CC | Bereich „Daily Quests“ ersetzt die Aufgabentafel (`ui/dailyQuestsView.ts`) | Tests grün |
+| [x] Q.8 | CC | Lehrer-Bereich: Status, Warnung, Vorschau (`teacher/questsView.ts`) | Tests grün |
+| [x] Q.9 | CC | Doku (SPEC, SCOPE, PLAN, Anleitung „Daily Quests einspielen“), Screenshots, Reihenfolge fürs Einspielen | 552 Tests grün, Screenshots angesehen |
+| [ ] Q.10 | LK | **Abnahme durch die Lehrkraft** (Kriterien Spec §8): erst Migrationen 0015–0017 einspielen, dann das erste Paket | – |
+
 ## Stufe 5 – Probebetrieb
 
 | AP | Wer | Aufgabe | Fertig, wenn |
@@ -152,7 +169,7 @@ Nächstes: Zwischenpaket B – Bau-Feedback (`docs/superpowers/specs/2026-10-21-
 2. **Abnahmen:** nach jeder Stufe auf einem Schul-Tablet testen (je ca. 15 Min.), beim Stil-Test über den Look entscheiden.
 3. **Eventuell:** CC0-Modellpakete herunterladen, falls Claude Code sie nicht selbst laden kann.
 4. **Klären:** Datenschutztext (Schulleitung), Klassengrößen, Münzbeträge.
-5. **Im Alltag:** Stempel buchen (ca. 5 Min./Woche), Aufgabendatei der Woche hochladen.
+5. **Im Alltag:** Stempel buchen (ca. 5 Min./Woche), Quest-Datei der Woche hochladen (Daily Quests, Anleitung „Daily Quests einspielen“).
 
 ## Risiken im Ablauf
 
@@ -275,3 +292,14 @@ Nächstes: Zwischenpaket B – Bau-Feedback (`docs/superpowers/specs/2026-10-21-
 | 18.10.2026 | L.8 Name beim Antippen | Tippt man eine Figur an, zeigt sich ihr Name drei Sekunden lang, auch in der Ferne (`Crowd.wave` setzt `nameTimer`, `updateLabels` in `render/crowd.ts`). Zehn Prozent der Ziele sind jetzt Wahrzeichen statt Häuser (`nextAction` in `avatars/behaviour.ts`, Test). Offen: Tippen auf fremde Häuser zeigt den Namen noch nicht. Build und Tests grün (265) |
 | 18.10.2026 | L.10 Befundliste | Galerie neu erzeugt. Befundliste im Review um den Stand nach Stufe 1b ergänzt: 7 erledigt, 6 teilweise, 1 offen (Befund 11, freie Plätze). Abnahme am Tablet und durch die Lehrkraft (L.11) steht aus |
 | 17.10.2026 | Wege abwechslungsreicher | Erde-Textur mit warmen Flecken, Sandstellen und Grasresten am Rand; Wegfarbe mit Helligkeitsrauschen und leicht zertretenem Gras am Wegrand (`render/textures.ts`, `render/village.ts`). Galerie geprüft |
+| 21.10.2026 | Q (D11) | **Entscheidung der Lehrkraft:** Versuche bei Daily Quests unbegrenzt, Münzen nur bei richtiger Antwort in den ersten 3 Versuchen. Die Zahl steht in `public.quest_paid_attempts()`. Wird sie geändert, muss auch die Zeile „Münzen gibt es bei den ersten 3 Versuchen.“ in `web/src/ui/dailyQuestsView.ts` geändert werden |
+| 21.10.2026 | Q (D6) | **Entscheidung der Lehrkraft:** Ferienwochen bekommen eine Ferien-Datei `{"week": "...", "holiday": true}`: keine Quests, keine Warnung im Lehrer-Bereich |
+| 21.10.2026 | Q (D1–D11) | Alle Entscheidungen zu den Daily Quests stehen in SPEC §9 (Tabelle „Entscheidungen“) |
+| 21.10.2026 | Q Lehrkonto | `my_daily_quests` lehnt Lehrkonten ab. Öffnet eine Lehrkraft im Dorf „Aufgaben“, steht dort „Nur Schülerkonten können Quests lösen.“ Quests und Lösungen sieht die Lehrkraft in der Vorschau im Lehrer-Bereich |
+| 21.10.2026 | Q Lösungen | Die Lösungstabelle ist auch für die Lehrkraft nicht direkt lesbar, nur über die Vorschau-Funktion `teacher_quest_preview` |
+| 21.10.2026 | Q Hinweistext | Der grüne Hinweis im Lehrer-Bereich lautet „Daily Quests vorhanden bis So 15.11.“ (ohne doppelten Punkt am Ende) |
+| 21.10.2026 | Q Re-Import | Ein fehlerhafter erneuter Import einer schon eingespielten Woche (auch einer Ferienwoche) lässt die alte Fassung online; die Woche zählt weiter als abgedeckt. Der Fehler erscheint rot im Lehrer-Bereich |
+| 21.10.2026 | Q reward_left | `my_daily_quests` und `submit_quest_answer` liefern zusätzlich `reward_left`: so viele Münzen bringt eine richtige Antwort jetzt noch (0 nach 3 Versuchen oder wenn gelöst) (D11) |
+| 21.10.2026 | Q Screenshots | Für die Playwright-Bilder gibt es eine eigene Testseite `web/dev/quests.html` mit nachgebauten Antworten statt echtem Login, weil es keine Supabase-Attrappe gab. Sie läuft nur über den Entwicklungsserver und ist nicht im fertigen Build (`e2e/daily-quests.spec.ts`, Projekt `harness`) |
+| 21.10.2026 | Q Lehrer-Hinweise | Beim Bildercheck gefunden und behoben: Die Hinweise im Abschnitt „Daily Quests“ lagen übereinander oben am Rand, weil sie den Stil der Dorf-Meldung geerbt hatten (`teacher/teacher.css`) |
+| 21.10.2026 | Q Reihenfolge | Noch nicht hochgeladen. Reihenfolge: erst Migrationen 0015–0017 auf `main`, grünen Lauf „migrate“ abwarten, dann die erste Datei in `content/daily-quests/` und grünen Lauf „import-content“ prüfen (Anleitung „Daily Quests einspielen“). Abnahme Q.10 steht aus |

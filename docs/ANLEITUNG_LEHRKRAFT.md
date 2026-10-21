@@ -152,39 +152,51 @@ Vorsicht: Das Löschen entfernt Konto, Haus und alle Münzen unwiderruflich. Sch
 
 ---
 
-## Neue Aufgabenwoche einspielen
+## Daily Quests einspielen
 
-Die Aufgaben einer Woche kommen als eine Datei in den Ordner `content/tasks/`. Die Datei heißt wie der **Montag** der Woche, zum Beispiel `2026-11-09.json`. Die Schüler sehen die Aufgaben ab diesem Montag.
+Seit Oktober 2026 gibt es statt der Wochenaufgaben **Daily Quests**: jeden Tag (auch am Wochenende) 3 kurze Englisch-Aufgaben. Die Schüler öffnen sie mit dem Knopf **Aufgaben** oder durch Antippen der Tafel am Marktplatz. Was von gestern noch offen ist, steht darunter unter „Nachholen von gestern“ und bringt die halben Münzen. Versuche sind unbegrenzt, Münzen gibt es aber nur, wenn die richtige Antwort unter den ersten 3 Versuchen ist.
 
-1. Die Datei für die Woche erstellen. Vorlage: `content/schema.json` zeigt den Aufbau. Ein Beispiel für jede Aufgabenart:
+### Wer schreibt die Quests?
+
+Die Quests einer Woche stehen in **einer Datei**. Sie heißt wie der **Montag** der Woche, zum Beispiel `2026-11-09.json`, und liegt im Ordner `content/daily-quests/`. Die Datei schreiben Sie nicht selbst: Claude im **Wochenplan-Projekt** erstellt sie aus der Jahresplanung und hält sich dabei an die Beschreibung `content/daily-quests/FORMAT.md`. Sie bitten dort zum Beispiel: „Erstelle die Daily Quests für die Woche ab 09.11. nach FORMAT.md.“
+
+Für **Ferienwochen** gibt es eine kurze Ferien-Datei, damit der Lehrer-Bereich keine Warnung zeigt. Sie hat nur eine Zeile:
 
 ```json
-{
-  "week": "2026-11-09",
-  "class": null,
-  "tasks": [
-    { "id": "v01", "type": "choice", "reward": 5, "prompt": "What is 'Fahrkarte'?",
-      "options": ["ticket", "card", "map", "fare"], "solution": "ticket" },
-    { "id": "g01", "type": "gap", "reward": 10, "prompt": "Yesterday we ___ to Brooklyn.",
-      "solution": ["went"] },
-    { "id": "m01", "type": "match", "reward": 15, "prompt": "Ordne zu.",
-      "pairs": [["subway", "U-Bahn"], ["sidewalk", "Gehweg"], ["block", "Häuserblock"]] },
-    { "id": "o01", "type": "order", "reward": 10, "prompt": "Bring the words in order.",
-      "solution": ["I", "went", "home"] }
-  ]
-}
+{ "week": "2026-12-21", "holiday": true }
 ```
 
-2. Die Regeln:
-   - `reward` ist 5, 10 oder 15 Münzen (leicht, mittel, schwer).
-   - `class` ist `null` für beide Klassen oder `"8a"` bzw. `"8b"`.
-   - Die Lösungen stehen in der Datei und werden nie an die Schüler geschickt.
-   - Die Datei muss ein gültiges JSON sein. Kommas am Ende sind nicht erlaubt.
+### Das erste Mal: zuerst die Datenbank, dann die Quests
 
-3. Die Datei nach `content/tasks/` legen und auf GitHub hochladen (Commit auf `main`).
+Beim ersten Mal muss die Reihenfolge stimmen. Sonst versucht GitHub, Quests in eine Datenbank zu schreiben, die die Quest-Tabellen noch gar nicht hat.
 
-4. Im Repository auf **Actions** prüfen, ob der Ablauf **import-content** grün ist. Bei einem Fehler zeigt er die Zeile und die Stelle an, zum Beispiel „tasks[2].reward: 5, 10 oder 15“. Die Datei korrigieren und erneut hochladen.
+1. **Datenbank zuerst.** Claude Code lädt die neue Version des Lerndorfs auf GitHub hoch (Zweig `main`). Darin sind die Datenbank-Änderungen (Migrationen `0015` bis `0017`), aber noch **keine** Quest-Datei.
+2. Auf GitHub im Repository **Lerndorf** oben auf **Actions** klicken.
+3. In der Liste den neuesten Lauf **migrate** suchen. Warten, bis er einen **grünen Haken** hat (meist 1–2 Minuten). Ist er rot: den Namen des Ablaufs und die Fehlermeldung an Claude Code schicken und **nicht** weitermachen.
+   - Gleichzeitig läuft vielleicht auch **import-content**. Er ist grün, weil noch keine Quest-Datei da ist. Das ist in Ordnung.
+   - Bis die erste Quest-Datei eingespielt ist, sehen die Schüler „Heute gibt es keine neuen Quests.“ Das ist normal.
+4. **Erst jetzt die Quests.** Die erste Wochendatei (zum Beispiel `2026-11-09.json`) und, falls nötig, Ferien-Dateien in den Ordner `content/daily-quests/` legen und auf GitHub hochladen (Commit auf `main`). Das kann auch Claude Code für Sie tun.
+5. Wieder auf **Actions** gehen und warten, bis der neue Lauf **import-content** grün ist.
+6. Im **Lehrer-Bereich** den Abschnitt **Daily Quests** ansehen (siehe unten). Dort muss jetzt stehen, bis wann Quests vorhanden sind.
 
-5. Nach dem Lauf erscheinen die Aufgaben in der Aufgabentafel der Schüler.
+### Jede weitere Woche
 
-Ergebnisse sieht man im Lehrer-Bereich unter **Aufgaben-Statistik**: Zu jeder Aufgabe steht, wie viele Antworten es gab und wie hoch der Anteil richtiger Antworten ist.
+1. Die neue Wochendatei aus dem Wochenplan-Projekt in `content/daily-quests/` legen und hochladen. Am besten ein paar Tage vor dem Montag.
+2. Auf **Actions** prüfen, ob **import-content** grün ist.
+3. Im Lehrer-Bereich unter **Daily Quests** nachsehen.
+
+Eine Woche darf auch später noch einmal hochgeladen werden, zum Beispiel um einen Fehler zu korrigieren. Dann gilt die neue Fassung. Was Schüler schon gelöst haben, bleibt gelöst, und ihre Münzen bleiben. Hat die neue Fassung einen Fehler, bleibt die alte Fassung online.
+
+### Was der Lehrer-Bereich zeigt
+
+Im Lehrer-Bereich gibt es den Abschnitt **Daily Quests**:
+
+- **Grüner Strich:** „Daily Quests vorhanden bis So 15.11.“: bis zu diesem Tag ist alles da.
+- **Gelber Strich:** „Morgen gibt es noch keine Daily Quests.“ oder „Heute gibt es keine Daily Quests. Bitte das Quest-Paket für die Woche ab … hochladen.“: die nächste Wochendatei fehlt.
+- **Roter Strich, rote Schrift:** „Das Quest-Paket für die Woche ab … hat Fehler und wurde nicht übernommen: …“: Die Datei hatte einen Fehler. Die Meldung sagt, wo (zum Beispiel `days[2].quests[1].hint`). Die Meldung an Claude im Wochenplan-Projekt geben, die Datei korrigieren lassen und erneut hochladen.
+- **Grüner Strich** „Woche ab 21.12.: Ferien, keine Quests.“: eine Ferien-Datei ist eingespielt.
+- **Vorschau: die nächsten 7 Tage**: alle kommenden Quests mit Tipp, Münzen und **Lösung**. So können Sie die Aufgaben vorher prüfen. Die Schüler sehen die Lösungen nie.
+
+Mit einem Lehrkonto kann man im Dorf keine Quests lösen; dort steht dann „Nur Schülerkonten können Quests lösen.“ Zum Ansehen ist die Vorschau im Lehrer-Bereich da.
+
+Der Abschnitt **Aufgaben-Statistik** zeigt nur noch die alten Wochenaufgaben von früher.
