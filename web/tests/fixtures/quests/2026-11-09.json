@@ -1,0 +1,345 @@
+{
+  "week": "2026-11-09",
+  "days": [
+    {
+      "date": "2026-11-09",
+      "quests": [
+        {
+          "id": "mon-1",
+          "type": "choice",
+          "prompt": "What is 'Fahrkarte' in English?",
+          "hint": "It is a small paper for the bus.",
+          "reward": 5,
+          "options": [
+            "ticket",
+            "card",
+            "map",
+            "fare"
+          ],
+          "solution": "ticket"
+        },
+        {
+          "id": "mon-2",
+          "type": "gap",
+          "prompt": "Yesterday we ___ to Brooklyn.",
+          "hint": "Think of the past of go.",
+          "reward": 10,
+          "solution": [
+            "went"
+          ]
+        },
+        {
+          "id": "mon-3",
+          "type": "match",
+          "prompt": "Match the words.",
+          "hint": "Look at the first letters.",
+          "reward": 10,
+          "pairs": [
+            [
+              "bridge",
+              "Brücke"
+            ],
+            [
+              "street",
+              "Straße"
+            ],
+            [
+              "river",
+              "Fluss"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-11-10",
+      "quests": [
+        {
+          "id": "tue-1",
+          "type": "order",
+          "prompt": "Put the words in order.",
+          "hint": "The sentence starts with the.",
+          "reward": 15,
+          "solution": [
+            "the",
+            "dog",
+            "sees",
+            "the",
+            "cat"
+          ]
+        },
+        {
+          "id": "tue-2",
+          "type": "listening",
+          "prompt": "Listen. Where is the girl going?",
+          "hint": "Listen for a place.",
+          "reward": 5,
+          "speak": "The girl is going to the station.",
+          "mode": "choice",
+          "options": [
+            "the station",
+            "the school",
+            "the park"
+          ],
+          "solution": "the station"
+        },
+        {
+          "id": "tue-3",
+          "type": "choice",
+          "prompt": "Which word is a fruit?",
+          "hint": "You can eat it.",
+          "reward": 10,
+          "options": [
+            "apple",
+            "chair",
+            "window"
+          ],
+          "solution": "apple"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-11",
+      "quests": [
+        {
+          "id": "wed-1",
+          "type": "listening",
+          "prompt": "Listen and fill the gap: He is waiting at ___.",
+          "hint": "Listen for the place.",
+          "reward": 10,
+          "speak": "He is waiting at the station.",
+          "mode": "gap",
+          "solution": [
+            "the station"
+          ]
+        },
+        {
+          "id": "wed-2",
+          "type": "gap",
+          "prompt": "She ___ a book every day.",
+          "hint": "Use the form with s.",
+          "reward": 10,
+          "solution": [
+            "reads"
+          ]
+        },
+        {
+          "id": "wed-3",
+          "type": "choice",
+          "prompt": "What is the opposite of \"big\"?",
+          "hint": "Think of a mouse.",
+          "reward": 5,
+          "options": [
+            "small",
+            "tall",
+            "long"
+          ],
+          "solution": "small"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "quests": [
+        {
+          "id": "thu-1",
+          "type": "match",
+          "prompt": "Match the animals.",
+          "hint": "Think of the farm.",
+          "reward": 5,
+          "pairs": [
+            [
+              "cow",
+              "Kuh"
+            ],
+            [
+              "horse",
+              "Pferd"
+            ],
+            [
+              "sheep",
+              "Schaf"
+            ],
+            [
+              "duck",
+              "Ente"
+            ]
+          ]
+        },
+        {
+          "id": "thu-2",
+          "type": "order",
+          "prompt": "Put the words in order.",
+          "hint": "The sentence ends with a place.",
+          "reward": 10,
+          "solution": [
+            "we",
+            "go",
+            "to",
+            "school",
+            "by",
+            "bus"
+          ]
+        },
+        {
+          "id": "thu-3",
+          "type": "listening",
+          "prompt": "Listen. What colour is the car?",
+          "hint": "Listen for a colour.",
+          "reward": 15,
+          "speak": "The car is red and very old.",
+          "mode": "choice",
+          "options": [
+            "red",
+            "blue",
+            "green"
+          ],
+          "solution": "red"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "quests": [
+        {
+          "id": "fri-1",
+          "type": "gap",
+          "prompt": "They ___ football on Fridays.",
+          "hint": "Think of a sport.",
+          "reward": 5,
+          "solution": [
+            "play"
+          ]
+        },
+        {
+          "id": "fri-2",
+          "type": "choice",
+          "prompt": "Which sentence is correct?",
+          "hint": "Look at the verb.",
+          "reward": 10,
+          "options": [
+            "He goes home.",
+            "He go home.",
+            "He going home."
+          ],
+          "solution": "He goes home."
+        },
+        {
+          "id": "fri-3",
+          "type": "match",
+          "prompt": "Match the days.",
+          "hint": "Think of the week.",
+          "reward": 10,
+          "pairs": [
+            [
+              "Monday",
+              "Montag"
+            ],
+            [
+              "Friday",
+              "Freitag"
+            ],
+            [
+              "Sunday",
+              "Sonntag"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "quests": [
+        {
+          "id": "sat-1",
+          "type": "order",
+          "prompt": "Put the words in order.",
+          "hint": "It is a question.",
+          "reward": 10,
+          "solution": [
+            "where",
+            "do",
+            "you",
+            "live"
+          ]
+        },
+        {
+          "id": "sat-2",
+          "type": "listening",
+          "prompt": "Listen and fill the gap: I like ___ music.",
+          "hint": "Listen for the kind of music.",
+          "reward": 5,
+          "speak": "I like rock music.",
+          "mode": "gap",
+          "solution": [
+            "rock"
+          ]
+        },
+        {
+          "id": "sat-3",
+          "type": "gap",
+          "prompt": "There ___ two cats in the garden.",
+          "hint": "Think of more than one cat.",
+          "reward": 15,
+          "solution": [
+            "are"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "quests": [
+        {
+          "id": "sun-1",
+          "type": "choice",
+          "prompt": "What is 'Hausaufgaben' in English?",
+          "hint": "You do it after school.",
+          "reward": 5,
+          "options": [
+            "homework",
+            "housework",
+            "hometown"
+          ],
+          "solution": "homework"
+        },
+        {
+          "id": "sun-2",
+          "type": "match",
+          "prompt": "Match the places.",
+          "hint": "Think of the town.",
+          "reward": 10,
+          "pairs": [
+            [
+              "library",
+              "Bibliothek"
+            ],
+            [
+              "market",
+              "Markt"
+            ],
+            [
+              "museum",
+              "Museum"
+            ]
+          ]
+        },
+        {
+          "id": "sun-3",
+          "type": "order",
+          "prompt": "Put the words in order.",
+          "hint": "It starts with I.",
+          "reward": 15,
+          "solution": [
+            "I",
+            "am",
+            "reading",
+            "a",
+            "new",
+            "book"
+          ]
+        }
+      ]
+    }
+  ]
+}
