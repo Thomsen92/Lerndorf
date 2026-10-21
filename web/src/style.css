@@ -269,31 +269,6 @@ button:disabled {
   font-weight: 700;
 }
 
-.task-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 12px;
-  display: grid;
-  gap: 6px;
-}
-
-.task-list button {
-  width: 100%;
-  text-align: left;
-}
-
-.task {
-  border-top: 1px solid var(--line);
-  padding-top: 12px;
-  display: grid;
-  gap: 10px;
-}
-
-.task-prompt {
-  font-size: 20px;
-  margin: 0;
-}
-
 .choices,
 .matches {
   display: grid;

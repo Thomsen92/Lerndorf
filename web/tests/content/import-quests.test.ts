@@ -83,10 +83,43 @@ describe('importQuestDir', () => {
 
   it('puts an RPC error into failed instead of throwing', async () => {
     copyFileSync(FIXTURE, join(dir, '2026-11-09.json'));
-    const { client } = fakeRpc('import_quest_week');
+    const { client, calls } = fakeRpc('import_quest_week');
     const report = await importQuestDir(url, client);
     expect(report.imported).toEqual([]);
-    expect(report.failed[0].errors).toEqual(['boom']);
+    expect(report.failed[0].errors).toEqual(['Die Datenbank hat die Woche abgelehnt: boom']);
+    // the teacher area must see the failure too
+    const rec = calls.find((c) => c.fn === 'record_quest_import');
+    expect(rec?.args).toEqual({
+      p_week: '2026-11-09',
+      p_ok: false,
+      p_errors: ['Die Datenbank hat die Woche abgelehnt: boom'],
+    });
+  });
+
+  it('reports it when the failure cannot be recorded for the teacher', async () => {
+    copyFileSync(FIXTURE, join(dir, '2026-11-09.json'));
+    const { client } = fakeRpc('import_quest_week');
+    const base = client.rpc.bind(client);
+    client.rpc = async (fn, args) =>
+      fn === 'record_quest_import' ? { error: { message: 'nope' } } : base(fn, args);
+    const report = await importQuestDir(url, client);
+    expect(report.failed[0].errors).toEqual([
+      'Die Datenbank hat die Woche abgelehnt: boom',
+      'Fehler konnte nicht im Lehrer-Bereich gespeichert werden: nope',
+    ]);
+  });
+
+  it('a thrown rpc error fails one file but not the run', async () => {
+    copyFileSync(FIXTURE, join(dir, '2026-11-09.json'));
+    writeFileSync(join(dir, '2026-11-16.json'), '{ kaputt');
+    const { client } = fakeRpc();
+    client.rpc = async () => {
+      throw new Error('network down');
+    };
+    const report = await importQuestDir(url, client);
+    expect(report.imported).toEqual([]);
+    expect(report.failed.map((f) => f.file)).toEqual(['2026-11-09.json', '2026-11-16.json']);
+    expect(report.failed[0].errors[0]).toContain('network down');
   });
 
   it('returns an empty report for a missing directory', async () => {

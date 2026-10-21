@@ -14,6 +14,7 @@ declare
   v_imports jsonb;
   v_tomorrow date := v_today + 1;
   v_covered boolean;
+  v_tomorrow_covered boolean;
 begin
   if not public.is_teacher() then
     raise exception 'only the teacher may call this' using errcode = '42501';
@@ -30,6 +31,13 @@ begin
     v_d := v_d + 1;
   end loop;
 
+  -- tomorrow is checked on its own: it can be covered although today is not
+  select exists (select 1 from daily_quests q where q.day = v_tomorrow and q.active)
+      or exists (select 1 from quest_imports i
+                 where i.week = v_tomorrow - (extract(isodow from v_tomorrow)::int - 1)
+                   and i.holiday)
+    into v_tomorrow_covered;
+
   select coalesce(jsonb_agg(jsonb_build_object(
            'week', i.week, 'ok', i.ok, 'holiday', i.holiday, 'errors', to_jsonb(i.errors),
            'quest_count', i.quest_count, 'imported_at', i.imported_at) order by i.week), '[]'::jsonb)
@@ -41,7 +49,7 @@ begin
     'today', v_today,
     'covered_until', v_until,
     'today_missing', v_until is null,
-    'tomorrow_missing', v_until is null or v_until < v_tomorrow,
+    'tomorrow_missing', not v_tomorrow_covered,
     'imports', v_imports);
 end $$;
 

@@ -254,6 +254,38 @@ describe('import_quest_week', () => {
     expect(sol.rows[0].solution).toBe('CHANGED');
   });
 
+  it('re-import with two quests of a day swapped (slots exchanged) succeeds', async () => {
+    const { quests, solutions } = rowsOf('2026-11-09.json');
+    await asService();
+    await importWeek(WEEK, false, quests, solutions);
+    const A = quests[0];
+    const B = quests.find((q) => q.day === A.day && q.slot !== A.slot)!;
+    const K = A.key;
+    await asSuperuser(`
+      insert into daily_quest_results (player_id, quest_key, attempts, solved_at, reward_paid)
+        values ('${BEN}', '${K}', 1, now(), 5);
+      insert into coin_ledger (player_id, delta, reason, ref) values ('${BEN}', 5, 'quest', '${K}');
+    `);
+    const swapped = quests.map((q) =>
+      q.key === A.key ? { ...q, slot: B.slot } : q.key === B.key ? { ...q, slot: A.slot } : q,
+    );
+    await asService();
+    const r = await importWeek(WEEK, false, swapped, solutions);
+    expect(r.rows[0].n).toBe(21);
+    await asSuperuser('');
+    const slots = await db.query<{ key: string; slot: number }>(
+      `select key, slot from daily_quests where key in ('${A.key}', '${B.key}') order by key`,
+    );
+    const bySlot = Object.fromEntries(slots.rows.map((x) => [x.key, x.slot]));
+    expect(bySlot[A.key]).toBe(B.slot);
+    expect(bySlot[B.key]).toBe(A.slot);
+    expect(await count(`select 1 from daily_quests where active`)).toBe(21);
+    expect(
+      await count(`select 1 from daily_quest_results where quest_key = '${K}' and reward_paid = 5`),
+    ).toBe(1);
+    expect(await count(`select 1 from coin_ledger where reason = 'quest' and ref = '${K}'`)).toBe(1);
+  });
+
   it('re-import can reactivate a dropped quest', async () => {
     const { quests, solutions } = rowsOf('2026-11-09.json');
     await asService();
@@ -610,6 +642,17 @@ describe('teacher quest RPCs', () => {
       covered_until: null,
       today_missing: true,
       tomorrow_missing: true,
+    });
+  });
+
+  it('today missing but tomorrow covered (next week imported): only today is missing', async () => {
+    await asService();
+    await importWeek('2026-11-23', true, [], []);
+    await setToday('2026-11-22');
+    expect(await status()).toMatchObject({
+      covered_until: null,
+      today_missing: true,
+      tomorrow_missing: false,
     });
   });
 

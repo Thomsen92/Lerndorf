@@ -159,6 +159,26 @@ describe('renderQuestPanel', () => {
     expect(el.querySelector('b')).toBeNull();
     expect(rpc).toHaveBeenCalledWith('teacher_quest_preview', { p_from: '2026-11-11', p_days: 7 });
   });
+  it('shows the read-aloud text of listening quests in the preview, escaped', async () => {
+    const rpc = vi.fn(async (fn: string) =>
+      fn === 'quest_status'
+        ? {
+            data: { today: '2026-11-11', covered_until: '2026-11-11', today_missing: false, tomorrow_missing: true, imports: [] },
+            error: null,
+          }
+        : {
+            data: [
+              { key: 'l', day: '2026-11-11', slot: 1, type: 'listening', prompt: 'Listen', data: { mode: 'choice', speak: 'I <i>like</i> dogs.' }, hint: '', reward: 5, solution: 'A' },
+            ],
+            error: null,
+          },
+    );
+    const el = document.createElement('div');
+    el.innerHTML = await renderQuestPanel({ rpc } as unknown as SupabaseClient);
+    expect(el.textContent).toContain('Vorlesetext: I <i>like</i> dogs.');
+    expect(el.querySelector('i')).toBeNull();
+    expect(el.querySelector('span[lang="en"]')?.textContent).toContain('dogs');
+  });
   it('shows an error when the status cannot be loaded', async () => {
     const html = await renderQuestPanel(fake(null, { message: 'x' }).client);
     expect(html).toContain('class="error"');

@@ -41,6 +41,14 @@ export async function renderQuestPanel(supabase: SupabaseClient): Promise<string
     ${previewHtml}</section>`;
 }
 
+function listeningText(r: QuestPreview): string {
+  if (r.type !== 'listening') return '';
+  const speak = (r.data as Record<string, unknown> | null)?.speak;
+  return typeof speak === 'string' && speak
+    ? `<br><span lang="en">Vorlesetext: ${esc(speak)}</span>`
+    : '';
+}
+
 function previewTables(rows: QuestPreview[]): string {
   if (rows.length === 0) return '<p>Keine Quests in den nächsten Tagen.</p>';
   const days: string[] = [];
@@ -51,7 +59,7 @@ function previewTables(rows: QuestPreview[]): string {
         .filter((r) => r.day === day)
         .map(
           (r) =>
-            `<tr><td>${esc(r.prompt)}${r.hint ? `<br><span class="hint">Tipp: ${esc(r.hint)}</span>` : ''}</td>` +
+            `<tr><td>${esc(r.prompt)}${listeningText(r)}${r.hint ? `<br><span class="hint">Tipp: ${esc(r.hint)}</span>` : ''}</td>` +
             `<td>${esc(TYPE_LABELS[r.type] ?? r.type)}</td><td class="num">${r.reward}</td>` +
             `<td>${esc(solutionText(r.solution, r.type, r.data))}</td></tr>`,
         )

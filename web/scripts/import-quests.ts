@@ -38,12 +38,26 @@ export async function importQuestDir(dir: URL, client: QuestRpc): Promise<Import
 
   for (const file of files) {
     const week = weekFromFileName(file);
-    const fail = async (errors: string[]): Promise<void> => {
-      report.failed.push({ file, errors });
-      if (week) {
-        // best effort: the teacher sees the errors in the app; a failure here is not fatal
-        await client.rpc('record_quest_import', { p_week: week, p_ok: false, p_errors: errors });
+    const fail = async (errors: string[], failWeek: string | null = week): Promise<void> => {
+      const all = [...errors];
+      if (failWeek) {
+        // the teacher sees the errors in the app; if even that fails, say so in the log
+        try {
+          const rec = await client.rpc('record_quest_import', {
+            p_week: failWeek,
+            p_ok: false,
+            p_errors: errors,
+          });
+          if (rec.error) {
+            all.push(`Fehler konnte nicht im Lehrer-Bereich gespeichert werden: ${rec.error.message}`);
+          }
+        } catch (err) {
+          all.push(
+            `Fehler konnte nicht im Lehrer-Bereich gespeichert werden: ${(err as Error).message}`,
+          );
+        }
       }
+      report.failed.push({ file, errors: all });
     };
 
     let json: unknown;
@@ -60,14 +74,23 @@ export async function importQuestDir(dir: URL, client: QuestRpc): Promise<Import
     }
     const pkg = json as WeekPackage;
     const { quests, solutions } = packageToRows(pkg);
-    const { error } = await client.rpc('import_quest_week', {
-      p_week: pkg.week,
-      p_holiday: 'holiday' in pkg,
-      p_quests: quests,
-      p_solutions: solutions,
-    });
-    if (error) report.failed.push({ file, errors: [error.message] });
-    else report.imported.push(file);
+    let rpcError: string | null = null;
+    try {
+      const { error } = await client.rpc('import_quest_week', {
+        p_week: pkg.week,
+        p_holiday: 'holiday' in pkg,
+        p_quests: quests,
+        p_solutions: solutions,
+      });
+      if (error) rpcError = error.message;
+    } catch (err) {
+      rpcError = (err as Error).message;
+    }
+    if (rpcError !== null) {
+      await fail([`Die Datenbank hat die Woche abgelehnt: ${rpcError}`], pkg.week);
+    } else {
+      report.imported.push(file);
+    }
   }
   return report;
 }

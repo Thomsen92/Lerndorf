@@ -106,10 +106,10 @@ begin
     raise exception 'solution for unknown quest' using errcode = '22023';
   end if;
 
-  -- deactivate first so the (day, slot) unique index never sees two active quests
-  update daily_quests set active = false
-    where week = p_week and active
-      and key not in (select q->>'key' from jsonb_array_elements(p_quests) q);
+  -- deactivate ALL active quests of the week first, so the (day, slot) unique index never sees
+  -- two active quests while survivors are upserted (e.g. two quests of a day swapped slots);
+  -- the upsert below sets active = true again for everything that is in the new version
+  update daily_quests set active = false where week = p_week and active;
 
   insert into daily_quests (key, week, day, slot, qid, type, prompt, hint, reward, data, active)
     select q->>'key', (q->>'week')::date, (q->>'day')::date, (q->>'slot')::smallint,
