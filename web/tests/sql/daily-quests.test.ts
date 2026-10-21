@@ -624,6 +624,30 @@ describe('teacher quest RPCs', () => {
     });
   });
 
+  it('a failed re-import of a holiday week keeps it covered', async () => {
+    await asService();
+    await importWeek('2026-11-16', true, [], []);
+    await db.query(`select public.record_quest_import('2026-11-16'::date, false, '{"x"}')`);
+    await setToday('2026-11-16');
+    const s = await status();
+    expect(s).toMatchObject({
+      today_missing: false,
+      tomorrow_missing: false,
+      covered_until: '2026-11-22',
+    });
+    expect(s.imports.find((i) => i.week === '2026-11-16')).toMatchObject({
+      ok: false,
+      holiday: true,
+    });
+  });
+
+  it('a failed re-import of a normal week keeps it covered', async () => {
+    await asService();
+    await db.query(`select public.record_quest_import('${WEEK}'::date, false, '{"x"}')`);
+    await setToday('2026-11-10');
+    expect(await status()).toMatchObject({ covered_until: '2026-11-15', today_missing: false });
+  });
+
   it('lists imports from last week on, with failed ones and their errors', async () => {
     await asService();
     await db.query(`select public.record_quest_import('2026-11-23'::date, false, '{"days: kaputt"}')`);

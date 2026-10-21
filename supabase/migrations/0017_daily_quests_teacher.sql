@@ -2,7 +2,7 @@
 -- preview of upcoming quests including solutions. Solutions are unreadable for authenticated
 -- roles, so both functions are security definer and check is_teacher() themselves.
 
--- A day is covered if it has an active quest or lies in a successfully imported holiday week.
+-- A day is covered if it has an active quest or lies in a holiday week (holiday is only set by a successful import; a failed re-import keeps the live version).
 -- covered_until is the end of the unbroken run of covered days starting today (null if today is
 -- not covered); the scan stops after 60 days.
 create or replace function public.quest_status() returns jsonb
@@ -23,7 +23,7 @@ begin
     select exists (select 1 from daily_quests q where q.day = v_d and q.active)
         or exists (select 1 from quest_imports i
                    where i.week = v_d - (extract(isodow from v_d)::int - 1)
-                     and i.holiday and i.ok)
+                     and i.holiday)
       into v_covered;
     exit when not v_covered;
     v_until := v_d;
