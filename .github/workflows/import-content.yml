@@ -1,4 +1,4 @@
-# Push of a week file in content/ to main: validate and import tasks (SPEC §9).
+# Push of a daily-quests week file in content/ to main: validate and import quests.
 # The service role key is only used here, in GitHub Actions.
 name: import-content
 
@@ -28,4 +28,4 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node scripts/import-content.ts
+        run: node scripts/import-quests.ts
