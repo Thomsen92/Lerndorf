@@ -1,10 +1,11 @@
 /**
  * Villagers in the 3D scene: placeholder figures that walk, sit, wait and greet each other.
  * Behaviour comes from avatars/behaviour.ts; this file only moves and shows them.
- * Placeholder models (boxes and spheres). Real animated figures come in Stufe 2.
+ * Placeholder figures (boxes) until the animated boy model is loaded (render/character.ts).
  */
 import * as THREE from 'three';
 import { bakeStatic } from './merge';
+import { instantiate, loadCharacter, type CharacterAsset, type CharacterClip, type CharacterInstance } from './character';
 import { createRng, type Rng } from '../world/rng';
 import type { Layout } from '../world/layout';
 import { walkHeight } from '../world/walk';
@@ -35,7 +36,17 @@ export interface Villager {
   nameTimer: number;
   bubbleTimer: number;
   rng: Rng;
+  /** Animated model, once loaded. */
+  fig: CharacterInstance | null;
+  /** Clip that plays now; 'stand' = walk clip frozen on its first frame. */
+  pose: CharacterClip | 'stand' | null;
+  /** Seconds left of a tap animation (catwalk or dance); the figure stops walking meanwhile. */
+  emote: { clip: 'catwalk' | 'dance'; timer: number } | null;
 }
+
+/** Tap animations run two loops. */
+const EMOTE_LOOPS = 2;
+const FADE = 0.25;
 
 interface Input {
   nickname: string;
@@ -177,10 +188,75 @@ export class Crowd {
         nameTimer: 0,
         bubbleTimer: 0,
         rng,
+        fig: null,
+        pose: null,
+        emote: null,
       };
       this.placeAt(v, layout.graph.nodes[start]);
       this.villagers.push(v);
     });
+    void loadCharacter().then((asset) => {
+      if (asset) this.attachModel(asset);
+    });
+  }
+
+  /** Swaps every placeholder body for the animated model; sign, marker and bubbles stay. */
+  private attachModel(asset: CharacterAsset): void {
+    for (const v of this.villagers) {
+      for (const child of [...v.group.children]) {
+        const mesh = child as THREE.Mesh;
+        if (mesh.isMesh && mesh.material instanceof THREE.MeshStandardMaterial) mesh.visible = false;
+      }
+      v.fig = instantiate(asset);
+      v.group.add(v.fig.root);
+      // spread the walk phase so the figures do not step in sync
+      v.fig.mixer.setTime(v.rng() * 2);
+      v.pose = null;
+    }
+  }
+
+  /** Single tap: catwalk, double tap: dance, each two loops. Without the model the figure hops. */
+  react(v: Villager, kind: 'single' | 'double'): void {
+    const clip = kind === 'double' ? 'dance' : 'catwalk';
+    if (!v.fig) {
+      this.wave(v);
+      return;
+    }
+    const seconds = v.fig.actions[clip].getClip().duration * EMOTE_LOOPS;
+    v.emote = { clip, timer: seconds };
+    if (v.pose === clip) {
+      // same animation again: start it over
+      v.fig.mixer.stopAllAction();
+      v.pose = null;
+    }
+    v.nameTimer = Math.max(3, seconds);
+  }
+
+  private setPose(v: Villager, pose: CharacterClip | 'stand'): void {
+    const fig = v.fig;
+    if (!fig || v.pose === pose) return;
+    const prev = v.pose === null ? null : fig.actions[v.pose === 'stand' ? 'walk' : v.pose];
+    const clip: CharacterClip = pose === 'stand' ? 'walk' : pose;
+    const next = fig.actions[clip];
+    if (prev && prev !== next) prev.fadeOut(FADE);
+    if (prev !== next) next.reset();
+    if (pose === 'stand') {
+      next.time = 0;
+      next.setEffectiveTimeScale(0);
+    } else {
+      next.setEffectiveTimeScale(1);
+    }
+    if (pose === 'catwalk' || pose === 'dance') {
+      next.reset();
+      next.setLoop(THREE.LoopRepeat, EMOTE_LOOPS);
+      next.clampWhenFinished = true;
+    } else {
+      next.setLoop(THREE.LoopRepeat, Infinity);
+    }
+    next.setEffectiveWeight(1);
+    if (prev && prev !== next) next.fadeIn(FADE);
+    next.play();
+    v.pose = pose;
   }
 
   /** Figure under a pointer tap: returns the villager, so the caller can make it wave. */
@@ -214,7 +290,13 @@ export class Crowd {
   update(dt: number): void {
     this.clock += dt;
     for (const v of this.villagers) {
-      if (v.walker) {
+      if (v.emote) {
+        v.emote.timer -= dt;
+        if (v.emote.timer <= 0) v.emote = null;
+      }
+      if (v.emote) {
+        // the figure stays on the spot while it dances; walking resumes afterwards
+      } else if (v.walker) {
         v.walker.advance(dt);
         const p = v.walker.position();
         v.group.position.set(p.x, walkHeight(this.layout, p), p.z);
@@ -237,7 +319,12 @@ export class Crowd {
         v.bubbleTimer -= dt;
         if (v.bubbleTimer <= 0) this.removeBubble(v);
       }
-      this.animateArm(v);
+      if (v.fig) {
+        this.setPose(v, v.emote ? v.emote.clip : v.walker ? 'walk' : 'stand');
+        v.fig.mixer.update(dt);
+      } else {
+        this.animateArm(v);
+      }
     }
     this.checkGreetings();
   }

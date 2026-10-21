@@ -21,6 +21,7 @@ import { buildLayout, type Plot } from '../world/layout';
 import { buildVillage } from '../render/village';
 import { loadClassSlots, type SlotMap } from '../api/build';
 import { Crowd } from '../render/crowd';
+import { createDoubleTap } from '../avatars/doubleTap';
 import { setupScene } from '../render/scene';
 import { supabaseItemApi, type ItemKind } from '../api/items';
 import {
@@ -235,6 +236,7 @@ export async function mountVillage(
     if (sky) (village.userData.setSky as ((t: THREE.Texture) => void) | undefined)?.(sky);
   });
 
+  const figureTap = createDoubleTap(350);
   const crowd = new Crowd(
     scene,
     layout,
@@ -339,7 +341,7 @@ export async function mountVillage(
       ((ev.clientX - rect.left) / rect.width) * 2 - 1,
       -((ev.clientY - rect.top) / rect.height) * 2 + 1,
     );
-    // in build mode a tap picks a cell of the own plot; otherwise a villager waves
+    // in build mode a tap picks a cell of the own plot; otherwise a villager dances (tap: catwalk, double tap: dance)
     if (buildMode?.isActive) {
       buildMode.handleTap(pointer, camera);
       return;
@@ -348,7 +350,7 @@ export async function mountVillage(
     const hit = raycaster.intersectObjects(scene.children, true)[0];
     const v = hit ? crowd.findByObject(hit.object) : null;
     if (v) {
-      crowd.wave(v);
+      crowd.react(v, figureTap(v.nickname, performance.now()));
       return;
     }
     // a pupil without a plot: tap a free lot to build there
