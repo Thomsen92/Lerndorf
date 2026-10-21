@@ -1,7 +1,7 @@
 // SQL tests for daily quests (migration 0015): schema, RLS and the import RPCs, against PGlite.
 import { PGlite } from '@electric-sql/pglite';
 import { readFileSync } from 'node:fs';
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import { packageToRows, type WeekPackage } from '../../scripts/quests';
 
 const MIGRATIONS = [
@@ -364,6 +364,18 @@ describe('pupil quests', () => {
       `select 1 from coin_ledger where player_id = '${uid}' and reason = 'quest' and ref = '${key}'`,
     );
 
+  // invariant after every test (and its real bookings): coins = sum of the ledger
+  afterEach(async () => {
+    await asSuperuser('');
+    for (const uid of [ANNA, BEN]) {
+      const r = await db.query<{ coins: number; s: number }>(
+        `select p.coins, coalesce((select sum(delta) from coin_ledger where player_id = p.id), 0)::int as s
+         from profiles p where p.id = '${uid}'`,
+      );
+      expect(r.rows[0].coins).toBe(r.rows[0].s);
+    }
+  });
+
   beforeEach(async () => {
     await asSuperuser('delete from coin_ledger; update profiles set coins = 0;');
     const { quests, solutions } = rowsOf('2026-11-09.json');
@@ -541,16 +553,5 @@ describe('pupil quests', () => {
     await expectError(db.query(`select public.submit_quest_answer('${T1}', '"x"')`), /not logged in/);
     await asSuperuser('set role anon;');
     await expectError(db.query(`select public.my_daily_quests()`), /permission denied/);
-  });
-
-  it('invariant: coins equal the sum of the ledger', async () => {
-    await asSuperuser('');
-    for (const uid of [ANNA, BEN]) {
-      const r = await db.query<{ coins: number; s: number }>(
-        `select p.coins, coalesce((select sum(delta) from coin_ledger where player_id = p.id), 0)::int as s
-         from profiles p where p.id = '${uid}'`,
-      );
-      expect(r.rows[0].coins).toBe(r.rows[0].s);
-    }
   });
 });

@@ -12,9 +12,9 @@ create or replace function public.quest_answer_matches(
   p_type text, p_data jsonb, p_solution jsonb, p_answer jsonb
 ) returns boolean
   language sql immutable as $$
-  select public.answer_matches(
+  select coalesce(public.answer_matches(
     case when p_type = 'listening' then p_data->>'mode' else p_type end,
-    p_solution, p_answer)
+    p_solution, p_answer), false)
 $$;
 
 -- my_daily_quests(): array of quests the pupil can work on right now. No hint, no solution.
@@ -126,7 +126,7 @@ begin
     'coins', v_coins,
     'reward', v_pay,
     'reward_left', v_left,
-    'hint', case when v_correct then null else v_q.hint end
+    'hint', case when v_correct then null else nullif(v_q.hint, '') end
   );
 end $$;
 
