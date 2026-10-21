@@ -189,22 +189,26 @@ button.danger {
   margin: 0 0 12px;
 }
 
-.notice {
+/* style.css makes .notice a fixed toast for the village; here it is a plain list line */
+.notices .notice {
+  position: static;
+  background: none;
+  border: 0;
   padding: 6px 10px;
   margin-bottom: 6px;
   border-radius: 8px;
   border-left: 4px solid var(--muted);
 }
 
-.notice-ok {
+.notices .notice-ok {
   border-left-color: #3fae5a;
 }
 
-.notice-warn {
+.notices .notice-warn {
   border-left-color: #e0a526;
 }
 
-.notice-error {
+.notices .notice-error {
   border-left-color: var(--warn);
   color: var(--warn);
   font-weight: 700;
