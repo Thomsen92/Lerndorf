@@ -20,6 +20,7 @@ const MIGRATIONS = [
   '0013_plot_slots.sql',
   '0014_cat_sign_shop_asset.sql',
   '0015_daily_quests.sql',
+  '0016_daily_quests_rpc.sql',
 ];
 const migrationDir = new URL('../../../supabase/migrations/', import.meta.url);
 const fixtureDir = new URL('../fixtures/quests/', import.meta.url);
@@ -312,5 +313,244 @@ describe('quest_today', () => {
     await setToday('2026-11-10');
     const r = await db.query<{ d: string }>(`select quest_today()::text as d`);
     expect(r.rows[0].d).toBe('2026-11-10');
+  });
+});
+
+describe('pupil quests', () => {
+  const T1 = '2026-11-10-tue-1'; // order, reward 15
+  const T2 = '2026-11-10-tue-2'; // listening/choice, reward 5
+  const T3 = '2026-11-10-tue-3'; // choice, reward 10
+  const W1 = '2026-11-11-wed-1'; // listening/gap
+  const ORDER_OK = ['the', 'dog', 'sees', 'the', 'cat'];
+  type Q = {
+    key: string;
+    day: string;
+    catch_up: boolean;
+    reward: number;
+    reward_left: number;
+    solved: boolean;
+    attempts: number;
+    [k: string]: unknown;
+  };
+  type R = {
+    correct: boolean;
+    already_solved: boolean;
+    coins: number;
+    reward: number;
+    reward_left: number;
+    hint: string | null;
+    [k: string]: unknown;
+  };
+  const mine = async (uid: string): Promise<Q[]> => {
+    await asUser(uid);
+    const r = await db.query<{ q: Q[] }>('select public.my_daily_quests() as q');
+    return r.rows[0].q;
+  };
+  const submit = async (uid: string, key: string, answer: unknown): Promise<R> => {
+    await asUser(uid);
+    const r = await db.query<{ r: R }>('select public.submit_quest_answer($1, $2::jsonb) as r', [
+      key,
+      JSON.stringify(answer),
+    ]);
+    return r.rows[0].r;
+  };
+  const coinsOf = async (uid: string): Promise<number> => {
+    await asSuperuser('');
+    return (await db.query<{ coins: number }>(`select coins from profiles where id = '${uid}'`))
+      .rows[0].coins;
+  };
+  const ledgerCount = (uid: string, key: string) =>
+    count(
+      `select 1 from coin_ledger where player_id = '${uid}' and reason = 'quest' and ref = '${key}'`,
+    );
+
+  beforeEach(async () => {
+    await asSuperuser('delete from coin_ledger; update profiles set coins = 0;');
+    const { quests, solutions } = rowsOf('2026-11-09.json');
+    await asService();
+    await importWeek(WEEK, false, quests, solutions);
+  });
+
+  it('shows the three quests of today to both classes, no other day, no hint or solution', async () => {
+    await setToday('2026-11-10');
+    const a = await mine(ANNA);
+    const c = await mine(CARLA);
+    const todayOnly = (l: Q[]) => l.filter((q) => !q.catch_up);
+    expect(todayOnly(a).map((q) => q.key)).toEqual([T1, T2, T3]);
+    expect(todayOnly(c).map((q) => q.key)).toEqual([T1, T2, T3]);
+    expect(todayOnly(a).every((q) => q.day === '2026-11-10')).toBe(true);
+    // yesterday's (Monday) unsolved quests are catch-up; tomorrow's never appear
+    expect(a.filter((q) => q.catch_up).every((q) => q.day === '2026-11-09')).toBe(true);
+    expect(a.some((q) => q.day === '2026-11-11')).toBe(false);
+    for (const q of a) {
+      expect(q).not.toHaveProperty('hint');
+      expect(q).not.toHaveProperty('solution');
+    }
+    expect(JSON.stringify(a)).not.toContain('The sentence starts');
+    await expectError(submit(ANNA, W1, 'x'), /quest not available/);
+  });
+
+  it('wrong answers give the hint but no solution; unlimited tries; late correct pays nothing', async () => {
+    await setToday('2026-11-10');
+    const before = await coinsOf(ANNA);
+    let r: R | undefined;
+    for (let i = 0; i < 10; i++) r = await submit(ANNA, T1, ['x']);
+    expect(r).toMatchObject({
+      correct: false,
+      reward: 0,
+      reward_left: 0,
+      hint: 'The sentence starts with the.',
+    });
+    expect(r).not.toHaveProperty('solution');
+    const ok = await submit(ANNA, T1, ORDER_OK);
+    expect(ok).toMatchObject({ correct: true, already_solved: false, reward: 0 });
+    expect(await coinsOf(ANNA)).toBe(before);
+    expect(await ledgerCount(ANNA, T1)).toBe(0);
+    // another quest, correct on the first try: full reward and a ledger row
+    const ok3 = await submit(ANNA, T3, 'apple');
+    expect(ok3).toMatchObject({ correct: true, already_solved: false, reward: 10, hint: null });
+    expect(ok3.coins).toBe(before + 10);
+    expect(await coinsOf(ANNA)).toBe(before + 10);
+    expect(await ledgerCount(ANNA, T3)).toBe(1);
+  });
+
+  it('D11: after 2 wrong answers the 3rd (correct) one still pays in full', async () => {
+    await setToday('2026-11-10');
+    const before = await coinsOf(ANNA);
+    const w1 = await submit(ANNA, T3, 'chair');
+    expect(w1.reward_left).toBe(10);
+    await submit(ANNA, T3, 'window');
+    const ok = await submit(ANNA, T3, 'apple');
+    expect(ok).toMatchObject({ correct: true, reward: 10 });
+    expect(await coinsOf(ANNA)).toBe(before + 10);
+  });
+
+  it('D11: 3 wrong answers then correct is solved without coins; reward_left is 0', async () => {
+    await setToday('2026-11-10');
+    const before = await coinsOf(ANNA);
+    await submit(ANNA, T3, 'a');
+    await submit(ANNA, T3, 'b');
+    const w3 = await submit(ANNA, T3, 'c');
+    expect(w3.reward_left).toBe(0);
+    const list = await mine(ANNA);
+    expect(list.find((q) => q.key === T3)).toMatchObject({
+      reward_left: 0,
+      attempts: 3,
+      solved: false,
+    });
+    expect(list.find((q) => q.key === T2)?.reward_left).toBe(5);
+    const ok = await submit(ANNA, T3, 'apple');
+    expect(ok).toMatchObject({ correct: true, already_solved: false, reward: 0 });
+    expect(await ledgerCount(ANNA, T3)).toBe(0);
+    expect(await coinsOf(ANNA)).toBe(before);
+    expect((await mine(ANNA)).find((q) => q.key === T3)).toMatchObject({
+      solved: true,
+      reward_left: 0,
+    });
+  });
+
+  it('a correct answer submitted twice books once', async () => {
+    await setToday('2026-11-10');
+    const before = await coinsOf(ANNA);
+    const first = await submit(ANNA, T2, 'the station');
+    expect(first).toMatchObject({ correct: true, already_solved: false, reward: 5 });
+    const second = await submit(ANNA, T2, 'the station');
+    expect(second).toMatchObject({ correct: true, already_solved: true, reward: 0 });
+    expect(await ledgerCount(ANNA, T2)).toBe(1);
+    expect(await coinsOf(ANNA)).toBe(before + 5);
+    await asSuperuser('');
+    const att = await db.query<{ attempts: number }>(
+      `select attempts from daily_quest_results where player_id = '${ANNA}' and quest_key = '${T2}'`,
+    );
+    expect(att.rows[0].attempts).toBe(1);
+  });
+
+  it('catch-up: the next day shows unsolved quests of yesterday at half reward', async () => {
+    await setToday('2026-11-10');
+    await submit(BEN, T3, 'apple');
+    await setToday('2026-11-11');
+    const list = await mine(BEN);
+    const cu = list.filter((q) => q.catch_up);
+    expect(cu.map((q) => [q.key, q.reward])).toEqual([
+      [T1, 8],
+      [T2, 3],
+    ]);
+    expect(list.slice(0, 3).every((q) => !q.catch_up)).toBe(true);
+    expect(list).toHaveLength(5);
+    const before = await coinsOf(BEN);
+    const r = await submit(BEN, T1, ORDER_OK);
+    expect(r).toMatchObject({ correct: true, reward: 8 });
+    expect(await coinsOf(BEN)).toBe(before + 8);
+  });
+
+  it('attempts carry over from today into the catch-up day', async () => {
+    await setToday('2026-11-10');
+    await submit(BEN, T3, 'a');
+    await submit(BEN, T3, 'b');
+    await submit(BEN, T3, 'c');
+    await setToday('2026-11-11');
+    expect((await mine(BEN)).find((q) => q.key === T3)).toMatchObject({
+      attempts: 3,
+      reward_left: 0,
+    });
+    expect(await submit(BEN, T3, 'apple')).toMatchObject({ correct: true, reward: 0 });
+  });
+
+  it('expiry: a quest two days old is gone', async () => {
+    await setToday('2026-11-12');
+    await expectError(submit(BEN, T1, ORDER_OK), /quest not available/);
+    expect((await mine(BEN)).some((q) => q.day === '2026-11-10')).toBe(false);
+  });
+
+  it('a Sunday quest is catch-up on the following Monday', async () => {
+    await setToday('2026-11-16');
+    const list = await mine(ANNA);
+    expect(list.length).toBeGreaterThan(0);
+    expect(list.every((q) => q.catch_up && q.day === '2026-11-15')).toBe(true);
+  });
+
+  it('listening in gap mode normalises the answer', async () => {
+    await setToday('2026-11-11');
+    expect(await submit(ANNA, W1, '  The Station ')).toMatchObject({ correct: true, reward: 10 });
+  });
+
+  it('order quest with duplicate words accepts the exact sequence only', async () => {
+    await setToday('2026-11-10');
+    expect((await submit(ANNA, T1, ['the', 'the', 'dog', 'sees', 'cat'])).correct).toBe(false);
+    expect((await submit(ANNA, T1, ORDER_OK)).correct).toBe(true);
+  });
+
+  it('a deactivated quest is not listed and cannot be answered', async () => {
+    const { quests, solutions } = rowsOf('2026-11-09.json');
+    await asService();
+    await importWeek(
+      WEEK,
+      false,
+      quests.filter((q) => q.key !== T3),
+      solutions.filter((s) => s.quest_key !== T3),
+    );
+    await setToday('2026-11-10');
+    expect((await mine(ANNA)).filter((q) => !q.catch_up).map((q) => q.key)).toEqual([T1, T2]);
+    await expectError(submit(ANNA, T3, 'apple'), /quest not available/);
+  });
+
+  it('teacher and anonymous callers are refused', async () => {
+    await setToday('2026-11-10');
+    await expectError(submit(TEACHER, T1, ORDER_OK), /only pupils/);
+    await asSuperuser(`select set_config('request.jwt.claim.sub', '', false); set role authenticated;`);
+    await expectError(db.query(`select public.submit_quest_answer('${T1}', '"x"')`), /not logged in/);
+    await asSuperuser('set role anon;');
+    await expectError(db.query(`select public.my_daily_quests()`), /permission denied/);
+  });
+
+  it('invariant: coins equal the sum of the ledger', async () => {
+    await asSuperuser('');
+    for (const uid of [ANNA, BEN]) {
+      const r = await db.query<{ coins: number; s: number }>(
+        `select p.coins, coalesce((select sum(delta) from coin_ledger where player_id = p.id), 0)::int as s
+         from profiles p where p.id = '${uid}'`,
+      );
+      expect(r.rows[0].coins).toBe(r.rows[0].s);
+    }
   });
 });
