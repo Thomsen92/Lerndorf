@@ -4,6 +4,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { isMonday, mondayOf, weekLabel } from './week';
+import { renderQuestPanel } from './questsView';
 import {
   adminCall,
   adjustCoins,
@@ -119,6 +120,7 @@ async function renderTeacherArea(root: HTMLElement, supabase: SupabaseClient): P
       return;
     }
     const list = pupils.value;
+    const questHtml = await renderQuestPanel(supabase);
     main.innerHTML = `
       ${overviewSection(list)}
       ${stampSection(list)}
@@ -126,6 +128,7 @@ async function renderTeacherArea(root: HTMLElement, supabase: SupabaseClient): P
       ${coinSection(list)}
       ${switchSection(flags.value)}
       ${instanceSection(instance.ok ? instance.value : null)}
+      ${questHtml}
       ${statsSection()}
       <p id="status" role="status" class="status"></p>`;
     wireStamps();

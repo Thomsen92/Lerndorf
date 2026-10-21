@@ -182,3 +182,30 @@ button.danger {
     margin: 2mm 0 0;
   }
 }
+
+.notices {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+}
+
+.notice {
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  border-left: 4px solid var(--muted);
+}
+
+.notice-ok {
+  border-left-color: #3fae5a;
+}
+
+.notice-warn {
+  border-left-color: #e0a526;
+}
+
+.notice-error {
+  border-left-color: var(--warn);
+  color: var(--warn);
+  font-weight: 700;
+}

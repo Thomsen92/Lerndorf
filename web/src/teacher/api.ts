@@ -3,6 +3,7 @@
  * (SPEC §8) or the Edge Function admin-accounts. Nothing here writes tables directly.
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { mondayOf, parseIsoDate, weekLabel } from './week';
 
 export interface Pupil {
   id: string;
@@ -289,4 +290,137 @@ export async function saveLayout(
   const { error } = await supabase.rpc('set_layout', { p_class_id: classId, p_map_id: mapId, p_seed: seed });
   if (error) return fail(error.message);
   return { ok: true, value: true };
+}
+
+// ---- Daily quests: status, warning, preview (teacher only) ----
+
+export interface QuestImport {
+  week: string;
+  ok: boolean;
+  holiday: boolean;
+  errors: string[];
+  questCount: number;
+  importedAt: string;
+}
+
+export interface QuestStatus {
+  today: string;
+  coveredUntil: string | null;
+  todayMissing: boolean;
+  tomorrowMissing: boolean;
+  imports: QuestImport[];
+}
+
+export interface QuestPreview {
+  key: string;
+  day: string;
+  slot: number;
+  type: string;
+  prompt: string;
+  data: Record<string, unknown>;
+  hint: string;
+  reward: number;
+  solution: unknown;
+}
+
+export async function loadQuestStatus(supabase: SupabaseClient): Promise<Result<QuestStatus>> {
+  const { data, error } = await supabase.rpc('quest_status');
+  if (error || !data) return fail('Der Quest-Status konnte nicht geladen werden');
+  const imports = (data.imports ?? []) as Array<Record<string, unknown>>;
+  return {
+    ok: true,
+    value: {
+      today: String(data.today),
+      coveredUntil: data.covered_until ?? null,
+      todayMissing: Boolean(data.today_missing),
+      tomorrowMissing: Boolean(data.tomorrow_missing),
+      imports: imports.map((i) => ({
+        week: String(i.week),
+        ok: Boolean(i.ok),
+        holiday: Boolean(i.holiday),
+        errors: ((i.errors ?? []) as unknown[]).map(String),
+        questCount: Number(i.quest_count ?? 0),
+        importedAt: String(i.imported_at ?? ''),
+      })),
+    },
+  };
+}
+
+export async function loadQuestPreview(
+  supabase: SupabaseClient,
+  from: string,
+  days: number,
+): Promise<Result<QuestPreview[]>> {
+  const { data, error } = await supabase.rpc('teacher_quest_preview', { p_from: from, p_days: days });
+  if (error) return fail('Die Vorschau konnte nicht geladen werden');
+  return {
+    ok: true,
+    value: ((data ?? []) as Array<Record<string, unknown>>).map((r) => ({
+      key: String(r.key),
+      day: String(r.day),
+      slot: Number(r.slot),
+      type: String(r.type),
+      prompt: String(r.prompt),
+      data: (r.data ?? {}) as Record<string, unknown>,
+      hint: String(r.hint ?? ''),
+      reward: Number(r.reward),
+      solution: r.solution,
+    })),
+  };
+}
+
+const WEEKDAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+
+/** "Mo 09.11." for an ISO date; unparsable input is returned unchanged. */
+export function dayLabel(iso: string): string {
+  const d = parseIsoDate(iso);
+  if (!d) return iso;
+  const dd = String(d.getUTCDate()).padStart(2, '0');
+  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+  return `${WEEKDAYS[d.getUTCDay()]} ${dd}.${mm}.`;
+}
+
+/**
+ * Teacher notices for the quest status, in this order: warn lines, the ok line, one error per
+ * failed import, one line per holiday import. Without coverage (coveredUntil null) there is no
+ * ok line. dayLabel already ends in a dot, so the ok sentence gets no extra one.
+ */
+export function questNotices(s: QuestStatus): Array<{ level: 'ok' | 'warn' | 'error'; text: string }> {
+  const out: Array<{ level: 'ok' | 'warn' | 'error'; text: string }> = [];
+  if (s.todayMissing) {
+    const monday = mondayOf(s.today) ?? s.today;
+    out.push({
+      level: 'warn',
+      text: `Heute gibt es keine Daily Quests. Bitte das Quest-Paket für die ${weekLabel(monday)} hochladen.`,
+    });
+  }
+  if (s.tomorrowMissing) out.push({ level: 'warn', text: 'Morgen gibt es noch keine Daily Quests.' });
+  if (s.coveredUntil) out.push({ level: 'ok', text: `Daily Quests vorhanden bis ${dayLabel(s.coveredUntil)}` });
+  for (const i of s.imports) {
+    if (!i.ok) {
+      out.push({
+        level: 'error',
+        text: `Das Quest-Paket für die ${weekLabel(i.week)} hat Fehler und wurde nicht übernommen: ${i.errors.join('; ')}`,
+      });
+    }
+  }
+  for (const i of s.imports) {
+    if (i.ok && i.holiday) out.push({ level: 'ok', text: `${weekLabel(i.week)}: Ferien, keine Quests.` });
+  }
+  return out;
+}
+
+/**
+ * A quest solution in plain words. Text as it is; gap alternatives "a / b"; pairs "left → right";
+ * other lists "a · b". Listening quests are shown by their answer mode (choice or gap).
+ */
+export function solutionText(solution: unknown, type?: string, data?: Record<string, unknown>): string {
+  if (solution === null || solution === undefined) return '–';
+  const kind = type === 'listening' ? String(data?.mode ?? '') : type;
+  if (typeof solution === 'string') return solution;
+  if (Array.isArray(solution)) {
+    if (kind === 'gap') return solution.map(String).join(' / ');
+    return solution.map((x) => (Array.isArray(x) ? x.join(' → ') : String(x))).join(' · ');
+  }
+  return JSON.stringify(solution);
 }
