@@ -28,7 +28,7 @@ for (const size of SIZES) {
     await expect(page.getByRole('heading', { name: 'Nachholen von gestern' })).toBeVisible();
     await expect(page.locator('.quest-card.solved')).toHaveCount(1);
 
-    await page.locator('[data-open="2026-11-09:mon-2"]').click();
+    await page.locator('[data-open="2026-11-09-mon-2"]').click();
     await page.locator('[data-listen]').click();
     const fallback = page.locator('.quest-fallback');
     await expect(fallback).toBeVisible();

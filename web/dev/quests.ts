@@ -8,7 +8,7 @@ import { renderQuestPanel } from '../src/teacher/questsView';
 
 const QUESTS = [
   {
-    key: '2026-11-09:mon-1',
+    key: '2026-11-09-mon-1',
     day: '2026-11-09',
     catch_up: false,
     type: 'choice',
@@ -20,7 +20,7 @@ const QUESTS = [
     attempts: 1,
   },
   {
-    key: '2026-11-09:mon-2',
+    key: '2026-11-09-mon-2',
     day: '2026-11-09',
     catch_up: false,
     type: 'listening',
@@ -36,7 +36,7 @@ const QUESTS = [
     attempts: 0,
   },
   {
-    key: '2026-11-08:sun-1',
+    key: '2026-11-08-sun-1',
     day: '2026-11-08',
     catch_up: true,
     type: 'gap',
@@ -48,7 +48,7 @@ const QUESTS = [
     attempts: 0,
   },
   {
-    key: '2026-11-08:sun-2',
+    key: '2026-11-08-sun-2',
     day: '2026-11-08',
     catch_up: true,
     type: 'order',
@@ -73,7 +73,7 @@ const STATUS = {
       week: '2026-11-16',
       ok: false,
       holiday: false,
-      errors: ['tue-2: hint is empty'],
+      errors: ['days[1].quests[1].hint: darf nicht leer sein'],
       quest_count: 0,
       imported_at: '2026-11-07T09:00:00Z',
     },
@@ -82,7 +82,7 @@ const STATUS = {
 
 const PREVIEW = [
   {
-    key: '2026-11-09:mon-1',
+    key: '2026-11-09-mon-1',
     day: '2026-11-09',
     slot: 1,
     type: 'choice',
@@ -93,7 +93,7 @@ const PREVIEW = [
     solution: 'ticket',
   },
   {
-    key: '2026-11-09:mon-2',
+    key: '2026-11-09-mon-2',
     day: '2026-11-09',
     slot: 2,
     type: 'listening',
@@ -104,7 +104,7 @@ const PREVIEW = [
     solution: 'Empire State Building',
   },
   {
-    key: '2026-11-10:tue-1',
+    key: '2026-11-10-tue-1',
     day: '2026-11-10',
     slot: 1,
     type: 'match',
@@ -118,7 +118,7 @@ const PREVIEW = [
     ],
   },
   {
-    key: '2026-11-10:tue-2',
+    key: '2026-11-10-tue-2',
     day: '2026-11-10',
     slot: 2,
     type: 'gap',
