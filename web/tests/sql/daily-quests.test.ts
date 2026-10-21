@@ -21,6 +21,7 @@ const MIGRATIONS = [
   '0014_cat_sign_shop_asset.sql',
   '0015_daily_quests.sql',
   '0016_daily_quests_rpc.sql',
+  '0017_daily_quests_teacher.sql',
 ];
 const migrationDir = new URL('../../../supabase/migrations/', import.meta.url);
 const fixtureDir = new URL('../fixtures/quests/', import.meta.url);
@@ -553,5 +554,105 @@ describe('pupil quests', () => {
     await expectError(db.query(`select public.submit_quest_answer('${T1}', '"x"')`), /not logged in/);
     await asSuperuser('set role anon;');
     await expectError(db.query(`select public.my_daily_quests()`), /permission denied/);
+  });
+});
+
+describe('teacher quest RPCs', () => {
+  type Status = {
+    today: string;
+    covered_until: string | null;
+    today_missing: boolean;
+    tomorrow_missing: boolean;
+    imports: { week: string; ok: boolean; holiday: boolean; errors: string[]; quest_count: number }[];
+  };
+  const status = async (uid = TEACHER): Promise<Status> => {
+    await asUser(uid);
+    return (await db.query<{ s: Status }>('select public.quest_status() as s')).rows[0].s;
+  };
+
+  beforeEach(async () => {
+    const { quests, solutions } = rowsOf('2026-11-09.json');
+    await asService();
+    await importWeek(WEEK, false, quests, solutions);
+  });
+
+  it('refuses pupils', async () => {
+    await expectError(status(ANNA), /42501|only the teacher|not allowed/i);
+    await asUser(ANNA);
+    await expectError(
+      db.query(`select public.teacher_quest_preview('${WEEK}'::date, 1)`),
+      /42501|only the teacher|not allowed/i,
+    );
+  });
+
+  it('mid-week: covered until Sunday, nothing missing', async () => {
+    await setToday('2026-11-10');
+    expect(await status()).toMatchObject({
+      today: '2026-11-10',
+      covered_until: '2026-11-15',
+      today_missing: false,
+      tomorrow_missing: false,
+    });
+  });
+
+  it('on the last day tomorrow is missing', async () => {
+    await setToday('2026-11-15');
+    expect(await status()).toMatchObject({
+      covered_until: '2026-11-15',
+      today_missing: false,
+      tomorrow_missing: true,
+    });
+  });
+
+  it('no package for today: today missing, not covered', async () => {
+    await setToday('2026-11-16');
+    expect(await status()).toMatchObject({
+      covered_until: null,
+      today_missing: true,
+      tomorrow_missing: true,
+    });
+  });
+
+  it('a holiday week counts as covered', async () => {
+    await asService();
+    await importWeek('2026-11-16', true, [], []);
+    await setToday('2026-11-16');
+    expect(await status()).toMatchObject({
+      covered_until: '2026-11-22',
+      today_missing: false,
+      tomorrow_missing: false,
+    });
+  });
+
+  it('lists imports from last week on, with failed ones and their errors', async () => {
+    await asService();
+    await db.query(`select public.record_quest_import('2026-11-23'::date, false, '{"days: kaputt"}')`);
+    await setToday('2026-11-10');
+    const s = await status();
+    expect(s.imports.map((i) => i.week)).toEqual([WEEK, '2026-11-23']);
+    expect(s.imports[1]).toMatchObject({ ok: false, errors: ['days: kaputt'] });
+    expect(s.imports[0]).toMatchObject({ ok: true, quest_count: 21 });
+  });
+
+  it('preview returns the quests with solutions, ordered', async () => {
+    await asUser(TEACHER);
+    const r = await db.query<{ p: { key: string; day: string; slot: number; solution: unknown }[] }>(
+      `select public.teacher_quest_preview('${WEEK}'::date, 7) as p`,
+    );
+    const p = r.rows[0].p;
+    expect(p).toHaveLength(21);
+    expect(p.every((q) => 'solution' in q && 'hint' in q)).toBe(true);
+    expect(p[0].day).toBe(WEEK);
+    expect(p[20].day).toBe('2026-11-15');
+    const one = await db.query<{ p: unknown[] }>(
+      `select public.teacher_quest_preview('${WEEK}'::date, 1) as p`,
+    );
+    expect(one.rows[0].p).toHaveLength(3);
+  });
+
+  it('preview rejects p_days outside 1..14', async () => {
+    await asUser(TEACHER);
+    await expectError(db.query(`select public.teacher_quest_preview('${WEEK}'::date, 15)`), /p_days/);
+    await expectError(db.query(`select public.teacher_quest_preview('${WEEK}'::date, 0)`), /p_days/);
   });
 });
