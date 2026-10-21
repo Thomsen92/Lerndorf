@@ -147,7 +147,7 @@ Spec: `docs/superpowers/specs/2026-10-20-daily-quests-design.md`, Plan: `docs/su
 | [x] Q.6 | CC | Client-API, Antworten, Vorlesen (`api/quests.ts`, `quests/speech.ts`) | Tests grün |
 | [x] Q.7 | CC | Bereich „Daily Quests“ ersetzt die Aufgabentafel (`ui/dailyQuestsView.ts`) | Tests grün |
 | [x] Q.8 | CC | Lehrer-Bereich: Status, Warnung, Vorschau (`teacher/questsView.ts`) | Tests grün |
-| [x] Q.9 | CC | Doku (SPEC, SCOPE, PLAN, Anleitung „Daily Quests einspielen“), Screenshots, Reihenfolge fürs Einspielen | 552 Tests grün, Screenshots angesehen |
+| [x] Q.9 | CC | Doku (SPEC, SCOPE, PLAN, Anleitung „Daily Quests einspielen“), Screenshots, Reihenfolge fürs Einspielen | 557 Tests grün, Screenshots angesehen |
 | [ ] Q.10 | LK | **Abnahme durch die Lehrkraft** (Kriterien Spec §8): erst Migrationen 0015–0017 einspielen, dann das erste Paket | – |
 
 ## Stufe 5 – Probebetrieb

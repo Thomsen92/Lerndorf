@@ -10,7 +10,7 @@ Eine Datei pro Woche, benannt nach dem **Montag** der Woche: `2026-11-09.json`. 
 
 - `week`: Montag, Format `JJJJ-MM-TT`.
 - `days`: **genau 7 Tage** (Montag bis Sonntag), jeder mit `date` (Montag + 0 bis 6 Tage) und `quests`.
-- `quests`: **genau 3 Aufgaben** pro Tag.
+- `quests`: **genau 3 Aufgaben** pro Tag. Die Reihenfolge der Aufgaben im Tag ist ihr Platz (Slot 1 bis 3). Eine korrigierte Datei darf die Aufgaben eines Tages umsortieren.
 - Jede `id` kommt in der ganzen Datei nur **einmal** vor. Schema: Tageskürzel plus Nummer, z. B. `tue-2`. Erlaubt sind Kleinbuchstaben, Ziffern und Bindestrich (max. 31 Zeichen).
 
 Gemeinsame Felder jeder Aufgabe:
@@ -92,7 +92,7 @@ Der `prompt` enthält `___` (drei Unterstriche). `solution` ist eine Liste erlau
   "id": "tue-1",
   "type": "order",
   "prompt": "Put the words in order.",
-  "hint": "The sentence starts with the.",
+  "hint": "Who does something? Start with them.",
   "reward": 15,
   "solution": ["the", "dog", "sees", "the", "cat"]
 }

@@ -160,7 +160,7 @@ Seit Oktober 2026 gibt es statt der Wochenaufgaben **Daily Quests**: jeden Tag (
 
 Die Quests einer Woche stehen in **einer Datei**. Sie heißt wie der **Montag** der Woche, zum Beispiel `2026-11-09.json`, und liegt im Ordner `content/daily-quests/`. Die Datei schreiben Sie nicht selbst: Claude im **Wochenplan-Projekt** erstellt sie aus der Jahresplanung und hält sich dabei an die Beschreibung `content/daily-quests/FORMAT.md`. Sie bitten dort zum Beispiel: „Erstelle die Daily Quests für die Woche ab 09.11. nach FORMAT.md.“
 
-Für **Ferienwochen** gibt es eine kurze Ferien-Datei, damit der Lehrer-Bereich keine Warnung zeigt. Sie hat nur eine Zeile:
+Für **Ferienwochen** gibt es eine kurze Ferien-Datei, damit der Lehrer-Bereich keine Warnung zeigt. Sie heißt wie der **Montag der Ferienwoche**, zum Beispiel `2026-12-21.json`, und hat nur eine Zeile:
 
 ```json
 { "week": "2026-12-21", "holiday": true }
@@ -173,7 +173,8 @@ Beim ersten Mal muss die Reihenfolge stimmen. Sonst versucht GitHub, Quests in e
 1. **Datenbank zuerst.** Claude Code lädt die neue Version des Lerndorfs auf GitHub hoch (Zweig `main`). Darin sind die Datenbank-Änderungen (Migrationen `0015` bis `0017`), aber noch **keine** Quest-Datei.
 2. Auf GitHub im Repository **Lerndorf** oben auf **Actions** klicken.
 3. In der Liste den neuesten Lauf **migrate** suchen. Warten, bis er einen **grünen Haken** hat (meist 1–2 Minuten). Ist er rot: den Namen des Ablaufs und die Fehlermeldung an Claude Code schicken und **nicht** weitermachen.
-   - Gleichzeitig läuft vielleicht auch **import-content**. Er ist grün, weil noch keine Quest-Datei da ist. Das ist in Ordnung.
+   - Es läuft auch **import-content**, weil die Beschreibung `FORMAT.md` im Ordner `content/` neu ist. Er ist grün, weil noch keine Quest-Datei da ist.
+   - Bis **migrate** grün ist, kann bei Schülern „Die Quests konnten nicht geladen werden.“ stehen. Laden Sie deshalb außerhalb der Unterrichtszeit hoch.
    - Bis die erste Quest-Datei eingespielt ist, sehen die Schüler „Heute gibt es keine neuen Quests.“ Das ist normal.
 4. **Erst jetzt die Quests.** Die erste Wochendatei (zum Beispiel `2026-11-09.json`) und, falls nötig, Ferien-Dateien in den Ordner `content/daily-quests/` legen und auf GitHub hochladen (Commit auf `main`). Das kann auch Claude Code für Sie tun.
 5. Wieder auf **Actions** gehen und warten, bis der neue Lauf **import-content** grün ist.
