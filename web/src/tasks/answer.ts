@@ -1,5 +1,5 @@
 /**
- * Answer building for the task board (SPEC §8, §9). The browser only collects the pupil's answer
+ * Answer building for the quest forms (SPEC §8, §9). The browser only collects the pupil's answer
  * in the shape the server expects; the server checks it. Pure functions, tested in Node.
  */
 
@@ -12,16 +12,6 @@ export function answerMode(type: QuestType, data: Record<string, unknown>): Task
   if (type !== 'listening') return type;
   const mode = data.mode;
   return mode === 'gap' || mode === 'match' || mode === 'order' ? mode : 'choice';
-}
-
-export interface TaskView {
-  id: string;
-  week: string;
-  type: TaskType;
-  prompt: string;
-  reward: number;
-  /** Public task data (never the solution). */
-  data: Record<string, unknown>;
 }
 
 export type AnswerState =
@@ -54,24 +44,4 @@ export function buildAnswer(state: AnswerState): unknown | null {
     case 'order':
       return state.sequence.length > 0 ? state.sequence : null;
   }
-}
-
-/** Date of today in Europe/Berlin as YYYY-MM-DD (for the daily limits, SPEC §4). */
-export function berlinToday(now: Date = new Date()): string {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Europe/Berlin',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(now);
-  const get = (t: string): string => parts.find((p) => p.type === t)?.value ?? '';
-  return `${get('year')}-${get('month')}-${get('day')}`;
-}
-
-/** Message for the pupil after a wrong answer (plain German). */
-export function wrongMessage(attemptsLeft: number): string {
-  if (attemptsLeft <= 0) return 'Leider falsch. Die Versuche für heute sind aufgebraucht.';
-  return attemptsLeft === 1
-    ? 'Leider falsch. Noch 1 Versuch.'
-    : `Leider falsch. Noch ${attemptsLeft} Versuche.`;
 }

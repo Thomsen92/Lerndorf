@@ -1,7 +1,7 @@
 /**
  * The village screen for a logged-in pupil: 3D village, villagers, own house marked,
  * main navigation (Dorf / Aufgaben / Mein Haus), the areas behind it (house menu, shop, inventory,
- * build mode, task board), settings menu, and automatic logout after 15 minutes.
+ * build mode, daily quests), settings menu, and automatic logout after 15 minutes.
  * Glue only: the area logic lives in ui/areas.ts.
  */
 import * as THREE from 'three';
@@ -35,7 +35,7 @@ import { createGameNav, type GameNav, type NavArea } from './gameNav';
 import { openHouseMenu } from './houseMenu';
 import { openShop } from './shopView';
 import { openInventory } from './inventoryView';
-import { openTaskBoard } from './taskBoardView';
+import { openDailyQuests } from './dailyQuestsView';
 import { openLedger } from './ledgerView';
 import { openAccountMenu } from './accountMenu';
 import { BuildMode, type EnterOptions } from '../render/buildMode';
@@ -441,7 +441,7 @@ export async function mountVillage(
   const ctl = createAreaController({
     openers: {
       aufgaben: async () =>
-        openTaskBoard({ supabase, coins: coinsNow, onCoins, onClose: () => void areas?.select('dorf') }),
+        openDailyQuests({ supabase, coins: coinsNow, onCoins, onClose: () => void areas?.select('dorf') }),
       haus: async () => {
         if (!home) {
           showNotice('Du hast noch kein Grundstück.');

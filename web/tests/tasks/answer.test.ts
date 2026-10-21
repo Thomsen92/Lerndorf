@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { berlinToday, buildAnswer, stringList, wrongMessage } from '../../src/tasks/answer';
+import { buildAnswer, stringList } from '../../src/tasks/answer';
 
 describe('buildAnswer', () => {
   it('choice needs a picked option', () => {
@@ -30,18 +30,6 @@ describe('helpers', () => {
   it('reads word lists from the task data and ignores other values', () => {
     expect(stringList({ options: ['a', 'b', 3] }, 'options')).toEqual(['a', 'b']);
     expect(stringList({}, 'options')).toEqual([]);
-  });
-
-  it('gives today in Berlin time, also around midnight', () => {
-    // 2026-10-17 23:30 UTC is already 2026-10-18 in Berlin
-    expect(berlinToday(new Date('2026-10-17T23:30:00Z'))).toBe('2026-10-18');
-    expect(berlinToday(new Date('2026-10-17T10:00:00Z'))).toBe('2026-10-17');
-  });
-
-  it('tells the pupil how many attempts are left, in plain German', () => {
-    expect(wrongMessage(2)).toBe('Leider falsch. Noch 2 Versuche.');
-    expect(wrongMessage(1)).toBe('Leider falsch. Noch 1 Versuch.');
-    expect(wrongMessage(0)).toMatch(/aufgebraucht/);
   });
 });
 

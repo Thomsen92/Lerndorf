@@ -40,6 +40,11 @@ describe('loadDailyQuests', () => {
     const { client } = fakeClient({ error: { message: 'boom' } });
     expect(await loadDailyQuests(client)).toEqual({ ok: false, message: 'Die Quests konnten nicht geladen werden.' });
   });
+
+  it('tells a teacher account that only pupils can solve quests', async () => {
+    const { client } = fakeClient({ error: { message: 'only pupils can answer' } });
+    expect(await loadDailyQuests(client)).toEqual({ ok: false, message: 'Nur Schülerkonten können Quests lösen.' });
+  });
 });
 
 describe('submitQuestAnswer', () => {

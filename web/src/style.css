@@ -153,7 +153,7 @@ button:disabled {
   z-index: 5;
 }
 
-/* overlays: shop and task board */
+/* overlays: shop and daily quests */
 .overlay {
   position: fixed;
   inset: 0;
@@ -312,6 +312,115 @@ button:disabled {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+/* daily quests: one card per quest, the open one shows its answer form */
+.quest-rule {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 15px;
+}
+.quests h3 {
+  margin: 14px 0 8px;
+  font-size: 16px;
+  color: var(--muted);
+}
+.quest-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.quest-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 236, 200, 0.04);
+  min-width: 0;
+}
+.quest-card.open {
+  border-color: var(--lantern);
+}
+.quest-card .quest-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 12px;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+}
+.quest-card button.quest-head:focus-visible {
+  outline: 3px solid var(--lantern);
+  outline-offset: 2px;
+}
+.quest-prompt {
+  flex: 1 1 200px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 17px;
+}
+.quest-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.quest-card.solved .quest-reward {
+  color: var(--lantern);
+  font-weight: 700;
+}
+.quest-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--lantern);
+  color: var(--lantern);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.quest-body {
+  display: grid;
+  gap: 10px;
+  padding: 0 12px 12px;
+}
+.quest-body button,
+.quest-body .words button {
+  min-height: 44px;
+}
+.quest-body button.quest-listen,
+.quest-body button.primary {
+  justify-self: start;
+  min-width: 120px;
+}
+.quest-body input[type='text'] {
+  width: 100%;
+  box-sizing: border-box;
+}
+.quest-body select {
+  max-width: 100%;
+}
+.quest-feedback,
+.quest-fallback {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.quest-card.solved .quest-feedback {
+  padding: 0 12px 10px;
+}
+.quest-empty,
+.quest-done {
+  color: var(--muted);
 }
 
 .overlay input[type='text'],
