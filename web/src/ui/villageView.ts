@@ -1,7 +1,8 @@
 /**
  * The village screen for a logged-in pupil: 3D village, villagers, own house marked,
- * HUD with nickname and coins, quality choice, camera buttons, logout and automatic
- * logout after 15 minutes.
+ * main navigation (Dorf / Aufgaben / Mein Haus), the areas behind it (house menu, shop, inventory,
+ * build mode, task board), settings menu, and automatic logout after 15 minutes.
+ * Glue only: the area logic lives in ui/areas.ts.
  */
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -21,10 +22,24 @@ import { buildVillage } from '../render/village';
 import { loadClassSlots, type SlotMap } from '../api/build';
 import { Crowd } from '../render/crowd';
 import { setupScene } from '../render/scene';
+import { supabaseItemApi, type ItemKind } from '../api/items';
+import {
+  HOUSE_AREAS,
+  createAreaController,
+  createModalTracker,
+  type AreaController,
+  type AreaHandle,
+} from './areas';
+import { createTapDetector } from './tapDetector';
+import { createGameNav, type GameNav, type NavArea } from './gameNav';
+import { openHouseMenu } from './houseMenu';
 import { openShop } from './shopView';
+import { openInventory } from './inventoryView';
 import { openTaskBoard } from './taskBoardView';
 import { openLedger } from './ledgerView';
-import { BuildMode } from '../render/buildMode';
+import { openAccountMenu } from './accountMenu';
+import { BuildMode, type EnterOptions } from '../render/buildMode';
+import { FLIGHT_SECONDS, houseView, lerpPose, onPlot, type CameraPose } from '../render/houseCamera';
 import {
   AUTO_MEASURE_SECONDS,
   decideAuto,
@@ -70,11 +85,7 @@ async function load(supabase: SupabaseClient): Promise<Loaded> {
 function freePlotAt(plots: Plot[], occupied: Set<number>, p: THREE.Vector3): Plot | undefined {
   return plots.find((q) => {
     if (occupied.has(q.index)) return false;
-    const dx = p.x - q.x;
-    const dz = p.z - q.z;
-    const lx = dx * Math.cos(q.face) - dz * Math.sin(q.face);
-    const lz = dx * Math.sin(q.face) + dz * Math.cos(q.face);
-    return Math.abs(lx) <= q.w / 2 && Math.abs(lz) <= q.d / 2;
+    return onPlot(q, p);
   });
 }
 
@@ -84,36 +95,36 @@ export async function mountVillage(
   onLogout: () => void,
 ): Promise<VillageHandle> {
   root.innerHTML = `
-    <div class="village-hud">
-      <span class="coins" id="coins"></span>
-      <span class="who" id="who"></span>
-      <div class="seg" role="group" aria-label="Grafik-Qualität">
-        <button type="button" data-q="auto" aria-pressed="true">Auto</button>
-        <button type="button" data-q="high" aria-pressed="false">Hoch</button>
-        <button type="button" data-q="low" aria-pressed="false">Niedrig</button>
-      </div>
-      <button type="button" id="taskBoard">Aufgaben</button>
-      <button type="button" id="ledger">Konto</button>
-      <button type="button" id="shop">Shop</button>
-      <button type="button" id="build">Bauen</button>
-      <button type="button" id="toMarket">Marktplatz</button>
-      <button type="button" id="toHouse">Mein Haus</button>
-      <button type="button" id="logout" class="primary">Abmelden</button>
-    </div>
+    <div class="dorf-actions"><button type="button" id="toMarket">Marktplatz</button></div>
     <p class="notice" id="notice" hidden></p>
   `;
   const notice = root.querySelector<HTMLParagraphElement>('#notice');
-  const logoutBtn = root.querySelector<HTMLButtonElement>('#logout');
 
   let renderer: THREE.WebGLRenderer | null = null;
   let running = true;
   let frames: number[] = [];
   let autoResult: QualityLevel | null = null;
   let choice: QualityChoice = 'auto';
+  let nav: GameNav | null = null;
+  let areas: AreaController | null = null;
+  const modals = createModalTracker();
+  // Escape leaves the house menu even when focus is not inside it; a modal handles its own Escape first
+  const onEscape = (e: KeyboardEvent): void => {
+    if (e.key !== 'Escape' || e.defaultPrevented || modals.anyOpen) return;
+    if (areas?.current === 'haus') void areas.select('dorf');
+  };
+  document.addEventListener('keydown', onEscape);
 
+  let removeWindowPointer: (() => void) | null = null;
   const stop = (): void => {
+    // close the current area (the build preview reverts via exit) and every open modal, so no `inert` is left behind
+    void areas?.select('dorf');
     buildMode?.dispose();
-    document.querySelectorAll('.overlay').forEach((el) => el.remove());
+    modals.closeAll();
+    document.querySelectorAll('.overlay:not(.modal), .house-menu').forEach((el) => el.remove());
+    nav?.el.remove();
+    document.removeEventListener('keydown', onEscape);
+    removeWindowPointer?.();
     autoLogout.stop();
     running = false;
     renderer?.setAnimationLoop(null);
@@ -136,9 +147,14 @@ export async function mountVillage(
     renderer.setSize(w, h, false);
     cameraRef.aspect = w / h;
     cameraRef.updateProjectionMatrix();
+    renderOnce?.();
   };
+  // while an area covers the canvas, a resize or quality change still repaints one frame
+  let renderOnce: (() => void) | null = null;
 
-  logoutBtn?.addEventListener('click', () => void logout());
+  // auto-logout also runs on the error screen
+  for (const ev of activity) window.addEventListener(ev, onActivity, { passive: true });
+  autoLogout.touch();
 
   let loaded: Loaded;
   try {
@@ -149,49 +165,23 @@ export async function mountVillage(
       notice.hidden = false;
       notice.textContent = 'Das Dorf konnte nicht geladen werden. Bitte die Seite neu laden.';
     }
+    // the session must stay endable on a shared tablet
+    const out = document.createElement('button');
+    out.type = 'button';
+    out.className = 'primary load-logout';
+    out.textContent = 'Abmelden';
+    out.addEventListener('click', () => void logout());
+    root.appendChild(out);
     return { dispose: stop };
   }
 
   const { profile, layoutSeed, mapId, shopOpen, buildOpen, members, slots } = loaded;
-  const who = root.querySelector<HTMLSpanElement>('#who');
-  const coins = root.querySelector<HTMLSpanElement>('#coins');
-  if (who) who.textContent = profile.nickname;
   let coinsNow = profile.coins;
-  const showCoins = (): void => {
-    if (coins) coins.textContent = `${coinsNow} Münzen`;
-  };
-  showCoins();
-
-  // shop and task board open as overlays above the village
+  // single source of truth for the coin value; nav status and item areas read from here
   const onCoins = (c: number): void => {
-    if (c > coinsNow) showGain(c - coinsNow);
     coinsNow = c;
-    showCoins();
+    nav?.setCoins(c);
   };
-  // short '+10' next to the coins, so the pupil sees what the answer or the shop changed
-  const showGain = (amount: number): void => {
-    if (!coins?.parentElement) return;
-    const tag = document.createElement('span');
-    tag.className = 'gain';
-    tag.textContent = `+${amount}`;
-    coins.parentElement.appendChild(tag);
-    window.setTimeout(() => tag.remove(), 1400);
-  };
-  root
-    .querySelector<HTMLButtonElement>('#shop')
-    ?.addEventListener(
-      'click',
-      () => void openShop({ supabase, shopOpen, coins: coinsNow, onCoins, onClose: () => undefined }),
-    );
-  root
-    .querySelector<HTMLButtonElement>('#ledger')
-    ?.addEventListener('click', () => void openLedger(supabase, () => undefined));
-  root
-    .querySelector<HTMLButtonElement>('#taskBoard')
-    ?.addEventListener(
-      'click',
-      () => void openTaskBoard({ supabase, coins: coinsNow, onCoins, onClose: () => undefined }),
-    );
 
   const stage = document.createElement('div');
   stage.className = 'stage';
@@ -259,18 +249,9 @@ export async function mountVillage(
     sun.castShadow = s.shadows;
     gl.setPixelRatio(Math.min(window.devicePixelRatio, s.maxPixelRatio));
     resize();
-    root
-      .querySelectorAll<HTMLButtonElement>('[data-q]')
-      .forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.q === choice)));
   };
-  root.querySelectorAll<HTMLButtonElement>('[data-q]').forEach((b) =>
-    b.addEventListener('click', () => {
-      choice = b.dataset.q as QualityChoice;
-      applyQuality();
-    }),
-  );
 
-  // camera: start on the own house, buttons jump to the market or the house
+  // camera: start on the own house; the market button jumps, house areas fly to the fixed house view
   const home = ownPlot !== null ? layout.plots[ownPlot] : undefined;
   const homeTarget = home ? new THREE.Vector3(home.x, home.h, home.z) : new THREE.Vector3(-2, 0, 2);
   const marketTarget = new THREE.Vector3(layout.plaza.x, layout.plazaHeight, layout.plaza.z);
@@ -288,16 +269,71 @@ export async function mountVillage(
     camera.position.copy(t).add(offset);
   };
   root.querySelector<HTMLButtonElement>('#toMarket')?.addEventListener('click', () => jumpTo(marketTarget));
-  root.querySelector<HTMLButtonElement>('#toHouse')?.addEventListener('click', () => jumpTo(homeTarget));
   controls.update();
+
+  // camera flight into the house view (animation loop advances it)
+  let flight: { from: CameraPose; to: CameraPose; t: number } | null = null;
+  let paused = false;
+  const reducedMotion = (): boolean => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  const applyControls = (area: NavArea): void => {
+    if (!HOUSE_AREAS.has(area)) {
+      flight = null; // leaving the house cancels a running flight
+      controls.enabled = true;
+      controls.enablePan = true;
+    } else if (area === 'bauen') {
+      controls.enabled = flight === null;
+      controls.enablePan = false;
+    } else {
+      controls.enabled = false;
+    }
+  };
+  const setPose = (pose: CameraPose): void => {
+    camera.position.copy(pose.position);
+    controls.target.copy(pose.target);
+    controls.update();
+  };
+  renderOnce = () => {
+    if (paused && running) gl.render(scene, camera);
+  };
+  const finishFlight = (): void => {
+    if (!flight) return;
+    setPose(lerpPose(flight.from, flight.to, 1));
+    flight = null;
+  };
+  const onAreaChange = (area: NavArea, previous: NavArea): void => {
+    if (!running) return;
+    nav?.setActive(area);
+    const dorfActions = root.querySelector<HTMLElement>('.dorf-actions');
+    if (dorfActions) dorfActions.hidden = area !== 'dorf';
+    if (home && HOUSE_AREAS.has(area) && !HOUSE_AREAS.has(previous)) {
+      const from: CameraPose = { position: camera.position.clone(), target: controls.target.clone() };
+      flight = { from, to: houseView(home), t: 0 };
+      if (reducedMotion()) finishFlight();
+    }
+    paused = area === 'shop' || area === 'inventar' || area === 'aufgaben';
+    if (paused) finishFlight(); // the camera is in place before rendering stops
+    applyControls(area);
+  };
 
   // tap a villager: it waves. A drag (camera move) is not a tap.
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-  let down: { x: number; y: number } | null = null;
-  gl.domElement.addEventListener('pointerdown', (ev) => (down = { x: ev.clientX, y: ev.clientY }));
+  const taps = createTapDetector(8);
+  gl.domElement.addEventListener('pointerdown', (ev) =>
+    taps.down(ev.pointerId, ev.clientX, ev.clientY, ev.isPrimary),
+  );
+  // up/cancel may end outside the canvas (nav, menu): window listeners keep the detector from getting stuck
+  const onWindowPointerEnd = (ev: PointerEvent): void => taps.release(ev.pointerId);
+  const onWindowPointerCancel = (ev: PointerEvent): void => taps.cancel(ev.pointerId);
+  window.addEventListener('pointerup', onWindowPointerEnd);
+  window.addEventListener('pointercancel', onWindowPointerCancel);
+  removeWindowPointer = () => {
+    window.removeEventListener('pointerup', onWindowPointerEnd);
+    window.removeEventListener('pointercancel', onWindowPointerCancel);
+  };
   gl.domElement.addEventListener('pointerup', (ev) => {
-    if (!down || Math.hypot(ev.clientX - down.x, ev.clientY - down.y) > 8) return;
+    // a drag, a pinch or a cancelled gesture is not a tap
+    if (!taps.up(ev.pointerId, ev.clientX, ev.clientY)) return;
     const rect = gl.domElement.getBoundingClientRect();
     pointer.set(
       ((ev.clientX - rect.left) / rect.width) * 2 - 1,
@@ -324,17 +360,16 @@ export async function mountVillage(
       }
     }
     // the task board: tap the board in the market
-    if (hit && hit.object.userData.kind === 'board' && !buildMode?.isActive) {
-      void openTaskBoard({ supabase, coins: coinsNow, onCoins, onClose: () => undefined });
+    if (hit && hit.object.userData.kind === 'board') {
+      void areas?.select('aufgaben');
+      return;
     }
+    // the own house: tap opens the house menu
+    if (hit && home && onPlot(home, hit.point)) void areas?.select('haus');
   });
 
-  // build mode: only on the own plot; the camera comes back when the pupil is done
+  // build mode: only on the own plot
   let buildMode: BuildMode | null = null;
-  const exitBuild = (): void => {
-    buildMode?.exit();
-    jumpTo(homeTarget);
-  };
   if (home) {
     buildMode = new BuildMode({
       scene,
@@ -342,22 +377,101 @@ export async function mountVillage(
       supabase,
       uid: profile.id,
       onSlots: (s) => (village.userData.updateOwnPlot as ((s: SlotMap) => void) | undefined)?.(s),
-      onDone: () => exitBuild(),
+      onDone: () => void areas?.select('haus'),
     });
   }
-  root.querySelector<HTMLButtonElement>('#build')?.addEventListener('click', async () => {
-    if (!buildMode) return showNotice('Du hast noch kein Grundstück.');
-    if (!buildOpen) return showNotice('Das Bauen ist gerade geschlossen.');
-    const err = await buildMode.enter();
-    if (err) return showNotice(err);
-    jumpTo(homeTarget);
-  });
+  const enterBuild = async (opts?: EnterOptions): Promise<AreaHandle | null> => {
+    if (!buildMode) {
+      showNotice('Du hast noch kein Grundstück.');
+      return null;
+    }
+    if (!buildOpen) {
+      showNotice('Das Bauen ist gerade geschlossen.');
+      return null;
+    }
+    const err = await buildMode.enter(opts);
+    if (err) {
+      showNotice(err);
+      return null;
+    }
+    const mode = buildMode;
+    return { close: () => mode.exit() };
+  };
   const showNotice = (text: string): void => {
     if (!notice) return;
     notice.hidden = false;
     notice.textContent = text;
     window.setTimeout(() => (notice.hidden = true), 3000);
   };
+
+  // settings menu and ledger are modals; tracked so logout can close them properly
+  const openSettings = (opener: HTMLElement): void => {
+    modals.track(
+      openAccountMenu({
+        opener,
+        nickname: profile.nickname,
+        coins: coinsNow,
+        quality: choice,
+        onQuality: (q) => {
+          choice = q;
+          applyQuality();
+        },
+        onLedger: () => modals.track(openLedger(supabase, opener)),
+        onLogout: () => void logout(),
+      }),
+    );
+  };
+
+  const categories: Partial<Record<'shop' | 'inventar', ItemKind | null>> = {};
+  const itemOptions = (area: 'shop' | 'inventar') => ({
+    api: supabaseItemApi(supabase, profile.id),
+    getCoins: () => coinsNow,
+    onCoins,
+    shopOpen,
+    buildOpen,
+    category: categories[area] ?? null,
+    onCategory: (k: ItemKind) => {
+      categories[area] = k;
+    },
+    onBuild: (itemId: string) => void areas?.open('bauen', () => enterBuild({ itemId })),
+    onShowSlot: (slotId: EnterOptions['slotId']) => void areas?.open('bauen', () => enterBuild({ slotId })),
+    onClose: () => void areas?.select('haus'),
+  });
+
+  const ctl = createAreaController({
+    openers: {
+      aufgaben: async () =>
+        openTaskBoard({ supabase, coins: coinsNow, onCoins, onClose: () => void areas?.select('dorf') }),
+      haus: async () => {
+        if (!home) {
+          showNotice('Du hast noch kein Grundstück.');
+          return null;
+        }
+        return openHouseMenu({
+          onBuild: () => void areas?.select('bauen'),
+          onShop: () => void areas?.select('shop'),
+          onInventory: () => void areas?.select('inventar'),
+          onSettings: openSettings,
+          onBack: () => void areas?.select('dorf'),
+        });
+      },
+      shop: async () =>
+        openShop({ ...itemOptions('shop'), onOpenInventory: () => void areas?.select('inventar') }),
+      inventar: async () => openInventory(itemOptions('inventar')),
+      bauen: () => enterBuild(),
+    },
+    onChange: onAreaChange,
+  });
+  areas = ctl;
+
+  nav = createGameNav({
+    nickname: profile.nickname,
+    coins: coinsNow,
+    onSelect: (area) => void ctl.select(area),
+    onAccount: openSettings,
+  });
+  root.appendChild(nav.el);
+  nav.setActive('dorf');
 
   window.addEventListener('resize', resize);
   applyQuality();
@@ -371,6 +485,14 @@ export async function mountVillage(
     const dt = Math.min(0.1, (now - last) / 1000);
     const frameMs = now - last;
     last = now;
+    if (flight) {
+      flight.t += dt;
+      if (flight.t >= FLIGHT_SECONDS) finishFlight();
+      else setPose(lerpPose(flight.from, flight.to, flight.t / FLIGHT_SECONDS));
+      if (!flight) applyControls(areas?.current ?? 'dorf');
+    }
+    // covered by an area: no rendering and no Auto measurement
+    if (paused) return;
     if (autoResult === null) {
       elapsed += dt;
       frames.push(frameMs);
@@ -388,9 +510,6 @@ export async function mountVillage(
     rig.follow(controls.target);
     gl.render(scene, camera);
   });
-
-  for (const ev of activity) window.addEventListener(ev, onActivity, { passive: true });
-  autoLogout.touch();
 
   return { dispose: stop };
 }

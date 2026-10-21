@@ -42,15 +42,15 @@ function explain(message: string): string {
 
 /** Loads the items of the plot kinds the pupil may use and the own slots. */
 export async function loadBuildState(supabase: SupabaseClient, uid: string): Promise<Result<BuildState>> {
-  const [items, inv, placements] = await Promise.all([
+  const [items, inv, own] = await Promise.all([
     supabase
       .from('items')
       .select('id, kind, name_de, starter')
       .in('kind', ['house', 'garage', 'car', 'deco']),
     supabase.from('inventory').select('item_id, qty').gt('qty', 0),
-    supabase.from('placements').select('item_id, slot, rot').eq('player_id', uid),
+    loadOwnSlots(supabase, uid),
   ]);
-  if (items.error || inv.error || placements.error) {
+  if (items.error || inv.error || !own.ok) {
     return { ok: false, message: 'Die Sachen konnten nicht geladen werden.' };
   }
   const owned: Record<string, number> = {};
@@ -64,7 +64,14 @@ export async function loadBuildState(supabase: SupabaseClient, uid: string): Pro
       owned: r.starter ? 1 : (owned[r.id as string] ?? 0),
     }))
     .filter((i) => i.owned > 0);
-  return { ok: true, value: { items: list, slots: slotMap(placements.data ?? []) } };
+  return { ok: true, value: { items: list, slots: own.value } };
+}
+
+/** The own slots (placements of the signed-in pupil). */
+export async function loadOwnSlots(supabase: SupabaseClient, uid: string): Promise<Result<SlotMap>> {
+  const { data, error } = await supabase.from('placements').select('item_id, slot, rot').eq('player_id', uid);
+  if (error) return { ok: false, message: 'Die Sachen konnten nicht geladen werden.' };
+  return { ok: true, value: slotMap(data ?? []) };
 }
 
 function slotMap(rows: Array<{ item_id: string; slot: string; rot: number }>): SlotMap {

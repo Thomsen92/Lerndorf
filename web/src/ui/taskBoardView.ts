@@ -13,12 +13,8 @@ import {
   type TaskView,
 } from '../tasks/answer';
 import { weekLabel } from '../teacher/week';
-
-const esc = (s: string): string =>
-  s.replace(
-    /[&<>"']/g,
-    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string,
-  );
+import type { AreaHandle } from './areas';
+import { esc } from './esc';
 
 export interface TaskBoardOptions {
   supabase: SupabaseClient;
@@ -27,30 +23,40 @@ export interface TaskBoardOptions {
   onClose: () => void;
 }
 
-export async function openTaskBoard(opts: TaskBoardOptions): Promise<void> {
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-label', 'Aufgabentafel');
+let boardCounter = 0;
+
+/** Non-modal area. Its own „Schließen“ button calls opts.onClose; the returned close() only removes it. */
+export function openTaskBoard(opts: TaskBoardOptions): AreaHandle {
+  const titleId = `taskboard-title-${++boardCounter}`;
+  const overlay = document.createElement('section');
+  overlay.className = 'overlay area';
+  overlay.setAttribute('role', 'region');
+  overlay.setAttribute('aria-labelledby', titleId);
   document.body.appendChild(overlay);
 
-  const close = (): void => {
-    overlay.remove();
-    opts.onClose();
-  };
+  let closed = false;
+  const close = (): void => opts.onClose();
   let coins = opts.coins;
   let openTask: string | null = null;
   let state: AnswerState | null = null;
 
   const draw = async (): Promise<void> => {
-    overlay.innerHTML = '<section class="panel"><p>Lädt …</p></section>';
+    overlay.innerHTML = `<section class="panel"><h2 id="${titleId}">Aufgabentafel</h2><p>Lädt …</p></section>`;
     const day = berlinToday();
-    const [tasks, status] = await Promise.all([
-      loadTasks(opts.supabase),
-      loadTodayStatus(opts.supabase, day),
-    ]);
-    if (!tasks.ok || !status.ok) {
-      overlay.innerHTML = `<section class="panel"><p class="error">${esc(
+    let tasks: Awaited<ReturnType<typeof loadTasks>>;
+    let status: Awaited<ReturnType<typeof loadTodayStatus>>;
+    let thrown = false;
+    try {
+      [tasks, status] = await Promise.all([loadTasks(opts.supabase), loadTodayStatus(opts.supabase, day)]);
+    } catch (err) {
+      console.error('task board load failed', err);
+      thrown = true;
+      tasks = { ok: false, message: 'Das hat nicht geklappt. Versuch es nochmal.' };
+      status = tasks;
+    }
+    if (closed) return;
+    if (thrown || !tasks.ok || !status.ok) {
+      overlay.innerHTML = `<section class="panel"><h2 id="${titleId}">Aufgabentafel</h2><p class="error">${esc(
         !tasks.ok ? tasks.message : status.ok ? '' : status.message,
       )}</p><button type="button" id="close">Schließen</button></section>`;
       overlay.querySelector('#close')?.addEventListener('click', close);
@@ -63,7 +69,7 @@ export async function openTaskBoard(opts: TaskBoardOptions): Promise<void> {
     overlay.innerHTML = `
       <section class="panel">
         <header class="panel-head">
-          <h2>Aufgabentafel</h2>
+          <h2 id="${titleId}">Aufgabentafel</h2>
           <span class="coins">${coins} Münzen</span>
           <button type="button" id="close">Schließen</button>
         </header>
@@ -149,6 +155,11 @@ export async function openTaskBoard(opts: TaskBoardOptions): Promise<void> {
           return;
         }
         const res = await submitAnswer(opts.supabase, task.id, answer);
+        if (closed) {
+          // coins were awarded on the server; keep the display in sync
+          opts.onCoins(res.ok ? res.value.coins : coins);
+          return;
+        }
         if (!res.ok) {
           if (msg) msg.textContent = res.message;
           return;
@@ -167,7 +178,13 @@ export async function openTaskBoard(opts: TaskBoardOptions): Promise<void> {
   };
 
   let tasksRef: TaskView[] = [];
-  await draw();
+  void draw();
+  return {
+    close() {
+      closed = true;
+      overlay.remove();
+    },
+  };
 }
 
 /** Tasks grouped by week, newest first (the caller sorts). */

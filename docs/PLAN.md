@@ -111,6 +111,28 @@ Ziel: Schüler kaufen Deko und gestalten ihr Grundstück; Mitschüler sehen es.
 | [ ] 4.5 | CC | Platzierungen aller Klassenmitglieder im Dorf rendern (Instancing je Item-Typ) | `render/placements.ts` | 32 Grundstücke à 10 Teile < Leistungsbudget |
 | [ ] 4.6 | LK | **Abnahme Stufe 4** | Notiz hier | Kriterien SPEC §18 |
 
+## Zwischenpaket T – Tablet-UI und Navigation
+
+Spec: `docs/superpowers/specs/2026-10-21-tablet-ui-navigation-design.md`, Plan: `docs/superpowers/plans/2026-10-21-tablet-ui-navigation.md`.
+
+| AP | Wer | Inhalt | Ergebnis |
+|---|---|---|---|
+| [x] T.1 | CC | Gegenstands-Modell (`api/items.ts`) | Tests grün |
+| [x] T.2 | CC | Barrierearme Dialoge (`ui/dialog.ts`), happy-dom | Tests grün |
+| [x] T.3 | CC | Navigation Dorf / Aufgaben / Mein Haus | Tests grün |
+| [x] T.4 | CC | Einstellungen (Kontoauszug, Grafik, Abmelden) | Tests grün |
+| [x] T.5 | CC | 3D-Vorschau im Detailfenster | Tests grün |
+| [x] T.6 | CC | Gegenstandskarten + Detailansicht mit Kauf | Tests grün |
+| [x] T.7 | CC | Shop- und Inventar-Bereiche mit Kategorien | Tests grün |
+| [x] T.8 | CC | Baumodus: Vorschau vor Speichern, Platzliste, Übergabe aus Shop | Tests grün |
+| [x] T.8b | CC | Vorschaubilder auf allen Karten | Tests grün, im Browser geprüft |
+| [x] T.9 | CC | Haus-Menü und feste Hauskamera | Tests grün |
+| [x] T.10 | CC | Einbau ins Dorf, Abmelden bei Ladefehler, Pinch ≠ Tipp | 449 Tests grün |
+| [–] T.11 | – | Screenshot-Testseite | gestrichen (LK, 21.10.2026) |
+| [x] T.12 | LK | **Abnahme Tablet-UI** | abgenommen 21.10.2026 |
+
+Nächstes: Zwischenpaket B – Bau-Feedback (`docs/superpowers/specs/2026-10-21-build-feedback-design.md`).
+
 ## Stufe 5 – Probebetrieb
 
 | AP | Wer | Aufgabe | Fertig, wenn |

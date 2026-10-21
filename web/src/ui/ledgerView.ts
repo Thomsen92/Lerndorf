@@ -3,6 +3,7 @@
  * Read through RLS: a pupil sees only the own rows.
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { openModal, type ModalHandle } from './dialog';
 
 const esc = (s: string): string =>
   s.replace(
@@ -82,25 +83,14 @@ export function renderLedger(target: HTMLElement, rows: LedgerRow[] | null): voi
     </table>`;
 }
 
-/** Opens the statement as a panel above the village. */
-export async function openLedger(supabase: SupabaseClient, onClose: () => void): Promise<void> {
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-label', 'Kontoauszug');
-  overlay.innerHTML = `
-    <section class="panel wide">
-      <header class="panel-head">
-        <h2>Kontoauszug</h2>
-        <button type="button" id="close">Schließen</button>
-      </header>
-      <div id="ledger"><p>Lädt …</p></div>
-    </section>`;
-  document.body.appendChild(overlay);
-  overlay.querySelector('#close')?.addEventListener('click', () => {
-    overlay.remove();
-    onClose();
+/** Opens the statement as a modal; the rows load in the background. */
+export function openLedger(supabase: SupabaseClient, opener?: HTMLElement | null): ModalHandle {
+  const modal = openModal({ title: 'Kontoauszug', opener, wide: true });
+  const target = document.createElement('div');
+  target.innerHTML = '<p>Lädt …</p>';
+  modal.body.appendChild(target);
+  void loadLedger(supabase).then((rows) => {
+    if (modal.isOpen) renderLedger(target, rows);
   });
-  const target = overlay.querySelector<HTMLElement>('#ledger');
-  if (target) renderLedger(target, await loadLedger(supabase));
+  return modal;
 }

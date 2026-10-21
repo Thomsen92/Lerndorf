@@ -1,130 +1,250 @@
 /**
- * Shop overlay (SPEC §12). Items grouped by kind: houses, garages, cars, decorations, avatar parts. A purchase needs its own confirmation
- * in the page (no confirm()). Greyed out when the coins are not enough or the shop is closed.
+ * Shop and inventory areas (non-modal, SPEC §12): a category bar and a grid of item cards.
+ * A card opens the shared detail dialog (purchase flow or inventory actions). After a change the list is
+ * reloaded, so the affordability of every card follows the new coin value.
+ * The inventory view reuses openItemArea with origin 'inventar'.
  */
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { buyItem, loadCatalog, loadInventory, type CatalogItem } from '../api/economy';
+import { KIND_LABEL, KIND_ORDER, type ItemApi, type ItemEntry, type ItemKind } from '../api/items';
+import type { PreviewFactory } from '../render/itemPreview';
+import { acquireSessionThumbs, type ThumbSource } from '../render/itemThumbs';
+import type { SlotId } from '../world/plotPlan';
+import type { AreaHandle } from './areas';
+import type { ModalHandle } from './dialog';
+import { itemCard, openItemDetail, setCardThumb, type ItemOrigin } from './itemDetail';
 
-const esc = (s: string): string =>
-  s.replace(
-    /[&<>"']/g,
-    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string,
-  );
-
-export interface ShopOptions {
-  supabase: SupabaseClient;
+export interface ItemAreaOptions {
+  api: ItemApi;
+  getCoins: () => number;
+  onCoins: (c: number) => void;
   shopOpen: boolean;
-  coins: number;
-  onCoins: (coins: number) => void;
+  buildOpen: boolean;
+  category: ItemKind | null;
+  onCategory: (k: ItemKind) => void;
+  onBuild: (itemId: string) => void;
+  onShowSlot: (slot: SlotId) => void;
+  onOpenInventory: () => void;
+  /** Called by the area's own „Schließen“ button; close() from outside does not call it. */
   onClose: () => void;
+  createPreview?: PreviewFactory;
+  /** Thumbnail source; default: the session WebGL source (renderer released when the area closes). */
+  thumbs?: ThumbSource;
 }
 
-export async function openShop(opts: ShopOptions): Promise<void> {
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  overlay.setAttribute('role', 'dialog');
-  overlay.setAttribute('aria-label', 'Shop');
-  document.body.appendChild(overlay);
+let counter = 0;
 
-  let coins = opts.coins;
-  // survives a redraw, so the result of a purchase stays visible
-  let statusText = '';
-  let statusError = false;
-  const close = (): void => {
-    overlay.remove();
-    opts.onClose();
-  };
+export function openShop(opts: ItemAreaOptions): AreaHandle {
+  return openItemArea('shop', opts);
+}
 
-  const draw = async (): Promise<void> => {
-    overlay.innerHTML = `<section class="panel"><p>Lädt …</p></section>`;
-    const [catalog, inv] = await Promise.all([loadCatalog(opts.supabase), loadInventory(opts.supabase)]);
-    if (!catalog.ok || !inv.ok) {
-      overlay.innerHTML = `<section class="panel"><p class="error">${esc(
-        !catalog.ok ? catalog.message : inv.ok ? '' : inv.message,
-      )}</p><button type="button" id="close">Schließen</button></section>`;
-      overlay.querySelector('#close')?.addEventListener('click', close);
+export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHandle {
+  const title = origin === 'shop' ? 'Shop' : 'Inventar';
+  const titleId = `area-title-${++counter}`;
+
+  const area = document.createElement('section');
+  area.className = 'overlay area';
+  area.setAttribute('role', 'region');
+  area.setAttribute('aria-labelledby', titleId);
+
+  const head = document.createElement('header');
+  head.className = 'panel-head';
+  const h2 = document.createElement('h2');
+  h2.id = titleId;
+  h2.textContent = title;
+  const coinsEl = document.createElement('span');
+  coinsEl.className = 'coins';
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.textContent = 'Schließen';
+  closeBtn.addEventListener('click', () => opts.onClose());
+  head.append(h2, coinsEl, closeBtn);
+  const content = document.createElement('div');
+  content.className = 'area-content';
+  const panel = document.createElement('div');
+  panel.className = 'panel';
+  panel.append(head, content);
+  area.appendChild(panel);
+  document.body.appendChild(area);
+
+  let closed = false;
+  let book: ItemEntry[] | null = null;
+  let error: string | null = null;
+  let category: ItemKind | null = opts.category;
+  let detail: ModalHandle | null = null;
+  let loadId = 0;
+  // cards are reused across redraws so the dialog's opener stays in the document
+  const cards = new Map<string, HTMLButtonElement>();
+
+  const session = opts.thumbs ? null : acquireSessionThumbs();
+  const thumbs: ThumbSource = opts.thumbs ?? (session as NonNullable<typeof session>).source;
+  // resolved pictures survive redraws (null = no picture); pending ids are requested only once
+  const urls = new Map<string, string | null>();
+  const pending = new Set<string>();
+
+  function attachThumb(entry: ItemEntry, card: HTMLButtonElement): void {
+    const known = urls.get(entry.id);
+    if (known) setCardThumb(card, known);
+    if (urls.has(entry.id) || pending.has(entry.id)) return;
+    pending.add(entry.id);
+    void thumbs(entry)
+      .catch(() => null)
+      .then((url) => {
+        pending.delete(entry.id);
+        if (closed) return;
+        urls.set(entry.id, url);
+        const c = cards.get(entry.id);
+        if (url && c) setCardThumb(c, url);
+      });
+  }
+
+  const visible = (): ItemEntry[] =>
+    (book ?? []).filter((e) => (origin === 'shop' ? !e.starter : e.owned > 0));
+  const kinds = (): ItemKind[] =>
+    origin === 'shop' ? [...KIND_ORDER] : KIND_ORDER.filter((k) => visible().some((e) => e.kind === k));
+
+  function draw(focusKind?: ItemKind): void {
+    coinsEl.textContent = `${opts.getCoins()} Münzen`;
+    content.replaceChildren();
+    if (error !== null) {
+      const p = document.createElement('p');
+      p.className = 'error';
+      p.textContent = error;
+      const retry = document.createElement('button');
+      retry.type = 'button';
+      retry.textContent = 'Nochmal versuchen';
+      retry.addEventListener('click', () => void load(false));
+      content.append(p, retry);
       return;
     }
-    const buyable = catalog.value.filter((i) => !i.starter);
-    overlay.innerHTML = `
-      <section class="panel">
-        <header class="panel-head">
-          <h2>Shop</h2>
-          <span class="coins">${coins} Münzen</span>
-          <button type="button" id="close">Schließen</button>
-        </header>
-        ${opts.shopOpen ? '' : '<p class="notice-in">Der Shop ist gerade geschlossen.</p>'}
-        <p class="status${statusError ? ' error' : ''}" id="status" role="status">${esc(statusText)}</p>
-        ${GROUPS.map(([kind, title]) => {
-          const list = buyable.filter((i) => i.kind === kind);
-          if (list.length === 0) return '';
-          return `<h3 class="shop-group">${title}</h3><div class="items">${list
-            .map((i) => itemRow(i, coins, inv.value[i.id] ?? 0, opts.shopOpen))
-            .join('')}</div>`;
-        }).join('')}
-      </section>`;
-    overlay.querySelector('#close')?.addEventListener('click', close);
-    overlay
-      .querySelectorAll<HTMLButtonElement>('[data-buy]')
-      .forEach((btn) => btn.addEventListener('click', () => askConfirm(btn.dataset.buy as string, buyable)));
-  };
+    if (book === null) {
+      const p = document.createElement('p');
+      p.textContent = 'Lädt …';
+      content.appendChild(p);
+      return;
+    }
+    if (origin === 'shop' && !opts.shopOpen) {
+      const p = document.createElement('p');
+      p.className = 'notice-in';
+      p.textContent = 'Der Shop ist gerade geschlossen.';
+      content.appendChild(p);
+    }
+    const available = kinds();
+    if (available.length === 0) {
+      const p = document.createElement('p');
+      p.textContent =
+        origin === 'shop'
+          ? 'In dieser Kategorie gibt es gerade nichts.'
+          : 'Du hast noch keine eigenen Sachen. Im Shop kannst du welche kaufen.';
+      content.appendChild(p);
+      return;
+    }
+    if (category === null || !available.includes(category)) category = available[0] ?? 'house';
+    const current = category;
 
-  const askConfirm = (itemId: string, list: CatalogItem[]): void => {
-    const item = list.find((i) => i.id === itemId);
-    if (!item) return;
-    const row = overlay.querySelector<HTMLElement>(`[data-row="${itemId}"]`);
-    if (!row) return;
-    row.classList.add('confirm');
-    row.innerHTML = `
-      <span class="confirm-text">Für ${item.price} Münzen „${esc(item.nameDe)}“ kaufen?</span>
-      <div class="confirm-actions">
-        <button type="button" data-no="${esc(itemId)}">Abbrechen</button>
-        <button type="button" class="primary" data-yes="${esc(itemId)}">Ja, kaufen</button>
-      </div>`;
-    row.querySelector(`[data-no]`)?.addEventListener('click', () => void draw());
-    const yes = row.querySelector<HTMLButtonElement>(`[data-yes]`);
-    yes?.addEventListener('click', async () => {
-      yes.disabled = true; // no double purchase on a second tap
-      yes.textContent = 'Kaufe …';
-      const res = await buyItem(opts.supabase, itemId);
-      if (!res.ok) {
-        statusText = res.message;
-        statusError = true;
-      } else {
-        coins = res.value.coins;
-        opts.onCoins(coins);
-        statusText = `„${item.nameDe}“ gekauft.`;
-        statusError = false;
+    const bar = document.createElement('div');
+    bar.className = 'category-bar';
+    bar.setAttribute('role', 'group');
+    bar.setAttribute('aria-label', 'Kategorien');
+    for (const kind of available) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.kind = kind;
+      b.textContent = KIND_LABEL[kind];
+      b.setAttribute('aria-pressed', String(kind === current));
+      b.addEventListener('click', () => {
+        category = kind;
+        draw(kind);
+        opts.onCategory(kind);
+      });
+      bar.appendChild(b);
+    }
+    content.appendChild(bar);
+
+    const list = visible().filter((e) => e.kind === current);
+    if (list.length === 0) {
+      const p = document.createElement('p');
+      p.textContent = 'In dieser Kategorie gibt es gerade nichts.';
+      content.appendChild(p);
+    } else {
+      const grid = document.createElement('div');
+      grid.className = 'item-grid';
+      const ctx = { coins: opts.getCoins(), shopOpen: opts.shopOpen };
+      for (const entry of list) {
+        const fresh = itemCard(entry, origin, ctx);
+        let card = cards.get(entry.id);
+        if (card) card.innerHTML = fresh.innerHTML;
+        else {
+          card = fresh;
+          cards.set(entry.id, card);
+          const c = card;
+          c.addEventListener('click', () => openDetail(entry.id, c));
+        }
+        attachThumb(entry, card);
+        grid.appendChild(card);
       }
-      void draw();
+      content.appendChild(grid);
+    }
+    if (focusKind) bar.querySelector<HTMLButtonElement>(`[data-kind="${focusKind}"]`)?.focus();
+  }
+
+  function openDetail(itemId: string, opener: HTMLButtonElement): void {
+    const entry = book?.find((e) => e.id === itemId);
+    if (!entry || detail?.isOpen) return;
+    const handle = openItemDetail({
+      entry,
+      origin,
+      opener,
+      api: opts.api,
+      getCoins: opts.getCoins,
+      shopOpen: opts.shopOpen,
+      buildOpen: opts.buildOpen,
+      onCoins: opts.onCoins,
+      onBuild: opts.onBuild,
+      onShowSlot: opts.onShowSlot,
+      onOpenInventory: opts.onOpenInventory,
+      onChanged: () => {
+        if (!closed) void load(false);
+      },
+      createPreview: opts.createPreview,
     });
+    detail = handle;
+  }
+
+  async function load(showLoading: boolean): Promise<void> {
+    const id = ++loadId;
+    if (showLoading || error !== null) {
+      error = null;
+      book = null;
+      draw();
+    }
+    let res: Awaited<ReturnType<ItemApi['loadBook']>>;
+    try {
+      res = await opts.api.loadBook();
+    } catch (err) {
+      console.error('loadBook failed', err);
+      res = { ok: false, message: 'Das hat nicht geklappt. Versuch es nochmal.' };
+    }
+    if (closed || id !== loadId) return;
+    if (res.ok) {
+      book = res.value;
+      error = null;
+    } else {
+      error = res.message;
+    }
+    draw();
+  }
+
+  draw();
+  void load(true);
+
+  return {
+    close() {
+      if (closed) return;
+      closed = true;
+      session?.release();
+      detail?.close();
+      detail = null;
+      area.remove();
+    },
   };
-
-  await draw();
 }
 
-/** Shop sections in this order. Houses, garages and cars can be owned once (one slot each). */
-const GROUPS: Array<[string, string]> = [
-  ['house', 'Häuser'],
-  ['garage', 'Garagen'],
-  ['car', 'Autos'],
-  ['deco', 'Garten-Deko (für die vier Deko-Plätze)'],
-  ['avatar', 'Für deinen Avatar'],
-];
-const ONCE = new Set(['house', 'garage', 'car']);
-
-function itemRow(i: CatalogItem, coins: number, owned: number, shopOpen: boolean): string {
-  const affordable = coins >= i.price;
-  const have = ONCE.has(i.kind) && owned > 0;
-  const disabled = !shopOpen || !affordable || have;
-  const why = have ? 'hast du schon' : !shopOpen ? 'geschlossen' : !affordable ? 'zu teuer' : '';
-  return `
-    <div class="item" data-row="${esc(i.id)}">
-      <span class="item-name">${esc(i.nameDe)}</span>
-      <span class="item-price">${i.price} Münzen</span>
-      <span class="item-owned">${owned > 0 ? `${owned} im Inventar` : ''}</span>
-      <button type="button" data-buy="${esc(i.id)}" ${disabled ? 'disabled' : ''} aria-label="${esc(i.nameDe)} kaufen">
-        Kaufen${why ? ` (${why})` : ''}
-      </button>
-    </div>`;
-}

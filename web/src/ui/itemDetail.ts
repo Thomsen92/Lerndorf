@@ -1,0 +1,306 @@
+/**
+ * Item cards and the detail dialog shared by shop and inventory.
+ * The card is a single button; the dialog shows a 3D preview, the purchase flow (own confirmation step,
+ * one RPC at a time) and the inventory actions. While a purchase runs the dialog cannot be closed.
+ */
+import { KIND_LABEL, purchaseState, type ItemApi, type ItemEntry } from '../api/items';
+import { createItemPreview, type ItemPreview, type PreviewFactory } from '../render/itemPreview';
+import { THUMB_PLACEHOLDER, type ThumbSource } from '../render/itemThumbs';
+import { slotById, type SlotId, type SlotKind } from '../world/plotPlan';
+import { openModal, type ModalHandle } from './dialog';
+import { esc } from './esc';
+
+export type ItemOrigin = 'shop' | 'inventar';
+
+/** Swaps the placeholder of a card's thumbnail for the picture. */
+export function setCardThumb(card: HTMLElement, url: string): void {
+  const thumb = card.querySelector('.item-thumb');
+  if (!thumb) return;
+  const img = document.createElement('img');
+  img.className = 'item-thumb';
+  img.alt = '';
+  img.setAttribute('aria-hidden', 'true');
+  img.src = url;
+  thumb.replaceWith(img);
+}
+
+export function itemCard(
+  e: ItemEntry,
+  origin: ItemOrigin,
+  ctx: { coins: number; shopOpen: boolean },
+  thumbs?: ThumbSource,
+): HTMLButtonElement {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'item-card';
+  btn.dataset.item = e.id;
+  const info =
+    origin === 'shop'
+      ? `<span class="item-price">${e.price} Münzen</span>${(() => {
+          const s = purchaseState(e, ctx.coins, ctx.shopOpen);
+          return s.reason ? `<span class="item-reason">${esc(s.reason)}</span>` : '';
+        })()}`
+      : `<span class="item-count">Besitz: ${e.owned} · aufgestellt: ${e.placedIn.length}</span>`;
+  btn.innerHTML = `<span class="item-thumb" aria-hidden="true">${THUMB_PLACEHOLDER[e.kind]}</span><span class="item-name">${esc(e.nameDe)}</span><span class="item-kind">${esc(
+    KIND_LABEL[e.kind],
+  )}</span>${info}`;
+  if (thumbs) {
+    void thumbs(e)
+      .then((url) => {
+        if (url) setCardThumb(btn, url);
+      })
+      .catch(() => undefined);
+  }
+  return btn;
+}
+
+export interface DetailOptions {
+  entry: ItemEntry;
+  origin: ItemOrigin;
+  opener: HTMLElement;
+  api: ItemApi;
+  getCoins: () => number;
+  shopOpen: boolean;
+  buildOpen: boolean;
+  onCoins: (coins: number) => void;
+  onBuild: (itemId: string) => void;
+  onShowSlot: (slotId: SlotId) => void;
+  onOpenInventory: () => void;
+  onChanged: () => void;
+  createPreview?: PreviewFactory;
+  reducedMotion?: boolean;
+}
+
+type Mode = 'detail' | 'confirm' | 'bought';
+
+export function openItemDetail(opts: DetailOptions): ModalHandle {
+  const { entry, origin } = opts;
+  const factory = opts.createPreview ?? createItemPreview;
+  const reducedMotion =
+    opts.reducedMotion ??
+    (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const hasSlot = entry.fits.length > 0;
+
+  let busy = false;
+  let mode: Mode = 'detail';
+  let preview: ItemPreview | null = null;
+
+  const modal = openModal({
+    title: entry.nameDe,
+    opener: opts.opener,
+    canClose: () => !busy,
+    onClose: () => {
+      preview?.dispose();
+      preview = null;
+    },
+  });
+
+  const previewBox = document.createElement('div');
+  previewBox.className = 'item-preview';
+  const actions = document.createElement('div');
+  actions.className = 'item-actions';
+  const status = document.createElement('p');
+  status.setAttribute('role', 'status');
+  status.className = 'status';
+  modal.body.append(previewBox, actions, status);
+
+  const button = (label: string, onClick: () => void, cls = '', disabled = false): HTMLButtonElement => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    if (cls) b.className = cls;
+    b.disabled = disabled;
+    b.addEventListener('click', onClick);
+    return b;
+  };
+  const note = (text: string): HTMLParagraphElement => {
+    const p = document.createElement('p');
+    p.className = 'notice-in';
+    p.textContent = text;
+    return p;
+  };
+
+  const focusIn = (el: HTMLElement | null | undefined): void => {
+    if (el && modal.isOpen) el.focus();
+  };
+  const actionButton = (label?: string): HTMLButtonElement | null =>
+    Array.from(actions.querySelectorAll('button')).find((b) => !label || b.textContent === label) ?? null;
+
+  function setStatus(text: string, error = false): void {
+    status.textContent = text;
+    status.className = error ? 'status error' : 'status';
+  }
+
+  function renderPreview(): void {
+    preview?.dispose();
+    preview = null;
+    previewBox.replaceChildren();
+    if (!hasSlot) {
+      const p = document.createElement('p');
+      p.className = 'preview-hint';
+      p.textContent = 'Vorschau gibt es mit dem Avatar-Editor.';
+      previewBox.appendChild(p);
+      return;
+    }
+    const showError = (): void => {
+      preview?.dispose();
+      preview = null;
+      previewBox.replaceChildren();
+      const p = document.createElement('p');
+      p.className = 'preview-hint';
+      p.textContent = 'Die Vorschau konnte nicht geladen werden.';
+      const retry = button('Nochmal versuchen', () => {
+        renderPreview();
+        focusIn(actionButton());
+      });
+      previewBox.append(p, retry);
+    };
+    const canvas = document.createElement('canvas');
+    canvas.className = 'item-preview-canvas';
+    canvas.setAttribute('aria-label', `Vorschau: ${entry.nameDe}`);
+    canvas.setAttribute('role', 'img');
+    previewBox.appendChild(canvas);
+    let p: ItemPreview | null = null;
+    try {
+      p = factory(canvas, { reducedMotion, onError: showError });
+    } catch {
+      p = null;
+    }
+    if (!p) {
+      showError();
+      return;
+    }
+    preview = p;
+    try {
+      p.show(entry.kind as SlotKind, entry.id);
+    } catch {
+      showError();
+    }
+  }
+
+  function renderActions(): void {
+    actions.replaceChildren();
+    const coins = opts.getCoins();
+    if (mode === 'confirm') {
+      const t = document.createElement('p');
+      t.className = 'confirm-text';
+      t.textContent = `Für ${entry.price} Münzen „${entry.nameDe}“ kaufen?`;
+      actions.append(
+        t,
+        button('Abbrechen', () => {
+          if (busy) return;
+          mode = 'detail';
+          setStatus('');
+          renderActions();
+          focusIn(actionButton());
+        }),
+        button('Ja, kaufen', () => void doBuy(), 'primary'),
+      );
+      return;
+    }
+    if (mode === 'bought') {
+      actions.append(
+        button('Zum Inventar', () => {
+          modal.close();
+          opts.onOpenInventory();
+        }),
+      );
+      if (hasSlot && opts.buildOpen) {
+        actions.append(
+          button(
+            'Jetzt aufstellen',
+            () => {
+              modal.close();
+              opts.onBuild(entry.id);
+            },
+            'primary',
+          ),
+        );
+      }
+      return;
+    }
+    if (origin === 'shop') {
+      const s = purchaseState(entry, coins, opts.shopOpen);
+      actions.append(
+        button(
+          `Kaufen für ${entry.price} Münzen`,
+          () => {
+            mode = 'confirm';
+            setStatus('');
+            renderActions();
+            focusIn(actionButton('Ja, kaufen'));
+          },
+          'primary',
+          !s.canBuy,
+        ),
+      );
+      if (s.reason) actions.append(note(s.reason));
+      return;
+    }
+    // inventory
+    if (hasSlot) {
+      const canBuild = opts.buildOpen && entry.free > 0;
+      actions.append(
+        button(
+          'Aufstellen',
+          () => {
+            modal.close();
+            opts.onBuild(entry.id);
+          },
+          'primary',
+          !canBuild,
+        ),
+      );
+      if (!opts.buildOpen) actions.append(note('Das Bauen ist gerade geschlossen.'));
+      else if (entry.free === 0) actions.append(note('Alles ist schon aufgestellt.'));
+    }
+    for (const id of entry.placedIn) {
+      const slot = slotById(id);
+      actions.append(
+        button(`Zum Platz: ${slot?.nameDe ?? id}`, () => {
+          modal.close();
+          opts.onShowSlot(id);
+        }),
+      );
+    }
+  }
+
+  async function doBuy(): Promise<void> {
+    if (busy) return;
+    busy = true;
+    for (const b of actions.querySelectorAll('button')) b.disabled = true;
+    setStatus('Einen Moment …');
+    let res: Awaited<ReturnType<ItemApi['buy']>>;
+    try {
+      res = await opts.api.buy(entry.id);
+    } catch (err) {
+      console.error('buy failed', err);
+      res = { ok: false, message: 'Das hat nicht geklappt. Versuch es nochmal.' };
+    }
+    busy = false;
+    if (res.ok) {
+      mode = 'bought';
+      setStatus(`„${entry.nameDe}“ gekauft. Du hast jetzt ${res.value.coins} Münzen.`);
+    } else {
+      mode = 'confirm';
+      setStatus(res.message, true);
+    }
+    if (modal.isOpen) {
+      renderActions();
+      focusIn(actionButton(res.ok ? undefined : 'Ja, kaufen'));
+    }
+    if (res.ok) {
+      // callbacks last: a throwing callback must not leave the dialog stuck
+      try {
+        opts.onCoins(res.value.coins);
+        opts.onChanged();
+      } catch (err) {
+        console.error('item purchase callback failed', err);
+      }
+    }
+  }
+
+  renderPreview();
+  renderActions();
+  return modal;
+}

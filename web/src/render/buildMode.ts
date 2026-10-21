@@ -7,7 +7,17 @@
 import * as THREE from 'three';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Plot } from '../world/layout';
-import { ROTATIONS, SLOTS, rectCentre, slotAt, type SlotDef, type SlotId } from '../world/plotPlan';
+import {
+  ROTATIONS,
+  SLOTS,
+  rectCentre,
+  slotAccepts,
+  slotAt,
+  slotById,
+  type SlotDef,
+  type SlotId,
+} from '../world/plotPlan';
+import { autoSlot, nextRotation, previewSlots, type Pending } from './buildPreview';
 import {
   clearSlot,
   loadBuildState,
@@ -30,18 +40,30 @@ export interface BuildModeOptions {
   plot: Plot;
   supabase: SupabaseClient;
   uid: string;
-  /** The own slots changed: the village shows the new state. */
+  /** The own slots changed or a preview is shown: the village shows this map. */
   onSlots?: (slots: SlotMap) => void;
   /** The pupil pressed "Fertig". */
   onDone?: () => void;
 }
+
+export interface EnterOptions {
+  /** Hand-over from the shop or inventory: preview this item right away. */
+  itemId?: string;
+  slotId?: SlotId;
+}
+
+const PREVIEW_HINT = 'Vorschau – noch nicht gespeichert';
 
 export class BuildMode {
   private readonly group = new THREE.Group();
   private readonly bar: HTMLDivElement;
   private state: BuildState | null = null;
   private slot: SlotDef | null = null;
-  private chosen: string | null = null;
+  private pending: Pending | null = null;
+  /** Item handed over from the shop: slots of other kinds are dimmed. */
+  private handOver: string | null = null;
+  private message: string | null = null;
+  private busy = false;
   private active = false;
 
   constructor(private readonly opts: BuildModeOptions) {
@@ -56,25 +78,40 @@ export class BuildMode {
   }
 
   /** Enters build mode: loads the state and outlines the slots. */
-  async enter(): Promise<string | null> {
+  async enter(opts: EnterOptions = {}): Promise<string | null> {
     const res = await loadBuildState(this.opts.supabase, this.opts.uid);
     if (!res.ok) return res.message;
     this.state = res.value;
+    this.dropPending();
     this.active = true;
+    this.message = null;
+    this.slot = null;
+    this.handOver = null;
+    const item = opts.itemId ? res.value.items.find((i) => i.id === opts.itemId) : undefined;
+    if (item) {
+      this.handOver = item.id;
+      const asked = opts.slotId ? slotById(opts.slotId) : undefined;
+      const id = asked && slotAccepts(asked, item.kind) ? asked.id : autoSlot(item.kind, res.value.slots);
+      this.slot = (id && slotById(id)) || null;
+      if (this.slot && this.hasFree(item.id, this.slot.id)) this.pending = { itemId: item.id, rot: 0 };
+    }
     this.opts.scene.add(this.group);
     this.bar.hidden = false;
+    this.showPending();
     this.redraw();
     return null;
   }
 
   exit(): void {
+    this.dropPending();
     this.active = false;
     this.opts.scene.remove(this.group);
     this.clearGroup();
     this.bar.hidden = true;
     this.bar.innerHTML = '';
     this.slot = null;
-    this.chosen = null;
+    this.handOver = null;
+    this.message = null;
   }
 
   dispose(): void {
@@ -89,9 +126,42 @@ export class BuildMode {
     if (!local) return;
     const slot = slotAt(local.x, local.z);
     if (!slot) return;
+    this.selectSlot(slot);
+  }
+
+  private selectSlot(slot: SlotDef): void {
+    if (this.busy || !this.state) return;
+    this.dropPending();
     this.slot = slot;
-    this.chosen = null;
+    this.message = null;
+    const item = this.handOver && this.state.items.find((i) => i.id === this.handOver);
+    if (item && slotAccepts(slot, item.kind) && this.hasFree(item.id, slot.id)) {
+      this.pending = { itemId: item.id, rot: 0 };
+      this.showPending();
+    }
     this.redraw();
+  }
+
+  /** True when a copy of the item is free for this slot (owned minus copies used in other slots). */
+  private hasFree(itemId: string, slot: SlotId): boolean {
+    const st = this.state;
+    const it = st?.items.find((i) => i.id === itemId);
+    if (!st || !it) return false;
+    const used = Object.entries(st.slots).filter(([sid, c]) => sid !== slot && c?.itemId === itemId).length;
+    return it.owned - used > 0;
+  }
+
+  /** Shows the pending item on the own plot (preview only). */
+  private showPending(): void {
+    if (!this.state || !this.slot || !this.pending) return;
+    this.opts.onSlots?.(previewSlots(this.state.slots, this.slot.id, this.pending));
+  }
+
+  /** Drops an unsaved preview and shows the server state again. */
+  private dropPending(): void {
+    if (!this.pending) return;
+    this.pending = null;
+    if (this.state) this.opts.onSlots?.(this.state.slots);
   }
 
   private localAt(ndc: THREE.Vector2, camera: THREE.Camera): { x: number; z: number } | null {
@@ -132,10 +202,11 @@ export class BuildMode {
     for (const s of SLOTS) {
       const c = rectCentre(s);
       const selected = this.slot?.id === s.id;
+      const dimmed = this.handOverKind() !== null && !slotAccepts(s, this.handOverKind() as string);
       const mat = new THREE.MeshBasicMaterial({
         color: selected ? '#ffd23f' : SLOT_COLOUR[s.kind],
         transparent: true,
-        opacity: selected ? 0.55 : 0.32,
+        opacity: dimmed ? 0.1 : selected ? 0.55 : 0.32,
         depthWrite: false,
         side: THREE.DoubleSide,
       });
@@ -149,37 +220,62 @@ export class BuildMode {
     this.renderBar();
   }
 
+  private handOverKind(): string | null {
+    const item = this.handOver ? this.state?.items.find((i) => i.id === this.handOver) : undefined;
+    return item?.kind ?? null;
+  }
+
   private renderBar(): void {
     if (!this.state) return;
     const st = this.state;
     const slot = this.slot;
+    const nameOf = (id: string): string => st.items.find((i) => i.id === id)?.nameDe ?? id;
+    const slotList = `<div class="build-items" role="group" aria-label="Plätze">${SLOTS.map((s) => {
+      const cur = shownItem(st.slots, s.id, s.kind);
+      const picked = slot?.id === s.id;
+      return `<button type="button" data-slot="${s.id}" aria-pressed="${picked}" class="${picked ? 'primary' : ''}"><strong>${escape(
+        s.nameDe,
+      )}</strong>: ${cur ? escape(nameOf(cur.itemId)) : 'leer'}</button>`;
+    }).join('')}</div>`;
+
     if (!slot) {
       this.bar.innerHTML = `
-        <p class="build-info" role="status">Tippe auf einen Platz: Haus, Garage, Auto-Platz oder einen der vier Deko-Plätze.</p>
+        <p class="build-info" role="status">${escape(
+          this.message ?? 'Wähle einen Platz: Haus, Garage, Auto-Platz oder einen der vier Deko-Plätze.',
+        )}</p>
+        ${slotList}
         <div class="build-actions"><button type="button" id="done">Fertig</button></div>`;
-      this.bar.querySelector('#done')?.addEventListener('click', () => this.opts.onDone?.());
+      this.wireBar();
       return;
     }
+    const pending = this.pending;
+    const placed = st.slots[slot.id];
     const current = shownItem(st.slots, slot.id, slot.kind);
     const usedElsewhere = (id: string): number =>
       Object.entries(st.slots).filter(([sid, c]) => sid !== slot.id && c?.itemId === id).length;
     const fitting = st.items.filter((i) => i.kind === slot.kind);
-    const canTurn = ROTATIONS[slot.kind].length > 1 && Boolean(st.slots[slot.id]);
-    const canClear = (slot.kind === 'deco' || slot.kind === 'car') && Boolean(st.slots[slot.id]);
-    const nameOf = (id: string): string => st.items.find((i) => i.id === id)?.nameDe ?? id;
+    const shown = pending ?? current;
+    const canTurn = ROTATIONS[slot.kind].length > 1 && Boolean(pending ?? placed);
+    const canClear = (slot.kind === 'deco' || slot.kind === 'car') && Boolean(placed);
+    const unchanged =
+      !pending || (current?.itemId === pending.itemId && (current?.rot ?? 0) === pending.rot);
+    const info =
+      this.message ??
+      `${slot.nameDe}: ${current ? `jetzt „${nameOf(current.itemId)}“` : 'noch leer'}`;
 
     this.bar.innerHTML = `
-      <p class="build-info" role="status"><strong>${escape(slot.nameDe)}</strong>: ${
-        current ? `jetzt „${escape(nameOf(current.itemId))}“` : 'noch leer'
-      }</p>
+      <p class="build-info" role="status">${escape(info)}</p>
+      ${pending && !unchanged ? `<p class="build-info">${PREVIEW_HINT} – „${escape(nameOf(pending.itemId))}“</p>` : ''}
+      ${slotList}
       <div class="build-items" role="group" aria-label="Passende Sachen">
         ${
           fitting
             .map((i) => {
               const free = i.owned - usedElsewhere(i.id);
               const here = current?.itemId === i.id;
-              return `<button type="button" data-item="${escape(i.id)}" class="${this.chosen === i.id ? 'primary' : ''}" ${
-                free <= 0 || here ? 'disabled' : ''
+              const chosen = shown?.itemId === i.id;
+              return `<button type="button" data-item="${escape(i.id)}" aria-pressed="${chosen}" class="${chosen ? 'primary' : ''}" ${
+                free <= 0 || this.busy ? 'disabled' : ''
               }>${escape(i.nameDe)}${here ? ' (steht hier)' : free > 1 ? ` (${free})` : ''}</button>`;
             })
             .join('') ||
@@ -187,54 +283,95 @@ export class BuildMode {
         }
       </div>
       <div class="build-actions">
-        <button type="button" id="place" class="primary" ${this.chosen ? '' : 'disabled'}>Setzen</button>
-        <button type="button" id="rot" ${canTurn ? '' : 'disabled'}>Drehen</button>
-        <button type="button" id="clear" ${canClear ? '' : 'disabled'}>Wegräumen</button>
+        <button type="button" id="save" class="primary" ${unchanged || this.busy ? 'disabled' : ''}>Speichern</button>
+        ${canTurn ? `<button type="button" id="rot" ${this.busy ? 'disabled' : ''}>Drehen</button>` : ''}
+        ${pending ? `<button type="button" id="cancel" ${this.busy ? 'disabled' : ''}>Abbrechen</button>` : ''}
+        <button type="button" id="clear" ${canClear && !this.busy ? '' : 'disabled'}>Wegräumen</button>
         <button type="button" id="done">Fertig</button>
       </div>`;
+    this.wireBar();
+  }
 
-    this.bar.querySelectorAll<HTMLButtonElement>('[data-item]').forEach((b) =>
+  private wireBar(): void {
+    this.bar.querySelectorAll<HTMLButtonElement>('[data-slot]').forEach((b) =>
       b.addEventListener('click', () => {
-        this.chosen = b.dataset.item ?? null;
-        this.renderBar();
+        const s = slotById(b.dataset.slot ?? '');
+        if (s) this.selectSlot(s);
       }),
     );
-    this.bar.querySelector('#place')?.addEventListener('click', () => void this.place(slot.id));
-    this.bar.querySelector('#rot')?.addEventListener('click', () => void this.turn(slot.id));
-    this.bar.querySelector('#clear')?.addEventListener('click', () => void this.clear(slot.id));
+    this.bar.querySelectorAll<HTMLButtonElement>('[data-item]').forEach((b) =>
+      b.addEventListener('click', () => this.choose(b.dataset.item ?? '')),
+    );
+    this.bar.querySelector('#save')?.addEventListener('click', () => void this.save());
+    this.bar.querySelector('#rot')?.addEventListener('click', () => this.turn());
+    this.bar.querySelector('#cancel')?.addEventListener('click', () => {
+      this.dropPending();
+      this.message = null;
+      this.renderBar();
+    });
+    this.bar.querySelector('#clear')?.addEventListener('click', () => void this.clear());
     this.bar.querySelector('#done')?.addEventListener('click', () => this.opts.onDone?.());
   }
 
-  private async place(slot: SlotId): Promise<void> {
-    if (!this.chosen) return;
-    const res = await placeInSlot(this.opts.supabase, this.chosen, slot, 0);
-    await this.after(res.ok ? 'Gesetzt.' : res.message, res.ok);
+  /** Picks an item for the chosen slot: shown as preview, not saved. */
+  private choose(itemId: string): void {
+    if (this.busy || !this.slot || !this.state) return;
+    const placed = this.state.slots[this.slot.id];
+    this.pending = { itemId, rot: placed?.itemId === itemId ? placed.rot : 0 };
+    this.message = null;
+    this.showPending();
+    this.renderBar();
   }
 
-  private async turn(slot: SlotId): Promise<void> {
-    const cur = this.state?.slots[slot];
-    if (!cur) return;
-    const res = await placeInSlot(this.opts.supabase, cur.itemId, slot, (cur.rot + 1) % 4);
-    await this.after(res.ok ? 'Gedreht.' : res.message, res.ok);
+  /** Turns the preview only; turning a placed item starts a preview of it. */
+  private turn(): void {
+    if (this.busy || !this.slot || !this.state) return;
+    const base = this.pending ?? this.state.slots[this.slot.id];
+    if (!base) return;
+    this.pending = { itemId: base.itemId, rot: nextRotation(this.slot.kind, base.rot) };
+    this.message = null;
+    this.showPending();
+    this.renderBar();
   }
 
-  private async clear(slot: SlotId): Promise<void> {
-    const res = await clearSlot(this.opts.supabase, slot);
+  private async save(): Promise<void> {
+    const slot = this.slot;
+    const pending = this.pending;
+    if (this.busy || !slot || !pending) return;
+    this.busy = true;
+    this.renderBar();
+    const res = await placeInSlot(this.opts.supabase, pending.itemId, slot.id, pending.rot);
+    this.busy = false;
+    await this.after(res.ok ? 'Gespeichert.' : res.message, res.ok);
+  }
+
+  private async clear(): Promise<void> {
+    const slot = this.slot;
+    if (this.busy || !slot) return;
+    this.busy = true;
+    this.renderBar();
+    const res = await clearSlot(this.opts.supabase, slot.id);
+    this.busy = false;
     await this.after(res.ok ? 'Weggeräumt. Es ist wieder im Inventar.' : res.message, res.ok);
   }
 
+  /** After an RPC: on success reload the server state and drop the preview; on error keep the preview. */
   private async after(message: string, changed: boolean): Promise<void> {
     if (changed) {
       const res = await loadBuildState(this.opts.supabase, this.opts.uid);
-      if (res.ok) {
-        this.state = res.value;
-        this.opts.onSlots?.(res.value.slots);
-      }
-      this.chosen = null;
+      if (res.ok) this.state = res.value;
+      this.pending = null;
+      this.handOver = null;
+      // Also when the pupil left meanwhile: the plot must show the server state (bar stays closed).
+      this.opts.onSlots?.(this.state?.slots ?? {});
+      if (!this.active) return;
+      this.message = message;
+      this.redraw();
+      return;
     }
-    this.redraw();
-    const info = this.bar.querySelector<HTMLParagraphElement>('.build-info');
-    if (info) info.textContent = message;
+    if (!this.active) return;
+    this.message = message;
+    this.renderBar();
   }
 }
 
