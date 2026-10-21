@@ -44,3 +44,12 @@ describe('helpers', () => {
     expect(wrongMessage(0)).toMatch(/aufgebraucht/);
   });
 });
+
+describe('answerMode', () => {
+  it('uses the task type directly and data.mode for listening', async () => {
+    const { answerMode } = await import('../../src/tasks/answer');
+    expect(answerMode('listening', { mode: 'gap' })).toBe('gap');
+    expect(answerMode('listening', { mode: 'choice' })).toBe('choice');
+    expect(answerMode('match', {})).toBe('match');
+  });
+});

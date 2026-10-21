@@ -3,7 +3,16 @@
  * in the shape the server expects; the server checks it. Pure functions, tested in Node.
  */
 
+import type { QuestType } from '../api/quests';
+
 export type TaskType = 'choice' | 'gap' | 'match' | 'order';
+
+/** The answer form a quest uses; listening quests carry theirs in data.mode. */
+export function answerMode(type: QuestType, data: Record<string, unknown>): TaskType {
+  if (type !== 'listening') return type;
+  const mode = data.mode;
+  return mode === 'gap' || mode === 'match' || mode === 'order' ? mode : 'choice';
+}
 
 export interface TaskView {
   id: string;
