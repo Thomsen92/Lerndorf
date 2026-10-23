@@ -177,25 +177,38 @@ Ihr eigenes Lehrkonto sieht das Tutorial nie.
 
 ### Die Datenbank-Änderung (Migration 0019) einspielen
 
-**Wichtig vorher lesen.** Das Tutorial liegt zurzeit nur auf dem Zweig `feature/first-login-tutorial`, **nicht** auf `main`. Die Datenbank-Änderung `0019_first_login_tutorial.sql` ist noch **nirgends eingespielt**. Der Ablauf **migrate** (siehe Einrichtung) spielt Datenbank-Änderungen **automatisch** ein, sobald sie auf `main` landen. Deshalb gilt: **Erst den Zweig testen, dann erst auf `main` übernehmen.** Was auf `main` ist, ist für Schüler sofort live.
+**Wichtig vorher lesen.** Das Tutorial liegt zurzeit nur auf dem Zweig `feature/first-login-tutorial`, **nicht** auf `main`. Die Datenbank-Änderung `0019_first_login_tutorial.sql` ist noch **nirgends eingespielt**. Die Test-Vorschau des Zweigs benutzt dieselbe Datenbank wie das echte Dorf. Um den Zweig zu testen, muss 0019 also **in die echte Datenbank**.
 
-Folgen von 0019, auf die Sie achten sollten:
+**Was das bedeutet (ehrlich):** Vom Einspielen bis zur Übernahme auf `main` trifft das alte, echte Dorf auf die neue Datenbank. In dieser Zeit ist die alte Grundstückswahl gesperrt, und das Fachwerkhaus kostet 50 Münzen statt nichts. Das ist nur unproblematisch, solange es **noch keine echten Schülerkonten** gibt. **In dieser Zeit bitte keine echten Schülerkonten anlegen.**
+
+Weitere Folgen von 0019:
 - Das Fachwerkhaus ist kein kostenloses Starterhaus mehr (kostet 50 Münzen).
-- Die alte Grundstückswahl per Antippen ist abgeschaltet. Die alte Fassung des Dorfes (ohne Tutorial) kann mit der neuen Datenbank nicht mehr richtig arbeiten. Migration und neuer Code müssen also **zusammen** live gehen.
+- Migration und neuer Code müssen am Ende **zusammen** live gehen.
 - Bitte außerhalb der Unterrichtszeit umstellen.
 
-**So testen Sie vorher (Claude Code übernimmt die Technik):**
-1. Claude Code bittet man: „Spiele Migration 0019 in die Datenbank ein, damit ich den Zweig testen kann.“ Claude Code spielt sie über die Supabase-Verbindung ein und trägt sie als erledigt ein. So versucht der Ablauf **migrate** sie später nicht noch einmal.
-2. Die Vorschau-Adresse des Zweigs finden: Cloudflare-Dashboard → **Workers & Pages** → Projekt `lerndorf` → **Deployments** → Eintrag mit dem Zweig `feature/first-login-tutorial` → die Adresse darunter (`https://…lerndorf.pages.dev`). Diese Seite benutzt dieselbe Datenbank wie die echte.
-3. Dort wie unter „Selbst ausprobieren“ mit einem Testkonto das Tutorial durchspielen.
+**Reihenfolge:** 1. Migration 0019 einspielen. 2. Die Vorschau des Zweigs testen. 3. Erst danach den Zweig auf `main` übernehmen.
 
-**Ohne Claude Code, von Hand (nur wenn nötig):**
+**Achtung beim Einspielen:** Die Migration darf **nicht** über ein Werkzeug eingespielt werden, das selbst einen Zeitstempel als Versionsnummer einträgt (zum Beispiel `apply_migration` der Supabase-Verbindung). Der Eintrag in der Migrations-Liste muss genau die Version `0019` und den Namen `0019_first_login_tutorial` haben, sonst hält der Ablauf **migrate** die Migration später für „noch offen“ und wird rot.
+
+**Ablauf (Claude Code übernimmt die Technik, oder Sie von Hand):**
 1. Supabase-Dashboard → Ihr Projekt → links **SQL Editor** → **New query**.
-2. Die Datei `supabase/migrations/0019_first_login_tutorial.sql` aus dem Repository auf GitHub öffnen (Zweig `feature/first-login-tutorial`), **Raw** anklicken, alles markieren und kopieren.
-3. In den SQL Editor einfügen und **Run** klicken. Es muss „Success“ erscheinen. Bei einer roten Fehlermeldung: nichts weiter tun, Meldung an Claude Code schicken.
-4. Danach **muss** zusätzlich diese eine Zeile ausgeführt werden (neue Abfrage, **Run**), damit **migrate** später nicht doppelt einspielt und rot wird: `insert into supabase_migrations.schema_migrations (version, name) values ('0019', 'first_login_tutorial');` Im Zweifel lieber Claude Code fragen.
+2. Zuerst nachsehen, wie die bisherigen Einträge aussehen, und diese Schreibweise übernehmen:
+   `select version, name from supabase_migrations.schema_migrations order by version;`
+   (Erwartet, aber nicht geprüft: Version zum Beispiel `0018`, Name zum Beispiel `0018_character_choice`. Passt das Muster nicht zu dem unten genannten Eintrag, bitte erst Claude Code fragen.)
+3. Neue Abfrage: Den Inhalt der Datei `supabase/migrations/0019_first_login_tutorial.sql` (auf GitHub, Zweig `feature/first-login-tutorial`, **Raw**) in **einem Stück** zwischen diese beiden Zeilen setzen und mit **Run** ausführen:
+   ```
+   begin;
+   -- hier der gesamte Inhalt von 0019_first_login_tutorial.sql
+   insert into supabase_migrations.schema_migrations (version, name) values ('0019', '0019_first_login_tutorial');
+   commit;
+   ```
+   So entsteht der Eintrag nur, wenn die Migration vollständig gelungen ist. Bei einer roten Fehlermeldung: nichts weiter tun, Meldung an Claude Code schicken.
+4. Die Vorschau-Adresse des Zweigs finden: Cloudflare-Dashboard → **Workers & Pages** → Projekt `lerndorf` → **Deployments** → Eintrag mit dem Zweig `feature/first-login-tutorial` → die Adresse darunter (`https://…lerndorf.pages.dev`).
+5. Dort wie unter „Selbst ausprobieren“ mit einem Testkonto das Tutorial durchspielen.
 
-**Wenn der Test gut war:** Claude Code bitten, den Zweig auf `main` zu übernehmen. Danach auf GitHub unter **Actions** prüfen, dass **migrate** und **deploy** grün sind (siehe „Daily Quests einspielen“, Schritt 3). Bei rot: Ablaufname und Fehlermeldung an Claude Code schicken.
+**Solange 0019 live, aber noch nicht auf `main` ist:** Jeder andere Push auf `main`, der etwas unter `supabase/**` ändert, lässt den Ablauf **migrate** fehlschlagen, bis der Zweig übernommen ist (die Datenbank kennt dann eine Migration, die `main` noch nicht hat). In dieser Zeit also keine anderen Datenbank-Änderungen auf `main` schicken.
+
+**Wenn der Test gut war:** Claude Code bitten, den Zweig auf `main` zu übernehmen. Danach auf GitHub unter **Actions** prüfen, dass **migrate** und **tests** (Datei `deploy.yml`) grün sind (siehe „Daily Quests einspielen“, Schritt 3). Bei rot: Ablaufname und Fehlermeldung an Claude Code schicken.
 
 ---
 

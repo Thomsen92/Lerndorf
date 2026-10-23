@@ -143,7 +143,7 @@ Spec: `docs/superpowers/specs/2026-10-21-first-login-tutorial-design.md`, Plan: 
 | [x] E.2 | CC | Ruine im Haus-Sockel, Sprechblasen im Comic-Stil, Kamerapfade, Tanz | Tests grün, Bilder angesehen |
 | [x] E.3 | CC | Ablauf in der Oberfläche (`ui/tutorial/`), Kaufdialog, geführter Baumodus, Einbau ins Dorf; manuelle Grundstückswahl entfernt | Tests grün |
 | [x] E.4 | CC | Playwright-Durchlauf mit Screenshots (`e2e/tutorial.spec.ts`, Testseite `dev/tutorial.html`), Galerie, Doku | alle Schritte als Bild angesehen |
-| [ ] E.5 | LK | **Abnahme durch die Lehrkraft:** Zweig testen (Anleitung „Erststart-Tutorial testen“), dann Migration 0019 einspielen und auf `main` übernehmen | – |
+| [ ] E.5 | LK | **Abnahme durch die Lehrkraft:** zuerst Migration 0019 einspielen, dann die Vorschau des Zweigs testen, erst danach auf `main` übernehmen (Anleitung „Die Datenbank-Änderung (Migration 0019) einspielen“ in `docs/ANLEITUNG_LEHRKRAFT.md`) | – |
 
 ## Zwischenpaket Q – Daily Quests
 
