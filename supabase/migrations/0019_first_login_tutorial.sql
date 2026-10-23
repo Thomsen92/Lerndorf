@@ -164,3 +164,131 @@ revoke execute on function public.tutorial_state() from public, anon;
 revoke execute on function public.tutorial_start() from public, anon;
 grant execute on function public.tutorial_state() to authenticated;
 grant execute on function public.tutorial_start() to authenticated;
+
+-- ================================================================ Part 3: quiz and the one-time reward
+-- The reward lives here and nowhere else.
+create or replace function public.tutorial_reward() returns int
+  language sql immutable as $$ select 50 $$;
+
+-- tutorial_continue(p_from): intro -> quiz. Only valid at step 'intro' with p_from = 'intro'
+-- and an assigned plot.
+create or replace function public.tutorial_continue(p_from text) returns jsonb
+  language plpgsql security definer set search_path = public as $$
+declare
+  v_uid uuid := auth.uid();
+  v_plot int;
+  v_step text;
+begin
+  if v_uid is null then
+    raise exception 'not logged in' using errcode = '42501';
+  end if;
+  select plot_index into v_plot from profiles where id = v_uid and role = 'student';
+  if not found then
+    raise exception 'forbidden: pupils only' using errcode = '42501';
+  end if;
+  select step into v_step from tutorial_progress where player_id = v_uid for update;
+  if v_step is distinct from 'intro' or p_from is distinct from 'intro' or v_plot is null then
+    raise exception 'not at this step' using errcode = '22023';
+  end if;
+  update tutorial_progress set step = 'quiz' where player_id = v_uid;
+  return public.tutorial_state_of(v_uid);
+end $$;
+
+-- tutorial_question(): the current question (number answered + 1), never the solution or the hint.
+create or replace function public.tutorial_question() returns jsonb
+  language plpgsql stable security definer set search_path = public as $$
+declare
+  v_uid uuid := auth.uid();
+  v_step text;
+  v_answered int;
+  v_q tutorial_questions%rowtype;
+begin
+  if v_uid is null then
+    raise exception 'not logged in' using errcode = '42501';
+  end if;
+  if not exists (select 1 from profiles where id = v_uid and role = 'student') then
+    raise exception 'forbidden: pupils only' using errcode = '42501';
+  end if;
+  select step, answered into v_step, v_answered from tutorial_progress where player_id = v_uid;
+  if v_step is distinct from 'quiz' then
+    raise exception 'not in the quiz' using errcode = '22023';
+  end if;
+  select * into v_q from tutorial_questions where nr = v_answered + 1;
+  return jsonb_build_object('nr', v_q.nr, 'total', 5, 'type', v_q.type, 'prompt', v_q.prompt, 'data', v_q.data);
+end $$;
+
+-- tutorial_answer(nr, answer): wrong answers cost nothing and may be repeated, the hint comes with
+-- them. The fifth correct answer pays the reward once (row lock + unique ledger index).
+-- Repeating the fifth answer after the quiz is a harmless replay (reward 0).
+create or replace function public.tutorial_answer(p_nr int, p_answer jsonb) returns jsonb
+  language plpgsql security definer set search_path = public as $$
+declare
+  v_uid uuid := auth.uid();
+  v_step text;
+  v_answered int;
+  v_paid boolean;
+  v_q tutorial_questions%rowtype;
+  v_sol jsonb;
+  v_correct boolean;
+  v_reward int := 0;
+  v_coins int;
+begin
+  if v_uid is null then
+    raise exception 'not logged in' using errcode = '42501';
+  end if;
+  if not exists (select 1 from profiles where id = v_uid and role = 'student') then
+    raise exception 'forbidden: pupils only' using errcode = '42501';
+  end if;
+  select step, answered, reward_paid into v_step, v_answered, v_paid
+    from tutorial_progress where player_id = v_uid for update;
+  if v_step is null or v_step = 'intro' then
+    raise exception 'not in the quiz' using errcode = '22023';
+  end if;
+
+  select coins into v_coins from profiles where id = v_uid;
+  select * into v_q from tutorial_questions where nr = p_nr;
+  select solution into v_sol from tutorial_solutions where nr = p_nr;
+
+  -- replay of the last question after the quiz is over (e.g. a lost response)
+  if v_step <> 'quiz' then
+    if v_answered = 5 and p_nr = 5 then
+      v_correct := public.quest_answer_matches(v_q.type, v_q.data, v_sol, p_answer);
+      return jsonb_build_object('correct', v_correct, 'hint', case when v_correct then null else nullif(v_q.hint, '') end,
+                                'answered', 5, 'done', true, 'coins', v_coins, 'reward', 0);
+    end if;
+    raise exception 'not the current question' using errcode = '22023';
+  end if;
+
+  if p_nr is distinct from v_answered + 1 then
+    raise exception 'not the current question' using errcode = '22023';
+  end if;
+
+  v_correct := public.quest_answer_matches(v_q.type, v_q.data, v_sol, p_answer);
+  if not v_correct then
+    return jsonb_build_object('correct', false, 'hint', nullif(v_q.hint, ''), 'answered', v_answered,
+                              'done', false, 'coins', v_coins, 'reward', 0);
+  end if;
+
+  v_answered := v_answered + 1;
+  if v_answered < 5 then
+    update tutorial_progress set answered = v_answered where player_id = v_uid;
+  else
+    if not v_paid then
+      v_reward := public.tutorial_reward();
+      insert into coin_ledger (player_id, delta, reason, ref, created_by)
+        values (v_uid, v_reward, 'tutorial', 'tutorial', null);
+      update profiles set coins = coins + v_reward where id = v_uid returning coins into v_coins;
+    end if;
+    update tutorial_progress set answered = 5, step = 'buy', reward_paid = true where player_id = v_uid;
+  end if;
+  return jsonb_build_object('correct', true, 'hint', null, 'answered', v_answered,
+                            'done', v_answered = 5, 'coins', v_coins, 'reward', v_reward);
+end $$;
+
+revoke execute on function public.tutorial_reward() from public, anon;
+revoke execute on function public.tutorial_continue(text) from public, anon;
+revoke execute on function public.tutorial_question() from public, anon;
+revoke execute on function public.tutorial_answer(int, jsonb) from public, anon;
+grant execute on function public.tutorial_continue(text) to authenticated;
+grant execute on function public.tutorial_question() to authenticated;
+grant execute on function public.tutorial_answer(int, jsonb) to authenticated;
