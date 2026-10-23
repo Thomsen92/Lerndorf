@@ -88,7 +88,7 @@ export interface TutorialContext {
   onCoins(coins: number): void;
   openDailyQuests(): void;
   api?: TutorialApi;
-  /** default: the user's „Bewegung reduzieren“ setting */
+  /** default: the OS media query prefers-reduced-motion */
   reducedMotion?: () => boolean;
   thumbs?: ThumbSource;
   /** aborted on logout: the flow stops and removes its UI */
@@ -223,7 +223,13 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
       await ui.guard(village.flyIntro(reduced()));
       const sad = ui.bubble(SAD_TEXT, 'sad');
       for (const text of MESSAGES) await ui.guard(ui.card(text, NEXT));
-      state = await untilOk(ui, () => api.continueIntro());
+      // continueTutorial answers ok after errcode 22023 with a re-read state; if that is still
+      // 'intro' (stale read), do not skip ahead: show the retry card and ask again
+      state = await untilOk(ui, async () => {
+        const r = await api.continueIntro();
+        if (r.ok && r.value.step === 'intro') return { ok: false, message: NETWORK_ERROR };
+        return r;
+      });
       sad();
     } else {
       // resume: a short, calm move to the own plot
