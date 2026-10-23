@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { TutorialState } from '../../src/api/tutorial';
+import { continueTutorial, type TutorialState } from '../../src/api/tutorial';
 
 vi.mock('../../src/quests/speech', () => ({
   speakEnglish: vi.fn().mockResolvedValue(true),
@@ -356,4 +356,91 @@ describe('runTutorial', () => {
     expect(f.log).toContain('release');
     expect(r.openDailyQuests).not.toHaveBeenCalled();
   });
+
+describe('runTutorial resume and replay', () => {
+  it('step buy (coins already granted) goes straight to the buy dialog, then place', async () => {
+    const f = fakeServer({ step: 'buy', character: 'boy', plotIndex: 0, answered: 5 });
+    f.s.coins = 50;
+    const r = run(f);
+    await until(() => Boolean(button('Haus kaufen')), 'buy dialog');
+    expect(f.log).not.toContain('continue');
+    expect(f.log).not.toContain('question1');
+    expect(document.querySelector('h2')?.textContent).not.toMatch(/^Frage/);
+    await click('Haus kaufen');
+    await r.done;
+    const steps = f.log.filter((x) => ['buy', 'build-mode', 'place', 'dance', 'daily'].includes(x));
+    expect(steps).toEqual(['buy', 'build-mode', 'place', 'dance', 'daily']);
+  });
+
+  it('step place with the house bought goes straight to the guided placement', async () => {
+    const f = fakeServer({ step: 'place', character: 'boy', plotIndex: 0, answered: 5 });
+    const r = run(f);
+    await r.done;
+    expect(f.log).not.toContain('buy');
+    const steps = f.log.filter((x) => ['build-mode', 'place', 'dance', 'daily'].includes(x));
+    expect(steps).toEqual(['build-mode', 'place', 'dance', 'daily']);
+  });
+
+  it('lost response after placing: server already at done, the replayed placement still ends with dance, bubble and finish', async () => {
+    // the client never got the answer of tutorial_place_house; the state it read still said "place"
+    const f = fakeServer({ step: 'place', character: 'boy', plotIndex: 0, answered: 5 });
+    const r = run(f); // the state is read here: still "place"
+    f.s.step = 'done';
+    await r.done;
+    expect(f.log).toEqual(expect.arrayContaining(['place', 'dance', 'final-bubble', 'finish', 'daily']));
+  });
+
+  it('a stale read after tutorial_continue (errcode 22023, still intro) does not skip ahead', async () => {
+    const f = fakeServer({ character: 'boy' });
+    let calls = 0;
+    const real = f.api.continueIntro;
+    f.api.continueIntro = async () => {
+      calls += 1;
+      if (calls === 1) return { ok: true, value: { ...f.state(), step: 'intro' } };
+      return real();
+    };
+    run(f);
+    for (let i = 0; i < MESSAGES.length; i++) await click('Weiter');
+    await until(
+      () => document.body.textContent?.includes('Bitte noch einmal versuchen') ?? false,
+      'retry card',
+    );
+    expect(f.log).not.toContain('question1');
+    expect(f.log).not.toContain('buy');
+    await click('Noch einmal versuchen');
+    await until(() => document.querySelector('h2')?.textContent === 'Frage 1 von 5', 'question 1');
+    expect(calls).toBe(2);
+  });
+
+  it('tutorial_continue answering 22023 is treated as success with the re-read state', async () => {
+    const f = fakeServer({ character: 'boy' });
+    const rpc = vi.fn(async (fn: string) => {
+      if (fn === 'tutorial_continue') {
+        f.s.step = 'quiz'; // the first call went through, only its answer was lost
+        return { data: null, error: { message: 'wording', code: '22023' } };
+      }
+      if (fn === 'tutorial_state')
+        return {
+          data: { needed: true, step: 'quiz', plot_index: 0, character: 'boy', answered: 0 },
+          error: null,
+        };
+      return { data: null, error: { message: 'unexpected', code: '00000' } };
+    });
+    const onCoins = vi.fn();
+    void runTutorial({
+      supabase: { rpc } as unknown as SupabaseClient,
+      state: f.state(),
+      api: { ...f.api, continueIntro: () => continueTutorial({ rpc } as unknown as SupabaseClient, 'intro') },
+      village: async () => f.village,
+      onCoins,
+      openDailyQuests: () => undefined,
+      reducedMotion: () => false,
+      thumbs: async () => null,
+      endPauseMs: 0,
+    });
+    for (let i = 0; i < MESSAGES.length; i++) await click('Weiter');
+    await until(() => document.querySelector('h2')?.textContent === 'Frage 1 von 5', 'quiz after replay');
+    expect(rpc).toHaveBeenCalledWith('tutorial_state', undefined);
+  });
+});
 });
