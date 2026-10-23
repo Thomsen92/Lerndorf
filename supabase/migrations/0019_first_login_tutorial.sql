@@ -292,3 +292,119 @@ revoke execute on function public.tutorial_answer(int, jsonb) from public, anon;
 grant execute on function public.tutorial_continue(text) to authenticated;
 grant execute on function public.tutorial_question() to authenticated;
 grant execute on function public.tutorial_answer(int, jsonb) to authenticated;
+
+-- ================================================================ Part 4: buy and place the house
+-- These are the only exceptions to the closed shop / closed build switch, and only for the
+-- Fachwerkhaus in slot 'house' at the matching step. buy_item, place_in_slot and clear_slot stay strict.
+
+-- tutorial_buy_house(): step 'buy' -> 'place'. The price comes from the catalogue (50).
+-- A house that is already bought is not charged again; the step just moves on.
+create or replace function public.tutorial_buy_house() returns jsonb
+  language plpgsql security definer set search_path = public as $$
+declare
+  v_uid uuid := auth.uid();
+  v_step text;
+  v_bought boolean;
+  v_price int;
+  v_coins int;
+  v_qty int;
+begin
+  if v_uid is null then
+    raise exception 'not logged in' using errcode = '42501';
+  end if;
+  if not exists (select 1 from profiles where id = v_uid and role = 'student') then
+    raise exception 'forbidden: pupils only' using errcode = '42501';
+  end if;
+  select step, house_bought into v_step, v_bought from tutorial_progress where player_id = v_uid for update;
+  if v_step is null or v_step not in ('buy', 'place') then
+    raise exception 'not at this step' using errcode = '22023';
+  end if;
+
+  select coalesce(sum(qty), 0) into v_qty from inventory where player_id = v_uid and item_id = 'house_fachwerk';
+  if not v_bought and v_qty = 0 then
+    select price into v_price from items where id = 'house_fachwerk' and active;
+    if v_price is null then
+      raise exception 'item not found' using errcode = 'P0002';
+    end if;
+    update profiles set coins = coins - v_price
+      where id = v_uid and coins >= v_price
+      returning coins into v_coins;
+    if not found then
+      raise exception 'not enough coins' using errcode = '22023';
+    end if;
+    insert into coin_ledger (player_id, delta, reason, ref, created_by)
+      values (v_uid, -v_price, 'purchase', 'house_fachwerk', null);
+    insert into inventory (player_id, item_id, qty) values (v_uid, 'house_fachwerk', 1)
+      on conflict (player_id, item_id) do update set qty = inventory.qty + 1;
+    v_qty := 1;
+  else
+    select coins into v_coins from profiles where id = v_uid;
+  end if;
+  update tutorial_progress set house_bought = true, step = 'place' where player_id = v_uid;
+  return jsonb_build_object('coins', v_coins, 'qty', v_qty);
+end $$;
+
+-- tutorial_place_house(): puts the bought Fachwerkhaus into the house slot (rotation 0), step -> 'done'.
+-- Repeating the call after 'done' returns the existing placement.
+create or replace function public.tutorial_place_house() returns bigint
+  language plpgsql security definer set search_path = public as $$
+declare
+  v_uid uuid := auth.uid();
+  v_step text;
+  v_bought boolean;
+  v_id bigint;
+begin
+  if v_uid is null then
+    raise exception 'not logged in' using errcode = '42501';
+  end if;
+  if not exists (select 1 from profiles where id = v_uid and role = 'student') then
+    raise exception 'forbidden: pupils only' using errcode = '42501';
+  end if;
+  select step, house_bought into v_step, v_bought from tutorial_progress where player_id = v_uid for update;
+  if v_step = 'done' then
+    select id into v_id from placements where player_id = v_uid and slot = 'house' and item_id = 'house_fachwerk';
+    if v_id is not null then
+      return v_id;
+    end if;
+  end if;
+  if v_step is distinct from 'place' or not v_bought then
+    raise exception 'not at this step' using errcode = '22023';
+  end if;
+  if not exists (select 1 from inventory where player_id = v_uid and item_id = 'house_fachwerk' and qty > 0) then
+    raise exception 'no free copy in the inventory' using errcode = '22023';
+  end if;
+
+  delete from placements where player_id = v_uid and slot = 'house';
+  insert into placements (player_id, item_id, slot, rot) values (v_uid, 'house_fachwerk', 'house', 0)
+    returning id into v_id;
+  update tutorial_progress set step = 'done', completed_at = now() where player_id = v_uid;
+  return v_id;
+end $$;
+
+-- tutorial_finish(): the closing call of the client; idempotent, only valid once the step is 'done'.
+create or replace function public.tutorial_finish() returns jsonb
+  language plpgsql security definer set search_path = public as $$
+declare
+  v_uid uuid := auth.uid();
+  v_step text;
+begin
+  if v_uid is null then
+    raise exception 'not logged in' using errcode = '42501';
+  end if;
+  if not exists (select 1 from profiles where id = v_uid and role = 'student') then
+    raise exception 'forbidden: pupils only' using errcode = '42501';
+  end if;
+  select step into v_step from tutorial_progress where player_id = v_uid for update;
+  if v_step is distinct from 'done' then
+    raise exception 'not at this step' using errcode = '22023';
+  end if;
+  update tutorial_progress set completed_at = coalesce(completed_at, now()) where player_id = v_uid;
+  return public.tutorial_state_of(v_uid);
+end $$;
+
+revoke execute on function public.tutorial_buy_house() from public, anon;
+revoke execute on function public.tutorial_place_house() from public, anon;
+revoke execute on function public.tutorial_finish() from public, anon;
+grant execute on function public.tutorial_buy_house() to authenticated;
+grant execute on function public.tutorial_place_house() to authenticated;
+grant execute on function public.tutorial_finish() to authenticated;
