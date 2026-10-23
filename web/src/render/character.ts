@@ -59,6 +59,20 @@ export function stripRootMotion(clip: THREE.AnimationClip): THREE.AnimationClip 
   return clip;
 }
 
+/**
+ * Forward (z) distance the hips travel between the first and last keyframe of a clip, as a share of
+ * the first keyframe's hips height (y). 0 if the clip has no hips position track or the height is 0.
+ * Measure before stripRootMotion, which freezes x/z.
+ */
+export function rootTravel(clip: THREE.AnimationClip): number {
+  const track = clip.tracks.find((t) => t.name.includes('Hips') && t.name.includes('.position'));
+  if (!track || track.values.length < 6) return 0;
+  const v = track.values;
+  const height = v[1];
+  if (!height) return 0;
+  return Math.abs(v[v.length - 1] - v[2]) / height;
+}
+
 const pending = new Map<CharacterKind, Promise<CharacterAsset | null>>();
 
 /** Loads a model once; resolves null if loading fails (the placeholder stays then). */
