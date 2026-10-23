@@ -64,9 +64,11 @@ export const ROTATIONS: Record<SlotKind, readonly number[]> = {
   deco: [0, 1, 2, 3],
 };
 
-/** Item used when a slot that may not stay empty has no placement (every pupil owns these). */
+/**
+ * Item used when a slot that may not stay empty has no placement (every pupil owns it).
+ * The house slot has none: it shows the ruin until the tutorial house is placed.
+ */
 export const STARTER: Partial<Record<SlotKind, string>> = {
-  house: 'house_fachwerk',
   garage: 'garage_holz',
 };
 
@@ -98,5 +100,9 @@ export function slotAt(lx: number, lz: number): SlotDef | undefined {
 export const PATH_X = rectCentre(PATH).lx;
 /** Local z of the house front (front door). */
 export const HOUSE_FRONT_Z = SLOTS[0].z + SLOTS[0].d - PLOT_ROWS / 2;
+/** Plot-local z where the own figure stands in the tutorial: on the footpath, 1.6 m in front of the door. */
+export const TUTORIAL_FIGURE_LZ = HOUSE_FRONT_Z + 1.6;
+/** Id the client puts into the house slot instead of a catalogue item until the tutorial house is placed. */
+export const RUIN_ID = 'ruin';
 /** Local x of the driveway centre (the opening in the fence). */
 export const DRIVEWAY_X = rectCentre(DRIVEWAY).lx;

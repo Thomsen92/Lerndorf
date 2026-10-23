@@ -2,6 +2,8 @@
  * The village screen for a logged-in pupil: 3D village, villagers, own house marked,
  * main navigation (Dorf / Aufgaben / Mein Haus), the areas behind it (house menu, shop, inventory,
  * build mode, daily quests), settings menu, and automatic logout after 15 minutes.
+ * A pupil who has not finished the first-login tutorial gets it first (ui/tutorial/flow.ts); meanwhile
+ * the main navigation is locked, the account menu (logout) stays usable.
  * Glue only: the area logic lives in ui/areas.ts.
  */
 import * as THREE from 'three';
@@ -10,14 +12,14 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { AutoLogout, AUTO_LOGOUT_MS } from '../auth/autoLogout';
 import {
   PLOT_COUNT,
-  claimPlot,
   loadClass,
   loadMembers,
   loadMyProfile,
+  saveCharacter,
   type Member,
   type MyProfile,
 } from '../api/village';
-import { buildLayout, type Plot } from '../world/layout';
+import { buildLayout } from '../world/layout';
 import { buildVillage } from '../render/village';
 import { loadClassSlots, type SlotMap } from '../api/build';
 import { Crowd } from '../render/crowd';
@@ -39,8 +41,13 @@ import { openInventory } from './inventoryView';
 import { openDailyQuests } from './dailyQuestsView';
 import { openLedger } from './ledgerView';
 import { openAccountMenu } from './accountMenu';
+import { openCharacterPicker } from './characterPicker';
 import { BuildMode, type EnterOptions } from '../render/buildMode';
 import { FLIGHT_SECONDS, houseView, lerpPose, onPlot, type CameraPose } from '../render/houseCamera';
+import { closeUpPath, introPath, type CameraPath } from '../render/introCamera';
+import { getTutorialState, type TutorialState } from '../api/tutorial';
+import { runTutorial, type TutorialVillage } from './tutorial/flow';
+import { PLACE_BUTTON, PLACE_HINT } from './tutorial/messages';
 import {
   AUTO_MEASURE_SECONDS,
   decideAuto,
@@ -81,15 +88,20 @@ async function load(supabase: SupabaseClient): Promise<Loaded> {
   };
 }
 
-/** Shows the village. Calls `onLogout` after a manual or automatic logout. */
-/** The free plot under a point on the ground, if any. Lots are not separate meshes, so the point decides. */
-function freePlotAt(plots: Plot[], occupied: Set<number>, p: THREE.Vector3): Plot | undefined {
-  return plots.find((q) => {
-    if (occupied.has(q.index)) return false;
-    return onPlot(q, p);
-  });
+/** Tutorial state; null when no tutorial is needed. Throws when it cannot be read. */
+async function loadTutorial(supabase: SupabaseClient): Promise<TutorialState | null> {
+  const res = await getTutorialState(supabase);
+  if (!res.ok) throw new Error(res.message);
+  return res.value.needed ? res.value : null;
 }
 
+/** A camera path from `from` to the end pose of `path`, same duration. */
+function pathFrom(from: CameraPose, path: CameraPath): CameraPath {
+  const to = path.at(path.duration);
+  return { duration: path.duration, at: (t) => lerpPose(from, to, Math.min(1, t / path.duration)) };
+}
+
+/** Shows the village. Calls `onLogout` after a manual or automatic logout. */
 export async function mountVillage(
   root: HTMLElement,
   supabase: SupabaseClient,
@@ -108,16 +120,21 @@ export async function mountVillage(
   let choice: QualityChoice = 'auto';
   let nav: GameNav | null = null;
   let areas: AreaController | null = null;
+  let buildMode: BuildMode | null = null;
+  /** true while the first-login tutorial runs: no areas, no camera control */
+  let inTutorial = false;
+  const tutorialAbort = new AbortController();
   const modals = createModalTracker();
   // Escape leaves the house menu even when focus is not inside it; a modal handles its own Escape first
   const onEscape = (e: KeyboardEvent): void => {
-    if (e.key !== 'Escape' || e.defaultPrevented || modals.anyOpen) return;
+    if (e.key !== 'Escape' || e.defaultPrevented || modals.anyOpen || inTutorial) return;
     if (areas?.current === 'haus') void areas.select('dorf');
   };
   document.addEventListener('keydown', onEscape);
 
   let removeWindowPointer: (() => void) | null = null;
   const stop = (): void => {
+    tutorialAbort.abort();
     // close the current area (the build preview reverts via exit) and every open modal, so no `inert` is left behind
     void areas?.select('dorf');
     buildMode?.dispose();
@@ -157,10 +174,51 @@ export async function mountVillage(
   for (const ev of activity) window.addEventListener(ev, onActivity, { passive: true });
   autoLogout.touch();
 
+  // The tutorial gives the pupil a plot (after the figure choice), so the village is built only when
+  // the tutorial asks for it. It then receives the village's tutorial side.
+  let villageReady: (v: TutorialVillage) => void = () => undefined;
+  let villageFailed: (err: unknown) => void = () => undefined;
+  const tutorialVillage = new Promise<TutorialVillage>((resolve, reject) => {
+    villageReady = resolve;
+    villageFailed = reject;
+  });
+  tutorialVillage.catch(() => undefined);
+  let worldOnCoins: (c: number) => void = () => undefined;
+  let endTutorial: (openQuests: boolean) => void = () => undefined;
+  let tutorialOver = false;
+
   let loaded: Loaded;
   try {
+    const tutorial = await loadTutorial(supabase);
+    if (tutorial) {
+      inTutorial = true;
+      // nothing of the game shows behind the figure choice
+      const actions = root.querySelector<HTMLElement>('.dorf-actions');
+      if (actions) actions.hidden = true;
+      let wantVillage: () => void = () => undefined;
+      const villageWanted = new Promise<void>((r) => (wantVillage = r));
+      const run = runTutorial({
+        supabase,
+        state: tutorial,
+        signal: tutorialAbort.signal,
+        village: () => {
+          wantVillage();
+          return tutorialVillage;
+        },
+        onCoins: (c) => worldOnCoins(c),
+        openDailyQuests: () => endTutorial(true),
+      });
+      // whatever happens in the tutorial, the game is unlocked afterwards
+      void run.finally(() => {
+        tutorialOver = true;
+        endTutorial(false);
+      });
+      await Promise.race([villageWanted, run]);
+      if (!running) return { dispose: stop };
+    }
     loaded = await load(supabase);
   } catch (err) {
+    villageFailed(err);
     console.error(err);
     if (notice) {
       notice.hidden = false;
@@ -176,6 +234,12 @@ export async function mountVillage(
     return { dispose: stop };
   }
 
+  // the tutorial may have ended before the village stood (e.g. an error): then play normally
+  if (tutorialOver) {
+    inTutorial = false;
+    const actions = root.querySelector<HTMLElement>('.dorf-actions');
+    if (actions) actions.hidden = false;
+  }
   const { profile, layoutSeed, mapId, shopOpen, buildOpen, members, slots } = loaded;
   let coinsNow = profile.coins;
   // single source of truth for the coin value; nav status and item areas read from here
@@ -202,30 +266,8 @@ export async function mountVillage(
   const sun = rig.sun;
 
   const layout = buildLayout(layoutSeed, PLOT_COUNT, mapId);
+  // the plot is assigned by the server in the tutorial (tutorial_start); there is no manual choice
   const ownPlot = profile.plotIndex;
-  const occupied = new Set(members.filter((m) => m.plotIndex !== null).map((m) => m.plotIndex as number));
-  // a pupil without a plot chooses one of the free lots (SPEC §10.5)
-  const chooseLot = async (index: number): Promise<void> => {
-    if (!window.confirm('Hier dein Haus bauen? Die Wahl gilt dauerhaft.')) return;
-    const r = await claimPlot(supabase, index);
-    if (!r.ok) {
-      window.alert(
-        r.message.includes('taken')
-          ? 'Dieses Grundstück ist schon vergeben.'
-          : 'Das hat nicht geklappt. Bitte versuche es noch einmal.',
-      );
-      return;
-    }
-    window.location.reload();
-  };
-  if (ownPlot === null) {
-    const hint = document.createElement('div');
-    hint.textContent =
-      'Wähle ein freies Grundstück: tippe auf eine Wiese mit Pflöcken. Die Wahl gilt dauerhaft.';
-    hint.style.cssText =
-      'position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:5;background:#fff;color:#222;padding:8px 14px;border-radius:10px;font-size:14px;max-width:90vw;text-align:center;';
-    root.appendChild(hint);
-  }
   const labels = members
     .filter((m) => m.plotIndex !== null)
     .map((m) => ({ plotIndex: m.plotIndex as number, nickname: m.nickname, slots: slots.get(m.id) ?? {} }));
@@ -240,7 +282,7 @@ export async function mountVillage(
   const crowd = new Crowd(
     scene,
     layout,
-    members.map((m) => ({ nickname: m.nickname, own: m.id === profile.id })),
+    members.map((m) => ({ nickname: m.nickname, own: m.id === profile.id, character: m.character })),
   );
 
   // quality: applied now, and again when Auto has measured
@@ -304,6 +346,7 @@ export async function mountVillage(
   };
   const onAreaChange = (area: NavArea, previous: NavArea): void => {
     if (!running) return;
+    if (inTutorial) return;
     nav?.setActive(area);
     const dorfActions = root.querySelector<HTMLElement>('.dorf-actions');
     if (dorfActions) dorfActions.hidden = area !== 'dorf';
@@ -346,20 +389,14 @@ export async function mountVillage(
       buildMode.handleTap(pointer, camera);
       return;
     }
+    // the tutorial leads; taps on the village do nothing meanwhile
+    if (inTutorial) return;
     raycaster.setFromCamera(pointer, camera);
     const hit = raycaster.intersectObjects(scene.children, true)[0];
     const v = hit ? crowd.findByObject(hit.object) : null;
     if (v) {
       crowd.react(v, figureTap(v.nickname, performance.now()));
       return;
-    }
-    // a pupil without a plot: tap a free lot to build there
-    if (hit && ownPlot === null) {
-      const lot = freePlotAt(layout.plots, occupied, hit.point);
-      if (lot) {
-        void chooseLot(lot.index);
-        return;
-      }
     }
     // the task board: tap the board in the market
     if (hit && hit.object.userData.kind === 'board') {
@@ -371,7 +408,6 @@ export async function mountVillage(
   });
 
   // build mode: only on the own plot
-  let buildMode: BuildMode | null = null;
   if (home) {
     buildMode = new BuildMode({
       scene,
@@ -406,6 +442,25 @@ export async function mountVillage(
     window.setTimeout(() => (notice.hidden = true), 3000);
   };
 
+  // figure choice: part of the tutorial on the first login, later from the settings
+  let myCharacter = profile.character;
+  const pickCharacter = (required: boolean, opener: HTMLElement | null): void => {
+    modals.track(
+      openCharacterPicker({
+        required,
+        current: myCharacter,
+        opener,
+        onPick: async (kind) => {
+          const res = await saveCharacter(supabase, kind);
+          if (!res.ok) return res.message;
+          myCharacter = kind;
+          crowd.setCharacter(profile.nickname, kind);
+          return null;
+        },
+      }),
+    );
+  };
+
   // settings menu and ledger are modals; tracked so logout can close them properly
   const openSettings = (opener: HTMLElement): void => {
     modals.track(
@@ -419,6 +474,7 @@ export async function mountVillage(
           applyQuality();
         },
         onLedger: () => modals.track(openLedger(supabase, opener)),
+        onCharacter: () => pickCharacter(false, opener),
         onLogout: () => void logout(),
       }),
     );
@@ -474,6 +530,88 @@ export async function mountVillage(
   });
   root.appendChild(nav.el);
   nav.setActive('dorf');
+  // fallback for a pupil without a figure who needs no tutorial; in the tutorial the choice is its first step
+  if (myCharacter === null && !inTutorial) pickCharacter(true, null);
+
+  // ---- first-login tutorial: the village side (camera paths, own figure, guided build mode)
+  let camPath: { path: CameraPath; t: number; done: () => void } | null = null;
+  const playPath = (path: CameraPath): Promise<void> =>
+    new Promise<void>((resolve) => {
+      camPath?.done();
+      setPose(path.at(0));
+      camPath = { path, t: 0, done: resolve };
+    });
+  const currentPose = (): CameraPose => ({ position: camera.position.clone(), target: controls.target.clone() });
+  const headPoint = new THREE.Vector3();
+  const tutorialSide: TutorialVillage = {
+    flyIntro: (reduced) => (ownPlot === null ? Promise.resolve() : playPath(introPath(layout, ownPlot, reduced))),
+    flyCloseUp: (reduced) =>
+      ownPlot === null ? Promise.resolve() : playPath(pathFrom(currentPose(), closeUpPath(layout, ownPlot, reduced))),
+    placeFigure: () => {
+      if (ownPlot !== null) crowd.placeOwnInFrontOfHouse(ownPlot);
+    },
+    releaseFigure: () => crowd.standStill(false),
+    danceOnce: () => crowd.playDanceOnce(),
+    figureScreen: () => {
+      if (!crowd.ownHeadPoint(headPoint)) return null;
+      headPoint.project(camera);
+      if (headPoint.z < -1 || headPoint.z > 1 || Math.abs(headPoint.x) > 1.2 || Math.abs(headPoint.y) > 1.2) return null;
+      const rect = gl.domElement.getBoundingClientRect();
+      const w = rect.width || window.innerWidth;
+      const h = rect.height || window.innerHeight;
+      return { x: rect.left + ((headPoint.x + 1) / 2) * w, y: rect.top + ((1 - headPoint.y) / 2) * h };
+    },
+    placeHouse: async (place) => {
+      const mode = buildMode;
+      if (!mode || !home) return { ok: false, message: 'Du hast noch kein Grundstück.' };
+      const seconds = reducedMotion() ? 0.01 : FLIGHT_SECONDS;
+      const from = currentPose();
+      const to = houseView(home);
+      await playPath({ duration: seconds, at: (t) => lerpPose(from, to, Math.min(1, t / seconds)) });
+      return new Promise((resolve) => {
+        void mode
+          .enter({
+            guided: {
+              itemId: 'house_fachwerk',
+              slotId: 'house',
+              place,
+              hint: PLACE_HINT,
+              button: PLACE_BUTTON,
+              onPlaced: () => {
+                // a moment to see the house standing, then the closing scene
+                window.setTimeout(() => {
+                  mode.exit();
+                  resolve({ ok: true, value: true });
+                }, 900);
+              },
+            },
+          })
+          .then((err) => {
+            if (err) resolve({ ok: false, message: err });
+          });
+      });
+    },
+  };
+  worldOnCoins = onCoins;
+  const dorfActionsEl = root.querySelector<HTMLElement>('.dorf-actions');
+  const setTutorialMode = (on: boolean): void => {
+    inTutorial = on;
+    nav?.setLocked(on);
+    if (dorfActionsEl) dorfActionsEl.hidden = on;
+    controls.enabled = !on;
+  };
+  endTutorial = (openQuests) => {
+    if (!inTutorial || !running) return;
+    camPath?.done();
+    camPath = null;
+    if (buildMode?.isActive) buildMode.exit();
+    setTutorialMode(false);
+    if (openQuests) void ctl.select('aufgaben');
+  };
+  if (inTutorial) {
+    setTutorialMode(true);
+    villageReady(tutorialSide);
+  }
 
   window.addEventListener('resize', resize);
   applyQuality();
@@ -487,6 +625,16 @@ export async function mountVillage(
     const dt = Math.min(0.1, (now - last) / 1000);
     const frameMs = now - last;
     last = now;
+    if (camPath) {
+      camPath.t += dt;
+      const { path } = camPath;
+      setPose(path.at(Math.min(camPath.t, path.duration)));
+      if (camPath.t >= path.duration) {
+        const finished = camPath.done;
+        camPath = null;
+        finished();
+      }
+    }
     if (flight) {
       flight.t += dt;
       if (flight.t >= FLIGHT_SECONDS) finishFlight();

@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 // Smoke tests run against the built app served by `vite preview`.
-// The screenshot harness (e2e/daily-quests.spec.ts) needs the dev server, because its page
-// dev/quests.html is not part of the build.
+// The screenshot harnesses (e2e/daily-quests.spec.ts, e2e/tutorial.spec.ts) need the dev server, because their pages
+// dev/quests.html and dev/tutorial.html are not part of the build.
 export default defineConfig({
   testDir: './e2e',
   timeout: 30_000,
@@ -26,13 +26,18 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      testIgnore: /daily-quests\.spec\.ts/,
+      testIgnore: /(daily-quests|tutorial)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:4173/' },
     },
     {
       name: 'harness',
-      testMatch: /daily-quests\.spec\.ts/,
-      use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:5175/' },
+      testMatch: /(daily-quests|tutorial)\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:5175/',
+        // the tutorial harness renders the real 3D village: software WebGL for headless runs
+        launchOptions: { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] },
+      },
     },
   ],
 });

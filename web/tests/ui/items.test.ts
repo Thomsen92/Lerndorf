@@ -11,7 +11,8 @@ import {
 } from '../../src/api/items';
 
 const catalog: CatalogItem[] = [
-  { id: 'house_fachwerk', kind: 'house', slot: null, nameDe: 'Fachwerkhaus', price: 0, starter: true },
+  { id: 'garage_holz', kind: 'garage', slot: null, nameDe: 'Holzgarage', price: 0, starter: true },
+  { id: 'house_fachwerk', kind: 'house', slot: null, nameDe: 'Fachwerkhaus', price: 50, starter: false },
   { id: 'house_villa', kind: 'house', slot: null, nameDe: 'Villa', price: 100, starter: false },
   { id: 'deco_cat_sign', kind: 'deco', slot: null, nameDe: 'Katzenschild', price: 20, starter: false },
   { id: 'avatar_hat', kind: 'avatar', slot: null, nameDe: 'Hut', price: 10, starter: false },
@@ -22,9 +23,9 @@ const entry = (id: string, b: ItemEntry[]) => b.find((e) => e.id === id)!;
 
 describe('buildItemBook', () => {
   it('counts a starter as owned once and placed where it is the fallback', () => {
-    const e = entry('house_fachwerk', book());
+    const e = entry('garage_holz', book());
     expect(e.owned).toBe(1);
-    expect(e.placedIn).toEqual(['house']);
+    expect(e.placedIn).toEqual(['garage']);
     expect(e.free).toBe(0);
   });
 

@@ -1,125 +1,109 @@
 # Erststart-Tutorial für Lerndorf – Design
 
-**Stand:** 21.10.2026  
-**Status:** Die drei Designabschnitte wurden in der Unterhaltung bestätigt. Die schriftliche Prüfung dieses Dokuments steht noch aus.
+**Stand:** 23.10.2026 (Abschnitte 1–8 an die Entscheidungen der Lehrkraft vom 23.10. angepasst; §9 bleibt als Entscheidungsprotokoll stehen und gilt bei jedem Widerspruch zuerst)
+**Status:** Entscheidungen bestätigt. Die Ruine (Optik) wartet auf die Abnahme der Lehrkraft, bevor der Rest gebaut wird.
 
 ## 1. Ziel
 
-Jeder Schüler durchläuft beim ersten Spiele-Login ein kurzes, geführtes Tutorial, das die Dorfwelt emotional einführt und unmittelbar zum Englischlernen führt. Der Schüler erhält fünf einfache Einstiegsfragen, verdient einmalig 50 Münzen, kauft damit das erste richtige Haus und übt, es selbst auf dem Grundstück zu platzieren.
+Jeder Schüler ohne platziertes Haus durchläuft beim ersten Spiele-Login ein kurzes, geführtes Tutorial: Figur wählen, Kamerafahrt zum eigenen Grundstück mit einer Ruine, kurze Erklärungen zu Daily Quests und Münzen, fünf einfache Englischfragen, einmalig 50 Münzen, Kauf des Fachwerkhauses (50 Münzen) und eigenes Platzieren im Haus-Sockel. Zum Schluss tanzt die Figur, und die Daily-Quest-Ansicht öffnet sich.
 
-Das Tutorial ist in die bestehende Dorfansicht integriert. Es ändert noch keine Anwendung, Datenbank oder Spielinhalte. Bezüge zu den Daily Quests folgen dem bestätigten Entwurf in [Daily Quests für Lerndorf](2026-10-20-daily-quests-design.md): drei normale Tagesquests plus die einmalige Tutorial-Quest.
+## 2. Projektkontext (Ist-Stand vor der Umsetzung)
 
-## 2. Projektkontext
-
-- Lerndorf ist ein browserbasiertes 3D-Spiel für die Klassen 8a und 8b, auch auf geteilten Schul-Tablets. UI-Sprache ist Deutsch, Englischaufgaben sind auf Englisch.
-- Nach erfolgreichem Login wechselt `web/src/main.ts` direkt in `mountVillage`.
-- Neue Profile starten derzeit ohne Grundstück (`profiles.plot_index = null`). Sie wählen ein Grundstück beim ersten Besuch manuell durch Antippen.
-- Die Dorfansicht zeigt Haus- und Garagen-Sockel. Ohne Platzierung erscheinen die aktuellen Starter-Modelle `house_fachwerk` und `garage_holz`; `house_fachwerk` ist derzeit kostenlos und als Starter markiert.
-- Der reguläre Hauskauf läuft über `buy_item`; die Platzierung erfolgt getrennt über `place_in_slot`. Shop und Baumodus lassen sich für eine Klasse unabhängig schließen.
-- Mitschüler sehen die Grundstücks-Sockel der anderen Profile.
-
-Das Tutorial ersetzt für neue bzw. noch nicht eingewiesene Schüler die manuelle Grundstückswahl und den bisherigen kostenlosen Haus-Fallback. Die bestehenden Shop- und Platzierungsabläufe bleiben für alle späteren Käufe und Bauaktionen bestehen.
+- Lerndorf ist ein browserbasiertes 3D-Spiel für die Klassen 8a und 8b, auch auf geteilten Schul-Tablets. UI-Sprache Deutsch, Englischaufgaben Englisch.
+- Nach dem Login öffnet `web/src/main.ts` direkt `mountVillage`. Neue Profile haben `profiles.plot_index = null` und wählen ein Grundstück per Antippen (`claim_plot`, Migration 0012).
+- Figurwahl Junge/Mädchen: `web/src/ui/characterPicker.ts`, RPC `set_character` (Migration 0018), gespeichert in `profiles.avatar.character`. Beim ersten Login ist sie Pflicht.
+- Haus und Garage fallen auf Starter zurück (`STARTER` in `world/plotPlan.ts`: `house_fachwerk`, `garage_holz`; `house_fachwerk` ist kostenlos und `starter = true`, Migration 0013).
+- Kauf über `buy_item`, Platzierung über `place_in_slot`; Shop und Baumodus lassen sich pro Klasse schließen (`classes.shop_open`, `classes.build_open`).
+- Daily Quests: Migrationen 0015–0017, `web/src/ui/dailyQuestsView.ts`. Antwortprüfung über `answer_matches`/`quest_answer_matches`; Lösungen liegen in einer eigenen Tabelle ohne Client-Zugriff.
 
 ## 3. Bestätigte Entscheidungen
 
-- Das Tutorial erscheint für jedes Schülerkonto, das den Erststart noch nicht abgeschlossen hat, auch wenn das Konto bereits vor Einführung des Features angelegt wurde.
-- Beim ersten Spiele-Login weist Lerndorf serverseitig automatisch ein freies Grundstück zu.
-- Die Eröffnungsfahrt zeigt die Welt und endet am eigenen Grundstück. Sie dauert ungefähr 5–8 Sekunden und ist nicht überspringbar.
-- Bei aktivierter Einstellung „Bewegung reduzieren“ zeigt die Fahrt dieselben Stationen ruhiger und kürzer.
-- Bis zum Hauskauf steht dort eine echte Wellblech-Baracke. Mitschüler sehen sie ebenfalls; sie verschwindet erst, wenn das neue Haus platziert wurde.
-- Vor der Avatarwahl verwendet die Eröffnung einen neutralen Beispiel-Avatar. Nach der Auswahl ersetzt ihn der gewählte Avatar.
-- Zur Auswahl stehen zehn vorgefertigte Start-Avatare.
-- Nach der Avatarwahl erklären kurze deutsche UI-Nachrichten nur Daily Quests und Münzen. Jede Nachricht bleibt bis zum Antippen von „Weiter“ sichtbar.
-- Die einmalige Tutorial-Quest besteht aus fünf festen, einfachen Englischfragen. Sie ist zusätzlich zu den drei normalen Daily Quests.
-- Für falsche Antworten gelten die bestehenden Daily-Quest-Regeln: unbegrenzte Versuche, kurzer englischer Hinweis, Lösung bleibt verborgen.
-- Nach fünf richtigen Antworten erhält der Schüler einmalig 50 Münzen.
-- Das vorhandene Fachwerkhaus wird zum festen Tutorial-Haus und kostet 50 Münzen.
-- Der Kauf des Tutorial-Hauses ist verpflichtend, aber bleibt getrennt vom Platzieren. Der Kauf bleibt auch bei geschlossenem Klassenshop möglich.
-- Der Schüler muss anschließend selbst das Fachwerkhaus im Haus-Sockel platzieren. Dieser eine geführte Platzierungsschritt bleibt auch bei geschlossenem Baumodus möglich; andere Shop- und Bauaktionen bleiben gesperrt.
-- Nach dem erfolgreichen Platzieren erscheint das Fachwerkhaus für Mitschüler anstelle der Baracke.
-- Danach zoomt die Kamera auf den Avatar. Er winkt glücklich und sagt: „Jetzt wird gelernt und Dailys gemacht!“ Anschließend öffnet Lerndorf direkt die Daily-Quest-Ansicht.
-- Bei Logout oder Abbruch wird das Tutorial beim nächsten Login am zuletzt gespeicherten Schritt fortgesetzt.
-- Bereits gespeicherter Avatar- und Grundstücksfortschritt wird nicht überschrieben; bereits erfüllte Schritte werden übersprungen.
+- Das Tutorial erscheint für jeden Schüler, der noch kein Haus im Haus-Sockel platziert hat. Wer ein Haus platziert hat, bekommt es nie (derzeit gibt es noch keine Schülerkonten; keine Datenübernahme).
+- Die Figurwahl (Junge/Mädchen) steht am Anfang, vor der Kamerafahrt, und ist Teil des Tutorials (nicht doppelt zeigen). Bereits gespeicherte Figur wird übersprungen.
+- Beim ersten Login vergibt der Server atomar den niedrigsten freien Grundstücksplatz (von innen nach außen). Die manuelle Wahl entfällt für Schüler.
+- Die Kamerafahrt zeigt die Welt und endet am eigenen Grundstück (ca. 5–8 s, nicht überspringbar; mit „Bewegung reduzieren“ kürzer und ruhiger).
+- Im Haus-Sockel steht eine **Ruine** (Kenney-Teile, CC0), bis das Fachwerkhaus platziert ist. Sie ist kein Shop-Artikel, nicht im Inventar, nicht auswählbar. Mitschüler sehen sie ebenfalls.
+- Vor der Ruine steht die eigene Figur mit trauriger Sprechblase. Eine Wink- oder Trauer-Animation gibt es nicht (Figuren haben nur walk, Catwalk, Tänze).
+- Sprechblasen sind Comic-Blasen (abgerundet, weiß, dunkler Rand, Spitze zur Figur) mit der freien Schrift Comic Neue (SIL OFL, im Repo); Fallback `'Comic Sans MS', cursive`. Grafik aus Kenney UI Pack 2.0 (CC0). Gilt auch für die Begrüßungsblasen im Dorf.
+- Nach der Fahrt erklären kurze deutsche Nachrichten nur Daily Quests und Münzen; jede bleibt bis „Weiter“ sichtbar.
+- Die einmalige Tutorial-Quest hat fünf feste Fragen (Tabelle §5), getrennt von den drei normalen Daily Quests. Falsche Antworten: unbegrenzte Versuche, kurzer englischer Hinweis, Lösung bleibt verborgen.
+- Nach fünf richtigen Antworten gibt es einmalig 50 Münzen (idempotent).
+- Das Fachwerkhaus ist kein Starter mehr und kostet 50 Münzen. Der Kauf im Tutorial geht auch bei geschlossenem Shop; das Platzieren im Haus-Sockel auch bei geschlossenem Baumodus. Beides nur für dieses Haus, nur im jeweiligen Tutorialschritt.
+- Nach der bestätigten Platzierung verschwindet die Ruine für alle; das Fachwerkhaus steht dort.
+- Am Ende tanzt die Figur eine Runde ihres Tanzes; die Sprechblase sagt „Jetzt wird gelernt und Dailys gemacht!“. Danach öffnet sich die Daily-Quest-Ansicht.
+- Abbruch oder Logout: Das Tutorial setzt beim nächsten Login am zuletzt bestätigten Schritt fort. Erledigte Schritte werden übersprungen, nichts wird überschrieben.
 
 ## 4. Ablauf
 
-### 4.1 Login und Grundstück
+1. **Login:** Client fragt `tutorial_state()`. `needed = false` → normales Dorf.
+2. **Figur:** fehlt `avatar.character`, öffnet sich der Pflicht-Figurwähler (`set_character`). Der Server vermerkt Schritt `intro`.
+3. **Grundstück:** `tutorial_start()` vergibt atomar den niedrigsten freien Platz, falls `plot_index` leer ist (sonst bleibt er). Das Dorf wird aufgebaut.
+4. **Kamerafahrt:** Panorama → eigenes Grundstück → Figur vor der Ruine, traurige Blase.
+5. **Erklärungen:** 2 Nachrichten (Daily Quests, Münzen), jeweils „Weiter“. Danach Schritt `quiz`.
+6. **Quiz:** fünf Fragen nacheinander (`tutorial_answer`). Nach der fünften schreibt der Server 50 Münzen gut → Schritt `buy`.
+7. **Kauf:** geführter Kaufdialog nur für das Fachwerkhaus (`tutorial_buy_house`), 50 Münzen; → Schritt `place`.
+8. **Platzieren:** geführter Baumodus hebt Inventar-Eintrag und Haus-Sockel hervor; der Schüler platziert selbst (`tutorial_place_house`); → Schritt `done`. Bis der Server bestätigt, bleibt die Ruine.
+9. **Abschluss:** Kamera näher an die Figur, Tanz, Abschlussblase, dann Daily-Quest-Ansicht.
 
-Nach dem ersten erfolgreichen Schüler-Login prüft Lerndorf den serverseitigen Tutorialstatus. Ist das Tutorial nicht abgeschlossen, startet die geführte Erststart-Ansicht. Vor der Kamerafahrt vergibt ein serverseitiger Vorgang atomar einen freien Grundstücksplatz. So können gleichzeitige Logins nicht denselben Platz beanspruchen.
+Bei Verbindungsfehlern bleibt der zuletzt bestätigte Schritt; jeder Schritt lässt sich wiederholen. Kauf und Gutschrift sind idempotent.
 
-### 4.2 Kamerafahrt und Begrüßung
+## 5. Die fünf Fragen (fest, Lösungen nur auf dem Server)
 
-Die bestehende Dorfwelt wird einmal aufgebaut und die Kamera fährt in etwa 5–8 Sekunden über die Welt bis zum zugewiesenen Grundstück. Der Schüler kann die Fahrt nicht überspringen. Mit `prefers-reduced-motion` bleiben dieselben Stationen erkennbar, die Bewegung wird aber kürzer und ruhiger.
+| Nr. | Typ | Aufgabe | Lösung | Hinweis (englisch) |
+|---|---|---|---|---|
+| 1 | choice | What is 'Haus' in English? – house / mouse / horse | house | You live in it. |
+| 2 | gap | My name ___ Tom. | is | Use a form of 'be'. |
+| 3 | choice | Which word is a colour? – red / run / rain | red | Think of a tomato. |
+| 4 | match | dog – Hund, cat – Katze, bird – Vogel | Paare | Think of animals. |
+| 5 | listening (choice) | Vorlesen: „Hello! I am your new neighbour. Welcome to the village!“ – Frage: Listen. Who is talking? – your new neighbour / your teacher / your mum | your new neighbour | Listen to the second sentence. |
 
-Am Grundstück steht eine einfache, heruntergekommene Wellblech-Baracke im Haus-Sockel. Davor steht ein neutraler Beispiel-Avatar, winkt und blickt anschließend traurig zum Haus; eine traurige Sprechblase vermittelt die Situation ohne zusätzliche Erklärtexte. Die Baracke ist die sichtbare Darstellung eines noch nicht begonnenen Tutorials, kein kaufbares Haus und kein Shop-Gegenstand.
+## 6. Serverseitiger Entwurf (Entscheidungen innerhalb der SPEC)
 
-### 4.3 Avatar und kurze Erklärung
-
-Der Schüler wählt einen von zehn Start-Avataren. Die Auswahl speichert ein Avatar-Rezept im Profil und ersetzt die neutrale Beispiel-Figur. Profile mit bereits gespeicherter Avatarwahl behalten diese; die Auswahl wird dann übersprungen.
-
-Es folgen kurze deutsche Nachrichten zu zwei Themen: Daily Quests und Münzen. Jede Nachricht wird einzeln gezeigt und erst durch „Weiter“ fortgesetzt. Andere Funktionen wie Kamera-Bedienung, Shop-Kategorien oder Grundstücks-Dekoration werden hier nicht erklärt.
-
-### 4.4 Tutorial-Quest
-
-Die fünf festen Fragen sind eine einmalige, vom Wochenpaket unabhängige Lernaufgabe. Sie werden der Reihe nach beantwortet. Falsche Antworten zeigen jeweils einen knappen Hinweis auf Englisch, ohne die richtige Lösung zu verraten; unbegrenzt viele Versuche sind möglich.
-
-Nach der fünften richtigen Antwort schreibt der Server 50 Münzen einmalig gut. Die Gutschrift ist unabhängig von den regulären Tagesquests und deren Tagesregeln. Wiederholte Requests oder ein erneutes Laden der Seite können sie nicht verdoppeln.
-
-### 4.5 Hauskauf und Platzierung
-
-Nach der Münzgutschrift öffnet sich der geführte Kaufdialog für genau das Fachwerkhaus zum Preis von 50 Münzen. Während dieses Tutorial-Schritts darf dieses eine Haus auch dann gekauft werden, wenn der Klassenshop geschlossen ist. Das Haus wird wie vorgesehen zunächst dem Inventar gutgeschrieben.
-
-Danach öffnet Lerndorf den geführten Baumodus. Er hebt das Fachwerkhaus im Inventar und den Haus-Sockel hervor. Der Schüler wählt das Haus und platziert es selbst. Bis der Server die Platzierung bestätigt, bleibt die Baracke sichtbar. Erst die bestätigte Platzierung ersetzt sie für alle Schüler der Klasse.
-
-Falls Kauf oder Platzierung wegen eines Verbindungsfehlers scheitert, bleibt der zuletzt bestätigte Schritt gespeichert und der Schüler kann es erneut versuchen. Der Kauf darf nicht doppelt berechnet werden; eine bereits gekaufte Tutorial-Hauskopie bleibt verfügbar.
-
-### 4.6 Abschluss und Übergang
-
-Nach der Platzierung fährt die Kamera näher an den ausgewählten Avatar. Der Avatar winkt glücklich und zeigt die Abschlusszeile „Jetzt wird gelernt und Dailys gemacht!“. Lerndorf öffnet danach die Daily-Quest-Ansicht. Wenn für den aktuellen Tag kein gültiges Daily-Quest-Paket vorliegt, greift deren eigener Fehlerzustand: Es werden keine neuen Quests gezeigt und die Lehrkraft sieht einen Hinweis im Lehrerbereich.
-
-## 5. Fortschritt, Sicherheit und Wiederaufnahme
-
-Der Tutorialstatus wird pro Profil serverseitig gespeichert. Er enthält den aktuellen Abschnitt, den Fortschritt der fünf Fragen, den Status der Münzgutschrift, den Hauskauf, die Platzierung und den Abschluss. Browser-Speicher ist nicht maßgeblich, da mehrere Schüler dasselbe Tablet verwenden.
-
-Der Client darf weder Tutorialstatus, korrekte Lösungen, Münzgutschrift noch Hausbesitz selbst festlegen. Antworten, Belohnung und Kauf werden serverseitig geprüft und verbucht. Die 50 Münzen werden nach allen fünf richtigen Antworten atomar und einmalig gutgeschrieben. Der Hauskauf zieht 50 Münzen über den bestehenden Münzbuchungsweg ab. Die Platzierung wird über die vorhandene Slotlogik im Haus-Sockel gespeichert.
-
-Der besondere Kauf- und Platzierungszugriff ist eng begrenzt: Er gilt nur für das Fachwerkhaus und nur für den angemeldeten Schüler, dessen Tutorial gerade den jeweiligen Schritt erfordert. Er schaltet weder den restlichen Shop noch den restlichen Baumodus frei.
-
-## 6. Änderungen am bestehenden Produkt bei späterer Umsetzung
-
-Die Umsetzung wird voraussichtlich folgende vorhandene Abläufe betreffen:
-
-- `web/src/main.ts`: nach dem Login erst den Tutorialstatus prüfen und abhängig davon Dorf oder Erststart öffnen.
-- Grundstücksvergabe: die manuelle Grundstücksauswahl im Erststart durch eine atomare automatische Zuweisung ersetzen.
-- Grundstücksdarstellung: den bisherigen Fallback `house_fachwerk` vor dem Kauf durch die Wellblech-Baracke ersetzen und den Status allen Mitschülern sichtbar machen.
-- Shop-Katalog: `house_fachwerk` von kostenlosem Starterhaus auf ein kaufbares Tutorial-Haus für 50 Münzen umstellen.
-- Serverfunktionen: Tutorialstatus, fünf Antwortschritte und einmalige 50-Münzen-Belohnung serverseitig verwalten; begrenzte Ausnahmen für den Tutorial-Kauf und die Hausplatzierung unterstützen.
-- UI: Kamerafahrt, Avatar-Preset-Auswahl, Nachrichten, Quiz und geführte Schritte im bestehenden Dorfkontext integrieren.
-
-Die tatsächliche Migration und Ablösung des aktuellen Haus-Fallbacks ist Teil einer späteren Umsetzungsplanung und nicht Teil dieses Dokuments.
+- **Tabelle `tutorial_progress`** (`player_id` PK → profiles, `step` ∈ `intro|quiz|buy|place|done`, `answered int`, `reward_paid bool`, `house_bought bool`, `completed_at`): RLS an, nur Lesen der eigenen Zeile; Schreiben ausschließlich über RPCs.
+- **Tabellen `tutorial_questions`** (Nr, Typ, Aufgabe, Daten, Hinweis) und **`tutorial_solutions`** (Nr, Lösung): RLS an, keine Client-Policy. Die Fragen kommen nur über `tutorial_question()` (ohne Lösung, nur die aktuelle Frage).
+- **Gutschrift:** `coin_ledger.reason = 'tutorial'` mit Unique-Index je Spieler; zusätzlich Sperre der Fortschrittszeile (`for update`).
+- **Katalog:** `house_fachwerk`: `starter = false`, `price = 50`. Ein Haus-Slot ohne Platzierung zeigt auf dem Client die Ruine (`STARTER.house` entfällt). `place_in_slot` und `buy_item` bleiben unverändert streng; die Tutorial-RPCs sind die einzigen Ausnahmen für geschlossenen Shop/Baumodus.
+- **Grundstück:** `tutorial_start()` sperrt die Klasse (Advisory-Lock) und vergibt `min(frei)`; `claim_plot` wird für Schüler gesperrt.
+- **Wer ein Haus platziert hat:** `tutorial_state()` meldet `needed = false` und legt den Schritt `done` an.
 
 ## 7. Abnahmekriterien
 
-1. Ein Schülerkonto ohne abgeschlossenen Erststart erhält beim ersten Spiele-Login automatisch genau ein freies Grundstück.
-2. Nach dem Login läuft die nicht überspringbare Kamerafahrt bis zur eigenen Baracke; sie dauert im Normalfall etwa 5–8 Sekunden und berücksichtigt „Bewegung reduzieren“.
-3. Mitschüler sehen die Wellblech-Baracke auf einem unvollständigen Grundstück. Sie bleibt dort bis zur bestätigten Platzierung eines Hauses.
-4. Die Avatarwahl bietet zehn vorgefertigte Start-Avatare; eine vorhandene gespeicherte Wahl wird nicht überschrieben.
-5. Die deutschen Nachrichten behandeln ausschließlich Daily Quests und Münzen; jede wird manuell mit „Weiter“ bestätigt.
-6. Die einmalige Tutorial-Quest hat genau fünf einfache Englischfragen und ist getrennt von den drei normalen Tagesquests.
-7. Falsche Antworten zeigen einen englischen Hinweis und lassen weitere Versuche zu. Lösungen bleiben bis zum erfolgreichen Abschluss verborgen.
-8. Nach fünf richtigen Antworten gibt es genau eine Gutschrift über 50 Münzen; wiederholte Anfragen erzeugen keine weitere Gutschrift.
-9. Das feste Fachwerkhaus kostet 50 Münzen und kann im vorgesehenen Tutorial-Kaufschritt auch bei geschlossenem Shop erworben werden.
-10. Der Schüler muss das Fachwerkhaus selbst im Haus-Sockel platzieren. Bei geschlossenem Baumodus ist ausschließlich dieser Tutorial-Schritt erlaubt.
-11. Nach bestätigter Platzierung sehen alle Mitschüler das Fachwerkhaus statt der Baracke.
-12. Nach dem glücklichen Avatar-Moment öffnet sich die Daily-Quest-Ansicht.
-13. Ein Abbruch setzt beim nächsten Login an der zuletzt bestätigten Tutorialstufe fort; Belohnung und Kauf bleiben einmalig.
-14. Profile, Münzen und Hausplatzierungen können nicht durch direkte Client-Änderungen manipuliert werden.
+1. Erster Login ohne Haus: Figurwahl vor der Kamerafahrt; danach genau ein freier Platz, der niedrigste Index; gleichzeitige Logins bekommen verschiedene Plätze.
+2. Die Kamerafahrt (5–8 s, nicht überspringbar, „Bewegung reduzieren“ beachtet) endet an der Figur vor der Ruine mit trauriger Sprechblase.
+3. Mitschüler sehen die Ruine auf dem Platz, bis ein Haus platziert ist.
+4. Zwei Erklärungsnachrichten (nur Daily Quests und Münzen), jede mit „Weiter“.
+5. Genau fünf Fragen laut §5; Hinweise englisch; Lösungen verlassen den Server nicht.
+6. Nach der fünften richtigen Antwort genau 50 Münzen, auch bei wiederholten Aufrufen.
+7. Fachwerkhaus kostet 50 und ist kein Starter; Kauf im Tutorial bei geschlossenem Shop möglich, anderer Kauf bei geschlossenem Shop nicht.
+8. Platzieren im Tutorial bei geschlossenem Baumodus möglich, andere Bauaktionen nicht.
+9. Nach bestätigter Platzierung ersetzt das Haus die Ruine für alle.
+10. Figur tanzt, Blase zeigt die Abschlusszeile, danach öffnet sich die Daily-Quest-Ansicht.
+11. Abbruch an jedem Schritt: Wiederaufnahme am letzten bestätigten Schritt, nichts doppelt.
+12. Schüler mit platziertem Haus sehen kein Tutorial.
+13. Clients können Tutorialstatus, Münzen, Besitz und Platzierungen nicht direkt ändern (RLS, nur RPC).
+14. Comic-Sprechblasen mit Comic Neue; Lizenzen in `blender/sources/LICENSES.md`.
 
-## 8. Noch zu prüfen oder auszuarbeiten
+## 8. Offen / bewusst nicht Teil dieses Designs
 
-- Die fünf konkreten Einstiegsfragen und ihre Hinweise werden als eigener Inhalt festgelegt; dieses Design setzt noch keine Fragen fest.
-- Die genauen zehn Avatar-Rezepte werden aus den verfügbaren Startteilen zusammengestellt.
-- Für die automatische Grundstücksvergabe gilt als Umsetzungsvorschlag: atomar den niedrigsten freien Grundstücksindex vergeben. Da die Indizes nach Nähe zum Marktplatz sortiert sind, weist das Plätze der Reihe nach von innen nach außen zu.
-- Die exakte Darstellung der Wellblech-Baracke folgt dem Lerndorf-Look und dem vorhandenen Haus-Sockel; Stil und Form werden vor visueller Umsetzung anhand einer Vorschau geprüft.
+- Die Ruine wird erst nach Abnahme der Vorschau (Galerie „plot“) eingebaut.
+- Tripo-Lizenz der Figuren (siehe LICENSES.md) bleibt Sache der Lehrkraft.
 
-Diese Punkte betreffen die spätere Inhalts- und Umsetzungsplanung, nicht die bestätigte Tutorial-Reihenfolge.
+## 9. Änderungen nach Entscheidung der Lehrkraft (23.10.2026)
+
+Diese Entscheidungen gelten vor den Abschnitten 1–8. Wo der Text oben abweicht, gilt dieser Abschnitt.
+
+1. **Figurwahl statt zehn Start-Avatare.** Es gibt zwei Figuren, Junge und Mädchen (`web/src/ui/characterPicker.ts`, RPC `set_character`, Migration 0018). Die Wahl kommt **vor** der Kamerafahrt. Einen neutralen Beispiel-Avatar gibt es nicht: Vor der Baracke steht bereits die eigene Figur. Die bisherige Pflicht-Auswahl beim ersten Login wird in den Tutorialablauf übernommen (nicht doppelt anzeigen).
+2. **Keine Wink- und Trauer-Animation.** Die Figuren haben nur walk, Catwalk und Tänze. Am Anfang steht die Figur vor der Ruine und zeigt eine traurige Sprechblase. Am Ende tanzt sie (eine Runde ihres Tanzes) statt zu winken; die Abschlusszeile „Jetzt wird gelernt und Dailys gemacht!“ steht in der Sprechblase.
+3. **Sprechblasen im Comic-Stil.** Abgerundete weiße Blase mit dunklem Rand und Spitze zur Figur, Schrift im Comic-Stil. Comic Sans ist auf iPads und Android-Tablets meist nicht installiert und darf nicht mitgeliefert werden; deshalb die freie Schrift **Comic Neue** (SIL OFL) als Datei im Repo mitliefern, Fallback `'Comic Sans MS', cursive`. Grafik aus dem **Kenney UI Pack 2.0** (CC0, `Kenny/UI`, eine fertige Sprechblase enthält es nicht): Körper der Blase aus `PNG/Grey/Default/button_rectangle_depth_border.png` als 9-Slice (`border-image`, hell eingefärbt), Spitze zur Figur aus `PNG/Grey/Default/arrow_basic_s.png`. Die Kenney-Schrift „Future“ passt nicht zum Comic-Stil und wird nicht verwendet. Optional für Tutorial-Knöpfe („Weiter“): `Sounds/tap-a.ogg`. Quellen in `blender/sources/LICENSES.md` eintragen. Gilt auch für die normalen Begrüßungsblasen im Dorf.
+4. **Grundstück automatisch.** Beim ersten Login vergibt der Server atomar den niedrigsten freien Grundstücksplatz (von innen nach außen). Die manuelle Wahl durch Antippen (`claim_plot`, Hinweis „Tippe auf eine freie Wiese“) entfällt für Schüler.
+5. **Wer schon ein Haus platziert hat, bekommt kein Tutorial.** Derzeit hat noch kein Schüler ein Konto oder Haus; eine Datenübernahme ist nicht nötig.
+6. **Ruine statt Wellblech-Baracke und statt kostenlosem Starterhaus.** Vor dem Tutorial-Hauskauf steht im Haus-Sockel eine **Ruine** (heruntergekommenes Haus), zusammengesetzt aus Kenney-Teilen (CC0) in `Kenny/`, z. B. Fantasy Town `wall-wood-broken`, `wall-broken`, `wall-wood-window-shutters`, `planks`, `planks-half`, `fence-broken`, ein schiefes/halbes Dach aus `roof-*`, dazu Survival `structure-metal-wall`/`metal-panel-*` als geflickte Stellen und `floor-old`; Maße nach `docs/ASSET_VERTRAG.md` (Haus-Sockel 6×4). Die Ruine ist kein Shop-Artikel, nicht im Inventar und nicht auswählbar; nach der Platzierung des Fachwerkhauses verschwindet sie für alle. Vorschaubild vor dem Einbau der Lehrkraft zeigen.
+7. **Die fünf Tutorial-Fragen** (ganz einfach, fest im Code bzw. in einer Migration, Lösungen nur auf dem Server):
+
+| Nr. | Typ | Aufgabe | Lösung | Hinweis (englisch) |
+|---|---|---|---|---|
+| 1 | choice | What is 'Haus' in English? – house / mouse / horse | house | You live in it. |
+| 2 | gap | My name ___ Tom. | is | Use a form of 'be'. |
+| 3 | choice | Which word is a colour? – red / run / rain | red | Think of a tomato. |
+| 4 | match | dog – Hund, cat – Katze, bird – Vogel | Paare | Think of animals. |
+| 5 | listening (choice) | Vorlesen: „Hello! I am your new neighbour. Welcome to the village!“ – Frage: Listen. Who is talking? – your new neighbour / your teacher / your mum | your new neighbour | Listen to the second sentence. |

@@ -26,6 +26,7 @@ import {
   type BuildState,
   type SlotMap,
 } from '../api/build';
+import { RUIN_ID } from './ruin';
 
 const LIFT = 0.2;
 const SLOT_COLOUR: Record<SlotDef['kind'], string> = {
@@ -50,6 +51,25 @@ export interface EnterOptions {
   /** Hand-over from the shop or inventory: preview this item right away. */
   itemId?: string;
   slotId?: SlotId;
+  /** Guided placement of the first-login tutorial: one item, one slot, nothing else. */
+  guided?: GuidedPlacement;
+}
+
+export interface GuidedPlacement {
+  itemId: string;
+  slotId: SlotId;
+  /** Saves the placement (tutorial_place_house, not place_in_slot). */
+  place: () => Promise<{ ok: true } | { ok: false; message: string }>;
+  /** Called once the server confirmed and the plot shows the server state. */
+  onPlaced: () => void;
+  hint: string;
+  button: string;
+}
+
+/** What a slot really holds for the bar: the ruin in an empty house slot is no placement. */
+function realItem(slots: SlotMap, slot: SlotId, kind: string): ReturnType<typeof shownItem> {
+  const c = shownItem(slots, slot, kind);
+  return c?.itemId === RUIN_ID ? undefined : c;
 }
 
 const PREVIEW_HINT = 'Vorschau – noch nicht gespeichert';
@@ -65,6 +85,7 @@ export class BuildMode {
   private message: string | null = null;
   private busy = false;
   private active = false;
+  private guided: GuidedPlacement | null = null;
 
   constructor(private readonly opts: BuildModeOptions) {
     this.bar = document.createElement('div');
@@ -87,7 +108,13 @@ export class BuildMode {
     this.message = null;
     this.slot = null;
     this.handOver = null;
-    const item = opts.itemId ? res.value.items.find((i) => i.id === opts.itemId) : undefined;
+    this.guided = opts.guided ?? null;
+    if (this.guided) {
+      // the pupil picks the item and confirms; slot preselected, nothing else selectable
+      this.handOver = this.guided.itemId;
+      this.slot = slotById(this.guided.slotId) ?? null;
+    }
+    const item = !this.guided && opts.itemId ? res.value.items.find((i) => i.id === opts.itemId) : undefined;
     if (item) {
       this.handOver = item.id;
       const asked = opts.slotId ? slotById(opts.slotId) : undefined;
@@ -111,6 +138,8 @@ export class BuildMode {
     this.bar.innerHTML = '';
     this.slot = null;
     this.handOver = null;
+    this.guided = null;
+    this.bar.classList.remove('build-bar--guided');
     this.message = null;
   }
 
@@ -126,11 +155,15 @@ export class BuildMode {
     if (!local) return;
     const slot = slotAt(local.x, local.z);
     if (!slot) return;
+    if (this.guided && slot.id !== this.guided.slotId) return;
     this.selectSlot(slot);
   }
 
   private selectSlot(slot: SlotDef): void {
     if (this.busy || !this.state) return;
+    if (this.guided && slot.id !== this.guided.slotId) return;
+    // guided: tapping the (already chosen) house slot again keeps the preview
+    if (this.guided && this.slot?.id === slot.id) return;
     this.dropPending();
     this.slot = slot;
     this.message = null;
@@ -200,6 +233,8 @@ export class BuildMode {
     this.clearGroup();
     const p = this.opts.plot;
     for (const s of SLOTS) {
+      // guided: only the one slot is outlined
+      if (this.guided && s.id !== this.guided.slotId) continue;
       const c = rectCentre(s);
       const selected = this.slot?.id === s.id;
       const dimmed = this.handOverKind() !== null && !slotAccepts(s, this.handOverKind() as string);
@@ -227,11 +262,15 @@ export class BuildMode {
 
   private renderBar(): void {
     if (!this.state) return;
+    if (this.guided) {
+      this.renderGuided(this.guided);
+      return;
+    }
     const st = this.state;
     const slot = this.slot;
     const nameOf = (id: string): string => st.items.find((i) => i.id === id)?.nameDe ?? id;
     const slotList = `<div class="build-items" role="group" aria-label="Plätze">${SLOTS.map((s) => {
-      const cur = shownItem(st.slots, s.id, s.kind);
+      const cur = realItem(st.slots, s.id, s.kind);
       const picked = slot?.id === s.id;
       return `<button type="button" data-slot="${s.id}" aria-pressed="${picked}" class="${picked ? 'primary' : ''}"><strong>${escape(
         s.nameDe,
@@ -250,7 +289,7 @@ export class BuildMode {
     }
     const pending = this.pending;
     const placed = st.slots[slot.id];
-    const current = shownItem(st.slots, slot.id, slot.kind);
+    const current = realItem(st.slots, slot.id, slot.kind);
     const usedElsewhere = (id: string): number =>
       Object.entries(st.slots).filter(([sid, c]) => sid !== slot.id && c?.itemId === id).length;
     const fitting = st.items.filter((i) => i.kind === slot.kind);
@@ -289,6 +328,44 @@ export class BuildMode {
         <button type="button" id="clear" ${canClear && !this.busy ? '' : 'disabled'}>Wegräumen</button>
         <button type="button" id="done">Fertig</button>
       </div>`;
+    this.wireBar();
+  }
+
+  /** Tutorial bar: the house slot, the one item and one confirm button, each highlighted in turn. */
+  private renderGuided(g: GuidedPlacement): void {
+    const st = this.state;
+    if (!st) return;
+    this.bar.classList.add('build-bar--guided');
+    const slot = slotById(g.slotId);
+    const item = st.items.find((i) => i.id === g.itemId);
+    const chosen = this.pending?.itemId === g.itemId;
+    const placed = realItem(st.slots, g.slotId, 'house');
+    const placedName = placed ? (st.items.find((i) => i.id === placed.itemId)?.nameDe ?? '') : '';
+    const shownName = chosen && item ? item.nameDe : placedName;
+    const itemBtn = placed
+      ? ''
+      : item
+      ? `<button type="button" data-item="${escape(item.id)}" aria-pressed="${chosen}" class="${
+          chosen ? 'primary' : 'tutorial-highlight'
+        }" ${this.busy ? 'disabled' : ''}>${escape(item.nameDe)}</button>`
+      : '<span>Das Haus ist noch nicht im Inventar.</span>';
+    this.bar.innerHTML = `
+      <p class="build-info" role="status">${escape(this.message ?? g.hint)}</p>
+      <div class="build-items" role="group" aria-label="Plätze"><button type="button" data-slot="${escape(
+        g.slotId,
+      )}" aria-pressed="true" class="primary"><strong>${escape(slot?.nameDe ?? 'Haus')}</strong>: ${
+        shownName ? escape(shownName) : 'leer'
+      }</button></div>
+      <div class="build-items" role="group" aria-label="Passende Sachen">${itemBtn}</div>
+      ${
+        placed
+          ? ''
+          : `<div class="build-actions">
+        <button type="button" id="save" class="primary${chosen && !this.busy ? ' tutorial-highlight' : ''}" ${
+          chosen && !this.busy ? '' : 'disabled'
+        }>${escape(g.button)}</button>
+      </div>`
+      }`;
     this.wireBar();
   }
 
@@ -340,9 +417,19 @@ export class BuildMode {
     if (this.busy || !slot || !pending) return;
     this.busy = true;
     this.renderBar();
-    const res = await placeInSlot(this.opts.supabase, pending.itemId, slot.id, pending.rot);
+    const guided = this.guided;
+    let res: { ok: true } | { ok: false; message: string };
+    try {
+      res = guided
+        ? await guided.place()
+        : await placeInSlot(this.opts.supabase, pending.itemId, slot.id, pending.rot);
+    } catch (err) {
+      console.error('placing failed', err);
+      res = { ok: false, message: 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.' };
+    }
     this.busy = false;
-    await this.after(res.ok ? 'Gespeichert.' : res.message, res.ok);
+    await this.after(res.ok ? (guided ? 'Dein Haus steht!' : 'Gespeichert.') : res.message, res.ok);
+    if (res.ok && guided) guided.onPlaced();
   }
 
   private async clear(): Promise<void> {
@@ -360,6 +447,10 @@ export class BuildMode {
     if (changed) {
       const res = await loadBuildState(this.opts.supabase, this.opts.uid);
       if (res.ok) this.state = res.value;
+      else if (this.guided && this.state && this.slot && this.pending) {
+        // the server confirmed the placement: show it even if the reload failed (the ruin must not come back)
+        this.state = { ...this.state, slots: previewSlots(this.state.slots, this.slot.id, this.pending) };
+      }
       this.pending = null;
       this.handOver = null;
       // Also when the pupil left meanwhile: the plot must show the server state (bar stays closed).

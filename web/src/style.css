@@ -757,3 +757,180 @@ table.ledger td {
   min-height: 44px;
   padding: 6px 16px;
 }
+
+/* figure choice (boy or girl) */
+.character-choices { display: flex; gap: 16px; justify-content: center; margin: 12px 0; }
+.character-choice { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; min-width: 140px; border-radius: 14px; font-size: 18px; font-weight: 700; }
+.character-choice img { width: 120px; height: 160px; object-fit: contain; }
+.character-choice[aria-pressed='true'] { outline: 3px solid #ffb547; }
+
+/* Comic speech bubbles (tutorial overlay). Font: Comic Neue, SIL OFL 1.1 (public/fonts/OFL.txt). */
+@font-face {
+  font-family: 'Comic Neue';
+  src: url('/fonts/ComicNeue-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Comic Neue';
+  src: url('/fonts/ComicNeue-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.speech-bubble {
+  --tip-x: 50%;
+  position: fixed;
+  z-index: 60;
+  box-sizing: border-box;
+  max-width: min(320px, calc(100vw - 16px));
+  padding: 14px 18px 18px;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.25;
+  color: #1c1c28;
+  text-align: center;
+  pointer-events: none;
+}
+/* body: Kenney UI Pack 2.0 button as 9-slice, brightened to white and outlined dark */
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-style: solid;
+  border-width: 12px 12px 16px;
+  border-image: url('/assets/kenney/ui/bubble.png') 12 12 16 fill / 12px 12px 16px stretch;
+  filter: brightness(2.4) saturate(0.4) drop-shadow(1.5px 0 0 #1c1c28) drop-shadow(-1.5px 0 0 #1c1c28)
+    drop-shadow(0 1.5px 0 #1c1c28) drop-shadow(0 -1.5px 0 #1c1c28);
+}
+/* tip towards the figure: Kenney arrow, same treatment */
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  left: var(--tip-x);
+  bottom: -20px;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  z-index: -1;
+  background: url('/assets/kenney/ui/bubble-tip.png') center / contain no-repeat;
+  filter: brightness(2.4) saturate(0.4) drop-shadow(1.5px 0 0 #1c1c28) drop-shadow(-1.5px 0 0 #1c1c28)
+    drop-shadow(0 1.5px 0 #1c1c28) drop-shadow(0 -1.5px 0 #1c1c28);
+}
+.speech-bubble--below::after {
+  bottom: auto;
+  top: -20px;
+  transform: rotate(180deg);
+}
+.speech-bubble--happy::before,
+.speech-bubble--happy::after {
+  filter: brightness(2.4) saturate(0.4) sepia(0.25) drop-shadow(1.5px 0 0 #1c1c28) drop-shadow(-1.5px 0 0 #1c1c28)
+    drop-shadow(0 1.5px 0 #1c1c28) drop-shadow(0 -1.5px 0 #1c1c28);
+}
+.speech-bubble--sad::before,
+.speech-bubble--sad::after {
+  filter: brightness(2.1) saturate(0.5) hue-rotate(-10deg) drop-shadow(1.5px 0 0 #1c1c28)
+    drop-shadow(-1.5px 0 0 #1c1c28) drop-shadow(0 1.5px 0 #1c1c28) drop-shadow(0 -1.5px 0 #1c1c28);
+}
+
+/* first-login tutorial: message card, guided buy dialog, highlights */
+.tutorial-card {
+  position: fixed;
+  z-index: 25;
+  /* at the top, below the status button: the figure stands in the lower half of the picture */
+  left: calc(var(--nav-left, 0px) + (100vw - var(--nav-left, 0px)) / 2);
+  top: calc(max(12px, env(safe-area-inset-top)) + 64px);
+  transform: translateX(-50%);
+  box-sizing: border-box;
+  width: min(480px, calc(100vw - var(--nav-left, 0px) - 24px));
+  padding: 14px 16px;
+  background: var(--panel);
+  color: var(--ink);
+  border: 2px solid var(--lantern);
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tutorial-card p {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.35;
+}
+.tutorial-card--error {
+  border-color: #ff8a7a;
+}
+.tutorial-action,
+.tutorial-card button {
+  align-self: flex-end;
+  min-height: 48px;
+  min-width: 140px;
+  padding: 8px 20px;
+  font-size: 1.05rem;
+  border-radius: 12px;
+  border: 0;
+  background: var(--lantern);
+  color: #2a1d05;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tutorial-quiz .panel,
+.tutorial-buy .panel {
+  width: min(560px, 100%);
+}
+.tutorial-prompt {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.tutorial-quiz .quest-form {
+  margin: 10px 0 12px;
+}
+.tutorial-buy-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 12px auto;
+  padding: 12px;
+  width: min(280px, 100%);
+  border: 2px solid var(--lantern);
+  border-radius: 14px;
+}
+.tutorial-buy-card .item-thumb {
+  width: 100%;
+  max-width: 256px;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  object-fit: contain;
+}
+.tutorial-buy .tutorial-action {
+  display: block;
+  margin: 0 auto;
+}
+.tutorial-highlight {
+  outline: 3px solid #ffd23f;
+  outline-offset: 2px;
+  animation: tutorial-pulse 1.2s ease-in-out infinite;
+}
+@keyframes tutorial-pulse {
+  50% {
+    outline-color: rgba(255, 210, 63, 0.35);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tutorial-highlight {
+    animation: none;
+  }
+}
+.nav-btn[aria-disabled='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

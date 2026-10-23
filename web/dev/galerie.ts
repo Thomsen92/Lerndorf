@@ -82,12 +82,14 @@ const members = Array.from({ length: RESIDENTS }, (_, i) => {
     slots,
   };
 });
+// ?ruin=1: the first plot still shows the ruin of the first-login tutorial
+if (params.get('ruin') === '1') members.find((m) => m.plotIndex === 0)!.slots.house = { itemId: 'ruin', rot: 0 };
 const village = buildVillage(layout, members, null);
 scene.add(village);
 const crowd = new Crowd(
   scene,
   layout,
-  members.map((m) => ({ nickname: m.nickname })),
+  members.map((m, i) => ({ nickname: m.nickname, character: i % 2 === 0 ? ('boy' as const) : ('girl' as const) })),
 );
 
 const camera = new THREE.PerspectiveCamera(38, 1280 / 800, 0.1, 400);
@@ -107,6 +109,19 @@ const VIEWS: Record<string, { target: THREE.Vector3; offset: THREE.Vector3 }> = 
     target: new THREE.Vector3(layout.plots[0].x, layout.plots[0].h, layout.plots[0].z),
     offset: new THREE.Vector3(14, 22, 26),
   },
+  // close-up of the house slot of plot 0 from the street (the ruin of the first-login tutorial)
+  ruin: (() => {
+    const p = layout.plots[0];
+    const toWorld = (lx: number, lz: number): THREE.Vector3 =>
+      new THREE.Vector3(
+        p.x + lx * Math.cos(p.face) + lz * Math.sin(p.face),
+        p.h,
+        p.z - lx * Math.sin(p.face) + lz * Math.cos(p.face),
+      );
+    const c = toWorld(-1.5, -3.5);
+    const cam = toWorld(1.5, 7.5);
+    return { target: c.clone().setY(p.h + 1.2), offset: cam.sub(c).setY(5.5) };
+  })(),
   bridge: {
     target: layout.bridges[0]
       ? new THREE.Vector3(

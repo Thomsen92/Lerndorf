@@ -6,6 +6,7 @@
  * tests/render/plotAssets.test.ts measures every model against the contract.
  */
 import * as THREE from 'three';
+import { RUIN_ID, buildRuin } from './ruin';
 
 const solidMats = new Map<string, THREE.MeshStandardMaterial>();
 const glowMats = new Map<string, THREE.MeshBasicMaterial>();
@@ -709,6 +710,7 @@ export const MODEL_IDS = {
  * Unknown ids fall back to a neutral placeholder of the right kind.
  */
 export function plotAsset(kind: string, itemId: string, tint: Tint = tintFor(0)): THREE.Group {
+  if (kind === 'house' && itemId === RUIN_ID) return buildRuin();
   if (kind === 'house') return (HOUSES[itemId] ?? houseFachwerk)(tint);
   if (kind === 'garage') return (GARAGES[itemId] ?? garageHolz)();
   if (kind === 'car') return (CARS[itemId] ?? carKleinwagen)();
