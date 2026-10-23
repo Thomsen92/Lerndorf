@@ -217,6 +217,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
     done,
     close() {
       closed = true;
+      synth?.cancel(); // stop reading aloud on close / logout
       overlay.remove();
     },
   };

@@ -191,4 +191,17 @@ describe('tutorial quiz', () => {
     button('Noch einmal versuchen')?.click();
     await until(() => document.querySelector('h2')?.textContent === 'Frage 1 von 5', 'q1');
   });
+
+  it('close() stops reading aloud', async () => {
+    const cancel = vi.fn();
+    vi.stubGlobal('speechSynthesis', { cancel, getVoices: () => [], addEventListener: () => undefined });
+    try {
+      const quiz = openQuiz({ api: api(1).api, onCoins: () => undefined });
+      await until(() => document.querySelector('h2') !== null, 'question');
+      quiz.close();
+      expect(cancel).toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
 });
