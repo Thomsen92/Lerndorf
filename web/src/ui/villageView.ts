@@ -14,6 +14,7 @@ import {
   loadClass,
   loadMembers,
   loadMyProfile,
+  saveCharacter,
   type Member,
   type MyProfile,
 } from '../api/village';
@@ -39,6 +40,7 @@ import { openInventory } from './inventoryView';
 import { openDailyQuests } from './dailyQuestsView';
 import { openLedger } from './ledgerView';
 import { openAccountMenu } from './accountMenu';
+import { openCharacterPicker } from './characterPicker';
 import { BuildMode, type EnterOptions } from '../render/buildMode';
 import { FLIGHT_SECONDS, houseView, lerpPose, onPlot, type CameraPose } from '../render/houseCamera';
 import {
@@ -240,7 +242,7 @@ export async function mountVillage(
   const crowd = new Crowd(
     scene,
     layout,
-    members.map((m) => ({ nickname: m.nickname, own: m.id === profile.id })),
+    members.map((m) => ({ nickname: m.nickname, own: m.id === profile.id, character: m.character })),
   );
 
   // quality: applied now, and again when Auto has measured
@@ -406,6 +408,25 @@ export async function mountVillage(
     window.setTimeout(() => (notice.hidden = true), 3000);
   };
 
+  // figure choice: forced once on the first login, later from the settings
+  let myCharacter = profile.character;
+  const pickCharacter = (required: boolean, opener: HTMLElement | null): void => {
+    modals.track(
+      openCharacterPicker({
+        required,
+        current: myCharacter,
+        opener,
+        onPick: async (kind) => {
+          const res = await saveCharacter(supabase, kind);
+          if (!res.ok) return res.message;
+          myCharacter = kind;
+          crowd.setCharacter(profile.nickname, kind);
+          return null;
+        },
+      }),
+    );
+  };
+
   // settings menu and ledger are modals; tracked so logout can close them properly
   const openSettings = (opener: HTMLElement): void => {
     modals.track(
@@ -419,6 +440,7 @@ export async function mountVillage(
           applyQuality();
         },
         onLedger: () => modals.track(openLedger(supabase, opener)),
+        onCharacter: () => pickCharacter(false, opener),
         onLogout: () => void logout(),
       }),
     );
@@ -474,6 +496,7 @@ export async function mountVillage(
   });
   root.appendChild(nav.el);
   nav.setActive('dorf');
+  if (myCharacter === null) pickCharacter(true, null);
 
   window.addEventListener('resize', resize);
   applyQuality();

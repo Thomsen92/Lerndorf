@@ -1,5 +1,6 @@
 /** Data the village needs: own profile, class settings and classmates. Read-only (SPEC §6). */
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { isCharacterKind, type CharacterKind } from '../render/character';
 
 /**
  * Plots per class: 32 pupils + 2 reserve (SPEC §10, §19). Fixed, not per pupil count,
@@ -13,6 +14,8 @@ export interface MyProfile {
   classId: string;
   plotIndex: number | null;
   coins: number;
+  /** Boy or girl; null until the pupil has picked a figure. */
+  character: CharacterKind | null;
 }
 
 export interface ClassSettings {
@@ -27,6 +30,23 @@ export interface Member {
   id: string;
   nickname: string;
   plotIndex: number | null;
+  character: CharacterKind | null;
+}
+
+/** The figure stored in the avatar recipe (avatar.character), or null. */
+export function characterOf(avatar: unknown): CharacterKind | null {
+  const c = (avatar as { character?: unknown } | null)?.character;
+  return isCharacterKind(c) ? c : null;
+}
+
+/** Saves the pupil's figure (RPC set_character). */
+export async function saveCharacter(
+  supabase: SupabaseClient,
+  character: CharacterKind,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const { error } = await supabase.rpc('set_character', { p_character: character });
+  if (error) return { ok: false, message: 'Die Figur konnte nicht gespeichert werden. Bitte noch einmal versuchen.' };
+  return { ok: true };
 }
 
 export class VillageLoadError extends Error {}
@@ -48,7 +68,7 @@ export async function loadMyProfile(supabase: SupabaseClient): Promise<MyProfile
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, nickname, class_id, plot_index, coins')
+    .select('id, nickname, class_id, plot_index, coins, avatar')
     .eq('id', uid)
     .single();
   if (error || !data || !data.class_id) throw new VillageLoadError('profile not found');
@@ -58,6 +78,7 @@ export async function loadMyProfile(supabase: SupabaseClient): Promise<MyProfile
     classId: data.class_id,
     plotIndex: data.plot_index,
     coins: data.coins,
+    character: characterOf(data.avatar),
   };
 }
 
@@ -81,9 +102,10 @@ export async function loadClass(supabase: SupabaseClient, classId: string): Prom
 export async function loadMembers(supabase: SupabaseClient): Promise<Member[]> {
   const { data, error } = await supabase.rpc('village_members');
   if (error) throw new VillageLoadError('members not available');
-  return (data ?? []).map((r: { id: string; nickname: string; plot_index: number | null }) => ({
+  return (data ?? []).map((r: { id: string; nickname: string; plot_index: number | null; avatar?: unknown }) => ({
     id: r.id,
     nickname: r.nickname,
     plotIndex: r.plot_index,
+    character: characterOf(r.avatar),
   }));
 }

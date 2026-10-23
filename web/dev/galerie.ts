@@ -87,7 +87,7 @@ scene.add(village);
 const crowd = new Crowd(
   scene,
   layout,
-  members.map((m) => ({ nickname: m.nickname })),
+  members.map((m, i) => ({ nickname: m.nickname, character: i % 2 === 0 ? ('boy' as const) : ('girl' as const) })),
 );
 
 const camera = new THREE.PerspectiveCamera(38, 1280 / 800, 0.1, 400);

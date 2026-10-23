@@ -757,3 +757,9 @@ table.ledger td {
   min-height: 44px;
   padding: 6px 16px;
 }
+
+/* figure choice (boy or girl) */
+.character-choices { display: flex; gap: 16px; justify-content: center; margin: 12px 0; }
+.character-choice { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; min-width: 140px; border-radius: 14px; font-size: 18px; font-weight: 700; }
+.character-choice img { width: 120px; height: 160px; object-fit: contain; }
+.character-choice[aria-pressed='true'] { outline: 3px solid #ffb547; }

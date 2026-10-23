@@ -18,6 +18,8 @@ export function openAccountMenu(opts: {
   quality: QualityChoice;
   onQuality: (q: QualityChoice) => void;
   onLedger: () => void;
+  /** opens the figure choice (boy or girl); omitted: no button */
+  onCharacter?: () => void;
   onLogout: () => void;
 }): ModalHandle {
   const modal = openModal({ title: 'Einstellungen', opener: opts.opener });
@@ -57,11 +59,19 @@ export function openAccountMenu(opts: {
     opts.onLedger();
   });
 
+  const figure = document.createElement('button');
+  figure.type = 'button';
+  figure.textContent = 'Figur wechseln';
+  figure.addEventListener('click', () => {
+    modal.close();
+    opts.onCharacter?.();
+  });
+
   const logout = document.createElement('button');
   logout.type = 'button';
   logout.textContent = 'Abmelden';
   logout.addEventListener('click', () => opts.onLogout());
 
-  modal.body.append(who, group, ledger, logout);
+  modal.body.append(who, group, ledger, ...(opts.onCharacter ? [figure] : []), logout);
   return modal;
 }

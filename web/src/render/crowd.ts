@@ -1,11 +1,18 @@
 /**
  * Villagers in the 3D scene: placeholder figures that walk, sit, wait and greet each other.
  * Behaviour comes from avatars/behaviour.ts; this file only moves and shows them.
- * Placeholder figures (boxes) until the animated boy model is loaded (render/character.ts).
+ * Placeholder figures (boxes) until the animated boy or girl model is loaded (render/character.ts).
  */
 import * as THREE from 'three';
 import { bakeStatic } from './merge';
-import { instantiate, loadCharacter, type CharacterAsset, type CharacterClip, type CharacterInstance } from './character';
+import {
+  DEFAULT_CHARACTER,
+  instantiate,
+  loadCharacter,
+  type CharacterAsset,
+  type CharacterInstance,
+  type CharacterKind,
+} from './character';
 import { createRng, type Rng } from '../world/rng';
 import type { Layout } from '../world/layout';
 import { walkHeight } from '../world/walk';
@@ -38,11 +45,15 @@ export interface Villager {
   rng: Rng;
   /** Animated model, once loaded. */
   fig: CharacterInstance | null;
-  /** Clip that plays now; 'stand' = walk clip frozen on its first frame. */
-  pose: CharacterClip | 'stand' | null;
+  /** Chosen figure (boy or girl); the default until the pupil picks one. */
+  character: CharacterKind;
+  /** What plays now: 'stand' = walk clip frozen on its first frame, 'dance0', 'dance1' … */
+  pose: Pose | null;
   /** Seconds left of a tap animation (catwalk or dance); the figure stops walking meanwhile. */
-  emote: { clip: 'catwalk' | 'dance'; timer: number } | null;
+  emote: { pose: Pose; timer: number } | null;
 }
+
+type Pose = 'walk' | 'stand' | 'catwalk' | `dance${number}`;
 
 /** Tap animations run two loops. */
 const EMOTE_LOOPS = 2;
@@ -54,6 +65,8 @@ interface Input {
   own?: boolean;
   /** Node index to start at; random wander node if omitted. */
   startNode?: number;
+  /** Boy or girl; the default figure if the pupil has not picked one yet. */
+  character?: CharacterKind | null;
 }
 
 function hashString(s: string): number {
@@ -189,69 +202,89 @@ export class Crowd {
         bubbleTimer: 0,
         rng,
         fig: null,
+        character: input.character ?? DEFAULT_CHARACTER,
         pose: null,
         emote: null,
       };
       this.placeAt(v, layout.graph.nodes[start]);
       this.villagers.push(v);
     });
-    void loadCharacter().then((asset) => {
-      if (asset) this.attachModel(asset);
+    for (const v of this.villagers) this.loadFigure(v);
+  }
+
+  /** Loads the villager's model and swaps the placeholder body for it; sign, marker and bubbles stay. */
+  private loadFigure(v: Villager): void {
+    const kind = v.character;
+    void loadCharacter(kind).then((asset) => {
+      if (asset && v.character === kind) this.attachModel(v, asset);
     });
   }
 
-  /** Swaps every placeholder body for the animated model; sign, marker and bubbles stay. */
-  private attachModel(asset: CharacterAsset): void {
-    for (const v of this.villagers) {
-      for (const child of [...v.group.children]) {
-        const mesh = child as THREE.Mesh;
-        if (mesh.isMesh && mesh.material instanceof THREE.MeshStandardMaterial) mesh.visible = false;
-      }
-      v.fig = instantiate(asset);
-      v.group.add(v.fig.root);
-      // spread the walk phase so the figures do not step in sync
-      v.fig.mixer.setTime(v.rng() * 2);
-      v.pose = null;
+  private attachModel(v: Villager, asset: CharacterAsset): void {
+    for (const child of [...v.group.children]) {
+      const mesh = child as THREE.Mesh;
+      if (mesh.isMesh && mesh.material instanceof THREE.MeshStandardMaterial) mesh.visible = false;
     }
+    if (v.fig) {
+      v.fig.mixer.stopAllAction();
+      v.group.remove(v.fig.root);
+    }
+    v.fig = instantiate(asset);
+    v.group.add(v.fig.root);
+    // spread the walk phase so the figures do not step in sync
+    v.fig.mixer.setTime(v.rng() * 2);
+    v.pose = null;
+    v.emote = null;
   }
 
-  /** Single tap: catwalk, double tap: dance, each two loops. Without the model the figure hops. */
+  /** Changes a villager's figure (after the pupil picked boy or girl). */
+  setCharacter(nickname: string, kind: CharacterKind): void {
+    const v = this.villagers.find((x) => x.nickname === nickname);
+    if (!v || (v.character === kind && v.fig)) return;
+    v.character = kind;
+    this.loadFigure(v);
+  }
+
+  /** Single tap: catwalk, double tap: a dance, each two loops. Without the model the figure hops. */
   react(v: Villager, kind: 'single' | 'double'): void {
-    const clip = kind === 'double' ? 'dance' : 'catwalk';
-    if (!v.fig) {
+    const fig = v.fig;
+    if (!fig) {
       this.wave(v);
       return;
     }
-    const seconds = v.fig.actions[clip].getClip().duration * EMOTE_LOOPS;
-    v.emote = { clip, timer: seconds };
-    if (v.pose === clip) {
+    let pose: Pose = 'catwalk';
+    if (kind === 'double') pose = `dance${Math.floor(v.rng() * fig.dances.length)}`;
+    const seconds = this.actionOf(fig, pose).getClip().duration * EMOTE_LOOPS;
+    v.emote = { pose, timer: seconds };
+    if (v.pose === pose) {
       // same animation again: start it over
-      v.fig.mixer.stopAllAction();
+      fig.mixer.stopAllAction();
       v.pose = null;
     }
     v.nameTimer = Math.max(3, seconds);
   }
 
-  private setPose(v: Villager, pose: CharacterClip | 'stand'): void {
+  private actionOf(fig: CharacterInstance, pose: Pose): THREE.AnimationAction {
+    if (pose === 'walk' || pose === 'stand') return fig.walk;
+    if (pose === 'catwalk') return fig.catwalk;
+    return fig.dances[Number(pose.slice(5))] ?? fig.dances[0];
+  }
+
+  private setPose(v: Villager, pose: Pose): void {
     const fig = v.fig;
     if (!fig || v.pose === pose) return;
-    const prev = v.pose === null ? null : fig.actions[v.pose === 'stand' ? 'walk' : v.pose];
-    const clip: CharacterClip = pose === 'stand' ? 'walk' : pose;
-    const next = fig.actions[clip];
+    const prev = v.pose === null ? null : this.actionOf(fig, v.pose);
+    const next = this.actionOf(fig, pose);
     if (prev && prev !== next) prev.fadeOut(FADE);
     if (prev !== next) next.reset();
-    if (pose === 'stand') {
-      next.time = 0;
-      next.setEffectiveTimeScale(0);
+    next.setEffectiveTimeScale(pose === 'stand' ? 0 : 1);
+    if (pose === 'stand') next.time = 0;
+    if (pose === 'walk' || pose === 'stand') {
+      next.setLoop(THREE.LoopRepeat, Infinity);
     } else {
-      next.setEffectiveTimeScale(1);
-    }
-    if (pose === 'catwalk' || pose === 'dance') {
       next.reset();
       next.setLoop(THREE.LoopRepeat, EMOTE_LOOPS);
       next.clampWhenFinished = true;
-    } else {
-      next.setLoop(THREE.LoopRepeat, Infinity);
     }
     next.setEffectiveWeight(1);
     if (prev && prev !== next) next.fadeIn(FADE);
@@ -320,7 +353,7 @@ export class Crowd {
         if (v.bubbleTimer <= 0) this.removeBubble(v);
       }
       if (v.fig) {
-        this.setPose(v, v.emote ? v.emote.clip : v.walker ? 'walk' : 'stand');
+        this.setPose(v, v.emote ? v.emote.pose : v.walker ? 'walk' : 'stand');
         v.fig.mixer.update(dt);
       } else {
         this.animateArm(v);

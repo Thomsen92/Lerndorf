@@ -123,3 +123,23 @@ Die tatsächliche Migration und Ablösung des aktuellen Haus-Fallbacks ist Teil 
 - Die exakte Darstellung der Wellblech-Baracke folgt dem Lerndorf-Look und dem vorhandenen Haus-Sockel; Stil und Form werden vor visueller Umsetzung anhand einer Vorschau geprüft.
 
 Diese Punkte betreffen die spätere Inhalts- und Umsetzungsplanung, nicht die bestätigte Tutorial-Reihenfolge.
+
+## 9. Änderungen nach Entscheidung der Lehrkraft (23.10.2026)
+
+Diese Entscheidungen gelten vor den Abschnitten 1–8. Wo der Text oben abweicht, gilt dieser Abschnitt.
+
+1. **Figurwahl statt zehn Start-Avatare.** Es gibt zwei Figuren, Junge und Mädchen (`web/src/ui/characterPicker.ts`, RPC `set_character`, Migration 0018). Die Wahl kommt **vor** der Kamerafahrt. Einen neutralen Beispiel-Avatar gibt es nicht: Vor der Baracke steht bereits die eigene Figur. Die bisherige Pflicht-Auswahl beim ersten Login wird in den Tutorialablauf übernommen (nicht doppelt anzeigen).
+2. **Keine Wink- und Trauer-Animation.** Die Figuren haben nur walk, Catwalk und Tänze. Am Anfang steht die Figur vor der Ruine und zeigt eine traurige Sprechblase. Am Ende tanzt sie (eine Runde ihres Tanzes) statt zu winken; die Abschlusszeile „Jetzt wird gelernt und Dailys gemacht!“ steht in der Sprechblase.
+3. **Sprechblasen im Comic-Stil.** Abgerundete weiße Blase mit dunklem Rand und Spitze zur Figur, Schrift im Comic-Stil. Comic Sans ist auf iPads und Android-Tablets meist nicht installiert und darf nicht mitgeliefert werden; deshalb die freie Schrift **Comic Neue** (SIL OFL) als Datei im Repo mitliefern, Fallback `'Comic Sans MS', cursive`. Grafik aus dem **Kenney UI Pack 2.0** (CC0, `Kenny/UI`, eine fertige Sprechblase enthält es nicht): Körper der Blase aus `PNG/Grey/Default/button_rectangle_depth_border.png` als 9-Slice (`border-image`, hell eingefärbt), Spitze zur Figur aus `PNG/Grey/Default/arrow_basic_s.png`. Die Kenney-Schrift „Future“ passt nicht zum Comic-Stil und wird nicht verwendet. Optional für Tutorial-Knöpfe („Weiter“): `Sounds/tap-a.ogg`. Quellen in `blender/sources/LICENSES.md` eintragen. Gilt auch für die normalen Begrüßungsblasen im Dorf.
+4. **Grundstück automatisch.** Beim ersten Login vergibt der Server atomar den niedrigsten freien Grundstücksplatz (von innen nach außen). Die manuelle Wahl durch Antippen (`claim_plot`, Hinweis „Tippe auf eine freie Wiese“) entfällt für Schüler.
+5. **Wer schon ein Haus platziert hat, bekommt kein Tutorial.** Derzeit hat noch kein Schüler ein Konto oder Haus; eine Datenübernahme ist nicht nötig.
+6. **Ruine statt Wellblech-Baracke und statt kostenlosem Starterhaus.** Vor dem Tutorial-Hauskauf steht im Haus-Sockel eine **Ruine** (heruntergekommenes Haus), zusammengesetzt aus Kenney-Teilen (CC0) in `Kenny/`, z. B. Fantasy Town `wall-wood-broken`, `wall-broken`, `wall-wood-window-shutters`, `planks`, `planks-half`, `fence-broken`, ein schiefes/halbes Dach aus `roof-*`, dazu Survival `structure-metal-wall`/`metal-panel-*` als geflickte Stellen und `floor-old`; Maße nach `docs/ASSET_VERTRAG.md` (Haus-Sockel 6×4). Die Ruine ist kein Shop-Artikel, nicht im Inventar und nicht auswählbar; nach der Platzierung des Fachwerkhauses verschwindet sie für alle. Vorschaubild vor dem Einbau der Lehrkraft zeigen.
+7. **Die fünf Tutorial-Fragen** (ganz einfach, fest im Code bzw. in einer Migration, Lösungen nur auf dem Server):
+
+| Nr. | Typ | Aufgabe | Lösung | Hinweis (englisch) |
+|---|---|---|---|---|
+| 1 | choice | What is 'Haus' in English? – house / mouse / horse | house | You live in it. |
+| 2 | gap | My name ___ Tom. | is | Use a form of 'be'. |
+| 3 | choice | Which word is a colour? – red / run / rain | red | Think of a tomato. |
+| 4 | match | dog – Hund, cat – Katze, bird – Vogel | Paare | Think of animals. |
+| 5 | listening (choice) | Vorlesen: „Hello! I am your new neighbour. Welcome to the village!“ – Frage: Listen. Who is talking? – your new neighbour / your teacher / your mum | your new neighbour | Listen to the second sentence. |
