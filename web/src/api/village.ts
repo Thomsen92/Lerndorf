@@ -51,7 +51,10 @@ export async function saveCharacter(
 
 export class VillageLoadError extends Error {}
 
-/** The pupil chooses a free plot as building site (RPC claim_plot). The choice is final. */
+/**
+ * @deprecated The server now always rejects claim_plot: plots are assigned by tutorial_start()
+ * (api/tutorial.ts). Kept only until the plot picker is removed.
+ */
 export async function claimPlot(
   supabase: SupabaseClient,
   index: number,

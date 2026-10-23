@@ -64,9 +64,11 @@ export const ROTATIONS: Record<SlotKind, readonly number[]> = {
   deco: [0, 1, 2, 3],
 };
 
-/** Item used when a slot that may not stay empty has no placement (every pupil owns these). */
+/**
+ * Item used when a slot that may not stay empty has no placement (every pupil owns it).
+ * The house slot has none: it shows the ruin until the tutorial house is placed.
+ */
 export const STARTER: Partial<Record<SlotKind, string>> = {
-  house: 'house_fachwerk',
   garage: 'garage_holz',
 };
 
