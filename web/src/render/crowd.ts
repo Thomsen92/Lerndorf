@@ -16,6 +16,7 @@ import {
 import { createRng, type Rng } from '../world/rng';
 import type { Layout } from '../world/layout';
 import { walkHeight } from '../world/walk';
+import { HOUSE_FRONT_Z, PATH_X } from '../world/plotPlan';
 import {
   arrivalAction,
   greetingFor,
@@ -50,7 +51,9 @@ export interface Villager {
   /** What plays now: 'stand' = walk clip frozen on its first frame, 'dance0', 'dance1' … */
   pose: Pose | null;
   /** Seconds left of a tap animation (catwalk or dance); the figure stops walking meanwhile. */
-  emote: { pose: Pose; timer: number } | null;
+  emote: { pose: Pose; timer: number; loops?: number; done?: () => void } | null;
+  /** True while the tutorial holds the figure on the spot (no wandering, no walking). */
+  still: boolean;
 }
 
 type Pose = 'walk' | 'stand' | 'catwalk' | `dance${number}`;
@@ -248,6 +251,7 @@ export class Crowd {
         character: input.character ?? DEFAULT_CHARACTER,
         pose: null,
         emote: null,
+        still: false,
       };
       this.placeAt(v, layout.graph.nodes[start]);
       this.villagers.push(v);
@@ -307,13 +311,76 @@ export class Crowd {
     v.nameTimer = Math.max(3, seconds);
   }
 
+  private ownVillager(): Villager | undefined {
+    return this.villagers.find((x) => x.own);
+  }
+
+  /** Tutorial: puts the own figure in front of the house slot of the plot (ahead of the ruin, on the footpath), facing the street (+Z, towards the camera), and holds it there. */
+  placeOwnInFrontOfHouse(plotIndex: number): void {
+    const v = this.ownVillager();
+    const plot = this.layout.plots[plotIndex];
+    if (!v || !plot) return;
+    const lz = HOUSE_FRONT_Z + 1.6;
+    const cos = Math.cos(plot.face);
+    const sin = Math.sin(plot.face);
+    const x = plot.x + PATH_X * cos + lz * sin;
+    const z = plot.z - PATH_X * sin + lz * cos;
+    v.walker = null;
+    v.walkPath = null;
+    v.action = null;
+    v.emote = null;
+    v.group.position.set(x, walkHeight(this.layout, { x, z }), z);
+    v.group.userData.baseY = v.group.position.y;
+    v.group.rotation.y = plot.face; // heading 0 looks along +Z
+    v.still = true;
+  }
+
+  /** Tutorial: pauses (on) or resumes (off) wandering of the own figure. */
+  standStill(on: boolean): void {
+    const v = this.ownVillager();
+    if (!v) return;
+    v.still = on;
+    if (on) {
+      v.walker = null;
+      v.walkPath = null;
+      v.action = null;
+    } else {
+      v.timer = 0;
+    }
+  }
+
+  /** Plays the first dance of the own figure once; resolves when it ends, or after 2 s when no model is loaded. */
+  playDanceOnce(): Promise<void> {
+    const v = this.ownVillager();
+    return new Promise<void>((resolve) => {
+      let finished = false;
+      const done = (): void => {
+        if (finished) return;
+        finished = true;
+        resolve();
+      };
+      if (!v || !v.fig || v.fig.dances.length === 0) {
+        setTimeout(done, 2000);
+        return;
+      }
+      const seconds = v.fig.dances[0].getClip().duration;
+      if (v.pose === 'dance0') {
+        v.fig.mixer.stopAllAction();
+        v.pose = null;
+      }
+      v.emote = { pose: 'dance0', timer: seconds, loops: 1, done };
+      v.nameTimer = Math.max(3, seconds);
+      setTimeout(done, seconds * 1000 + 2000); // safety net if update() is not running
+    });
+  }
+
   private actionOf(fig: CharacterInstance, pose: Pose): THREE.AnimationAction {
     if (pose === 'walk' || pose === 'stand') return fig.walk;
     if (pose === 'catwalk') return fig.catwalk;
     return fig.dances[Number(pose.slice(5))] ?? fig.dances[0];
   }
 
-  private setPose(v: Villager, pose: Pose): void {
+  private setPose(v: Villager, pose: Pose, loops = EMOTE_LOOPS): void {
     const fig = v.fig;
     if (!fig || v.pose === pose) return;
     const prev = v.pose === null ? null : this.actionOf(fig, v.pose);
@@ -326,7 +393,8 @@ export class Crowd {
       next.setLoop(THREE.LoopRepeat, Infinity);
     } else {
       next.reset();
-      next.setLoop(THREE.LoopRepeat, EMOTE_LOOPS);
+      if (loops === 1) next.setLoop(THREE.LoopOnce, 1);
+      else next.setLoop(THREE.LoopRepeat, loops);
       next.clampWhenFinished = true;
     }
     next.setEffectiveWeight(1);
@@ -368,10 +436,16 @@ export class Crowd {
     for (const v of this.villagers) {
       if (v.emote) {
         v.emote.timer -= dt;
-        if (v.emote.timer <= 0) v.emote = null;
+        if (v.emote.timer <= 0) {
+          const done = v.emote.done;
+          v.emote = null;
+          done?.();
+        }
       }
       if (v.emote) {
         // the figure stays on the spot while it dances; walking resumes afterwards
+      } else if (v.still) {
+        // held on the spot by the tutorial
       } else if (v.walker) {
         v.walker.advance(dt);
         const p = v.walker.position();
@@ -396,7 +470,7 @@ export class Crowd {
         if (v.bubbleTimer <= 0) this.removeBubble(v);
       }
       if (v.fig) {
-        this.setPose(v, v.emote ? v.emote.pose : v.walker ? 'walk' : 'stand');
+        this.setPose(v, v.emote ? v.emote.pose : v.walker ? 'walk' : 'stand', v.emote?.loops);
         v.fig.mixer.update(dt);
       } else {
         this.animateArm(v);
