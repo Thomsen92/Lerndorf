@@ -248,3 +248,118 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
   };
 }
 
+
+/** The tutorial house (first-login tutorial, spec §4.7). */
+export const TUTORIAL_HOUSE: ItemEntry = {
+  id: 'house_fachwerk',
+  kind: 'house',
+  nameDe: 'Fachwerkhaus',
+  price: 50,
+  starter: false,
+  owned: 0,
+  placedIn: [],
+  free: 0,
+  fits: ['house'],
+};
+
+export interface TutorialBuyOptions {
+  title: string;
+  text: string;
+  button: string;
+  /** tutorial_buy_house; resolves the new coin value */
+  buy: () => Promise<{ ok: true; value: { coins: number } } | { ok: false; message: string }>;
+  onBought: (coins: number) => void;
+  thumbs?: ThumbSource;
+}
+
+/**
+ * Guided purchase of the tutorial house only: picture, name, price and one button. Non-modal (the
+ * account menu stays usable) and without a close button; works when the shop is closed.
+ */
+export function openTutorialBuy(opts: TutorialBuyOptions): AreaHandle {
+  const titleId = `area-title-${++counter}`;
+  const area = document.createElement('section');
+  area.className = 'overlay area tutorial-buy';
+  area.setAttribute('role', 'region');
+  area.setAttribute('aria-labelledby', titleId);
+  const panel = document.createElement('div');
+  panel.className = 'panel';
+  const head = document.createElement('header');
+  head.className = 'panel-head';
+  const h2 = document.createElement('h2');
+  h2.id = titleId;
+  h2.textContent = opts.title;
+  head.append(h2);
+  const text = document.createElement('p');
+  text.textContent = opts.text;
+  const card = document.createElement('div');
+  card.className = 'tutorial-buy-card';
+  const thumb = document.createElement('span');
+  thumb.className = 'item-thumb';
+  thumb.setAttribute('aria-hidden', 'true');
+  thumb.textContent = '🏠';
+  const name = document.createElement('strong');
+  name.className = 'item-name';
+  name.textContent = TUTORIAL_HOUSE.nameDe;
+  const price = document.createElement('span');
+  price.className = 'item-price';
+  price.textContent = `${TUTORIAL_HOUSE.price} Münzen`;
+  card.append(thumb, name, price);
+  const buy = document.createElement('button');
+  buy.type = 'button';
+  buy.className = 'primary tutorial-action';
+  buy.textContent = opts.button;
+  const status = document.createElement('p');
+  status.className = 'status';
+  status.setAttribute('role', 'status');
+  panel.append(head, text, card, buy, status);
+  area.appendChild(panel);
+  document.body.appendChild(area);
+
+  let closed = false;
+  const session = opts.thumbs ? null : acquireSessionThumbs();
+  const thumbs: ThumbSource = opts.thumbs ?? (session as NonNullable<typeof session>).source;
+  void thumbs(TUTORIAL_HOUSE)
+    .then((url) => {
+      if (!url || closed) return;
+      const img = document.createElement('img');
+      img.className = 'item-thumb';
+      img.src = url;
+      img.alt = '';
+      thumb.replaceWith(img);
+    })
+    .catch(() => undefined);
+
+  let busy = false;
+  buy.addEventListener('click', async () => {
+    if (busy) return;
+    busy = true;
+    buy.disabled = true;
+    status.textContent = 'Wird gekauft …';
+    let res: Awaited<ReturnType<TutorialBuyOptions['buy']>>;
+    try {
+      res = await opts.buy();
+    } catch (err) {
+      console.error('tutorial buy failed', err);
+      res = { ok: false, message: 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.' };
+    }
+    busy = false;
+    if (closed) return;
+    buy.disabled = false;
+    if (!res.ok) {
+      status.textContent = res.message;
+      return;
+    }
+    status.textContent = 'Gekauft!';
+    opts.onBought(res.value.coins);
+  });
+  buy.focus();
+
+  return {
+    close() {
+      closed = true;
+      session?.release();
+      area.remove();
+    },
+  };
+}

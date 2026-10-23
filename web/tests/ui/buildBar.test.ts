@@ -186,3 +186,70 @@ describe('build bar', () => {
     expect(lastSlots().deco_2).toEqual({ itemId: 'deco_cat_sign', rot: 0 });
   });
 });
+
+describe('build bar: ruin and guided tutorial placement', () => {
+  it('an empty house slot (ruin) is shown as empty, not as an item', async () => {
+    await mode.enter();
+    expect(btn('Haus').textContent).toContain('leer');
+    expect(document.querySelector('.build-bar')?.textContent).not.toContain('ruin');
+    btn('Haus').click();
+    expect(document.querySelector('.build-info')?.textContent).toContain('noch leer');
+  });
+
+  it('guided: only the house slot, the house item and one confirm button; saves via the tutorial call', async () => {
+    INV.push({ item_id: 'house_fachwerk', qty: 1 });
+    ITEMS[0].starter = false;
+    try {
+      const place = vi.fn().mockResolvedValue({ ok: true });
+      const onPlaced = vi.fn();
+      await mode.enter({
+        guided: { itemId: 'house_fachwerk', slotId: 'house', place, onPlaced, hint: 'Tipp', button: 'Haus hinstellen' },
+      });
+      const bar = document.querySelector('.build-bar') as HTMLElement;
+      expect(bar.classList.contains('build-bar--guided')).toBe(true);
+      expect(bar.querySelectorAll('[data-slot]').length).toBe(1);
+      expect(bar.textContent).not.toContain('Fertig');
+      expect(bar.textContent).not.toContain('Wegräumen');
+      const item = btn('Fachwerkhaus');
+      expect(item.classList.contains('tutorial-highlight')).toBe(true);
+      expect(btn('Haus hinstellen').disabled).toBe(true);
+      item.click();
+      expect(lastSlots().house?.itemId).toBe('house_fachwerk');
+      expect(btn('Haus hinstellen').disabled).toBe(false);
+      // after the server confirmed, the plot shows the reloaded server state
+      placements = [{ item_id: 'house_fachwerk', slot: 'house', rot: 0 }];
+      btn('Haus hinstellen').click();
+      await flush();
+      await flush();
+      expect(place).toHaveBeenCalledTimes(1);
+      expect(rpc).not.toHaveBeenCalled(); // never place_in_slot
+      expect(onPlaced).toHaveBeenCalledTimes(1);
+      expect(lastSlots().house?.itemId).toBe('house_fachwerk');
+    } finally {
+      INV.pop();
+      ITEMS[0].starter = true;
+    }
+  });
+
+  it('guided: an error keeps the preview and the button usable', async () => {
+    INV.push({ item_id: 'house_fachwerk', qty: 1 });
+    ITEMS[0].starter = false;
+    try {
+      const place = vi.fn().mockResolvedValue({ ok: false, message: 'Bitte noch einmal versuchen.' });
+      const onPlaced = vi.fn();
+      await mode.enter({
+        guided: { itemId: 'house_fachwerk', slotId: 'house', place, onPlaced, hint: 'Tipp', button: 'Haus hinstellen' },
+      });
+      btn('Fachwerkhaus').click();
+      btn('Haus hinstellen').click();
+      await flush();
+      expect(onPlaced).not.toHaveBeenCalled();
+      expect(document.querySelector('.build-info')?.textContent).toContain('Bitte noch einmal versuchen.');
+      expect(btn('Haus hinstellen').disabled).toBe(false);
+      expect(lastSlots().house?.itemId).toBe('house_fachwerk');
+    } finally {
+      INV.pop();
+      ITEMS[0].starter = true;
+    }
+  });
+});
