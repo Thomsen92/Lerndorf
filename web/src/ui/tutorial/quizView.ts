@@ -62,7 +62,11 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
   let resolveDone: () => void = () => undefined;
   const done = new Promise<void>((r) => (resolveDone = r));
 
-  const el = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string): HTMLElementTagNameMap[K] => {
+  const el = <K extends keyof HTMLElementTagNameMap>(
+    tag: K,
+    cls?: string,
+    text?: string,
+  ): HTMLElementTagNameMap[K] => {
     const e = document.createElement(tag);
     if (cls) e.className = cls;
     if (text !== undefined) e.textContent = text;
@@ -189,9 +193,9 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
         return;
       }
       // correct: lock the form and go on
-      formBox.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>('input, select, button').forEach(
-        (c) => (c.disabled = true),
-      );
+      formBox
+        .querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>('input, select, button')
+        .forEach((c) => (c.disabled = true));
       check.remove();
       if (r.done) {
         opts.onCoins(r.coins);

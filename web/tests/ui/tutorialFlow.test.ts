@@ -38,7 +38,13 @@ function fakeServer(init: Partial<TutorialState> & { failNext?: string[] } = {})
     character: init.character ?? null,
     answered: init.answered ?? 0,
     coins: 0,
-  } as { step: TutorialState['step']; plotIndex: number | null; character: TutorialState['character']; answered: number; coins: number };
+  } as {
+    step: TutorialState['step'];
+    plotIndex: number | null;
+    character: TutorialState['character'];
+    answered: number;
+    coins: number;
+  };
   const fail = new Set(init.failNext ?? []);
   const failOnce = (name: string): boolean => {
     if (!fail.has(name)) return false;
@@ -76,22 +82,30 @@ function fakeServer(init: Partial<TutorialState> & { failNext?: string[] } = {})
       const nr = s.answered + 1;
       return {
         ok: true,
-        value: nr === 2
-          ? { nr, total: 5, type: 'gap', prompt: 'My name ___ Tom.', data: {} }
-          : { nr, total: 5, type: 'choice', prompt: `Question ${nr}`, data: { options: ['yes', 'no'] } },
+        value:
+          nr === 2
+            ? { nr, total: 5, type: 'gap', prompt: 'My name ___ Tom.', data: {} }
+            : { nr, total: 5, type: 'choice', prompt: `Question ${nr}`, data: { options: ['yes', 'no'] } },
       };
     },
     answer: async (nr, a) => {
       if (failOnce('answer')) return err;
       log.push(`answer${nr}`);
       const right = nr === 2 ? a === SECRET : a === 'yes';
-      if (!right) return { ok: true, value: { correct: false, hint: 'Think again.', answered: s.answered, done: false, coins: s.coins } };
+      if (!right)
+        return {
+          ok: true,
+          value: { correct: false, hint: 'Think again.', answered: s.answered, done: false, coins: s.coins },
+        };
       s.answered += 1;
       if (s.answered === 5) {
         s.coins += 50;
         s.step = 'buy';
       }
-      return { ok: true, value: { correct: true, hint: null, answered: s.answered, done: s.answered === 5, coins: s.coins } };
+      return {
+        ok: true,
+        value: { correct: true, hint: null, answered: s.answered, done: s.answered === 5, coins: s.coins },
+      };
     },
     buyHouse: async () => {
       if (failOnce('buy')) return err;
@@ -193,7 +207,17 @@ describe('runTutorial', () => {
     const steps = f.log.filter((x) =>
       ['character', 'start', 'camera', 'continue', 'question1', 'buy', 'place', 'dance', 'daily'].includes(x),
     );
-    expect(steps).toEqual(['character', 'start', 'camera', 'continue', 'question1', 'buy', 'place', 'dance', 'daily']);
+    expect(steps).toEqual([
+      'character',
+      'start',
+      'camera',
+      'continue',
+      'question1',
+      'buy',
+      'place',
+      'dance',
+      'daily',
+    ]);
     expect(f.log).toContain('final-bubble');
     expect(f.log).toContain('release');
     expect(f.log).toContain('finish');
@@ -221,7 +245,10 @@ describe('runTutorial', () => {
     await tick();
     expect(f.log).not.toContain('continue');
     await click('Weiter');
-    await until(() => document.querySelector('.tutorial-card')?.textContent?.includes(MESSAGES[1]) ?? false, 'second');
+    await until(
+      () => document.querySelector('.tutorial-card')?.textContent?.includes(MESSAGES[1]) ?? false,
+      'second',
+    );
     expect(f.log).not.toContain('continue');
     // the sad bubble stands at the figure meanwhile
     expect(document.querySelector('.speech-bubble--sad')).not.toBeNull();
@@ -276,7 +303,10 @@ describe('runTutorial', () => {
   it('retries a failed start and a failed purchase with a German message', async () => {
     const f = fakeServer({ character: 'boy', failNext: ['start'] });
     run(f);
-    await until(() => document.body.textContent?.includes('Bitte noch einmal versuchen') ?? false, 'start error');
+    await until(
+      () => document.body.textContent?.includes('Bitte noch einmal versuchen') ?? false,
+      'start error',
+    );
     expect(f.log).not.toContain('village');
     await click('Noch einmal versuchen');
     await until(() => f.log.includes('camera'), 'camera after retry');
@@ -285,7 +315,10 @@ describe('runTutorial', () => {
     const g = fakeServer({ step: 'buy', character: 'boy', plotIndex: 0, failNext: ['buy'] });
     const r = run(g);
     await click('Haus kaufen');
-    await until(() => document.body.textContent?.includes('Bitte noch einmal versuchen') ?? false, 'buy error');
+    await until(
+      () => document.body.textContent?.includes('Bitte noch einmal versuchen') ?? false,
+      'buy error',
+    );
     expect(g.s.step).toBe('buy');
     expect(button('Haus kaufen')?.disabled).toBe(false);
     await click('Haus kaufen');

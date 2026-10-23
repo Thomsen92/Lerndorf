@@ -18,12 +18,26 @@ async function until(cond: () => boolean, what: string): Promise<void> {
   throw new Error(`timed out waiting for ${what}`);
 }
 const button = (label: string): HTMLButtonElement | undefined =>
-  Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find((b) => b.textContent?.trim() === label);
+  Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find(
+    (b) => b.textContent?.trim() === label,
+  );
 
 const QUESTIONS: TutorialQuestion[] = [
-  { nr: 1, total: 5, type: 'choice', prompt: "What is 'Haus' in English?", data: { options: ['house', 'mouse', 'horse'] } },
+  {
+    nr: 1,
+    total: 5,
+    type: 'choice',
+    prompt: "What is 'Haus' in English?",
+    data: { options: ['house', 'mouse', 'horse'] },
+  },
   { nr: 2, total: 5, type: 'gap', prompt: 'My name ___ Tom.', data: {} },
-  { nr: 3, total: 5, type: 'choice', prompt: 'Which word is a colour?', data: { options: ['red', 'run', 'rain'] } },
+  {
+    nr: 3,
+    total: 5,
+    type: 'choice',
+    prompt: 'Which word is a colour?',
+    data: { options: ['red', 'run', 'rain'] },
+  },
   {
     nr: 4,
     total: 5,
@@ -60,9 +74,15 @@ function api(startAt: number, opts: { failQuestion?: boolean } = {}) {
       answers.push([nr, answer]);
       // every answer is wrong first time for question 4, right otherwise
       if (nr === 4 && answers.filter(([n]) => n === 4).length === 1)
-        return { ok: true, value: { correct: false, hint: 'Think of animals.', answered: current - 1, done: false, coins: 0 } };
+        return {
+          ok: true,
+          value: { correct: false, hint: 'Think of animals.', answered: current - 1, done: false, coins: 0 },
+        };
       current += 1;
-      return { ok: true, value: { correct: true, hint: null, answered: nr, done: nr === 5, coins: nr === 5 ? 50 : 0 } };
+      return {
+        ok: true,
+        value: { correct: true, hint: null, answered: nr, done: nr === 5, coins: nr === 5 ? 50 : 0 },
+      };
     },
   };
   return { api: a, answers };
@@ -90,7 +110,9 @@ describe('tutorial quiz', () => {
     openQuiz({ api: a, onCoins: vi.fn() });
     await until(() => document.querySelectorAll('select[data-left]').length === 3, 'match form');
     const pick = (left: string, right: string): void => {
-      const sel = document.querySelector<HTMLSelectElement>(`select[data-left="${left}"]`) as HTMLSelectElement;
+      const sel = document.querySelector<HTMLSelectElement>(
+        `select[data-left="${left}"]`,
+      ) as HTMLSelectElement;
       sel.value = right;
       sel.dispatchEvent(new Event('change'));
     };
@@ -98,7 +120,10 @@ describe('tutorial quiz', () => {
     pick('cat', 'Hund');
     pick('bird', 'Vogel');
     button('Prüfen')?.click();
-    await until(() => document.querySelector('.quest-feedback')?.textContent?.includes('Think of animals.') ?? false, 'hint');
+    await until(
+      () => document.querySelector('.quest-feedback')?.textContent?.includes('Think of animals.') ?? false,
+      'hint',
+    );
     expect(document.querySelector('.quest-feedback span')?.getAttribute('lang')).toBe('en');
     expect(button('Prüfen')?.disabled).toBe(false);
     pick('dog', 'Hund');
@@ -122,7 +147,9 @@ describe('tutorial quiz', () => {
     expect(speakEnglish).toHaveBeenCalledTimes(2);
     // the spoken text is not printed while the device can speak
     expect(document.body.textContent).not.toContain('I am your new neighbour');
-    const opt = document.querySelector<HTMLInputElement>('input[value="your new neighbour"]') as HTMLInputElement;
+    const opt = document.querySelector<HTMLInputElement>(
+      'input[value="your new neighbour"]',
+    ) as HTMLInputElement;
     opt.checked = true;
     opt.dispatchEvent(new Event('change'));
     button('Prüfen')?.click();
@@ -139,7 +166,10 @@ describe('tutorial quiz', () => {
     speakEnglish.mockResolvedValue(false);
     const { api: a } = api(5);
     openQuiz({ api: a, onCoins: vi.fn() });
-    await until(() => (document.querySelector('.quest-fallback') as HTMLElement | null)?.hidden === false, 'fallback');
+    await until(
+      () => (document.querySelector('.quest-fallback') as HTMLElement | null)?.hidden === false,
+      'fallback',
+    );
     expect(document.querySelector('.quest-fallback')?.textContent).toContain('Welcome to the village!');
   });
 

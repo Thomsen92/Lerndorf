@@ -84,6 +84,9 @@ function hashString(s: string): number {
 const SKIN = ['#f1c7a3', '#d9a27a', '#a8714a', '#7a4e30', '#f6d6bb'];
 const TOPS = ['#e85d75', '#4b7bec', '#20bf6b', '#f7b731', '#8854d0', '#fd9644', '#2d98da'];
 
+/** Above the name sign and the own marker arrow (2.5 m): the speech bubble tip points here. */
+const HEAD_ANCHOR = new THREE.Vector3(0, 2.8, 0);
+
 /** Simple figure: legs, body, head, nickname sign. Colours come from the nickname, so they are stable. */
 function buildFigure(nickname: string, own: boolean): THREE.Group {
   const h = hashString(nickname);
@@ -313,6 +316,13 @@ export class Crowd {
 
   private ownVillager(): Villager | undefined {
     return this.villagers.find((x) => x.own);
+  }
+
+  /** Tutorial: world point just above the own figure's head (anchor of the speech bubble); null without own figure. */
+  ownHeadPoint(out: THREE.Vector3): THREE.Vector3 | null {
+    const v = this.ownVillager();
+    if (!v) return null;
+    return out.copy(v.group.position).add(HEAD_ANCHOR);
   }
 
   /** Tutorial: puts the own figure in front of the house slot of the plot (ahead of the ruin, on the footpath), facing the street (+Z, towards the camera), and holds it there. */

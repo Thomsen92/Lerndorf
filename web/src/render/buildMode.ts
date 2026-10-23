@@ -339,7 +339,12 @@ export class BuildMode {
     const slot = slotById(g.slotId);
     const item = st.items.find((i) => i.id === g.itemId);
     const chosen = this.pending?.itemId === g.itemId;
-    const itemBtn = item
+    const placed = realItem(st.slots, g.slotId, 'house');
+    const placedName = placed ? (st.items.find((i) => i.id === placed.itemId)?.nameDe ?? '') : '';
+    const shownName = chosen && item ? item.nameDe : placedName;
+    const itemBtn = placed
+      ? ''
+      : item
       ? `<button type="button" data-item="${escape(item.id)}" aria-pressed="${chosen}" class="${
           chosen ? 'primary' : 'tutorial-highlight'
         }" ${this.busy ? 'disabled' : ''}>${escape(item.nameDe)}</button>`
@@ -349,14 +354,18 @@ export class BuildMode {
       <div class="build-items" role="group" aria-label="Plätze"><button type="button" data-slot="${escape(
         g.slotId,
       )}" aria-pressed="true" class="primary"><strong>${escape(slot?.nameDe ?? 'Haus')}</strong>: ${
-        chosen && item ? escape(item.nameDe) : 'leer'
+        shownName ? escape(shownName) : 'leer'
       }</button></div>
       <div class="build-items" role="group" aria-label="Passende Sachen">${itemBtn}</div>
-      <div class="build-actions">
+      ${
+        placed
+          ? ''
+          : `<div class="build-actions">
         <button type="button" id="save" class="primary${chosen && !this.busy ? ' tutorial-highlight' : ''}" ${
           chosen && !this.busy ? '' : 'disabled'
         }>${escape(g.button)}</button>
-      </div>`;
+      </div>`
+      }`;
     this.wireBar();
   }
 
@@ -419,7 +428,7 @@ export class BuildMode {
       res = { ok: false, message: 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.' };
     }
     this.busy = false;
-    await this.after(res.ok ? 'Gespeichert.' : res.message, res.ok);
+    await this.after(res.ok ? (guided ? 'Dein Haus steht!' : 'Gespeichert.') : res.message, res.ok);
     if (res.ok && guided) guided.onPlaced();
   }
 

@@ -51,19 +51,6 @@ export async function saveCharacter(
 
 export class VillageLoadError extends Error {}
 
-/**
- * @deprecated The server now always rejects claim_plot: plots are assigned by tutorial_start()
- * (api/tutorial.ts). Kept only until the plot picker is removed.
- */
-export async function claimPlot(
-  supabase: SupabaseClient,
-  index: number,
-): Promise<{ ok: true } | { ok: false; message: string }> {
-  const { error } = await supabase.rpc('claim_plot', { p_index: index });
-  if (error) return { ok: false, message: error.message };
-  return { ok: true };
-}
-
 export async function loadMyProfile(supabase: SupabaseClient): Promise<MyProfile> {
   const { data: auth } = await supabase.auth.getUser();
   const uid = auth.user?.id;

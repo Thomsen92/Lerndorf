@@ -841,8 +841,9 @@ table.ledger td {
 .tutorial-card {
   position: fixed;
   z-index: 25;
+  /* at the top, below the status button: the figure stands in the lower half of the picture */
   left: calc(var(--nav-left, 0px) + (100vw - var(--nav-left, 0px)) / 2);
-  bottom: calc(var(--nav-bottom, 0px) + 16px + env(safe-area-inset-bottom));
+  top: calc(max(12px, env(safe-area-inset-top)) + 64px);
   transform: translateX(-50%);
   box-sizing: border-box;
   width: min(480px, calc(100vw - var(--nav-left, 0px) - 24px));
