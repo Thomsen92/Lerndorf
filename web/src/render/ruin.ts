@@ -32,10 +32,10 @@ const S = 2; // wall tiles: 1 m * 2 = 2 m wide and high
 const HALF_PI = Math.PI / 2;
 
 // A Fantasy Town wall tile has its wall on the +X edge of the tile. These centres put the outer
-// face of the wall on the border of the 6 x 4 footprint (0.9 = 0.45 m * scale 2 from the centre).
-const FRONT_Z = 2 - 0.9;
-const BACK_Z = -(2 - 0.9);
-const SIDE_X = 3 - 0.9;
+// face of the wall on the border of the 6 x 4 footprint (1.0 = 0.5 m * scale 2 from the centre).
+const FRONT_Z = 2 - 1.0;
+const BACK_Z = -(2 - 1.0);
+const SIDE_X = 3 - 1.0;
 
 export const RUIN_PARTS: readonly RuinPart[] = [
   // floor of old planks, with holes
@@ -64,15 +64,15 @@ export const RUIN_PARTS: readonly RuinPart[] = [
   { pack: 'town', name: 'wall-wood-window-shutters', x: SIDE_X, z: 1, rot: 0, scale: S },
 
   // corner posts
-  { pack: 'town', name: 'pillar-wood', x: -2.95, z: 1.95, rot: 0, scale: S },
-  { pack: 'town', name: 'pillar-wood', x: 2.95, z: 1.95, rot: 0, scale: S },
-  { pack: 'town', name: 'pillar-wood', x: -2.95, z: -1.95, rot: 0, scale: S },
-  { pack: 'town', name: 'pillar-wood', x: 2.95, z: -1.95, rot: 0, scale: S },
+  { pack: 'town', name: 'pillar-wood', x: -2.85, z: 1.85, rot: 0, scale: S },
+  { pack: 'town', name: 'pillar-wood', x: 2.85, z: 1.85, rot: 0, scale: S },
+  { pack: 'town', name: 'pillar-wood', x: -2.85, z: -1.85, rot: 0, scale: S },
+  { pack: 'town', name: 'pillar-wood', x: 2.85, z: -1.85, rot: 0, scale: S },
 
   // half a roof over the back, crooked and sagging towards the right
   { pack: 'town', name: 'roof-gable', x: -1.98, z: -1.0, y: 1.98, rot: 0, scale: 1.8, tilt: [0.03, 0.04] },
   { pack: 'town', name: 'roof-gable', x: 0.0, z: -1.0, y: 1.9, rot: 0, scale: 1.8, tilt: [-0.05, 0.1] },
-  { pack: 'town', name: 'roof-gable', x: 1.98, z: -0.9, y: 1.55, rot: 0, scale: 1.8, tilt: [0.18, -0.28] },
+  { pack: 'town', name: 'roof-gable', x: 1.8, z: -0.9, y: 1.55, rot: 0, scale: 1.8, tilt: [0.18, -0.28] },
   { pack: 'town', name: 'chimney', x: -1.4, z: -1.2, y: 2.6, rot: 0, scale: 1.2, tilt: [0.03, 0.08] },
 
   // patches of sheet metal over the holes
@@ -81,10 +81,10 @@ export const RUIN_PARTS: readonly RuinPart[] = [
   { pack: 'survival', name: 'metal-panel-screws', x: -2.0, z: BACK_Z + 0.13, y: 0.5, rot: HALF_PI, scale: 2.4 },
 
   // clutter in front
-  { pack: 'graveyard', name: 'debris-wood', x: -1.2, z: 2.0, rot: 0.4, scale: 1.4 },
-  { pack: 'graveyard', name: 'debris-wood', x: 1.6, z: 1.7, rot: -0.7, scale: 1.2 },
-  { pack: 'survival', name: 'resource-planks', x: -2.4, z: 1.7, rot: 0.9, scale: 1.5 },
-  { pack: 'town', name: 'fence-broken', x: 0.0, z: 1.99, rot: 0, scale: 1.6 },
+  { pack: 'graveyard', name: 'debris-wood', x: -1.2, z: 1.55, rot: 0.4, scale: 1.4 },
+  { pack: 'graveyard', name: 'debris-wood', x: 1.6, z: 1.6, rot: -0.7, scale: 1.2 },
+  { pack: 'survival', name: 'resource-planks', x: -2.4, z: 1.5, rot: 0.9, scale: 1.5 },
+  { pack: 'town', name: 'fence-broken', x: 0.0, z: 1.2, rot: 0, scale: 1.6 },
 ];
 
 /**
