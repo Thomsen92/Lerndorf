@@ -4,8 +4,7 @@
  * only ever act on the caller's own plot and check kind, slot and rotation (migration 0013).
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { STARTER, type SlotId } from '../world/plotPlan';
-import { RUIN_ID } from '../render/ruin';
+import { RUIN_ID, STARTER, type SlotId } from '../world/plotPlan';
 
 export interface BuildItem {
   id: string;

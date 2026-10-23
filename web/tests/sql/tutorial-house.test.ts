@@ -182,6 +182,22 @@ describe('tutorial_place_house', () => {
     await expectError('select tutorial_place_house()', /not at this step/, '22023');
   });
 
+  it('is refused without an assigned plot (22023), even with a bought house', async () => {
+    await asSuperuser(`
+      update profiles set plot_index = null where id = '${FINN}';
+      insert into tutorial_progress (player_id, step, answered, reward_paid, house_bought)
+        values ('${FINN}', 'place', 5, true, true);
+      insert into inventory (player_id, item_id, qty) values ('${FINN}', 'house_fachwerk', 1);
+    `);
+    await asUser(FINN);
+    await expectError('select tutorial_place_house()', /not at this step/, '22023');
+    await asSuperuser(`
+      delete from inventory where player_id = '${FINN}';
+      delete from tutorial_progress where player_id = '${FINN}';
+      update profiles set plot_index = 0 where id = '${FINN}';
+    `);
+  });
+
   it('place_in_slot and clear_slot stay closed while building is closed', async () => {
     await asUser(ANNA);
     await expectError(`select place_in_slot('house_fachwerk', 'house', 0)`, /building is closed/, '42501');

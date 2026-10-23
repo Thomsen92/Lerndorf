@@ -61,19 +61,21 @@ describe('tutorial state rpcs', () => {
     expect(calls).toEqual([{ fn: 'tutorial_continue', args: { p_from: 'intro' } }]);
   });
 
-  it('continueTutorial treats "not at this step" as success and re-reads the state', async () => {
+  it('continueTutorial treats error code 22023 as success and re-reads the state', async () => {
     const { client, calls } = fakeClient(
-      { error: { message: 'not at this step', code: '22023' } },
+      { error: { message: 'wording does not matter', code: '22023' } },
       { data: RAW },
     );
     expect(await continueTutorial(client, 'intro')).toEqual({ ok: true, value: STATE });
     expect(calls.map((c) => c.fn)).toEqual(['tutorial_continue', 'tutorial_state']);
   });
 
-  it('continueTutorial reports other errors', async () => {
+  it('continueTutorial reports other errors, also with the old message text but another code', async () => {
     const { client } = fakeClient({ error: { message: 'boom' } });
     const res = await continueTutorial(client, 'intro');
     expect(res.ok).toBe(false);
+    const other = fakeClient({ error: { message: 'not at this step', code: '42501' } });
+    expect((await continueTutorial(other.client, 'intro')).ok).toBe(false);
   });
 
   it('finishTutorial calls tutorial_finish', async () => {

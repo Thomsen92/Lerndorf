@@ -157,6 +157,28 @@ describe('tutorial_progress', () => {
   });
 });
 
+describe('privileges', () => {
+  it('no client role has write-like table privileges on the tutorial tables', async () => {
+    await asSuperuser('');
+    for (const t of ['tutorial_progress', 'tutorial_questions', 'tutorial_solutions']) {
+      for (const role of ['anon', 'authenticated']) {
+        for (const priv of ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER']) {
+          const r = await db.query<{ ok: boolean }>(`select has_table_privilege('${role}', 'public.${t}', '${priv}') as ok`);
+          expect([t, role, priv, r.rows[0].ok]).toEqual([t, role, priv, false]);
+        }
+      }
+    }
+  });
+
+  it('tutorial_reward() is not callable by clients', async () => {
+    await asUser(ANNA);
+    await expect(db.query('select tutorial_reward()')).rejects.toThrow(/permission denied/);
+    await asSuperuser('');
+    const r = await db.query<{ n: number }>('select tutorial_reward() as n');
+    expect(r.rows[0].n).toBe(50);
+  });
+});
+
 describe('catalogue and ledger', () => {
   it('house_fachwerk costs 50 and is no starter', async () => {
     await asSuperuser('');

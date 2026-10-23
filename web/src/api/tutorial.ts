@@ -90,7 +90,8 @@ export function startTutorial(supabase: SupabaseClient): Promise<Result<Tutorial
 export async function continueTutorial(supabase: SupabaseClient, from: 'intro'): Promise<Result<TutorialState>> {
   const { data, error } = await supabase.rpc('tutorial_continue', { p_from: from });
   if (!error) return { ok: true, value: stateOf(data) };
-  if (error.message.includes('not at this step')) return getTutorialState(supabase);
+  // 22023 = the server is not at this step (it moved on already); the message text is not relied on
+  if (error.code === '22023') return getTutorialState(supabase);
   return { ok: false, message: explain(error.message) };
 }
 

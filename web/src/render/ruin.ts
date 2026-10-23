@@ -8,10 +8,10 @@
  * footprint on the ground, front towards +Z, nothing outside 6.0 x 4.0 m and 6.0 m high.
  */
 import * as THREE from 'three';
+import { RUIN_ID } from '../world/plotPlan';
 import { kenneyModel, type Pack } from './kenney';
 
-/** Id that the client puts into the house slot instead of a catalogue item. */
-export const RUIN_ID = 'ruin';
+export { RUIN_ID };
 
 export interface RuinPart {
   pack: Pack;

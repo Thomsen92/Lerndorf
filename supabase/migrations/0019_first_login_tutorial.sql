@@ -40,7 +40,7 @@ alter table tutorial_solutions enable row level security;
 create policy tutorial_progress_read on tutorial_progress for select using (player_id = auth.uid());
 
 -- Supabase grants new tables to anon/authenticated by default; leave only the own-row read.
-revoke insert, update, delete on tutorial_progress from anon, authenticated;
+revoke insert, update, delete, truncate, references, trigger on tutorial_progress from anon, authenticated;
 revoke all on tutorial_progress from anon;
 -- Questions and solutions: no client role may touch them (questions come via RPC, one at a time).
 revoke all on tutorial_questions, tutorial_solutions from anon, authenticated;
@@ -285,7 +285,7 @@ begin
                             'done', v_answered = 5, 'coins', v_coins, 'reward', v_reward);
 end $$;
 
-revoke execute on function public.tutorial_reward() from public, anon;
+revoke execute on function public.tutorial_reward() from public, anon, authenticated;
 revoke execute on function public.tutorial_continue(text) from public, anon;
 revoke execute on function public.tutorial_question() from public, anon;
 revoke execute on function public.tutorial_answer(int, jsonb) from public, anon;
@@ -352,12 +352,14 @@ declare
   v_uid uuid := auth.uid();
   v_step text;
   v_bought boolean;
+  v_plot int;
   v_id bigint;
 begin
   if v_uid is null then
     raise exception 'not logged in' using errcode = '42501';
   end if;
-  if not exists (select 1 from profiles where id = v_uid and role = 'student') then
+  select plot_index into v_plot from profiles where id = v_uid and role = 'student';
+  if not found then
     raise exception 'forbidden: pupils only' using errcode = '42501';
   end if;
   select step, house_bought into v_step, v_bought from tutorial_progress where player_id = v_uid for update;
@@ -367,7 +369,7 @@ begin
       return v_id;
     end if;
   end if;
-  if v_step is distinct from 'place' or not v_bought then
+  if v_step is distinct from 'place' or not v_bought or v_plot is null then
     raise exception 'not at this step' using errcode = '22023';
   end if;
   if not exists (select 1 from inventory where player_id = v_uid and item_id = 'house_fachwerk' and qty > 0) then

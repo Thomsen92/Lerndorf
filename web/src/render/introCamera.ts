@@ -4,7 +4,7 @@
  */
 import * as THREE from 'three';
 import type { Layout, Plot } from '../world/layout';
-import { SLOTS, rectCentre } from '../world/plotPlan';
+import { SLOTS, TUTORIAL_FIGURE_LZ, rectCentre } from '../world/plotPlan';
 import type { CameraPose } from './houseCamera';
 
 export type { CameraPose };
@@ -20,8 +20,8 @@ const CLOSEUP_SECONDS = 2.5;
 const CLOSEUP_REDUCED_SECONDS = 1;
 
 const HOUSE_CENTRE = rectCentre(SLOTS[0]);
-/** Where the figure stands, plot-local z (see Crowd.placeOwnInFrontOfHouse). */
-const FIGURE_LZ = 0.1;
+/** Where the figure stands, plot-local z (shared with Crowd.placeOwnInFrontOfHouse). */
+const FIGURE_LZ = TUTORIAL_FIGURE_LZ;
 
 /** World point of a plot-local offset (same convention as BuildMode.toWorld and houseView). */
 function plotPoint(plot: Plot, lx: number, lz: number, y: number): THREE.Vector3 {

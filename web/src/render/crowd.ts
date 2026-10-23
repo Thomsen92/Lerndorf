@@ -16,7 +16,7 @@ import {
 import { createRng, type Rng } from '../world/rng';
 import type { Layout } from '../world/layout';
 import { walkHeight } from '../world/walk';
-import { HOUSE_FRONT_Z, PATH_X } from '../world/plotPlan';
+import { PATH_X, TUTORIAL_FIGURE_LZ } from '../world/plotPlan';
 import {
   arrivalAction,
   greetingFor,
@@ -188,7 +188,7 @@ function drawBubble(cv: HTMLCanvasElement, text: string): void {
   cx.lineWidth = 7;
   cx.strokeStyle = '#1c1c28';
   cx.stroke();
-  // cover the seam between body and tip, then redraw the two tip edges
+  // paint over the outline where the tip meets the body, so the tip opens into the body (the tip's side strokes stay)
   cx.fillStyle = '#ffffff';
   cx.fillRect(99, 56, 22, 8);
   cx.fillStyle = '#1c1c28';
@@ -330,7 +330,7 @@ export class Crowd {
     const v = this.ownVillager();
     const plot = this.layout.plots[plotIndex];
     if (!v || !plot) return;
-    const lz = HOUSE_FRONT_Z + 1.6;
+    const lz = TUTORIAL_FIGURE_LZ;
     const cos = Math.cos(plot.face);
     const sin = Math.sin(plot.face);
     const x = plot.x + PATH_X * cos + lz * sin;
