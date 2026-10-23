@@ -763,3 +763,76 @@ table.ledger td {
 .character-choice { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; min-width: 140px; border-radius: 14px; font-size: 18px; font-weight: 700; }
 .character-choice img { width: 120px; height: 160px; object-fit: contain; }
 .character-choice[aria-pressed='true'] { outline: 3px solid #ffb547; }
+
+/* Comic speech bubbles (tutorial overlay). Font: Comic Neue, SIL OFL 1.1 (public/fonts/OFL.txt). */
+@font-face {
+  font-family: 'Comic Neue';
+  src: url('/fonts/ComicNeue-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Comic Neue';
+  src: url('/fonts/ComicNeue-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.speech-bubble {
+  --tip-x: 50%;
+  position: fixed;
+  z-index: 60;
+  box-sizing: border-box;
+  max-width: min(320px, calc(100vw - 16px));
+  padding: 14px 18px 18px;
+  font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1.25;
+  color: #1c1c28;
+  text-align: center;
+  pointer-events: none;
+}
+/* body: Kenney UI Pack 2.0 button as 9-slice, brightened to white and outlined dark */
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-style: solid;
+  border-width: 12px 12px 16px;
+  border-image: url('/assets/kenney/ui/bubble.png') 12 12 16 fill / 12px 12px 16px stretch;
+  filter: brightness(2.4) saturate(0.4) drop-shadow(1.5px 0 0 #1c1c28) drop-shadow(-1.5px 0 0 #1c1c28)
+    drop-shadow(0 1.5px 0 #1c1c28) drop-shadow(0 -1.5px 0 #1c1c28);
+}
+/* tip towards the figure: Kenney arrow, same treatment */
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  left: var(--tip-x);
+  bottom: -20px;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  z-index: -1;
+  background: url('/assets/kenney/ui/bubble-tip.png') center / contain no-repeat;
+  filter: brightness(2.4) saturate(0.4) drop-shadow(1.5px 0 0 #1c1c28) drop-shadow(-1.5px 0 0 #1c1c28)
+    drop-shadow(0 1.5px 0 #1c1c28) drop-shadow(0 -1.5px 0 #1c1c28);
+}
+.speech-bubble--below::after {
+  bottom: auto;
+  top: -20px;
+  transform: rotate(180deg);
+}
+.speech-bubble--happy::before,
+.speech-bubble--happy::after {
+  filter: brightness(2.4) saturate(0.4) sepia(0.25) drop-shadow(1.5px 0 0 #1c1c28) drop-shadow(-1.5px 0 0 #1c1c28)
+    drop-shadow(0 1.5px 0 #1c1c28) drop-shadow(0 -1.5px 0 #1c1c28);
+}
+.speech-bubble--sad::before,
+.speech-bubble--sad::after {
+  filter: brightness(2.1) saturate(0.5) hue-rotate(-10deg) drop-shadow(1.5px 0 0 #1c1c28)
+    drop-shadow(-1.5px 0 0 #1c1c28) drop-shadow(0 1.5px 0 #1c1c28) drop-shadow(0 -1.5px 0 #1c1c28);
+}

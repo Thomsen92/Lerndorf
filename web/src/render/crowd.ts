@@ -145,26 +145,69 @@ function buildFigure(nickname: string, own: boolean): THREE.Group {
   return bakeStatic(g);
 }
 
+const BUBBLE_FONT = "'Comic Neue', 'Comic Sans MS', cursive";
+let bubbleFontReady = false;
+let bubbleFontLoad: Promise<void> | null = null;
+
+/** Loads Comic Neue once; resolves quietly when the font API or the file is unavailable (fallback font is used then). */
+function ensureBubbleFont(): Promise<void> {
+  if (!bubbleFontLoad) {
+    bubbleFontLoad =
+      typeof document !== 'undefined' && document.fonts
+        ? document.fonts.load("bold 30px 'Comic Neue'").then(
+            (faces) => {
+              bubbleFontReady = faces.length > 0;
+            },
+            () => undefined,
+          )
+        : Promise.resolve();
+  }
+  return bubbleFontLoad;
+}
+
+/** Comic bubble: white rounded body, dark outline, tip pointing down to the figure. */
+function drawBubble(cv: HTMLCanvasElement, text: string): void {
+  const cx = cv.getContext('2d');
+  if (!cx) return;
+  cx.clearRect(0, 0, cv.width, cv.height);
+  cx.beginPath();
+  cx.roundRect(8, 8, 204, 52, 22);
+  cx.moveTo(96, 59);
+  cx.lineTo(110, 83);
+  cx.lineTo(124, 59);
+  cx.closePath();
+  cx.fillStyle = '#ffffff';
+  cx.fill();
+  cx.lineJoin = 'round';
+  cx.lineWidth = 7;
+  cx.strokeStyle = '#1c1c28';
+  cx.stroke();
+  // cover the seam between body and tip, then redraw the two tip edges
+  cx.fillStyle = '#ffffff';
+  cx.fillRect(99, 56, 22, 8);
+  cx.fillStyle = '#1c1c28';
+  cx.font = `bold 32px ${BUBBLE_FONT}`;
+  cx.textAlign = 'center';
+  cx.textBaseline = 'middle';
+  cx.fillText(text, 110, 35, 186);
+}
+
 /** Speech bubble with one fixed greeting, shown for a short time. */
 function bubble(text: string): THREE.Sprite {
   const cv = document.createElement('canvas');
   cv.width = 220;
   cv.height = 90;
-  const cx = cv.getContext('2d');
-  if (cx) {
-    cx.fillStyle = '#ffffff';
-    cx.beginPath();
-    cx.roundRect(6, 6, 208, 58, 22);
-    cx.fill();
-    cx.fillStyle = '#222';
-    cx.font = 'bold 30px Atkinson Hyperlegible, Verdana, sans-serif';
-    cx.textAlign = 'center';
-    cx.textBaseline = 'middle';
-    cx.fillText(text, 110, 35, 200);
+  drawBubble(cv, text);
+  const tex = new THREE.CanvasTexture(cv);
+  if (!bubbleFontReady) {
+    // first draw may have used the fallback font: redraw once Comic Neue has arrived
+    void ensureBubbleFont().then(() => {
+      if (!bubbleFontReady) return;
+      drawBubble(cv, text);
+      tex.needsUpdate = true;
+    });
   }
-  const s = new THREE.Sprite(
-    new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthTest: false, transparent: true }),
-  );
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
   s.scale.set(1.5, 0.6, 1);
   s.position.y = 2.9;
   s.renderOrder = 11;
