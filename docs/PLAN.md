@@ -133,6 +133,18 @@ Spec: `docs/superpowers/specs/2026-10-21-tablet-ui-navigation-design.md`, Plan: 
 
 Nächstes: Zwischenpaket B – Bau-Feedback (`docs/superpowers/specs/2026-10-21-build-feedback-design.md`).
 
+## Zwischenpaket E – Erststart-Tutorial
+
+Spec: `docs/superpowers/specs/2026-10-21-first-login-tutorial-design.md`, Plan: `docs/superpowers/plans/2026-10-23-first-login-tutorial.md`, SPEC §8a. Beim ersten Login: Figur, Kamerafahrt, zwei Nachrichten, fünf Fragen, Fachwerkhaus kaufen und hinstellen, Tanz, Daily Quests.
+
+| AP | Wer | Inhalt | Ergebnis |
+|---|---|---|---|
+| [x] E.1 | CC | Migration `0019_first_login_tutorial.sql` (Tabellen, fünf Fragen, RPCs, automatisches Grundstück, Haus kostet 50) | SQL-Tests grün |
+| [x] E.2 | CC | Ruine im Haus-Sockel, Sprechblasen im Comic-Stil, Kamerapfade, Tanz | Tests grün, Bilder angesehen |
+| [x] E.3 | CC | Ablauf in der Oberfläche (`ui/tutorial/`), Kaufdialog, geführter Baumodus, Einbau ins Dorf; manuelle Grundstückswahl entfernt | Tests grün |
+| [x] E.4 | CC | Playwright-Durchlauf mit Screenshots (`e2e/tutorial.spec.ts`, Testseite `dev/tutorial.html`), Galerie, Doku | alle Schritte als Bild angesehen |
+| [ ] E.5 | LK | **Abnahme durch die Lehrkraft:** Zweig testen (Anleitung „Erststart-Tutorial testen“), dann Migration 0019 einspielen und auf `main` übernehmen | – |
+
 ## Zwischenpaket Q – Daily Quests
 
 Spec: `docs/superpowers/specs/2026-10-20-daily-quests-design.md`, Plan: `docs/superpowers/plans/2026-10-21-daily-quests.md`, Entscheidungen D1–D11: SPEC §9. Ersetzt die Wochenaufgaben (Aufgabentafel) durch 3 Quests pro Tag.
@@ -303,3 +315,4 @@ Spec: `docs/superpowers/specs/2026-10-20-daily-quests-design.md`, Plan: `docs/su
 | 21.10.2026 | Q Screenshots | Für die Playwright-Bilder gibt es eine eigene Testseite `web/dev/quests.html` mit nachgebauten Antworten statt echtem Login, weil es keine Supabase-Attrappe gab. Sie läuft nur über den Entwicklungsserver und ist nicht im fertigen Build (`e2e/daily-quests.spec.ts`, Projekt `harness`) |
 | 21.10.2026 | Q Lehrer-Hinweise | Beim Bildercheck gefunden und behoben: Die Hinweise im Abschnitt „Daily Quests“ lagen übereinander oben am Rand, weil sie den Stil der Dorf-Meldung geerbt hatten (`teacher/teacher.css`) |
 | 21.10.2026 | Q Reihenfolge | Noch nicht hochgeladen. Reihenfolge: erst Migrationen 0015–0017 auf `main`, grünen Lauf „migrate“ abwarten, dann die erste Datei in `content/daily-quests/` und grünen Lauf „import-content“ prüfen (Anleitung „Daily Quests einspielen“). Abnahme Q.10 steht aus |
+| 23.10.2026 | E Erststart-Tutorial | Zweig `feature/first-login-tutorial`, **noch nicht auf `main`, Migration 0019 noch nirgends eingespielt**. Server: `tutorial_state/start/continue/question/answer/buy_house/place_house/finish`, Lösungen nur in `tutorial_solutions`, 50 Münzen einmalig (Unique-Index), `claim_plot` für Schüler gesperrt, `house_fachwerk` kein Starter mehr und 50 Münzen. Client: Ruine (`render/ruin.ts`) bis das Haus steht, Comic-Sprechblasen (Comic Neue), Kamerapfade (`render/introCamera.ts`), Ablauf `ui/tutorial/flow.ts`. Playwright-Durchlauf mit Bild je Schritt: `npx playwright test e2e/tutorial.spec.ts --project=harness` (Bilder in `web/test-results/tutorial/`). Bekannter Fehler außerhalb des Pakets: `tests/render/character.test.ts` (`rootTravel`) lässt `npm run build` am `tsc` scheitern (`vite build` läuft) |

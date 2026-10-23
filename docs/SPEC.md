@@ -314,7 +314,30 @@ Münzstände anderer Schüler sind für Schüler **nicht** sichtbar. Die alten T
 
 **Antwortprüfung** (`submit_answer`; die Daily Quests nutzen über `quest_answer_matches` dieselbe Prüfung, `listening` wie sein `mode`): Vergleich nach Normalisierung – trimmen, Kleinschreibung, mehrfache Leerzeichen zusammenfassen, typografische Apostrophe → `'`. `gap` erlaubt mehrere richtige Lösungen (Array). Kein Teilpunkt.
 
-**Edge Function `admin-accounts`** (nur Lehrkraft): `create` (nickname, password, class_id; der Schüler startet **ohne** Grundstück und wählt selbst, RPC `claim_plot`), `reset_password`, `move_class` (Regeln §1a), `delete`. Bulk-Anlegen aus einer Liste (eine Zeile pro Schüler: `Spitzname;Passwort;Klasse`).
+**Edge Function `admin-accounts`** (nur Lehrkraft): `create` (nickname, password, class_id; der Schüler startet **ohne** Grundstück und bekommt es im Erststart-Tutorial automatisch, §8a; `claim_plot` ist gesperrt), `reset_password`, `move_class` (Regeln §1a), `delete`. Bulk-Anlegen aus einer Liste (eine Zeile pro Schüler: `Spitzname;Passwort;Klasse`).
+
+## 8a. Erststart-Tutorial (Migration 0019)
+
+Entwurf und Entscheidungen: `docs/superpowers/specs/2026-10-21-first-login-tutorial-design.md` (§9 gilt zuerst). Jeder Schüler ohne platziertes Haus durchläuft es einmal.
+
+**Zustand** je Schüler in `tutorial_progress` (`step`, `answered`, `reward_paid`, `house_bought`, `completed_at`; RLS: nur die eigene Zeile lesbar). Ablauf der Schritte:
+
+```
+intro --tutorial_continue--> quiz --5x tutorial_answer richtig--> buy --tutorial_buy_house--> place --tutorial_place_house--> done
+```
+
+| Funktion | Wirkung |
+| --- | --- |
+| `tutorial_state()` | `{needed, step, plot_index, character, answered}`; wer schon ein Haus im Haus-Sockel hat, bekommt `done` |
+| `tutorial_start()` | vergibt atomar das niedrigste freie Grundstück der Klasse (Advisory-Lock), legt die Fortschrittszeile an; Wiederholung ändert nichts |
+| `tutorial_continue('intro')` | `intro` → `quiz` (braucht ein Grundstück) |
+| `tutorial_question()` | die aktuelle Frage (Nr. = `answered + 1`), nie Lösung oder Tipp |
+| `tutorial_answer(nr, antwort)` | falsch: Tipp, keine Strafe, beliebig oft; fünfte richtige Antwort: einmalig 50 Münzen (`coin_ledger.reason = 'tutorial'`, Unique-Index) → `buy` |
+| `tutorial_buy_house()` | Kauf des Fachwerkhauses zum Katalogpreis (50), auch bei geschlossenem Shop → `place`; doppelter Aufruf bucht nicht noch einmal |
+| `tutorial_place_house()` | setzt das Haus in den Sockel `house` (Drehung 0), auch bei geschlossenem Baumodus; braucht ein Grundstück → `done` |
+| `tutorial_finish()` | Abschlussaufruf des Clients, wiederholbar, nur bei `done` |
+
+`tutorial_state_of(uuid)` und `tutorial_reward()` sind intern (nicht für Clients aufrufbar). Fehler „falscher Schritt“ ist `22023`. **`claim_plot` ist für alle gesperrt** (Fehler `forbidden: plot is assigned automatically`, Code `42501`): das Grundstück vergibt nur `tutorial_start`. `buy_item`, `place_in_slot` und `clear_slot` bleiben unverändert streng; die Tutorial-Funktionen sind die einzigen Ausnahmen für geschlossenen Shop und Baumodus, nur für das Fachwerkhaus im Sockel `house` im jeweiligen Schritt. Bis das Haus steht, zeigt der Client im Sockel die **Ruine** (`RUIN_ID`, kein Katalog-Eintrag).
 
 ## 9. Aufgaben-Inhalte: Daily Quests
 
@@ -385,7 +408,7 @@ Grundsatz: **Das Layout (Positionen von allem) entsteht im Code in `world/`, det
 - **Hangregel:** Höhenunterschied des natürlichen Geländes unter dem Grundstück ≤ 1,5 m; Einebnung mit kurzer, weicher Böschung (≤ 2 m), keine Erdwände.
 - Ausrichtung: Haus und Tor zeigen zum nächsten Weg; **Gartenweg** vom Tor zum Weg wird gezeichnet und ist im Wegegraph.
 - Aufbau: Rasenfläche, Zaun aus Pfosten + Latten mit Tor vorn (keine geschlossene Wand), Haus mit Tür, 2–4 Fenstern (leuchtend), Satteldach mit Dachüberstand, das innerhalb des Grundstücks bleibt; Briefkasten am Tor. Hausgröße und Farben variieren deterministisch.
-- **Freie Plätze** (ohne Schüler): kein Haus, sondern Bauplatz-Optik (Wiese, Holzpflöcke an den Ecken, kleines Schild „frei“). Die Häuser sind nur Platzhalter. Ein Schüler ohne Grundstück wählt einen freien Platz, indem er auf die Wiese tippt (Bestätigung). Die Wahl gilt dauerhaft (RPC `claim_plot(p_index)`, nur solange kein Platz gewählt ist, Platz 0 bis 33). Am Anfang sind alle Plätze frei.
+- **Freie Plätze** (ohne Schüler): kein Haus, sondern Bauplatz-Optik (Wiese, Holzpflöcke an den Ecken, kleines Schild „frei“). Die Häuser sind nur Platzhalter. Ein Schüler ohne Grundstück bekommt beim ersten Login automatisch den niedrigsten freien Platz (RPC `tutorial_start`, §8a); die frühere Wahl per Antippen (`claim_plot`) ist abgeschaltet. Am Anfang sind alle Plätze frei.
 - **Grundstücksplan (fest, für alle gleich):** 11 × 11 Zellen à 1 m plus 0,7 m Rasen ringsum (12,4 × 12,4 m). Sieben Slots: Haus 6×4, Garage 3×4, Auto-Sockel 3×5 in der Einfahrt, vier Deko-Sockel 3×3; Weg vom Tor zur Haustür und Einfahrt bleiben frei. Maße, Höchstgrößen, Ausrichtung und Regeln: `docs/ASSET_VERTRAG.md`; Code: `world/plotPlan.ts`. Platzieren nur per RPC `place_in_slot` / `clear_slot` (Migration 0013). Haus und Garage sind nie leer (Starter-Haus „Fachwerkhaus“, Starter-Garage „Holzgarage“), leere Deko-Sockel bleiben Wiese.
 - Kartengröße: Die Vorlagen in `world/maps/` sind im Maßstab 1 gezeichnet und werden mit `WORLD_SCALE = 1,65` gestreckt, damit 34 Grundstücke à 12,4 m Platz haben; der Marktplatz bleibt gleich groß.
 - Wechsel von Vorlage oder Seed nach dem Start nur mit Warnung im Lehrer-Bereich: Grundstücke bleiben über `plot_index` erhalten, ihre Lage ändert sich.

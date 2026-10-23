@@ -152,6 +152,53 @@ Vorsicht: Das Löschen entfernt Konto, Haus und alle Münzen unwiderruflich. Sch
 
 ---
 
+## Erststart-Tutorial
+
+### Was Schüler beim ersten Anmelden erleben
+
+Wer sich zum ersten Mal anmeldet, bekommt automatisch ein kurzes Tutorial (etwa 5 Minuten). Ein Grundstück wählen die Schüler nicht mehr selbst: Das Dorf vergibt das nächste freie.
+
+1. Sie wählen ihre **Figur** (Junge oder Mädchen).
+2. Die Kamera fliegt über das Dorf zum eigenen Grundstück. Dort steht die Figur vor einer **Ruine** und sagt traurig: „Oh nein, mein Haus ist eine Ruine!“
+3. Zwei kurze Nachrichten erklären **Daily Quests** und **Münzen**. Jede bleibt, bis man auf „Weiter“ tippt.
+4. **Fünf ganz leichte Fragen** (Wörter, Lücke, Zuordnen, Hören). Falsch ist nicht schlimm: Es gibt einen kurzen englischen Tipp und man darf es noch einmal versuchen. Nach der fünften richtigen Antwort gibt es **50 Münzen**, einmalig.
+5. Mit den Münzen **kaufen** sie das Fachwerkhaus (50 Münzen) und **stellen** es selbst auf den Platz der Ruine. Das geht auch, wenn Shop und Bauen für die Klasse ausgeschaltet sind.
+6. Die Figur **tanzt**, sagt „Jetzt wird gelernt und Dailys gemacht!“, und die Daily Quests öffnen sich.
+
+Bricht jemand ab oder meldet sich ab, geht es beim nächsten Mal am letzten abgeschlossenen Schritt weiter. Bereits gelöste Schritte kommen nicht noch einmal, und die 50 Münzen gibt es nie doppelt.
+
+### Selbst ausprobieren
+
+1. Im Lehrer-Bereich unter **Konten** ein neues **Schülerkonto** anlegen (zum Beispiel `testfuchs;test123;8a`).
+2. Im Dorf (nicht im Lehrer-Bereich) mit diesem Konto anmelden. Das Tutorial startet sofort.
+3. Zum Wiederholen: ein weiteres Testkonto anlegen. Ein Konto, das das Tutorial beendet hat, bekommt es nicht noch einmal. Testkonten danach im Lehrer-Bereich löschen.
+
+Ihr eigenes Lehrkonto sieht das Tutorial nie.
+
+### Die Datenbank-Änderung (Migration 0019) einspielen
+
+**Wichtig vorher lesen.** Das Tutorial liegt zurzeit nur auf dem Zweig `feature/first-login-tutorial`, **nicht** auf `main`. Die Datenbank-Änderung `0019_first_login_tutorial.sql` ist noch **nirgends eingespielt**. Der Ablauf **migrate** (siehe Einrichtung) spielt Datenbank-Änderungen **automatisch** ein, sobald sie auf `main` landen. Deshalb gilt: **Erst den Zweig testen, dann erst auf `main` übernehmen.** Was auf `main` ist, ist für Schüler sofort live.
+
+Folgen von 0019, auf die Sie achten sollten:
+- Das Fachwerkhaus ist kein kostenloses Starterhaus mehr (kostet 50 Münzen).
+- Die alte Grundstückswahl per Antippen ist abgeschaltet. Die alte Fassung des Dorfes (ohne Tutorial) kann mit der neuen Datenbank nicht mehr richtig arbeiten. Migration und neuer Code müssen also **zusammen** live gehen.
+- Bitte außerhalb der Unterrichtszeit umstellen.
+
+**So testen Sie vorher (Claude Code übernimmt die Technik):**
+1. Claude Code bittet man: „Spiele Migration 0019 in die Datenbank ein, damit ich den Zweig testen kann.“ Claude Code spielt sie über die Supabase-Verbindung ein und trägt sie als erledigt ein. So versucht der Ablauf **migrate** sie später nicht noch einmal.
+2. Die Vorschau-Adresse des Zweigs finden: Cloudflare-Dashboard → **Workers & Pages** → Projekt `lerndorf` → **Deployments** → Eintrag mit dem Zweig `feature/first-login-tutorial` → die Adresse darunter (`https://…lerndorf.pages.dev`). Diese Seite benutzt dieselbe Datenbank wie die echte.
+3. Dort wie unter „Selbst ausprobieren“ mit einem Testkonto das Tutorial durchspielen.
+
+**Ohne Claude Code, von Hand (nur wenn nötig):**
+1. Supabase-Dashboard → Ihr Projekt → links **SQL Editor** → **New query**.
+2. Die Datei `supabase/migrations/0019_first_login_tutorial.sql` aus dem Repository auf GitHub öffnen (Zweig `feature/first-login-tutorial`), **Raw** anklicken, alles markieren und kopieren.
+3. In den SQL Editor einfügen und **Run** klicken. Es muss „Success“ erscheinen. Bei einer roten Fehlermeldung: nichts weiter tun, Meldung an Claude Code schicken.
+4. Danach **muss** zusätzlich diese eine Zeile ausgeführt werden (neue Abfrage, **Run**), damit **migrate** später nicht doppelt einspielt und rot wird: `insert into supabase_migrations.schema_migrations (version, name) values ('0019', 'first_login_tutorial');` Im Zweifel lieber Claude Code fragen.
+
+**Wenn der Test gut war:** Claude Code bitten, den Zweig auf `main` zu übernehmen. Danach auf GitHub unter **Actions** prüfen, dass **migrate** und **deploy** grün sind (siehe „Daily Quests einspielen“, Schritt 3). Bei rot: Ablaufname und Fehlermeldung an Claude Code schicken.
+
+---
+
 ## Daily Quests einspielen
 
 Seit Oktober 2026 gibt es statt der Wochenaufgaben **Daily Quests**: jeden Tag (auch am Wochenende) 3 kurze Englisch-Aufgaben. Die Schüler öffnen sie mit dem Knopf **Aufgaben** oder durch Antippen der Tafel am Marktplatz. Was von gestern noch offen ist, steht darunter unter „Nachholen von gestern“ und bringt die halben Münzen. Versuche sind unbegrenzt, Münzen gibt es aber nur, wenn die richtige Antwort unter den ersten 3 Versuchen ist.
