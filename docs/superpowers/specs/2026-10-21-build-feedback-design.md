@@ -1,6 +1,6 @@
 # Bau-Feedback für Lerndorf – Design
 
-**Stand:** 21.10.2026 · **Status:** vom Auftraggeber beauftragt, Umsetzungsplan steht aus.
+**Stand:** 21.10.2026 · **Status:** vom Auftraggeber beauftragt; Umsetzungsplan `docs/superpowers/plans/2026-10-24-build-feedback.md` (24.10.2026). §6 geht §1–§5 vor.
 
 ## Ziel
 Bauen soll auf dem Tablet leicht zu bedienen sein und sich befriedigend anfühlen – mit minimalem Aufwand, ohne neue Dateien oder kostenpflichtige Dienste.
@@ -39,3 +39,13 @@ Bauen soll auf dem Tablet leicht zu bedienen sein und sich befriedigend anfühle
 3. Aufstellen zeigt Plopp-Animation, Rauch und Ton; Wegräumen Schrumpfen, Rauch und Ton.
 4. Bei Serverfehler kein Effekt; Töne abschaltbar; reduzierte Bewegung wird beachtet.
 5. Effekte erscheinen nur beim bauenden Schüler; auf anderen Geräten nie.
+
+## 6. Präzisierungen für die Umsetzung (24.10.2026)
+1. **Kenney-Effekte statt selbst erzeugter Töne und Kugeln** (Wunsch Auftraggeber 24.10.2026). Quelle `Kenny/Effects` (CC0): Töne aus *Interface Sounds* und *Impact Sounds*, Rauch aus *Smoke Particles* („White puff“). Die Töne werden einmalig nach MP3 umgewandelt (ältere iPads spielen kein OGG ab), der Rauch auf 128 × 128 px verkleinert; beides liegt in `web/public/assets/kenney/fx/` und steht in `blender/sources/LICENSES.md`. Das ersetzt „Low-Poly-Kugeln“ (§3, §4), „per Web Audio API erzeugt (keine Audiodatei)“ (§3) und „keine neuen Texturen“ (§5): Es gibt genau eine kleine Rauch-Textur.
+2. **Tonzuordnung** (Standard, an einer Stelle austauschbar): Aufstellen = `drop_002` („Plopp“) und 0,12 s später `confirmation_001` („Ding“); Wegräumen = `impactSoft_heavy_000` („Puff“); nur gedreht (gleicher Gegenstand) = nur „Ding“. Die Lehrkraft hört bei der Abnahme rein.
+3. **Platz-Menü:** Ohne gewählten Platz bleibt die kompakte Leiste mit den sieben Plätzen und „Fertig“. Ein gewählter Platz macht daraus das große Blatt. Das Blatt ist *kein* modaler Dialog: Die Vorschau im Dorf muss sichtbar und ein anderer Platz antippbar bleiben. Beim Öffnen springt der Fokus auf die Überschrift, Escape wirkt wie „Zurück“, danach liegt der Fokus auf dem Platz-Knopf. „Aufstellen“ ersetzt „Speichern“, „Zurück“ ersetzt „Abbrechen“ und verwirft die Vorschau. Solange das Blatt offen ist, rückt die Kamera das Grundstück in den freien Teil des Bildschirms.
+4. **Leerer Zustand** einheitlich „Du hast dafür noch nichts.“ (auch beim Auto) mit Knopf „Zum Shop“.
+5. **Tutorial:** Das erste Haus im Tutorial bekommt denselben Aufstellen-Effekt (nach Bestätigung durch `tutorial_place_house`). Die Tutorial-Leiste selbst bleibt kompakt.
+6. **Reduzierte Bewegung:** Der Gegenstand erscheint bzw. verschwindet sofort (kein Einblenden, weil die Materialien geteilt sind), kein Rauch, kein Pulsieren. Töne bleiben (abschaltbar).
+7. **Tippfläche:** Ein Tipp genau auf einen Platz gilt immer. Ein Tipp daneben zählt bis 0,5 m für den nächstgelegenen Platz (manche Plätze grenzen direkt aneinander).
+8. **Freier Platz** = leer oder Ruine im Haus-Platz.
