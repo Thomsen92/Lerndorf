@@ -20,6 +20,8 @@ Nur CC0-Inhalte oder eigene (CLAUDE.md). Die Quellpakete selbst liegen nicht im 
 
 ## XP-Rückmeldung (25.10.2026)
 
+Die interaktiven 3D-Truhen (`web/src/render/chestPreview.ts`) und ihre SVG-Ersatzansicht (`web/src/ui/chestControl.ts`) sind eigene, im Code erstellte Modelle/Grafiken ohne fremde Modell- oder Texturdateien. Der Deckel besitzt ein eigenes Scharnier für die Öffnungsanimation.
+
 | Datei | Quelle und Verarbeitung | Lizenz | Link |
 | --- | --- | --- | --- |
 | `web/public/assets/kenney/fx/xp.mp3` | Kenney Interface Sounds, `pluck_001.ogg`; mono MP3 64 kbps | CC0 | https://kenney.nl/assets/interface-sounds |

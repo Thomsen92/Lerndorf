@@ -57,6 +57,8 @@ const progress: Progress = {
   stats: { quests: 42, stamps: 3, bestStreak: 9 },
 };
 const opened = new Map<number, { coinsWon: number; roll: 'double'; coins: number }>();
+const chestCalls: number[] = [];
+(window as unknown as { profilePreview: { chestCalls: number[] } }).profilePreview = { chestCalls };
 const api: ProgressApi = {
   async load() {
     return { ok: true, value: structuredClone(progress) };
@@ -69,6 +71,7 @@ const api: ProgressApi = {
     return { ok: true, value: true };
   },
   async openChest(id) {
+    chestCalls.push(id);
     if (q.has('slow')) await new Promise((resolve) => setTimeout(resolve, 2000));
     let result = opened.get(id);
     if (!result) {

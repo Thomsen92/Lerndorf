@@ -1,0 +1,168 @@
+.loot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 240px));
+  justify-content: center;
+  gap: 12px;
+}
+.loot-chest {
+  min-width: 0;
+  position: relative;
+  text-align: center;
+  color: #f4ecd9;
+}
+.panel button.chest-hit {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  border-radius: 18px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.panel button.chest-hit:focus-visible {
+  outline: 2px solid #ffd16d;
+  outline-offset: 4px;
+}
+.chest-hit[aria-busy='true'] {
+  cursor: progress;
+}
+.chest-hit[aria-disabled='true']:not([aria-busy='true']) {
+  cursor: default;
+}
+.loot-visual {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.35;
+  isolation: isolate;
+}
+.loot-visual::before {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 7%;
+  height: 11%;
+  background: #070b2059;
+  border-radius: 50%;
+  filter: blur(8px);
+  z-index: -1;
+}
+.loot-visual canvas,
+.loot-fallback {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: filter 0.16s ease;
+}
+.loot-fallback svg {
+  width: 100%;
+  height: 100%;
+}
+.loot-visual canvas[hidden],
+.loot-fallback[hidden] {
+  display: none;
+}
+.loot-chest--hover .loot-visual canvas,
+.loot-chest--hover .loot-fallback {
+  filter: drop-shadow(1px 0 0 #ffd16d) drop-shadow(-1px 0 0 #ffd16d) drop-shadow(0 1px 0 #ffd16d)
+    drop-shadow(0 -1px 0 #ffd16d) drop-shadow(0 0 10px #ffc9659e);
+}
+.loot-caption {
+  display: block;
+  margin-top: -6px;
+  color: #ffd16d;
+  font-size: 14px;
+  font-weight: 700;
+}
+.loot-status {
+  margin: 8px 0 0;
+  min-height: 22px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #b8c8d7;
+}
+.loot-chest[data-state='open'] .loot-status {
+  color: #ffe2a0;
+  font-weight: 800;
+}
+.loot-chest[data-state='pending'] .loot-fallback {
+  animation: loot-rattle 0.16s ease-in-out infinite alternate;
+}
+.loot-chest[data-state='open'] .loot-fallback-lid {
+  transform: translateY(-28px) rotate(-12deg);
+  transform-origin: 150px 65px;
+  transition: transform 0.65s;
+}
+.loot-coins {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  pointer-events: none;
+}
+.loot-coins i {
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  border: 2px solid #a66c1c;
+  border-radius: 50%;
+  background: #ffd16d;
+  box-shadow: inset 0 0 0 2px #fff0ac;
+  animation: loot-coin 0.7s ease-out forwards;
+}
+.loot-counter {
+  position: absolute;
+  left: 50%;
+  top: 64%;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  background: #fff0c9;
+  color: #623e17;
+  border: 1px solid #dbac54;
+  border-radius: 20px;
+  font-size: 22px;
+  font-weight: 900;
+}
+.level-up .loot-grid {
+  margin: 8px 0 20px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 200px));
+}
+.chest-dialog .loot-chest {
+  width: 280px;
+  max-width: 100%;
+  margin: auto;
+}
+@keyframes loot-rattle {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+@keyframes loot-coin {
+  to {
+    transform: translate(var(--coin-x), var(--coin-y)) rotate(180deg);
+    opacity: 0;
+  }
+}
+.reduced-motion .loot-fallback,
+.reduced-motion .loot-visual canvas {
+  animation: none !important;
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .loot-fallback,
+  .loot-visual canvas,
+  .loot-fallback-lid {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -34,8 +34,8 @@ it('loads nonmodal profile with progress and exact streak text', async () => {
     reducedMotion: true,
   });
   await new Promise((r) => setTimeout(r, 0));
-  expect(document.querySelector('[role=region]')?.textContent).toContain('120 / 175 XP bis Level 7');
-  expect(document.body.textContent).toContain('🔥 6 Schultage in Folge');
+  expect(document.querySelector('[role=region]')?.textContent).toContain('Noch 55 XP bis Level 7');
+  expect(document.body.textContent).toContain('🔥 6 Tage');
   expect(document.body.textContent).toContain('Nächste Truhe bei Level 7.');
   h.close();
   expect(document.querySelector('[role=region]')).toBeNull();
@@ -81,9 +81,10 @@ it('keeps a failed selection unchanged, retries and prevents choosing locked tit
     reducedMotion: true,
   });
   await new Promise((r) => setTimeout(r, 0));
+  document.querySelector<HTMLButtonElement>('[aria-label="Sammlung ansehen"]')?.click();
   const all = () => [...document.querySelectorAll<HTMLButtonElement>('button')];
-  const unlocked = all().find((b) => b.textContent === 'Quest Rookie')!;
-  expect(all().find((b) => b.textContent?.startsWith('Busy Bee'))?.disabled).toBe(true);
+  const unlocked = all().find((b) => b.getAttribute('aria-label') === 'Quest Rookie, wählen')!;
+  expect(all().find((b) => b.getAttribute('aria-label') === 'Busy Bee, ab Level 7')?.disabled).toBe(true);
   unlocked.click();
   await new Promise((r) => setTimeout(r, 0));
   expect(onTitle).not.toHaveBeenCalled();
@@ -92,7 +93,7 @@ it('keeps a failed selection unchanged, retries and prevents choosing locked tit
   unlocked.click();
   await new Promise((r) => setTimeout(r, 0));
   expect(onTitle).toHaveBeenCalledWith('Quest Rookie');
-  expect(document.body.textContent).toContain('Quest Rookie · gewählt');
+  expect(all().find((b) => b.getAttribute('aria-label') === 'Quest Rookie, gewählt')).toBeTruthy();
   h.close();
 });
 

@@ -264,11 +264,11 @@ Der Abschnitt **Aufgaben-Statistik** zeigt nur noch die alten Wochenaufgaben von
 
 ## XP, Level und Profil benutzen
 
-Schüler tippen oben rechts auf ihr Figurenbild. Im Profil sehen sie XP bis zum nächsten Level, ihre Schultag-Serie mit Schutzschild, Truhen und freigeschaltete Titel und Rahmen. Die drei Hauptknöpfe bleiben unverändert. Während des Tutorials öffnet das Figurenbild weiterhin die Einstellungen.
+Schüler tippen oben rechts auf ihr Figurenbild. Im Profil sehen sie den Fortschritt bis zum nächsten Level, Münzen, ihre Serie, heutige Quests und Truhen. „Sammlung“ führt auf eine eigene Seite mit den Reitern „Titel“ und „Rahmen“: Dort sind freigeschaltete und noch gesperrte Einträge zu sehen. Antippen des Figurenbilds oder Titels im Profil führt direkt zur passenden Auswahl. Die drei Hauptknöpfe bleiben unverändert. Während des Tutorials öffnet das Figurenbild weiterhin die Einstellungen.
 
 Richtige Quests bringen auch nach dem dritten Versuch noch XP. Ein vollständiges Tagesziel bringt zusätzliche XP. Stempel geben automatisch 100 XP; dafür muss die Lehrkraft nichts zusätzlich buchen. In der Klassenübersicht stehen Level, XP und Serie. Die Liste bleibt nach Spitzname sortiert.
 
-Eine Truhe öffnet sich erst nach der Bestätigung des Servers. Bei einem Netzfehler kann der Schüler erneut versuchen; dieselbe Truhe bucht ihre Münzen höchstens einmal. Die Münzen stehen im Kontoauszug als „Truhe“. Titel und Rahmen sind erst ab dem angegebenen Level wählbar. XP werden nie abgezogen.
+Zum Öffnen tippen Schüler direkt auf die 3D-Truhe. Mit der Maus wackelt sie und ihre Umrisse leuchten. Der Deckel öffnet sich erst nach der Bestätigung des Servers. Bei einem Netzfehler kann der Schüler dieselbe Truhe erneut antippen; sie bucht ihre Münzen höchstens einmal. Das funktioniert ebenso in der Level-Feier, ohne zweiten Dialog. Die Münzen stehen im Kontoauszug als „Truhe“. Titel und Rahmen sind in der Sammlung erst ab dem angegebenen Level wählbar. XP werden nie abgezogen. Die Rechenregeln werden Schülern nicht als Tabelle angezeigt.
 
 ### Datenbank-Änderung 0020 einspielen
 

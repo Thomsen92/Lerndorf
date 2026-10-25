@@ -104,11 +104,8 @@ test('resumed placement confirms the XP badge and one chest payment before quest
   await page.getByRole('heading', { name: 'Level 2!', exact: true }).waitFor({ timeout: 30_000 });
   await expect(page.locator('.avatar-badge')).toHaveAttribute('aria-label', /Level 2/);
   await page.getByRole('button', { name: 'Truhe öffnen', exact: true }).click();
-  const chest = page.getByRole('dialog', { name: 'Deine Truhe', exact: true });
-  await chest.getByRole('button', { name: 'Truhe öffnen', exact: true }).click();
   await expect(page.getByText('+30 Münzen', { exact: true })).toBeVisible();
   await expect(page.locator('.avatar-badge')).toHaveAttribute('aria-label', /30 Münzen/);
-  await chest.getByRole('button', { name: 'Weiter', exact: true }).click();
   await expect(page.locator('.quest-rule')).toHaveCount(0);
   await page
     .getByRole('dialog', { name: 'Level 2!', exact: true })

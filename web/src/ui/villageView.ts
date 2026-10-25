@@ -607,6 +607,7 @@ export async function mountVillage(
           onFrame: (id) => progressFlow.frameChanged(id),
           onTitle: (label) => progressFlow.titleChanged(label),
           onSettings: openSettings,
+          onQuests: () => void areas?.select('aufgaben'),
           onClose: () => void areas?.select('dorf'),
           sound,
           reducedMotion: reducedMotion(),

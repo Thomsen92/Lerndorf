@@ -19,8 +19,9 @@ it('waits for server and blocks user closing while pending', async () => {
     onCoins: coins,
     onDone: vi.fn(),
   });
-  [...h.body.querySelectorAll('button')].find((b) => b.textContent === 'Truhe öffnen')!.click();
-  expect(h.body.querySelector('.chest--wobble')).not.toBeNull();
+  expect(h.body.querySelector('.chest-hit canvas')).not.toBeNull();
+  h.body.querySelector<HTMLButtonElement>('.chest-hit')!.click();
+  expect(h.body.querySelector('[data-state=pending]')).not.toBeNull();
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
   expect(h.isOpen).toBe(true);
   expect(coins).not.toHaveBeenCalled();
@@ -30,8 +31,11 @@ it('waits for server and blocks user closing while pending', async () => {
   expect(coins).toHaveBeenCalledWith(330);
   h.close();
 });
-it('closes nested chest when the celebration is externally closed', () => {
-  const api = {} as ProgressApi;
+it('opens the object directly in the celebration without a nested dialog', () => {
+  const openChest = vi
+    .fn()
+    .mockResolvedValue({ ok: true, value: { coinsWon: 30, roll: 'normal', coins: 30 } });
+  const api = { openChest } as unknown as ProgressApi;
   const h = openLevelUp({
     levelFrom: 4,
     levelTo: 7,
@@ -43,8 +47,10 @@ it('closes nested chest when the celebration is externally closed', () => {
     onEquip: vi.fn(),
     onDone: vi.fn(),
   });
-  [...h.body.querySelectorAll('button')].find((b) => b.textContent === 'Truhe öffnen')!.click();
-  expect(document.querySelectorAll('[role=dialog]')).toHaveLength(2);
+  expect(h.body.querySelector('.chest-hit')).not.toBeNull();
+  h.body.querySelector<HTMLButtonElement>('.chest-hit')!.click();
+  expect(openChest).toHaveBeenCalledWith(1);
+  expect(document.querySelectorAll('[role=dialog]')).toHaveLength(1);
   h.close();
   expect(document.querySelectorAll('[role=dialog]')).toHaveLength(0);
 });

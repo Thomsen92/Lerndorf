@@ -192,7 +192,7 @@ Spec: `docs/superpowers/specs/2026-10-24-xp-level-design.md`; Plan: `docs/superp
 | [x] X.6 | CC | Figuren-Brustbilder, sieben Rahmen und Wappen, Kenney-Töne/Sterne | Echte Geometrie bestimmt den Bildausschnitt; gültige MP3-Dateien |
 | [x] X.7 | CC | Avatar-Feld mit XP-Balken, Münzen, Serie und Truhenpunkt | Profil öffnet über das Figurenbild |
 | [x] X.8 | CC | XP-Einblendung, Level-Feier und Truhenöffnung | Serverantwort abwarten, Wiederholen bei Fehler, reduzierte Bewegung |
-| [x] X.9 | CC | Profilseite mit Serie, Truhen, Freischaltungen, Erfolgen und Hilfe | Auswahl- und Fehlerfälle getestet |
+| [x] X.9 | CC | Profilseite mit Serie, Truhen und eigener Sammlung für Freischaltungen | Am 25.10. nach Rückmeldung vereinfacht; Erfolge und XP-Hilfe entfallen |
 | [x] X.10 | CC | Level-Wappen und Titel in vorhandenen Namensschildern | Keine zusätzlichen Sprites oder Draw Calls |
 | [x] X.11 | CC | Quests, Bauen, Tutorial, Willkommen-Karte und Lehrerübersicht verbinden | Ungesehene Buchungen bleiben erhalten; Tutorial-Feier vor Quests |
 | [x] X.12 | CC | Browserbilder, Galerie, Gesamtprüfung und Dokumentation | 796 Tests, Build und ESLint grün; Tablet-Bilder, Audio-Prüfung und Tutorial grün; 36 Galeriebilder plus Wappenvergleich |
@@ -200,6 +200,19 @@ Spec: `docs/superpowers/specs/2026-10-24-xp-level-design.md`; Plan: `docs/superp
 | [ ] X.14 | LK | **Abnahme XP und Level** auf dem Schul-Tablet (Design §13) | Figurenbild, Fortschritt, Truhen, Titel/Rahmen, Töne, Bildrate |
 
 Die Browser-Vorschau steht unter `web/dev/profile.html`; Bilder unter `web/test-results/xp-gallery/`, Tutorial unter `web/test-results/tutorial/`, Dorf-Galerie unter `web/test-results/layout-xp/`. Vorschauen nutzen Testdaten und gehören nicht zum veröffentlichten Build.
+
+### Profil-Überarbeitung vom 25.10.2026
+
+Auftrag: weniger Informationen, eigene Sammlung und direkt bedienbare 3D-Truhen. Design und Reihenfolge: `docs/superpowers/specs/2026-10-25-profile-interaction-design.md`. Sequenziell ohne Teilagenten.
+
+| AP | Wer | Inhalt | Ergebnis |
+| --- | --- | --- | --- |
+| [x] P.1 | CC | Eigene 3D-Truhe mit Deckelscharnier und gemeinsamem Renderer | Modell-, Hover- und Bewegungsprüfungen; SVG-Ersatz ohne WebGL |
+| [x] P.2 | CC | Objekt direkt öffnen, Hover-Kontur und Wackeln | Ein Aufruf bei Doppelklick; Deckel wartet auf Server; Fehler erneut antippbar |
+| [x] P.3 | CC | Kompaktes Profil und separate Sammlung | Titel/Rahmen als Reiter, Auswahl und Tastatur geprüft; XP-Tabelle entfernt |
+| [x] P.4 | CC | Bilder, Tutorial, Gesamtprüfung und Dokumentation | 801 Tests, Build und ESLint grün; 8 Browserprüfungen inklusive Erststart/Fortsetzen; Desktop-, Tablet- und Handybilder geprüft (`web/test-results/profile-interaction/`) |
+
+Keine zusätzliche Datenbankänderung für diese UI-Überarbeitung. X.13 und X.14 bleiben offen.
 
 ## Stufe 5 – Probebetrieb
 

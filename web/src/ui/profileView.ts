@@ -1,11 +1,11 @@
-import { PROGRESS_ERROR, XP_HELP, type Progress, type ProgressApi, type Reward } from '../api/progress';
+import { PROGRESS_ERROR, levelFraction, type Progress, type ProgressApi, type Reward } from '../api/progress';
 import type { CharacterKind } from '../render/character';
 import { avatarPortrait, frameSvg } from './frames';
 import { crestSvg } from './crest';
 import type { AreaHandle } from './areas';
 import type { Sound } from './sound';
-import { openChestDialog } from './levelUp';
-import type { ModalHandle } from './dialog';
+import { createChestControl, type ChestControl } from './chestControl';
+import './profile.css';
 let serial = 0;
 export function openProfile(opts: {
   api: ProgressApi;
@@ -17,221 +17,340 @@ export function openProfile(opts: {
   onTitle: (label: string | null) => void;
   onSettings: (b: HTMLButtonElement) => void;
   onClose: () => void;
+  onQuests?: () => void;
   sound?: Sound;
   reducedMotion: boolean;
 }): AreaHandle {
   const area = document.createElement('section');
   area.className = 'overlay area profile-area';
   area.setAttribute('role', 'region');
+  if (opts.reducedMotion) area.classList.add('reduced-motion');
   const titleId = `profile-title-${++serial}`;
   area.setAttribute('aria-labelledby', titleId);
   const panel = document.createElement('div');
   panel.className = 'panel';
   const head = document.createElement('header');
-  head.className = 'panel-head';
+  head.className = 'panel-head profile-head';
   const title = document.createElement('h2');
   title.id = titleId;
-  title.textContent = 'Mein Profil';
-  const makeButton = (text: string, fn: (b: HTMLButtonElement) => void): HTMLButtonElement => {
+  title.tabIndex = -1;
+  const button = (
+    value: string,
+    action: (b: HTMLButtonElement) => void,
+    className = '',
+  ): HTMLButtonElement => {
     const b = document.createElement('button');
     b.type = 'button';
-    b.textContent = text;
-    b.addEventListener('click', () => fn(b));
+    b.textContent = value;
+    b.className = className;
+    b.addEventListener('click', () => action(b));
     return b;
   };
-  head.append(
-    title,
-    makeButton('Einstellungen', opts.onSettings),
-    makeButton('Schließen', () => opts.onClose()),
-  );
+  const text = (parent: HTMLElement, tag: string, value: string, className = ''): HTMLElement => {
+    const el = document.createElement(tag);
+    el.textContent = value;
+    el.className = className;
+    parent.append(el);
+    return el;
+  };
+  const back = button('← Profil', () => show('overview'));
+  back.setAttribute('aria-label', 'Zurück zum Profil');
+  const settings = button('Einstellungen', opts.onSettings, 'profile-settings');
+  head.append(back, title, settings, button('Schließen', opts.onClose));
   const content = document.createElement('div');
   content.className = 'area-content profile-content';
   panel.append(head, content);
   area.append(panel);
   document.body.append(area);
   let closed = false,
-    p: Progress | null = null,
+    progress: Progress | null = null,
     rewards: Reward[] = [],
-    dialog: ModalHandle | null = null,
-    selectionBusy = false;
-  const paragraph = (parent: HTMLElement, text: string): HTMLParagraphElement => {
-    const e = document.createElement('p');
-    e.textContent = text;
-    parent.append(e);
-    return e;
+    busy = false;
+  let page: 'overview' | 'collection' = 'overview',
+    category: 'title' | 'frame' = 'title';
+  let chests: ChestControl[] = [];
+  const clearChests = (): void => {
+    chests.forEach((c) => c.dispose());
+    chests = [];
   };
-  const section = (label: string): HTMLElement => {
-    const s = document.createElement('section');
-    s.className = 'profile-section';
-    const h = document.createElement('h3');
-    h.textContent = label;
-    s.append(h);
-    content.append(s);
-    return s;
-  };
-  async function choose(
-    reward: Reward | null,
-    kind: 'title' | 'frame',
-    b: HTMLButtonElement,
-    error: HTMLElement,
-  ): Promise<void> {
-    if (!p || selectionBusy || closed) return;
-    selectionBusy = true;
+  function show(next: typeof page, kind?: typeof category): void {
+    page = next;
+    if (kind) category = kind;
+    render();
+    title.focus();
+    content.scrollTop = 0;
+  }
+  function overview(p: Progress): void {
+    const hero = document.createElement('section');
+    hero.className = 'profile-player';
+    const portrait = button('', () => show('collection', 'frame'), 'profile-portrait-button');
+    portrait.setAttribute('aria-label', 'Rahmen ändern');
+    portrait.title = 'Rahmen ändern';
+    portrait.append(avatarPortrait({ character: opts.character, frameId: p.frameId, size: 'large' }));
+    const edit = text(portrait, 'span', '✎', 'profile-edit');
+    edit.setAttribute('aria-hidden', 'true');
+    const identity = document.createElement('div');
+    identity.className = 'profile-identity';
+    text(identity, 'h3', opts.nickname);
+    const titleButton = button(
+      rewards.find((r) => r.id === p.titleId)?.label ?? 'Titel auswählen',
+      () => show('collection', 'title'),
+      'profile-current-title',
+    );
+    titleButton.title = 'Titel ändern';
+    identity.append(titleButton);
+    text(identity, 'p', `${opts.getCoins()} Münzen`, 'profile-wallet');
+    hero.append(portrait, identity, crestSvg(p.level, 96));
+    content.append(hero);
+    const xp = document.createElement('div');
+    xp.className = 'profile-progress';
+    text(xp, 'p', `Noch ${Math.max(0, p.nextLevelXp - p.xp)} XP bis Level ${p.level + 1}`);
+    const bar = document.createElement('div');
+    bar.className = 'xp-bar';
+    bar.setAttribute('role', 'progressbar');
+    bar.setAttribute('aria-label', 'Fortschritt zum nächsten Level');
+    bar.setAttribute('aria-valuemin', '0');
+    bar.setAttribute('aria-valuenow', String(p.xp - p.levelXp));
+    bar.setAttribute('aria-valuemax', String(p.nextLevelXp - p.levelXp));
+    const fill = document.createElement('span');
+    fill.style.width = `${100 * levelFraction(p)}%`;
+    bar.append(fill);
+    xp.append(bar);
+    content.append(xp);
+    const daily = document.createElement('div');
+    daily.className = 'profile-daily';
+    const streak = document.createElement('div');
+    streak.className = 'profile-milestone';
+    text(streak, 'span', 'Deine Serie', 'profile-small-label');
+    text(streak, 'strong', `🔥 ${p.streak.current} Tage`);
+    if (p.streak.shieldLeft) {
+      const shield = text(streak, 'span', 'Geschützt', 'profile-shield');
+      shield.title = 'Ein Schutzschild ist bereit.';
+    }
+    const today = opts.onQuests ? button('', () => opts.onQuests?.()) : document.createElement('div');
+    today.className = 'profile-milestone profile-today';
+    text(today, 'span', 'Heute', 'profile-small-label');
+    text(today, 'strong', p.today.total ? `${p.today.solved} von ${p.today.total}` : 'Pause');
+    text(
+      today,
+      'span',
+      p.today.total ? 'Quests geschafft' : 'Bald gibt es neue Quests',
+      'profile-small-label',
+    );
+    const dots = document.createElement('span');
+    dots.className = 'profile-quest-dots';
+    dots.setAttribute('aria-hidden', 'true');
+    for (let i = 0; i < Math.min(3, p.today.total); i++) {
+      const dot = document.createElement('i');
+      if (i < p.today.solved) dot.className = 'done';
+      dots.append(dot);
+    }
+    today.append(dots);
+    daily.append(streak, today);
+    content.append(daily);
+    const loot = document.createElement('section');
+    loot.className = 'profile-loot';
+    const heading = text(loot, 'h3', 'Deine Truhen');
+    if (p.chests.length) text(heading, 'span', String(p.chests.length), 'profile-loot-count');
+    if (!p.chests.length) text(loot, 'p', `Nächste Truhe bei Level ${p.level + 1}.`, 'profile-empty');
+    else {
+      text(loot, 'p', 'Tippe eine Truhe an.', 'profile-small-label');
+      const row = document.createElement('div');
+      row.className = 'loot-grid';
+      for (const chest of p.chests) {
+        const card = createChestControl({
+          chest,
+          api: opts.api,
+          sound: opts.sound,
+          reducedMotion: opts.reducedMotion,
+          onCoins: (coins) => {
+            opts.onCoins(coins);
+            if (closed) return;
+            const wallet = content.querySelector('.profile-wallet');
+            if (wallet) wallet.textContent = `${coins} Münzen`;
+          },
+          onOpened: (id) => {
+            if (progress) {
+              progress.chests = progress.chests.filter((c) => c.id !== id);
+              if (!closed) {
+                const count = content.querySelector<HTMLElement>('.profile-loot-count');
+                if (count) {
+                  count.textContent = String(progress.chests.length);
+                  count.hidden = progress.chests.length === 0;
+                }
+              }
+            }
+          },
+        });
+        chests.push(card);
+        row.append(card.el);
+      }
+      loot.append(row);
+    }
+    content.append(loot);
+    const collection = button('', () => show('collection'), 'profile-collection-link');
+    collection.setAttribute('aria-label', 'Sammlung ansehen');
+    collection.append(frameSvg(p.frameId, 48));
+    const label = document.createElement('span');
+    text(label, 'strong', 'Sammlung');
+    text(label, 'span', 'Titel und Rahmen');
+    collection.append(label);
+    text(collection, 'span', '→', 'profile-collection-arrow');
+    content.append(collection);
+  }
+  async function choose(reward: Reward | null, b: HTMLButtonElement, error: HTMLElement): Promise<void> {
+    if (!progress || busy || closed) return;
+    busy = true;
     b.disabled = true;
+    const kind = category;
     try {
       const result =
         kind === 'title' ? await opts.api.setTitle(reward?.id ?? null) : await opts.api.setFrame(reward!.id);
       if (!result.ok) throw Error();
       if (closed) return;
       if (kind === 'title') {
-        p.titleId = reward?.id ?? null;
+        progress.titleId = reward?.id ?? null;
         opts.onTitle(reward?.label ?? null);
       } else {
-        p.frameId = reward!.id;
+        progress.frameId = reward!.id;
         opts.onFrame(reward!.id);
       }
+      busy = false;
       render();
+      content.querySelectorAll<HTMLButtonElement>('[data-reward]').forEach((button) => {
+        if (button.dataset.reward === (reward?.id ?? 'none')) button.focus();
+      });
     } catch {
       if (!closed) {
         error.textContent = PROGRESS_ERROR;
         b.disabled = false;
       }
     } finally {
-      selectionBusy = false;
+      busy = false;
     }
   }
-  function render(): void {
-    if (!p || closed) return;
-    content.replaceChildren();
-    const hero = document.createElement('div');
-    hero.className = 'profile-hero';
-    hero.append(
-      avatarPortrait({ character: opts.character, frameId: p.frameId, size: 'large' }),
-      crestSvg(p.level, 116),
-    );
-    const identity = document.createElement('div');
-    const nickname = document.createElement('h3');
-    nickname.textContent = opts.nickname;
-    identity.append(nickname);
-    paragraph(identity, rewards.find((r) => r.id === p!.titleId)?.label ?? 'Kein Titel');
-    paragraph(identity, `Level ${p.level}`);
-    paragraph(identity, `${p.xp - p.levelXp} / ${p.nextLevelXp - p.levelXp} XP bis Level ${p.level + 1}`);
-    const bar = document.createElement('div');
-    bar.className = 'xp-bar';
-    bar.setAttribute('role', 'progressbar');
-    bar.setAttribute('aria-label', 'Erfahrung');
-    bar.setAttribute('aria-valuenow', String(p.xp - p.levelXp));
-    bar.setAttribute('aria-valuemax', String(p.nextLevelXp - p.levelXp));
-    const fill = document.createElement('span');
-    fill.style.width = `${100 * Math.max(0, Math.min(1, (p.xp - p.levelXp) / (p.nextLevelXp - p.levelXp)))}%`;
-    bar.append(fill);
-    identity.append(bar);
-    paragraph(identity, `${opts.getCoins()} Münzen`);
-    hero.append(identity);
-    content.append(hero);
-    const streak = section('Deine Serie');
-    paragraph(streak, `🔥 ${p.streak.current} Schultage in Folge`);
-    paragraph(streak, `Beste Serie: ${p.streak.best}`);
-    paragraph(streak, p.streak.shieldLeft ? '🛡 1 Schutzschild diese Woche' : 'Schild verbraucht');
-    paragraph(streak, `Heute: ${p.today.solved} von ${p.today.total} Quests`);
-    const chests = section('Truhen');
-    if (!p.chests.length) paragraph(chests, `Nächste Truhe bei Level ${p.level + 1}.`);
-    for (const chest of p.chests) {
-      const row = document.createElement('div');
-      row.className = 'profile-chest';
-      paragraph(
-        row,
-        `${chest.size === 'big' ? 'Große Truhe' : 'Truhe'} · ${chest.source === 'level' ? `Level ${chest.ref}` : chest.source === 'streak' ? 'Serie' : 'Willkommen zurück'}`,
-      );
-      row.append(
-        makeButton('Öffnen', (b) => {
-          dialog = openChestDialog({
-            chest,
-            api: opts.api,
-            sound: opts.sound,
-            reducedMotion: opts.reducedMotion,
-            opener: b,
-            onCoins: opts.onCoins,
-            onDone: () => {
-              dialog = null;
-              if (!closed) void load();
-            },
-          });
-        }),
-      );
-      chests.append(row);
-    }
+  function collection(p: Progress): void {
+    const tabs = document.createElement('div');
+    tabs.className = 'collection-tabs';
+    tabs.setAttribute('role', 'tablist');
+    tabs.setAttribute('aria-label', 'Sammlungskategorien');
+    const panelId = `${titleId}-collection`;
+    const focusTab = (): void => {
+      content.querySelector<HTMLButtonElement>('[role=tab][aria-selected=true]')?.focus();
+    };
     for (const kind of ['title', 'frame'] as const) {
-      const s = section(kind === 'title' ? 'Titel' : 'Rahmen'),
-        list = document.createElement('div');
-      list.className = 'profile-rewards';
-      const items: Array<Reward | null> =
-        kind === 'title'
-          ? [null, ...rewards.filter((r) => r.kind === kind)]
-          : rewards.filter((r) => r.kind === kind);
-      for (const reward of items) {
-        const selected = kind === 'title' ? p.titleId === (reward?.id ?? null) : p.frameId === reward?.id,
-          locked = !!reward && reward.level > p.level;
-        const card = document.createElement('div');
-        card.className = 'profile-reward';
-        if (reward?.kind === 'frame') card.append(frameSvg(reward.id, 72));
-        const error = document.createElement('p');
-        error.setAttribute('role', 'status');
-        const b = makeButton(
-          `${reward?.label ?? 'Kein Titel'}${locked ? ` · ab Level ${reward!.level}` : selected ? ' · gewählt' : ''}`,
-          (button) => {
-            void choose(reward, kind, button, error);
-          },
-        );
-        b.disabled = locked || selected;
-        b.setAttribute('aria-pressed', String(selected));
-        card.append(b, error);
-        list.append(card);
+      const tab = button(kind === 'title' ? 'Titel' : 'Rahmen', () => {
+        category = kind;
+        render();
+        focusTab();
+      });
+      tab.setAttribute('role', 'tab');
+      tab.id = `${panelId}-${kind}`;
+      tab.setAttribute('aria-selected', String(category === kind));
+      tab.setAttribute('aria-controls', panelId);
+      tab.tabIndex = category === kind ? 0 : -1;
+      tab.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        category =
+          event.key === 'Home'
+            ? 'title'
+            : event.key === 'End'
+              ? 'frame'
+              : category === 'title'
+                ? 'frame'
+                : 'title';
+        render();
+        focusTab();
+      });
+      tabs.append(tab);
+    }
+    content.append(tabs);
+    const list = document.createElement('section');
+    list.className = 'collection-grid';
+    list.id = panelId;
+    list.setAttribute('role', 'tabpanel');
+    list.setAttribute('aria-labelledby', `${panelId}-${category}`);
+    const items: Array<Reward | null> =
+      category === 'title'
+        ? [null, ...rewards.filter((r) => r.kind === 'title')]
+        : rewards.filter((r) => r.kind === 'frame');
+    for (const reward of items) {
+      const selected = category === 'title' ? p.titleId === (reward?.id ?? null) : p.frameId === reward?.id;
+      const locked = !!reward && reward.level > p.level;
+      const card = document.createElement('div');
+      card.className = `collection-card${locked ? ' collection-card--locked' : ''}${selected ? ' collection-card--selected' : ''}`;
+      const error = document.createElement('p');
+      error.className = 'collection-error';
+      error.setAttribute('role', 'status');
+      const b = button('', (button) => {
+        if (!selected) void choose(reward, button, error);
+      });
+      b.dataset.reward = reward?.id ?? 'none';
+      b.setAttribute(
+        'aria-label',
+        `${reward?.label ?? 'Kein Titel'}${locked ? `, ab Level ${reward!.level}` : selected ? ', gewählt' : ', wählen'}`,
+      );
+      b.setAttribute('aria-pressed', String(selected));
+      b.disabled = locked || busy;
+      if (selected) b.setAttribute('aria-disabled', 'true');
+      if (category === 'frame') b.append(frameSvg(reward!.id, 104));
+      else {
+        const emblem = text(b, 'span', reward ? 'Aa' : '—', 'collection-title-emblem');
+        emblem.setAttribute('aria-hidden', 'true');
       }
-      s.append(list);
+      text(b, 'strong', reward?.label ?? 'Kein Titel');
+      text(
+        b,
+        'span',
+        locked ? `🔒 Level ${reward!.level}` : selected ? '✓ Gewählt' : 'Wählen',
+        'collection-card-state',
+      );
+      card.append(b, error);
+      list.append(card);
     }
-    const stats = section('Meine Erfolge');
-    paragraph(stats, `${p.stats.quests} Quests gelöst`);
-    paragraph(stats, `${p.stats.stamps} Stempel gesammelt`);
-    paragraph(stats, `Beste Serie: ${p.stats.bestStreak}`);
-    paragraph(stats, `Höchstes Level: ${p.level}`);
-    const help = section('So bekommst du XP'),
-      dl = document.createElement('dl');
-    for (const [label, value] of XP_HELP) {
-      const dt = document.createElement('dt'),
-        dd = document.createElement('dd');
-      dt.textContent = label;
-      dd.textContent = value;
-      dl.append(dt, dd);
-    }
-    help.append(dl);
+    content.append(list);
+  }
+  function render(): void {
+    if (!progress || closed) return;
+    clearChests();
+    content.replaceChildren();
+    title.textContent = page === 'overview' ? 'Mein Profil' : 'Meine Sammlung';
+    area.dataset.page = page;
+    back.hidden = page !== 'collection';
+    settings.hidden = page !== 'overview';
+    if (page === 'overview') overview(progress);
+    else collection(progress);
   }
   async function load(): Promise<void> {
     try {
-      const [progress, catalogue] = await Promise.all([opts.api.load(), opts.api.rewards()]);
+      const [p, catalogue] = await Promise.all([opts.api.load(), opts.api.rewards()]);
       if (closed) return;
-      if (!progress.ok || !catalogue.ok) throw Error();
-      p = progress.value;
+      if (!p.ok || !catalogue.ok) throw Error();
+      progress = p.value;
       rewards = catalogue.value;
       render();
     } catch {
       if (closed) return;
+      clearChests();
       content.replaceChildren();
-      const error = paragraph(content, PROGRESS_ERROR);
+      const error = text(content, 'p', PROGRESS_ERROR);
       error.setAttribute('role', 'status');
       content.append(
-        makeButton('Nochmal versuchen', () => {
+        button('Nochmal versuchen', () => {
           void load();
         }),
       );
     }
   }
-  paragraph(content, 'Profil wird geladen …');
+  title.textContent = 'Mein Profil';
+  back.hidden = true;
+  text(content, 'p', 'Profil wird geladen …');
   void load();
   return {
     close() {
       closed = true;
-      dialog?.close();
+      clearChests();
       area.remove();
     },
   };

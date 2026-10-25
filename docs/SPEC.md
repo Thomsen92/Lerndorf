@@ -351,7 +351,7 @@ Produktregeln: [XP-Design](superpowers/specs/2026-10-24-xp-level-design.md); Ums
 - Neue Schüler-RPCs: `my_progress()`, `mark_progress_seen(p_id)`, `open_chest(p_id)`, `set_title(p_id|null)`, `set_frame(p_id)`. Truhenöffnung ist wiederholbar ohne zweite Münzbuchung; Inhalt und Freischaltungen entscheidet ausschließlich der Server.
 - `submit_quest_answer`, `tutorial_finish` und `place_in_slot` liefern zusätzlich `progress`; `place_in_slot` liefert jetzt `{ok, id, progress}`. `add_stamps` bucht die XP zusammen mit den Münzen. Interne Funktionen `grant_xp` und `touch_streak` sind für Clients nicht ausführbar.
 - `village_members` liefert zusätzlich nur `level`, `title_label`, `frame_id`; keine XP, Münzen oder Serie anderer Schüler. Haus- und Figuren-Schilder zeichnen das Level-Wappen im vorhandenen Sprite.
-- Das Avatar-Feld öffnet „Mein Profil“ mit gerendertem Figurenbild, verziertem Rahmen, Wappen, XP-Balken, Serie, Truhen und wählbaren Titeln/Rahmen. Während des Tutorials öffnet es weiter die Einstellungen. Das Profil pausiert das Dorf. Die Hauptnavigation behält drei Knöpfe; „Aufgaben“ zeigt die Zahl offener heutiger Quests.
+- Das Avatar-Feld öffnet „Mein Profil“ mit Figurenbild, Rahmen, Wappen, XP-Balken, Münzen, kompakten Karten für Serie/Tagesziel und direkt antippbaren 3D-Truhen. „Sammlung“ öffnet eine eigene Ansicht mit Reitern für Titel und Rahmen. XP-Rechenregeln und historische Statistiken stehen nicht in der Schüleransicht. Truhen wackeln und leuchten bei Hover/Fokus; nach bestätigtem Öffnen klappt der Deckel auf. Während des Tutorials öffnet das Avatar-Feld weiter die Einstellungen. Das Profil pausiert das Dorf. Die Hauptnavigation behält drei Knöpfe; „Aufgaben“ zeigt die Zahl offener heutiger Quests. Details: [Profil-Interaktion](superpowers/specs/2026-10-25-profile-interaction-design.md).
 - XP-Gewinn, Level-Feier und Truhenöffnung beachten reduzierte Bewegung und den Ton-Schalter. Ungesehene Buchungen erscheinen beim Login als Willkommen-Karte. Nach dem Tutorial kommt die Level-2-Feier vor den Daily Quests.
 - Der Lehrerbereich zeigt Level, XP und Serie, weiterhin nach Spitzname sortiert. Es gibt keine manuelle XP-Vergabe.
 - Nachberechnung bestehender Schüler: 10 XP je bisher gelöster Daily Quest, 100 je Stempel, 50 für das abgeschlossene Tutorial; höchstens drei Truhen, keine rückwirkende Serie.
@@ -480,7 +480,8 @@ Grundsatz: **Das Layout (Positionen von allem) entsteht im Code in `world/`, det
 | --- | --- |
 | Login | Spitzname, Passwort, „Los geht's“; Fehlermeldung verständlich („Spitzname oder Passwort stimmt nicht“) |
 | Dorf (Haupt) | 3D-Ansicht; Avatar-Feld mit Figurenbild, Rahmen, Level-Wappen, XP, Münzen und Serie; Hauptnavigation Dorf, Aufgaben, Mein Haus |
-| Mein Profil | Fortschritt, Serie/Schild, Tagesziel, Truhen, Titel/Rahmen wählen, Erfolge, XP-Hilfe und Einstellungen (§8b) |
+| Mein Profil | Kompakter Fortschritt, Serie/Schild, Tagesziel, interaktive 3D-Truhen, Zugang zur Sammlung und Einstellungen (§8b) |
+| Meine Sammlung | Eigene Profil-Unterseite, Reiter Titel/Rahmen, freigeschaltete Auswahl und gesperrte Einträge mit benötigtem Level (§8b) |
 | Daily Quests (Knopf „Aufgaben“) | „Heute“ und „Nachholen von gestern“ mit Belohnung bzw. „gelöst ✓“; eine Quest aufklappen und lösen; Rückmeldung richtig/falsch mit englischem Tipp; Hören mit „▶ Anhören“ oder sichtbarem Text; Regelzeile „Münzen gibt es bei den ersten 3 Versuchen.“ (§9) |
 | Shop | Kategorien Deko / Avatar; Preis, „Kaufen“ (mit eigener Bestätigung, kein `confirm()`); ausgegraut wenn zu teuer |
 | Bauen | Kamera fährt zum eigenen Grundstück; Inventar-Leiste; Teil wählen → Raster erscheint → Feld antippen → Drehen/Entfernen; grün/rot für frei/belegt |

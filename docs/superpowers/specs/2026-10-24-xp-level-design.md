@@ -88,7 +88,7 @@ Schätzung: Ein fleißiger Schüler (alle Quests, Serie, Stempel) sammelt etwa 5
 
 ## 8. Titel und Rahmen
 
-Beides wird mit dem Level freigeschaltet und auf der Profilseite selbst gewählt. Gesperrte Einträge sind sichtbar, mit Schloss und Text „ab Level 12“, damit es ein Ziel gibt. Katalog in der Tabelle `level_rewards` (ein Ort, Server und Browser lesen dasselbe). Die Titel sind englisch, weil Englisch das Fach ist; die Oberfläche bleibt deutsch.
+Beides wird mit dem Level freigeschaltet und in der eigenen Ansicht „Meine Sammlung“ gewählt (vom Profil erreichbar). Gesperrte Einträge sind sichtbar, mit Schloss und Text „ab Level 12“, damit es ein Ziel gibt. Katalog in der Tabelle `level_rewards` (ein Ort, Server und Browser lesen dasselbe). Die Titel sind englisch, weil Englisch das Fach ist; die Oberfläche bleibt deutsch.
 
 **Titel (Entscheidung Claude):**
 
@@ -120,20 +120,19 @@ Aufbau wie das Vorbild des Auftraggebers: links das **runde Figurenbild** im gew
 **Figurenbild (Ergänzung 25.10.2026):** ein gerendertes **Brustbild** (Kopf und Schultern) der eigenen 3D-Spielfigur, kein gezeichnetes Bild: **weißer Hintergrund**, **Dreiviertelansicht** (die Figur ist etwa 30° zur Seite gedreht, die Kamera etwas über Augenhöhe, also nicht frontal), **gutes, weiches Licht** (Hauptlicht schräg vorn oben, schwaches Aufhelllicht von der anderen Seite, leichtes Kantenlicht von hinten, damit sich Haare und Schultern vom Weiß abheben). Die Figur steht dabei in der ruhigen Grundhaltung (erstes Bild der Laufanimation), mit leicht freundlichem Blick zur Kamera, falls das Modell das hergibt. Gerendert wird einmal pro Figur und Sitzung mit einem unsichtbaren Renderer (wie die Vorschaubilder im Shop), dann zwischengespeichert. Bis es fertig ist, oder ohne WebGL, erscheint das bisherige Bild aus der Figurenwahl. Dieselbe Funktion liefert später auch das Bild für den Avatar-Editor (Stufe 2), dann mit dem Rezept des Schülers.
 
 ### 9.2 Profilseite (neuer Bereich, nicht modal, wie Shop)
-1. Kopf: großes Figurenbild im Rahmen, Spitzname, gewählter Titel, „Level 6“, XP-Balken mit „120 / 175 XP bis Level 7“.
-2. **Serie:** „🔥 6 Schultage in Folge“, „Beste Serie: 9“, Schild „🛡 1 Schutzschild diese Woche“ bzw. „Schild verbraucht“, „Heute: 2 von 3 Quests“ (Tagesziel).
-3. **Truhen:** ungeöffnete Truhen mit Knopf „Öffnen“; ohne Truhen: „Nächste Truhe bei Level 7.“
-4. **Titel wählen:** Liste, gewählter Titel markiert (Text „gewählt“), gesperrte mit „ab Level n“. Auch „Kein Titel“ ist möglich.
-5. **Rahmen wählen:** Musterkacheln mit Namen, gesperrte mit „ab Level n“.
-6. **Meine Erfolge:** Quests gelöst (gesamt), Stempel, beste Serie, höchstes Level.
-7. **„So bekommst du XP“:** die Tabelle aus §5 in einfachen Worten.
-8. Knopf **Einstellungen** (öffnet das bisherige Einstellungen-Menü).
+Überarbeitet nach Rückmeldung vom 25.10.2026: [Profil und interaktive Truhen](2026-10-25-profile-interaction-design.md).
+
+1. Kopf: großes Figurenbild im Rahmen, Spitzname, gewählter Titel, Level-Wappen, Münzen und XP-Balken mit „Noch 55 XP bis Level 7“.
+2. Kompakte Karten: „🔥 6 Tage“, Schutzstatus und „Heute: 2 von 3 Quests geschafft“.
+3. **Truhen:** echte 3D-Objekte, direkt anklickbar; Wackeln und goldene Silhouette bei Hover/Fokus, beweglicher Deckel nach Serverbestätigung. Ohne Truhen: „Nächste Truhe bei Level 7.“ Kein zusätzlicher Öffnen-Knopf.
+4. **Sammlung:** öffnet eine eigene Ansicht mit Zurück-Knopf und Reitern „Titel“ / „Rahmen“. Nur eine Kategorie gleichzeitig. Gewählte Einträge sind markiert, gesperrte zeigen „ab Level n“. Auch „Kein Titel“ ist möglich. Antippen von Figurenbild oder Titel öffnet direkt die passende Kategorie.
+5. Knopf **Einstellungen** öffnet das bisherige Einstellungen-Menü. Rechenregeln und historische Summen entfallen aus der Schüleransicht.
 
 Erreichbar über das Avatar-Feld. Die Hauptnavigation bleibt bei drei Knöpfen. Während die Profilseite offen ist, pausiert das Dorf wie bei Shop und Inventar.
 
 ### 9.3 Rückmeldungen (das „Handygame-Gefühl“)
 - **XP-Gewinn:** Nach einer richtigen Antwort fliegt „+15 XP“ von der Quest zum Avatar-Feld, der Balken füllt sich animiert, dazu ein kurzer Ton. Tagesziel und Serien-Tag erscheinen als eigene kleine Einblendungen („Tagesziel geschafft! +15 XP“, „🔥 Serie: 6 Tage! +25 XP“).
-- **Level-Aufstieg:** Vollbild-Feier (modal): „Level 7!“, Konfetti (Kenney Particle Pack, Sterne), Fanfare (Kenney Interface Sounds), dazu die Freischaltungen („Neuer Titel: Busy Bee“ mit „Jetzt wählen“, „Neuer Rahmen: …“ mit „Jetzt anlegen“) und die Truhe mit „Truhe öffnen“. Mehrere Level auf einmal ergeben eine einzige Feier mit allen Truhen.
+- **Level-Aufstieg:** Vollbild-Feier (modal): „Level 7!“, Konfetti (Kenney Particle Pack, Sterne), Fanfare (Kenney Interface Sounds), dazu die Freischaltungen („Neuer Titel: Busy Bee“ mit „Jetzt wählen“, „Neuer Rahmen: …“ mit „Jetzt anlegen“) und direkt antippbare 3D-Truhen im selben Dialog. Mehrere Level auf einmal ergeben eine einzige Feier mit allen Truhen, ohne weiteren Truhendialog.
 - **Truhe öffnen:** Die Truhe wackelt, springt auf, Münzen fliegen heraus, die Zahl zählt hoch („+100 Münzen – Super!“), dazu ein Ton. Das Ergebnis kommt vom Server, die Animation startet erst nach der Antwort (bei langsamem Netz: Wackeln bis zur Antwort).
 - **Willkommen zurück:** Beim Einloggen zeigt eine Karte, was seit dem letzten Besuch passiert ist, zum Beispiel ein von der Lehrkraft gebuchter Stempel („Stempel für die Woche ab 19.10.: +100 XP“) und ein dadurch erreichtes Level. Danach folgt die Level-Feier.
 - **Aufgaben-Knopf:** Ein Abzeichen zeigt die offenen heutigen Quests („2“), bei erreichtem Tagesziel ein Häkchen.
