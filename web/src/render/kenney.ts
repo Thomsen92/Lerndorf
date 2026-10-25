@@ -12,7 +12,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
-export type Pack = 'forests' | 'survival' | 'town' | 'food' | 'nature';
+export type Pack = 'forests' | 'survival' | 'town' | 'food' | 'nature' | 'graveyard';
 
 export interface KenneyModel {
   geometry: THREE.BufferGeometry;

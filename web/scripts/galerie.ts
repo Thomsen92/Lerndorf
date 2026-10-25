@@ -14,7 +14,7 @@ const PORT = 5174;
 const BASE = `http://localhost:${PORT}/dev/galerie.html`;
 
 const date = new Date().toISOString().slice(0, 10);
-const outDirPath = fileURLToPath(new URL(`../../Konzept/Galerie/${date}/`, import.meta.url));
+const outDirPath = process.env.GALLERY_OUTPUT_DIR ?? fileURLToPath(new URL(`../../Konzept/Galerie/${date}/`, import.meta.url));
 mkdirSync(outDirPath, { recursive: true });
 
 async function waitFor(url: string, timeoutMs: number): Promise<void> {
@@ -38,7 +38,7 @@ const server: ChildProcess = spawn('npx', ['vite', '--port', String(PORT), '--st
 
 try {
   await waitFor(BASE, 60000);
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -68,7 +68,7 @@ try {
   await browser.close();
 
   writeFileSync(join(outDirPath, 'stats.json'), JSON.stringify(stats, null, 2));
-  console.log(`Galerie: ${Object.keys(stats).length} Bilder in Konzept/Galerie/${date}/`);
+  console.log(`Galerie: ${Object.keys(stats).length} Bilder in ${outDirPath}`);
   console.log(
     Object.entries(stats)
       .map(([k, v]) => `${k}: ${v.total} Draw Calls (Welt ${v.world})`)

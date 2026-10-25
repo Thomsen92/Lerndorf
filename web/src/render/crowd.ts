@@ -16,6 +16,7 @@ import {
 import { createRng, type Rng } from '../world/rng';
 import type { Layout } from '../world/layout';
 import { walkHeight } from '../world/walk';
+import { PATH_X, TUTORIAL_FIGURE_LZ } from '../world/plotPlan';
 import {
   arrivalAction,
   greetingFor,
@@ -50,7 +51,9 @@ export interface Villager {
   /** What plays now: 'stand' = walk clip frozen on its first frame, 'dance0', 'dance1' … */
   pose: Pose | null;
   /** Seconds left of a tap animation (catwalk or dance); the figure stops walking meanwhile. */
-  emote: { pose: Pose; timer: number } | null;
+  emote: { pose: Pose; timer: number; loops?: number; done?: () => void } | null;
+  /** True while the tutorial holds the figure on the spot (no wandering, no walking). */
+  still: boolean;
 }
 
 type Pose = 'walk' | 'stand' | 'catwalk' | `dance${number}`;
@@ -80,6 +83,9 @@ function hashString(s: string): number {
 
 const SKIN = ['#f1c7a3', '#d9a27a', '#a8714a', '#7a4e30', '#f6d6bb'];
 const TOPS = ['#e85d75', '#4b7bec', '#20bf6b', '#f7b731', '#8854d0', '#fd9644', '#2d98da'];
+
+/** Above the name sign and the own marker arrow (2.5 m): the speech bubble tip points here. */
+const HEAD_ANCHOR = new THREE.Vector3(0, 2.8, 0);
 
 /** Simple figure: legs, body, head, nickname sign. Colours come from the nickname, so they are stable. */
 function buildFigure(nickname: string, own: boolean): THREE.Group {
@@ -145,26 +151,69 @@ function buildFigure(nickname: string, own: boolean): THREE.Group {
   return bakeStatic(g);
 }
 
+const BUBBLE_FONT = "'Comic Neue', 'Comic Sans MS', cursive";
+let bubbleFontReady = false;
+let bubbleFontLoad: Promise<void> | null = null;
+
+/** Loads Comic Neue once; resolves quietly when the font API or the file is unavailable (fallback font is used then). */
+function ensureBubbleFont(): Promise<void> {
+  if (!bubbleFontLoad) {
+    bubbleFontLoad =
+      typeof document !== 'undefined' && document.fonts
+        ? document.fonts.load("bold 30px 'Comic Neue'").then(
+            (faces) => {
+              bubbleFontReady = faces.length > 0;
+            },
+            () => undefined,
+          )
+        : Promise.resolve();
+  }
+  return bubbleFontLoad;
+}
+
+/** Comic bubble: white rounded body, dark outline, tip pointing down to the figure. */
+function drawBubble(cv: HTMLCanvasElement, text: string): void {
+  const cx = cv.getContext('2d');
+  if (!cx) return;
+  cx.clearRect(0, 0, cv.width, cv.height);
+  cx.beginPath();
+  cx.roundRect(8, 8, 204, 52, 22);
+  cx.moveTo(96, 59);
+  cx.lineTo(110, 83);
+  cx.lineTo(124, 59);
+  cx.closePath();
+  cx.fillStyle = '#ffffff';
+  cx.fill();
+  cx.lineJoin = 'round';
+  cx.lineWidth = 7;
+  cx.strokeStyle = '#1c1c28';
+  cx.stroke();
+  // paint over the outline where the tip meets the body, so the tip opens into the body (the tip's side strokes stay)
+  cx.fillStyle = '#ffffff';
+  cx.fillRect(99, 56, 22, 8);
+  cx.fillStyle = '#1c1c28';
+  cx.font = `bold 32px ${BUBBLE_FONT}`;
+  cx.textAlign = 'center';
+  cx.textBaseline = 'middle';
+  cx.fillText(text, 110, 35, 186);
+}
+
 /** Speech bubble with one fixed greeting, shown for a short time. */
 function bubble(text: string): THREE.Sprite {
   const cv = document.createElement('canvas');
   cv.width = 220;
   cv.height = 90;
-  const cx = cv.getContext('2d');
-  if (cx) {
-    cx.fillStyle = '#ffffff';
-    cx.beginPath();
-    cx.roundRect(6, 6, 208, 58, 22);
-    cx.fill();
-    cx.fillStyle = '#222';
-    cx.font = 'bold 30px Atkinson Hyperlegible, Verdana, sans-serif';
-    cx.textAlign = 'center';
-    cx.textBaseline = 'middle';
-    cx.fillText(text, 110, 35, 200);
+  drawBubble(cv, text);
+  const tex = new THREE.CanvasTexture(cv);
+  if (!bubbleFontReady) {
+    // first draw may have used the fallback font: redraw once Comic Neue has arrived
+    void ensureBubbleFont().then(() => {
+      if (!bubbleFontReady) return;
+      drawBubble(cv, text);
+      tex.needsUpdate = true;
+    });
   }
-  const s = new THREE.Sprite(
-    new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthTest: false, transparent: true }),
-  );
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
   s.scale.set(1.5, 0.6, 1);
   s.position.y = 2.9;
   s.renderOrder = 11;
@@ -205,6 +254,7 @@ export class Crowd {
         character: input.character ?? DEFAULT_CHARACTER,
         pose: null,
         emote: null,
+        still: false,
       };
       this.placeAt(v, layout.graph.nodes[start]);
       this.villagers.push(v);
@@ -264,13 +314,83 @@ export class Crowd {
     v.nameTimer = Math.max(3, seconds);
   }
 
+  private ownVillager(): Villager | undefined {
+    return this.villagers.find((x) => x.own);
+  }
+
+  /** Tutorial: world point just above the own figure's head (anchor of the speech bubble); null without own figure. */
+  ownHeadPoint(out: THREE.Vector3): THREE.Vector3 | null {
+    const v = this.ownVillager();
+    if (!v) return null;
+    return out.copy(v.group.position).add(HEAD_ANCHOR);
+  }
+
+  /** Tutorial: puts the own figure in front of the house slot of the plot (ahead of the ruin, on the footpath), facing the street (+Z, towards the camera), and holds it there. */
+  placeOwnInFrontOfHouse(plotIndex: number): void {
+    const v = this.ownVillager();
+    const plot = this.layout.plots[plotIndex];
+    if (!v || !plot) return;
+    const lz = TUTORIAL_FIGURE_LZ;
+    const cos = Math.cos(plot.face);
+    const sin = Math.sin(plot.face);
+    const x = plot.x + PATH_X * cos + lz * sin;
+    const z = plot.z - PATH_X * sin + lz * cos;
+    v.walker = null;
+    v.walkPath = null;
+    v.action = null;
+    v.emote = null;
+    v.group.position.set(x, walkHeight(this.layout, { x, z }), z);
+    v.group.userData.baseY = v.group.position.y;
+    v.group.rotation.y = plot.face; // heading 0 looks along +Z
+    v.still = true;
+  }
+
+  /** Tutorial: pauses (on) or resumes (off) wandering of the own figure. */
+  standStill(on: boolean): void {
+    const v = this.ownVillager();
+    if (!v) return;
+    v.still = on;
+    if (on) {
+      v.walker = null;
+      v.walkPath = null;
+      v.action = null;
+    } else {
+      v.timer = 0;
+    }
+  }
+
+  /** Plays the first dance of the own figure once; resolves when it ends, or after 2 s when no model is loaded. */
+  playDanceOnce(): Promise<void> {
+    const v = this.ownVillager();
+    return new Promise<void>((resolve) => {
+      let finished = false;
+      const done = (): void => {
+        if (finished) return;
+        finished = true;
+        resolve();
+      };
+      if (!v || !v.fig || v.fig.dances.length === 0) {
+        setTimeout(done, 2000);
+        return;
+      }
+      const seconds = v.fig.dances[0].getClip().duration;
+      if (v.pose === 'dance0') {
+        v.fig.mixer.stopAllAction();
+        v.pose = null;
+      }
+      v.emote = { pose: 'dance0', timer: seconds, loops: 1, done };
+      v.nameTimer = Math.max(3, seconds);
+      setTimeout(done, seconds * 1000 + 2000); // safety net if update() is not running
+    });
+  }
+
   private actionOf(fig: CharacterInstance, pose: Pose): THREE.AnimationAction {
     if (pose === 'walk' || pose === 'stand') return fig.walk;
     if (pose === 'catwalk') return fig.catwalk;
     return fig.dances[Number(pose.slice(5))] ?? fig.dances[0];
   }
 
-  private setPose(v: Villager, pose: Pose): void {
+  private setPose(v: Villager, pose: Pose, loops = EMOTE_LOOPS): void {
     const fig = v.fig;
     if (!fig || v.pose === pose) return;
     const prev = v.pose === null ? null : this.actionOf(fig, v.pose);
@@ -283,7 +403,8 @@ export class Crowd {
       next.setLoop(THREE.LoopRepeat, Infinity);
     } else {
       next.reset();
-      next.setLoop(THREE.LoopRepeat, EMOTE_LOOPS);
+      if (loops === 1) next.setLoop(THREE.LoopOnce, 1);
+      else next.setLoop(THREE.LoopRepeat, loops);
       next.clampWhenFinished = true;
     }
     next.setEffectiveWeight(1);
@@ -325,10 +446,16 @@ export class Crowd {
     for (const v of this.villagers) {
       if (v.emote) {
         v.emote.timer -= dt;
-        if (v.emote.timer <= 0) v.emote = null;
+        if (v.emote.timer <= 0) {
+          const done = v.emote.done;
+          v.emote = null;
+          done?.();
+        }
       }
       if (v.emote) {
         // the figure stays on the spot while it dances; walking resumes afterwards
+      } else if (v.still) {
+        // held on the spot by the tutorial
       } else if (v.walker) {
         v.walker.advance(dt);
         const p = v.walker.position();
@@ -353,7 +480,7 @@ export class Crowd {
         if (v.bubbleTimer <= 0) this.removeBubble(v);
       }
       if (v.fig) {
-        this.setPose(v, v.emote ? v.emote.pose : v.walker ? 'walk' : 'stand');
+        this.setPose(v, v.emote ? v.emote.pose : v.walker ? 'walk' : 'stand', v.emote?.loops);
         v.fig.mixer.update(dt);
       } else {
         this.animateArm(v);

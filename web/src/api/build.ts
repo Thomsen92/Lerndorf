@@ -4,7 +4,7 @@
  * only ever act on the caller's own plot and check kind, slot and rotation (migration 0013).
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { STARTER, type SlotId } from '../world/plotPlan';
+import { RUIN_ID, STARTER, type SlotId } from '../world/plotPlan';
 
 export interface BuildItem {
   id: string;
@@ -80,10 +80,14 @@ function slotMap(rows: Array<{ item_id: string; slot: string; rot: number }>): S
   return map;
 }
 
-/** Item that a slot shows: its placement, or the starter for house and garage. */
+/**
+ * Item that a slot shows: its placement; the starter garage; the ruin in an empty house slot
+ * (the house is bought and placed in the tutorial, there is no starter house any more).
+ */
 export function shownItem(slots: SlotMap, slot: SlotId, kind: string): SlotContent | undefined {
   const own = slots[slot];
   if (own) return own;
+  if (kind === 'house') return { itemId: RUIN_ID, rot: 0 };
   const starter = STARTER[kind as keyof typeof STARTER];
   return starter ? { itemId: starter, rot: 0 } : undefined;
 }

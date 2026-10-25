@@ -13,6 +13,7 @@ import {
   SLOTS,
   rectCentre,
   type SlotDef,
+  type SlotId,
 } from '../world/plotPlan';
 import { plotAsset, tintFor } from './plotAssets';
 import { shownItem, type SlotMap } from '../api/build';
@@ -404,10 +405,7 @@ function driveGates(plots: Plot[]): THREE.Group {
         .multiply(new THREE.Matrix4().makeRotationY(Math.PI / 2))
         .multiply(new THREE.Matrix4().makeScale(DRIVE_GATE, 2.2, DRIVE_GATE))
         .multiply(new THREE.Matrix4().makeTranslation(-0.46, 0, 0));
-      return new THREE.Matrix4()
-        .makeRotationY(p.face)
-        .setPosition(p.x, p.h, p.z)
-        .multiply(local);
+      return new THREE.Matrix4().makeRotationY(p.face).setPosition(p.x, p.h, p.z).multiply(local);
     });
     const gates = instancedModel(model, mats);
     gates.castShadow = true;
@@ -441,6 +439,7 @@ function plotContents(p: Plot, slots: SlotMap): THREE.Group {
     const content = shownItem(slots, slot.id, slot.kind);
     if (!content) continue; // empty pedestal: green lawn
     const model = plotAsset(slot.kind, content.itemId, tint);
+    model.userData.slot = slot.id;
     const c = rectCentre(slot);
     model.position.set(c.lx, 0.07, c.lz);
     model.rotation.y = (content.rot * Math.PI) / 2;
@@ -543,6 +542,8 @@ export function buildVillage(
     fresh.name = 'contents';
     ownGroup.add(fresh);
   };
+  root.userData.ownSlotObject = (slot: SlotId): THREE.Object3D | null =>
+    ownGroup?.getObjectByName('contents')?.children.find((object) => object.userData.slot === slot) ?? null;
   root.add(buildNature(layout));
   root.add(buildVegetation(layout));
   root.add(buildLandmarks(layout));

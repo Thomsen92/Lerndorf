@@ -36,6 +36,14 @@ afterEach(() => {
 });
 
 describe('openAccountMenu', () => {
+  it('offers an optional persistent sound toggle', () => {
+    const onChange = vi.fn();
+    setup({ sound: { on: true, onChange } });
+    expect(btn('Töne: an').getAttribute('aria-pressed')).toBe('true');
+    btn('Töne: an').click();
+    expect(onChange).toHaveBeenCalledWith(false);
+    expect(btn('Töne: aus').getAttribute('aria-pressed')).toBe('false');
+  });
   it('opens a modal titled Einstellungen showing nickname and coins', () => {
     setup();
     expect(document.querySelector('[role="dialog"]')?.getAttribute('aria-labelledby')).toBeTruthy();

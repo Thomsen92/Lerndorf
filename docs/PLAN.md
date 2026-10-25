@@ -131,7 +131,35 @@ Spec: `docs/superpowers/specs/2026-10-21-tablet-ui-navigation-design.md`, Plan: 
 | [–] T.11 | – | Screenshot-Testseite | gestrichen (LK, 21.10.2026) |
 | [x] T.12 | LK | **Abnahme Tablet-UI** | abgenommen 21.10.2026 |
 
-Nächstes: Zwischenpaket B – Bau-Feedback (`docs/superpowers/specs/2026-10-21-build-feedback-design.md`).
+## Zwischenpaket B – Bau-Feedback
+
+Spec: `docs/superpowers/specs/2026-10-21-build-feedback-design.md`, Plan: `docs/superpowers/plans/2026-10-24-build-feedback.md`.
+
+| AP | Wer | Inhalt | Ergebnis |
+|---|---|---|---|
+| [x] B.1 | CC | Kenney-Töne und Rauchtextur | Drei MP3-Dateien, eine transparente 128 × 128-Textur; Lizenzen dokumentiert |
+| [x] B.2 | CC | Töne mit gespeichertem An/Aus-Schalter | Leise Wiedergabe nach Nutzeraktion; Audio- und Speicherfehler bleiben folgenlos |
+| [x] B.3 | CC | Großzügigere Tippflächen | Exakte Treffer zuerst, sonst nächster Platz bis 0,5 m |
+| [x] B.4 | CC | Aufstellen- und Wegräum-Effekte | Pop, Schrumpfen, höchstens acht Rauchpartikel; Aufräumen beim Verlassen |
+| [x] B.5 | CC | Rahmen und Symbole für Bauplätze | Pulsieren bei freien Plätzen; dicker Rahmen bei Auswahl; reduzierte Bewegung |
+| [x] B.6 | CC | Großes Platz-Menü mit Bildkarten | Aufstellen, Drehen, Wegräumen, Zurück; Fokus und Escape; Effekte erst nach RPC-Erfolg |
+| [x] B.7 | CC | Einbau ins Dorf und Tutorial | Kameraversatz, gemeinsame Vorschaubilder, Ton-Einstellungen und Lebensdauer |
+| [x] B.8 | CC | Browserbilder, Galerie und Abschlussprüfung | 744 Tests, Build, ESLint und 2 Playwright-Tests grün; 14 Bau-Screenshots und 36 Galeriebilder geprüft, unter `web/test-results/build-feedback/` und `web/test-results/build-gallery/` |
+| [ ] B.9 | LK | **Abnahme Bau-Feedback** auf dem Schul-Tablet: Plätze erkennbar, großes Platz-Menü, Plopp/Rauch/Töne beim Aufstellen und Wegräumen, Töne abschaltbar, reduzierte Bewegung | Notiz hier |
+
+Umsetzung 25.10.2026: Tutorial bereits in `main`, daher Zweig `feature/build-feedback` darauf aufgebaut. Kenney-Quellen aus dem externen Ordner `C:\Users\thoms\OneDrive\Desktop\Kenny`; keine Änderung der Quellpakete. Galerie unterstützt `GALLERY_OUTPUT_DIR`, damit `Konzept/` unverändert bleibt. Hochformat-Kamera nutzt die 52° aus LOOK; das Platz-Menü berücksichtigt zusätzlich den Platzbedarf der Navigation.
+
+## Zwischenpaket E – Erststart-Tutorial
+
+Spec: `docs/superpowers/specs/2026-10-21-first-login-tutorial-design.md`, Plan: `docs/superpowers/plans/2026-10-23-first-login-tutorial.md`, SPEC §8a. Beim ersten Login: Figur, Kamerafahrt, zwei Nachrichten, fünf Fragen, Fachwerkhaus kaufen und hinstellen, Tanz, Daily Quests.
+
+| AP | Wer | Inhalt | Ergebnis |
+|---|---|---|---|
+| [x] E.1 | CC | Migration `0019_first_login_tutorial.sql` (Tabellen, fünf Fragen, RPCs, automatisches Grundstück, Haus kostet 50) | SQL-Tests grün |
+| [x] E.2 | CC | Ruine im Haus-Sockel, Sprechblasen im Comic-Stil, Kamerapfade, Tanz | Tests grün, Bilder angesehen |
+| [x] E.3 | CC | Ablauf in der Oberfläche (`ui/tutorial/`), Kaufdialog, geführter Baumodus, Einbau ins Dorf; manuelle Grundstückswahl entfernt | Tests grün |
+| [x] E.4 | CC | Playwright-Durchlauf mit Screenshots (`e2e/tutorial.spec.ts`, Testseite `dev/tutorial.html`), Galerie, Doku | alle Schritte als Bild angesehen |
+| [ ] E.5 | LK | **Abnahme durch die Lehrkraft:** zuerst Migration 0019 einspielen, dann die Vorschau des Zweigs testen, erst danach auf `main` übernehmen (Anleitung „Die Datenbank-Änderung (Migration 0019) einspielen“ in `docs/ANLEITUNG_LEHRKRAFT.md`) | – |
 
 ## Zwischenpaket Q – Daily Quests
 
@@ -303,3 +331,4 @@ Spec: `docs/superpowers/specs/2026-10-20-daily-quests-design.md`, Plan: `docs/su
 | 21.10.2026 | Q Screenshots | Für die Playwright-Bilder gibt es eine eigene Testseite `web/dev/quests.html` mit nachgebauten Antworten statt echtem Login, weil es keine Supabase-Attrappe gab. Sie läuft nur über den Entwicklungsserver und ist nicht im fertigen Build (`e2e/daily-quests.spec.ts`, Projekt `harness`) |
 | 21.10.2026 | Q Lehrer-Hinweise | Beim Bildercheck gefunden und behoben: Die Hinweise im Abschnitt „Daily Quests“ lagen übereinander oben am Rand, weil sie den Stil der Dorf-Meldung geerbt hatten (`teacher/teacher.css`) |
 | 21.10.2026 | Q Reihenfolge | Noch nicht hochgeladen. Reihenfolge: erst Migrationen 0015–0017 auf `main`, grünen Lauf „migrate“ abwarten, dann die erste Datei in `content/daily-quests/` und grünen Lauf „import-content“ prüfen (Anleitung „Daily Quests einspielen“). Abnahme Q.10 steht aus |
+| 23.10.2026 | E Erststart-Tutorial | Zweig `feature/first-login-tutorial`, **noch nicht auf `main`, Migration 0019 noch nirgends eingespielt**. Server: `tutorial_state/start/continue/question/answer/buy_house/place_house/finish`, Lösungen nur in `tutorial_solutions`, 50 Münzen einmalig (Unique-Index), `claim_plot` für Schüler gesperrt, `house_fachwerk` kein Starter mehr und 50 Münzen. Client: Ruine (`render/ruin.ts`) bis das Haus steht, Comic-Sprechblasen (Comic Neue), Kamerapfade (`render/introCamera.ts`), Ablauf `ui/tutorial/flow.ts`. Playwright-Durchlauf mit Bild je Schritt: `npx playwright test e2e/tutorial.spec.ts --project=harness` (Bilder in `web/test-results/tutorial/`). Bekannter Fehler außerhalb des Pakets: `tests/render/character.test.ts` (`rootTravel`) lässt `npm run build` am `tsc` scheitern (`vite build` läuft) |

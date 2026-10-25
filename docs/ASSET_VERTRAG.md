@@ -204,7 +204,8 @@ Wenn Meshy erlaubt wird [O], dann gilt die Arbeitsteilung:
 4. Haus tauschen: nur der Inhalt von `house` ändert sich. Garage, Einfahrt, Sockel und Deko bleiben an ihrer Stelle, weil ihre Lage nicht vom Haus abhängt.
 5. Garage tauschen: nur `garage` ändert sich. Die Einfahrt ist Grundstücks-Geometrie und bleibt.
 6. Wird ein Slot neu belegt, geht das vorherige Asset zurück ins Inventar (nichts geht verloren).
-7. `house` und `garage` sind nie leer: jeder Schüler startet mit einem Starter-Haus und einer Starter-Garage [O – Vorschlag]. `car` und die vier Deko-Sockel dürfen leer sein; leere Deko-Sockel bleiben grüne Wiese, ein leerer Auto-Platz ist leere Einfahrt [W].
+7. **Geändert 23.10.2026 (Erststart-Tutorial):** Das Fachwerkhaus (`house_fachwerk`) ist kein Starter mehr und kostet 50 Münzen. Bis der Schüler im Tutorial sein Haus gekauft und platziert hat, steht im Slot `house` die **Ruine** (`RUIN_ID = 'ruin'`, Modell `web/src/render/ruin.ts`, Kenney-Teile CC0). Sie hält denselben Vertrag wie ein Haus (B.1: 6 × 4 m, Ursprung Mitte, Front +Z, ≤ 6 m hoch), ist aber kein Katalog-Artikel, nie im Inventar und nicht auswählbar; in der Datenbank steht für den leeren Slot keine Zeile. Die Garage bleibt Starter. `car` und die vier Deko-Sockel dürfen leer sein; leere Deko-Sockel bleiben grüne Wiese, ein leerer Auto-Platz ist leere Einfahrt [W].
+7a. (bisher) `house` und `garage` waren nie leer: jeder Schüler startete mit einem Starter-Haus und einer Starter-Garage [O – Vorschlag]. Gilt nur noch für die Garage. `car` und die vier Deko-Sockel dürfen leer sein; leere Deko-Sockel bleiben grüne Wiese, ein leerer Auto-Platz ist leere Einfahrt [W].
 
 ### C.2 Prüfung auf dem Server [V]
 

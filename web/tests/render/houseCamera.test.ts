@@ -3,9 +3,15 @@ import { describe, expect, it } from 'vitest';
 import { houseView, lerpPose, onPlot } from '../../src/render/houseCamera';
 import type { Plot } from '../../src/world/layout';
 
-const plot = (o: Partial<Plot> = {}): Plot => ({ index: 0, x: 10, z: -20, w: 20, d: 10, rad: 11, big: false, h: 1.5, face: 0, ...o }) as Plot;
+const plot = (o: Partial<Plot> = {}): Plot =>
+  ({ index: 0, x: 10, z: -20, w: 20, d: 10, rad: 11, big: false, h: 1.5, face: 0, ...o }) as Plot;
 
 describe('houseView', () => {
+  it('keeps the plot in the uncovered part of a slot sheet', () => {
+    expect(sheetViewOffset(1180, 820)).toEqual({ x: 236, y: 0 });
+    expect(sheetViewOffset(820, 1180)).toEqual({ x: 0, y: 236 });
+    expect(sheetViewOffset(800, 800)).toEqual({ x: 160, y: 0 });
+  });
   it('targets the plot centre at house height, 26 away', () => {
     const p = plot();
     const v = houseView(p);
@@ -57,3 +63,4 @@ describe('onPlot', () => {
     expect(onPlot(p, new THREE.Vector3(p.x + 9, 0, p.z))).toBe(false);
   });
 });
+import { sheetViewOffset } from '../../src/render/houseCamera';

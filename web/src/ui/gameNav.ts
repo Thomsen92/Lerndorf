@@ -24,6 +24,8 @@ export interface GameNav {
   status: HTMLElement;
   setActive(area: NavArea): void;
   setCoins(coins: number): void;
+  /** Tutorial: the area buttons are aria-disabled and ignore taps; the status (account) button stays usable. */
+  setLocked(locked: boolean): void;
 }
 
 export function createGameNav(opts: {
@@ -37,6 +39,7 @@ export function createGameNav(opts: {
   el.setAttribute('aria-label', 'Hauptmenü');
 
   const buttons = new Map<NavButton, HTMLButtonElement>();
+  let locked = false;
   for (const area of NAV_BUTTONS) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -50,7 +53,10 @@ export function createGameNav(opts: {
     label.className = 'nav-label';
     label.textContent = LABELS[area].label;
     b.append(icon, label);
-    b.addEventListener('click', () => opts.onSelect(area, b));
+    b.addEventListener('click', () => {
+      if (locked) return;
+      opts.onSelect(area, b);
+    });
     buttons.set(area, b);
     el.append(b);
   }
@@ -91,6 +97,13 @@ export function createGameNav(opts: {
         b.classList.toggle('active', on);
         if (on) b.setAttribute('aria-current', 'page');
         else b.removeAttribute('aria-current');
+      }
+    },
+    setLocked(on) {
+      locked = on;
+      for (const b of buttons.values()) {
+        if (on) b.setAttribute('aria-disabled', 'true');
+        else b.removeAttribute('aria-disabled');
       }
     },
     setCoins(coins) {

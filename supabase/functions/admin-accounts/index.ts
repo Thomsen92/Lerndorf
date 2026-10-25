@@ -97,7 +97,8 @@ async function createOne(
   if (pErr) return json(400, { error: pErr });
   if (!isClassId(classId)) return json(400, { error: 'Klasse muss 8a oder 8b sein' });
 
-  // a new pupil has no plot yet: the pupil chooses a free one (RPC claim_plot, SPEC §10.5)
+  // a new pupil has no plot yet: the tutorial (migration 0019, tutorial_start) assigns the next free one;
+  // pupils no longer call claim_plot
   const { data: created, error } = await admin.auth.admin.createUser({
     email: loginEmail(nickname),
     password,
