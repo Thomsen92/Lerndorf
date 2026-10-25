@@ -39,17 +39,21 @@ import { openHouseMenu } from './houseMenu';
 import { openShop } from './shopView';
 import { openInventory } from './inventoryView';
 import { openDailyQuests } from './dailyQuestsView';
+import { loadDailyQuests } from '../api/quests';
 import { openLedger } from './ledgerView';
 import { openAccountMenu } from './accountMenu';
 import { openCharacterPicker } from './characterPicker';
 import { BuildMode, type EnterOptions } from '../render/buildMode';
 import { BuildFx, loadPuffTexture } from '../render/buildFx';
 import { createSound } from './sound';
+import { createMarketByte, type MarketByte } from '../mascot/marketByte';
+import { silenceSirByte } from '../mascot/voice';
 import { acquireSessionThumbs } from '../render/itemThumbs';
 import type { SlotId } from '../world/plotPlan';
 import { sheetViewOffset } from '../render/houseCamera';
 import { FLIGHT_SECONDS, houseView, lerpPose, onPlot, type CameraPose } from '../render/houseCamera';
 import { closeUpPath, introPath, type CameraPath } from '../render/introCamera';
+import { frameTutorialSubjects } from '../render/tutorialFraming';
 import { finishTutorial, getTutorialState, type TutorialState } from '../api/tutorial';
 import { runTutorial, type TutorialVillage } from './tutorial/flow';
 import { PLACE_BUTTON, PLACE_HINT } from './tutorial/messages';
@@ -135,6 +139,7 @@ export async function mountVillage(
   let areas: AreaController | null = null;
   let buildMode: BuildMode | null = null;
   const sound = createSound();
+  let marketByte: MarketByte | null = null;
   const unlockSound = (): void => sound.unlock();
   window.addEventListener('pointerdown', unlockSound);
   window.addEventListener('keydown', unlockSound);
@@ -162,6 +167,7 @@ export async function mountVillage(
     puffTexture?.dispose();
     thumbs.release();
     sound.dispose();
+    marketByte?.dispose();
     window.removeEventListener('pointerdown', unlockSound);
     window.removeEventListener('keydown', unlockSound);
     modals.closeAll();
@@ -247,6 +253,7 @@ export async function mountVillage(
         supabase,
         state: tutorial,
         signal: tutorialAbort.signal,
+        sound,
         village: () => {
           wantVillage();
           return tutorialVillage;
@@ -326,6 +333,22 @@ export async function mountVillage(
     }));
   const village = buildVillage(layout, labels, ownPlot);
   scene.add(village);
+  marketByte = createMarketByte({
+    scene,
+    layout,
+    sound,
+    openQuests: () => void areas?.select('aufgaben'),
+    questState: async () => {
+      const result = await loadDailyQuests(supabase);
+      return result.ok
+        ? {
+            todayOpen: result.value.some((q) => !q.catchUp && !q.solved),
+            catchUpOpen: result.value.some((q) => q.catchUp && !q.solved),
+          }
+        : { todayOpen: true, catchUpOpen: false };
+    },
+  });
+  const byte = marketByte;
   // the river reflects the sky panorama once it has loaded
   void rig.skyReady.then((sky) => {
     if (sky) (village.userData.setSky as ((t: THREE.Texture) => void) | undefined)?.(sky);
@@ -350,6 +373,7 @@ export async function mountVillage(
     const s = settingsFor(level);
     gl.shadowMap.enabled = s.shadows;
     sun.castShadow = s.shadows;
+    byte.setQuality(level);
     gl.setPixelRatio(Math.min(window.devicePixelRatio, s.maxPixelRatio));
     resize();
   };
@@ -418,6 +442,7 @@ export async function mountVillage(
       if (reducedMotion()) finishFlight();
     }
     paused = area === 'shop' || area === 'inventar' || area === 'aufgaben' || area === 'profil';
+    byte.setCovered(paused);
     if (paused) finishFlight(); // the camera is in place before rendering stops
     applyControls(area);
   };
@@ -463,6 +488,10 @@ export async function mountVillage(
     // the task board: tap the board in the market
     if (hit && hit.object.userData.kind === 'board') {
       void areas?.select('aufgaben');
+      return;
+    }
+    if (hit && hit.object.userData.kind === 'byte') {
+      void byte.tap();
       return;
     }
     // the own house: tap opens the house menu
@@ -556,7 +585,13 @@ export async function mountVillage(
         nickname: profile.nickname,
         coins: coinsNow,
         quality: choice,
-        sound: { on: sound.enabled, onChange: (on) => sound.setEnabled(on) },
+        sound: {
+          on: sound.enabled,
+          onChange: (on) => {
+            sound.setEnabled(on);
+            if (!on) silenceSirByte();
+          },
+        },
         onQuality: (q) => {
           choice = q;
           applyQuality();
@@ -590,6 +625,7 @@ export async function mountVillage(
         openDailyQuests({
           supabase,
           coins: coinsNow,
+          sound,
           onCoins,
           onProgress: (delta, from) => void worldOnProgress(delta, from),
           onClose: () => void areas?.select('dorf'),
@@ -702,13 +738,54 @@ export async function mountVillage(
     target: controls.target.clone(),
   });
   const headPoint = new THREE.Vector3();
+  const withByte = (path: CameraPath, overview = false): CameraPath => {
+    const pose = path.at(path.duration);
+    const second = new THREE.Vector3();
+    if (!crowd.ownHeadPoint(second)) return path;
+    second.y -= 0.6;
+    const framed = frameTutorialSubjects(pose, {
+      first: byte.root.position.clone().add(new THREE.Vector3(0, 0.9, 0)),
+      second,
+      aspect: camera.aspect,
+      fov: camera.fov,
+      overview,
+    });
+    return { duration: path.duration, at: () => framed };
+  };
   const tutorialSide: TutorialVillage = {
+    byte: {
+      ...byte.guide,
+      atPlot: () => {
+        if (home) byte.atPlot(home);
+      },
+    },
+    pauseForQuiz: (on) => {
+      paused = on;
+      byte.setCovered(on);
+    },
+    flyMarket: (reduced) => {
+      const at = byte.root.position.clone();
+      const face = byte.root.rotation.y;
+      const target = at.clone().add(new THREE.Vector3(0, 1.2, 0));
+      const to = {
+        position: at.clone().add(new THREE.Vector3(Math.sin(face) * 7, 3.2, Math.cos(face) * 7)),
+        target,
+      };
+      const from = {
+        position: marketTarget.clone().add(new THREE.Vector3(25, 35, 30)),
+        target: marketTarget.clone(),
+      };
+      const duration = reduced ? 0.5 : 3;
+      return playPath({ duration, at: (t) => lerpPose(from, to, Math.min(1, t / duration)) });
+    },
     flyIntro: (reduced) =>
-      ownPlot === null ? Promise.resolve() : playPath(introPath(layout, ownPlot, reduced)),
+      ownPlot === null
+        ? Promise.resolve()
+        : playPath(pathFrom(currentPose(), withByte(introPath(layout, ownPlot, reduced), true))),
     flyCloseUp: (reduced) =>
       ownPlot === null
         ? Promise.resolve()
-        : playPath(pathFrom(currentPose(), closeUpPath(layout, ownPlot, reduced))),
+        : playPath(pathFrom(currentPose(), withByte(closeUpPath(layout, ownPlot, reduced)))),
     placeFigure: () => {
       if (ownPlot !== null) crowd.placeOwnInFrontOfHouse(ownPlot);
     },
@@ -807,6 +884,7 @@ export async function mountVillage(
     }
     // covered by an area: no rendering and no Auto measurement
     if (paused) return;
+    byte.update(dt, camera, reducedMotion());
     if (autoResult === null) {
       elapsed += dt;
       frames.push(frameMs);

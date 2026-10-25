@@ -29,6 +29,7 @@ Schüler sind 13–14 Jahre alt; teils schwächere Lesekompetenz. Oberfläche au
 10. **Quest-Pflege**: eine JSON-Datei je Woche in `content/daily-quests/` (7 Tage × 3 Quests, Ferienwochen als kurze Ferien-Datei), automatisch geprüft und in die Datenbank eingespielt. Die Dateien schreibt Claude im Wochenplan-Projekt nach `content/daily-quests/FORMAT.md`. Der Lehrer-Bereich zeigt, bis wann Quests vorhanden sind, meldet Fehler und zeigt die nächsten 7 Tage mit Lösungen.
 
 11. **XP, Level, Schultag-Serie, Truhen, Titel und Rahmen sowie eine Profilseite** (Zwischenpaket X, Design vom 24.10.2026). Fortschritt entsteht automatisch durch Lern- und Spielaktionen, ohne Rangliste.
+12. **Sir Byte als Begleiter:** eigenes 3D-Maskottchen am Markt, englische Sprechblasen im Tutorial und Reaktionen im kleinen Quest-Fenster. Nur vorhandene Aufnahmen, keine KI-Anfragen oder neuen Schülerdaten (Design vom 25.10.2026).
 
 ## Ausdrücklich NICHT im Umfang
 

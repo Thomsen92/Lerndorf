@@ -214,6 +214,24 @@ Auftrag: weniger Informationen, eigene Sammlung und direkt bedienbare 3D-Truhen.
 
 Keine zusätzliche Datenbankänderung für diese UI-Überarbeitung. X.13 und X.14 bleiben offen.
 
+## Zwischenpaket B – Sir Byte als Begleiter
+
+Auftrag vom 25.10.2026: vorhandenen Sir Byte einbauen, Tutorial und Quests anpassen; autonom und sequenziell ohne Teilagenten. Design: `docs/superpowers/specs/2026-10-25-sir-byte-mascot-design.md`; Detailplan: `docs/superpowers/plans/2026-10-25-sir-byte-mascot.md`.
+
+| AP | Wer | Inhalt | Ergebnis |
+| --- | --- | --- | --- |
+| [x] B.1 | CC | Originalfigur, Typen, Aufnahmen und Herkunft übernehmen | Quelle `ea10e0c`; 24 Meshes / 26 930 Dreiecke; sechs Aufnahmen, keine neue Abhängigkeit |
+| [x] B.2 | CC | Ermutigende Reaktionen und eine gemeinsame Stimme | Fehler pro Frage; Nutzergeste/Tonschalter; verspätete Ladevorgänge abbrechbar |
+| [x] B.3 | CC | Kleine 3D-Bühne, Blasen und Standbild-Ersatz | WebGL-Fehler, Bewegungseinstellung, Aufräumen und sichere Texte getestet |
+| [x] B.4 | CC | Daily Quests und Tutorial-Quiz anbinden | Durchgängiges Fenster, Hör-Aufgaben unterbrechen Stimme, deutscher Feedbacktext bleibt |
+| [x] B.5 | CC | Marktfigur und Tutorial-Begleitung | Begrüßung, Grundstück, Hausplatz zeigen, Server-Schritte fortsetzen, Dorf bei Quiz pausiert |
+| [x] B.6 | CC | Browserbilder, Galerie, Renderbudget und Abschlussprüfung | 814 Tests, Build und ESLint grün; 20 Browserprüfungen, darunter kompletter Erststart in Quer-/Hochformat, Handy-Einstieg, Audio-Unterbrechung, Profilregression; 36 Dorfbilder geprüft |
+| [ ] B.7 | LK | **Abnahme auf dem Schul-Tablet** | Stimme, Lesbarkeit, Tutorial, Tafel-Antippen und Bildrate prüfen |
+
+Sir Byte erfordert keine Migration. Veröffentlichung und XP-Migration 0020 bleiben ausstehend.
+
+Messung in derselben Szene auf allen drei Karten, Qualität „Niedrig“: Sir Byte zusätzlich 19 Draw Calls / 25 594 sichtbare Dreiecke in Ruhe, 23 / 26 546 bei der Gehstock-Geste. Außer Sicht bzw. weit entfernt keine Aktualisierung; jenseits 90 m ausgeblendet. Das vollständige Modell umfasst 24 Meshes / 26 930 Dreiecke. Das bisherige Gesamtbudget ist mit den vorhandenen Bewohnern bereits teilweise überschritten; die echte Tablet-Bildrate ist weiterhin nicht bestätigt. Bilder: `web/test-results/sir-byte/`, `web/test-results/tutorial/1024-*` und `820-*`, `web/test-results/layout-byte/`. Originalmodule bis auf Herkunftskommentar unverändert geprüft. Nach der eigenen Codeprüfung sind verspätete Abschlusszeilen nach „Anhören“ durch einen Regressionstest abgesichert; Blasen und Kamerarahmung verhindern Überlappungen mit der Schülerfigur.
+
 ## Stufe 5 – Probebetrieb
 
 | AP | Wer | Aufgabe | Fertig, wenn |

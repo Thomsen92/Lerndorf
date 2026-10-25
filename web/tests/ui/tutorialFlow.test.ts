@@ -192,6 +192,38 @@ afterEach(() => {
 });
 
 describe('runTutorial', () => {
+  it('uses the English guide, pauses the village during the quiz and restores Byte on abort', async () => {
+    const f = fakeServer({ character: 'boy', plotIndex: 0 });
+    const byte = {
+      ask: vi.fn(async (_key: string) => {}),
+      say: vi.fn(),
+      react: vi.fn(),
+      atPlot: vi.fn(),
+      pointHouse: vi.fn(),
+      hideBubble: vi.fn(),
+      restore: vi.fn(),
+    };
+    f.village.byte = byte;
+    f.village.flyMarket = vi.fn(async () => {});
+    f.village.pauseForQuiz = vi.fn();
+    const abort = new AbortController();
+    const r = run(f, { signal: abort.signal });
+    await until(() => document.querySelector('.tutorial-quiz') !== null, 'quiz with guide');
+    expect(byte.ask.mock.calls.map((c) => c[0])).toEqual([
+      'hello',
+      'welcome',
+      'toHouse',
+      'ruin',
+      'quests',
+      'coins',
+    ]);
+    expect(f.village.pauseForQuiz).toHaveBeenCalledWith(true);
+    abort.abort();
+    await r.done;
+    expect(byte.restore).toHaveBeenCalledOnce();
+    expect(f.village.pauseForQuiz).toHaveBeenLastCalledWith(false);
+    expect(document.querySelector('.byte-stage')).toBeNull();
+  });
   it('awaits confirmed tutorial XP feedback after dancing before opening quests', async () => {
     const f = fakeServer({ step: 'place', character: 'boy', plotIndex: 0 });
     f.api.finish = async () => ({

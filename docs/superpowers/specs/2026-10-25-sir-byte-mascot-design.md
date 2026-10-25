@@ -1,6 +1,16 @@
 # Sir Byte – Maskottchen im Lerndorf – Design
 
-**Stand:** 25.10.2026 · **Status:** Vorgaben und Antworten des Auftraggebers vom 25.10.2026 (§2); Details „Entscheidung Claude“; Prüfung durch den Auftraggeber steht aus. Umsetzungsplan: `docs/superpowers/plans/2026-10-25-sir-byte-mascot.md`.
+**Stand:** 25.10.2026 · **Status:** Vom Auftraggeber zur selbständigen Umsetzung freigegeben und lokal umgesetzt. 814 Tests, Build und ESLint bestanden; Browserabläufe und 36 Galeriebilder geprüft. Veröffentlichung und Abnahme auf dem Schul-Tablet (PLAN B.7) stehen aus. Umsetzungsplan: `docs/superpowers/plans/2026-10-25-sir-byte-mascot.md`.
+
+## Abgleich mit der Umsetzung
+
+- `createCompanion` in `mascot/mascotStage.ts` verbindet das kleine 3D-Fenster mit den Quest-Reaktionen; separate öffentliche `MascotStage`-/`QuestMascot`-Hüllen sind dadurch nicht nötig. Die Lernlogik und alle Serverprüfungen bleiben in den vorhandenen Ansichten.
+- Die Blasen haben eigene, lokal begrenzte Stile (`mascot/mascot.css` / `.byte-bubble`), damit die Schülerblasen und das übrige Dorf unverändert bleiben.
+- Am Markt und im Tutorial wird **dieselbe Figur umgesetzt**; es gibt keine zweite gleichzeitig sichtbare Dorfkopie. Die Kameraposen passen sich an beide Figuren und das Bildschirmformat an (`render/tutorialFraming.ts`).
+- Die neuen Begrüßungs- und Erklärsätze im Tutorial bleiben Text, da dafür keine passende Aufnahme existiert. „Ready when you are.“ wird als vorhandene Quest-Begrüßung verwendet. Es gibt keine künstliche Wartezeit auf eine Aufnahme; gesprochenes Englisch und angezeigter Satz stimmen immer überein.
+- Das Ersatzbild ist ein neu gerendertes 320-px-Porträt desselben Modells statt eines verkleinerten Screenshots der gesamten Prototyp-Seite. Export: `web/scripts/byte-preview.mjs`.
+- Ein Tagesziel bei gleichzeitigem Level-Aufstieg zeigt die Überraschung vor der Level-Feier; die Feier hat Vorrang vor einer zusätzlichen Abschlussfolge. Auch nach einem Wechsel zu „Anhören“ oder einer neueren Reaktion darf keine alte Abschlusszeile nachlaufen.
+- Galerie-Messung ohne Sir-Byte-Schatten (Qualität „Niedrig“): 19 zusätzliche Draw Calls / 25 594 sichtbare Dreiecke in Ruhe, 23 / 26 546 während der Gehstock-Geste, identisch auf allen drei Karten. Das vollständige Modell umfasst 24 Meshes / 26 930 Dreiecke. Gesamtbudget und echte Tablet-Bildrate bleiben gesonderte Abnahmepunkte.
 
 ## 1. Ziel
 

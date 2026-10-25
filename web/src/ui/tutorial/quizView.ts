@@ -10,6 +10,8 @@ import { loadVoices, speakEnglish } from '../../quests/speech';
 import { answerMode, buildAnswer, type AnswerState } from '../../tasks/answer';
 import { answerForm, bindAnswerForm, emptyState, type AnswerFormSpec } from '../answerForms';
 import { NETWORK_ERROR, NEXT, QUIZ_DONE, QUIZ_INTRO, RETRY } from './messages';
+import { createCompanion } from '../../mascot/mascotStage';
+import type { Sound } from '../sound';
 
 export interface QuizApi {
   question(): Promise<Result<TutorialQuestion>>;
@@ -17,6 +19,8 @@ export interface QuizApi {
 }
 
 export interface QuizOptions {
+  sound?: Pick<Sound, 'enabled'>;
+  reducedMotion?: () => boolean;
   api: QuizApi;
   /** coins after the fifth correct answer (reward booked by the server) */
   onCoins: (coins: number) => void;
@@ -54,6 +58,8 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
   panel.className = 'panel';
   overlay.appendChild(panel);
   document.body.appendChild(overlay);
+  const byte = createCompanion({ sound: opts.sound, reducedMotion: opts.reducedMotion });
+  byte.say('quiz');
 
   const synth = (globalThis as { speechSynthesis?: SpeechSynthesis }).speechSynthesis;
   if (synth) void loadVoices(synth).catch(() => undefined);
@@ -78,6 +84,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
     const head = el('div', 'panel-head');
     head.appendChild(h);
     panel.replaceChildren(head);
+    panel.append(byte.el);
     return h;
   };
   const button = (label: string, primary: boolean, onClick: () => void): HTMLButtonElement => {
@@ -116,6 +123,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
     const prompt = el('p', 'tutorial-prompt', q.prompt);
     prompt.lang = 'en';
     panel.append(prompt);
+    byte.lookAt(prompt);
 
     if (q.type === 'listening') {
       const data = spec.data;
@@ -123,6 +131,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
       const fallback = el('p', 'quest-fallback');
       fallback.hidden = true;
       const play = (): void => {
+        byte.listen();
         void speakEnglish(speak).then((ok) => {
           if (ok || closed) return;
           fallback.textContent = 'Dein Gerät kann nicht vorlesen. Lies den Text: ';
@@ -169,6 +178,8 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
         return;
       }
       pending = true;
+      synth?.cancel();
+      byte.thinking();
       check.disabled = true;
       feedback.textContent = 'Wird geprüft …';
       const res = await safe(() => opts.api.answer(q.nr, answer));
@@ -183,6 +194,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
         return;
       }
       const r = res.value;
+      void byte.answer(`tutorial-${q.nr}`, r.correct);
       if (!r.correct) {
         feedback.textContent = r.hint ? 'Leider falsch. Tipp: ' : 'Leider falsch. Versuch es noch einmal.';
         if (r.hint) {
@@ -217,6 +229,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
     done,
     close() {
       closed = true;
+      byte.dispose();
       synth?.cancel(); // stop reading aloud on close / logout
       overlay.remove();
     },

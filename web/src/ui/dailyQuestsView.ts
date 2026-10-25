@@ -16,8 +16,11 @@ import { answerForm, bindAnswerForm, emptyState, type AnswerFormSpec } from './a
 import type { AreaHandle } from './areas';
 import { esc } from './esc';
 import type { ProgressDelta } from '../api/progress';
+import { createCompanion, type Companion } from '../mascot/mascotStage';
+import type { Sound } from './sound';
 
 export interface DailyQuestsOptions {
+  sound?: Pick<Sound, 'enabled'>;
   onProgress?: (delta: ProgressDelta, from: HTMLElement) => void;
   supabase: SupabaseClient;
   coins: number;
@@ -34,7 +37,7 @@ let areaCounter = 0;
 export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
   const titleId = `quests-title-${++areaCounter}`;
   const overlay = document.createElement('section');
-  overlay.className = 'overlay area';
+  overlay.className = 'overlay area quests-area';
   overlay.setAttribute('role', 'region');
   overlay.setAttribute('aria-labelledby', titleId);
   document.body.appendChild(overlay);
@@ -44,6 +47,7 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
   if (synth) void loadVoices(synth).catch(() => undefined);
 
   let closed = false;
+  let byte: Companion | null = null;
   let coins = opts.coins;
   let quests: DailyQuest[] = [];
   let openKey: string | null = null;
@@ -82,6 +86,10 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
       return;
     }
     quests = res.value;
+    byte ??= createCompanion({ sound: opts.sound });
+    if (quests.filter((q) => !q.catchUp).every((q) => q.solved) && quests.some((q) => !q.catchUp))
+      byte.say('allDone');
+    else byte.greet();
     if (openKey && !quests.some((q) => q.key === openKey && !q.solved)) {
       openKey = null;
       state = null;
@@ -102,6 +110,7 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
       <section class="panel quests">
         ${head()}
         <p class="status" id="status" role="status">${esc(listMessage)}</p>
+        <div class="quests-with-byte"><div class="byte-slot"></div><div class="quests-content">
         <h3>Heute</h3>
         ${todayHtml}
         ${
@@ -109,7 +118,9 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
             ? ''
             : `<h3>Nachholen von gestern</h3><ul class="quest-list">${catchUp.map(cardHtml).join('')}</ul>`
         }
+        </div></div>
       </section>`;
+    overlay.querySelector('.byte-slot')?.replaceWith(byte!.el);
     bindClose();
     overlay.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((btn) =>
       btn.addEventListener('click', () => {
@@ -129,6 +140,7 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
       }),
     );
     const open = quests.find((q) => q.key === openKey);
+    byte?.lookAt(open ? overlay.querySelector(`[data-quest="${CSS.escape(open.key)}"]`) : null);
     if (open) bindCard(open);
   };
 
@@ -181,6 +193,7 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
     bindForm();
 
     card.querySelector('[data-listen]')?.addEventListener('click', () => {
+      byte?.listen();
       const speak = typeof q.data.speak === 'string' ? q.data.speak : '';
       void speakEnglish(speak).then((ok) => {
         const box = card.querySelector<HTMLElement>('.quest-fallback');
@@ -199,6 +212,8 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
         return;
       }
       pending = true;
+      synth?.cancel?.();
+      byte?.thinking();
       check.disabled = true;
       let res: Awaited<ReturnType<typeof submitQuestAnswer>>;
       try {
@@ -216,6 +231,7 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
       }
       check.disabled = false;
       if (!res.ok) {
+        byte?.listen();
         if (res.message === QUEST_NOT_OPEN) {
           listMessage = res.message;
           openKey = null;
@@ -228,10 +244,20 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
       }
       coins = res.value.coins;
       opts.onCoins(coins);
-      if (res.value.progress) opts.onProgress?.(res.value.progress, card);
       if (res.value.correct || res.value.alreadySolved) {
         q.solved = true;
         q.rewardLeft = 0;
+        if (!res.value.alreadySolved) {
+          if (res.value.progress && res.value.progress.level > res.value.progress.levelBefore)
+            void byte?.react('surprise');
+          else
+            void byte?.answer(
+              q.key,
+              true,
+              !q.catchUp && quests.filter((q) => !q.catchUp).every((q) => q.solved),
+            );
+        }
+        if (res.value.progress) opts.onProgress?.(res.value.progress, card);
         solvedNote = { key: q.key, html: esc(solvedText(res.value)) };
         openKey = null;
         state = null;
@@ -239,6 +265,7 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
         return;
       }
       q.attempts += 1;
+      void byte?.answer(q.key, false);
       q.rewardLeft = res.value.rewardLeft;
       const label = card.querySelector<HTMLElement>('.quest-reward');
       if (label) label.textContent = rewardLabel(q);
@@ -256,6 +283,8 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
   return {
     close() {
       closed = true;
+      byte?.dispose();
+      synth?.cancel?.();
       overlay.remove();
     },
   };

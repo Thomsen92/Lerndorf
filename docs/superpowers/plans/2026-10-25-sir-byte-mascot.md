@@ -10,6 +10,22 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-25-sir-byte-mascot-design.md`. Related: tutorial spec `docs/superpowers/specs/2026-10-21-first-login-tutorial-design.md` (§9 comic bubbles), daily quests `docs/superpowers/specs/2026-10-20-daily-quests-design.md`, build feedback plan Task 2 (`ui/sound.ts`).
 
+## Ausführungsstand vom 25.10.2026
+
+Direkter Auftrag: eigenständig im aktuellen Chat, ohne Teilagenten. Die folgende Liste und PLAN B.1–B.7 verfolgen den tatsächlichen Stand; die ursprünglichen detaillierten Schritte darunter bleiben als Planungsreferenz erhalten. Abweichende interne Namen und UI-Entscheidungen stehen im Design unter „Abgleich mit der Umsetzung“.
+
+- [x] 1. Originalmodule `ea10e0c` und vier Typdeklarationen übernommen, sechs MP3 und eigenes Standbild bereitgestellt; Originalmodule bis auf Herkunftskommentar unverändert geprüft.
+- [x] 2. Englische Texte und VoicePlayer: Nutzergeste, Tonschalter, ein aktiver Sprecher, Abbruch verspäteter Ladevorgänge.
+- [x] 3. Lerndorf-Hülle: erlaubte Reaktionen, Fehler pro Frage, einfache Materialien bei niedriger Qualität und Freigabe von Ressourcen.
+- [x] 4. Sichere Blasen mit Weiter-Knopf, Bildschirmbegrenzung und Abstand zu Schülerblase, Navigation und Avatar-Feld.
+- [x] 5. Eigenes 3D-Fenster mit Standbild bei WebGL-Ausfall, reduzierter Bewegung und Renderer-Freigabe.
+- [x] 6. Daily Quests und Tutorial-Quiz verbunden; „Anhören“ unterbricht die Stimme, alte Abschlussfolgen werden verworfen.
+- [x] 7. Eine Marktfigur neben der Tafel, Zeigen/Antippen und Entfernungsgrenzen; keine zusätzliche Tafel.
+- [x] 8. Tutorial mit Marktbegrüßung, Hausbegleitung, Hausplatz zeigen, Abschluss und Wiederaufnahme vom Server-Schritt; Kamerarahmung für zwei Figuren.
+- [x] 9. Browserprüfung in Quer-/Hochformat, Galerie, Gesamtprüfung und Dokumentation abschließen; geprüften Stand lokal speichern.
+
+Abschluss: 814 Tests, Build und ESLint grün; 20 unterschiedliche Browserprüfungen, darunter vollständiger Erststart auf 1024 × 768 und 820 × 1180, Fortsetzen bei Platzierung, Handy-Einstieg, alle Quests geschafft, fehlendes WebGL und tatsächliches Abspielen/Unterbrechen der Stimme. Galerie mit 36 Bildern; Messung auf allen drei Karten 19 zusätzliche Draw Calls in Ruhe / 23 mit Gehstock (niedrige Qualität), vollständiges Modell 26 930 Dreiecke. Keine neue Datenbankmigration und keine Veröffentlichung. Die Lehrkraft prüft die echte Bildrate, Stimme und Bedienung am Schul-Tablet (B.7).
+
 ## Global Constraints
 
 - Read `CLAUDE.md` first. Do not touch `Konzept/`, `Prototyp/`, `Kenny/`, `../Referenz`, `Thomsen92/English-Club-8`. Do **not** change the `Thomsen92/Sir-Byte` repository; only read it (clone to a temporary folder outside Lerndorf).

@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { bridgeHeight, buildLayout } from '../src/world/layout';
 import { buildVillage } from '../src/render/village';
+import { createMarketByte } from '../src/mascot/marketByte';
 import { Crowd } from '../src/render/crowd';
 import { setupScene } from '../src/render/scene';
 import { grassReady } from '../src/render/grass';
@@ -92,6 +93,8 @@ if (params.get('ruin') === '1')
   members.find((m) => m.plotIndex === 0)!.slots.house = { itemId: 'ruin', rot: 0 };
 const village = buildVillage(layout, members, null);
 scene.add(village);
+const byte = createMarketByte({ scene, layout, sound: { enabled: false }, openQuests: () => undefined });
+if (params.get('byte') === '0') byte.root.visible = false;
 const crowd = new Crowd(
   scene,
   layout,
@@ -104,6 +107,10 @@ const crowd = new Crowd(
 
 const camera = new THREE.PerspectiveCamera(38, 1280 / 800, 0.1, 400);
 const VIEWS: Record<string, { target: THREE.Vector3; offset: THREE.Vector3 }> = {
+  byte: {
+    target: byte.root.position.clone().add(new THREE.Vector3(0, 1, 0)),
+    offset: new THREE.Vector3(Math.sin(byte.root.rotation.y) * 8, 4, Math.cos(byte.root.rotation.y) * 8),
+  },
   xp_tag: {
     target: new THREE.Vector3(layout.plots[0].x, layout.plots[0].h + 5, layout.plots[0].z),
     offset: new THREE.Vector3(9, 7, 12),
@@ -160,6 +167,7 @@ function step(seconds: number): void {
   const dt = 0.1;
   for (let t = 0; t < seconds; t += dt) {
     crowd.update(dt);
+    if (params.get('byte') !== '0') byte.update(dt, camera, true);
     (village.userData.animate as ((t: number) => void) | undefined)?.(t);
   }
 }
@@ -177,12 +185,35 @@ function drawCalls(): { total: number; world: number } {
   return { total, world };
 }
 
+/** Development-only same-frame measurement isolates the mascot from moving residents. */
+function byteCost(reaction: 'idle' | 'celebrate') {
+  void byte.mascot.react(reaction, { silent: true });
+  for (let i = 0; i < 10; i++) byte.update(0.08, camera, false);
+  const prior = byte.root.visible;
+  byte.root.visible = true;
+  renderer.info.reset();
+  renderer.render(scene, camera);
+  const calls = renderer.info.render.calls,
+    triangles = renderer.info.render.triangles;
+  byte.root.visible = false;
+  renderer.info.reset();
+  renderer.render(scene, camera);
+  const cost = {
+    calls: calls - renderer.info.render.calls,
+    triangles: triangles - renderer.info.render.triangles,
+  };
+  byte.root.visible = prior;
+  renderer.render(scene, camera);
+  return cost;
+}
+
 declare global {
   interface Window {
     galerie: {
       setView(name: string): void;
       step(seconds: number): void;
       drawCalls(): { total: number; world: number };
+      byteCost(reaction: 'idle' | 'celebrate'): { calls: number; triangles: number };
       ready: boolean;
     };
   }
@@ -192,6 +223,7 @@ window.galerie = {
   setView,
   step,
   drawCalls,
+  byteCost,
   ready: false,
 };
 

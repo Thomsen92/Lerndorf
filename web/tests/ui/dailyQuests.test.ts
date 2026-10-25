@@ -86,6 +86,28 @@ afterEach(() => {
 });
 
 describe('daily quest area', () => {
+  it('keeps Sir Byte through rerenders and reacts to confirmed answers', async () => {
+    loadDailyQuests.mockResolvedValue({ ok: true, value: [quest()] });
+    submitQuestAnswer.mockResolvedValue({ ok: true, value: result({ correct: false, rewardLeft: 5 }) });
+    const { h } = open();
+    await flush();
+    const stage = document.querySelector('.byte-stage');
+    expect(stage).toBeTruthy();
+    typeGap(await openCard('q1'), 'no');
+    button('Prüfen')!.click();
+    await flush();
+    expect(stage?.textContent).toContain('Nearly. Have another go!');
+    button('Prüfen')!.click();
+    await flush();
+    expect(stage?.textContent).toContain("Take your time. You've got this.");
+    submitQuestAnswer.mockResolvedValue({ ok: true, value: result() });
+    button('Prüfen')!.click();
+    await flush();
+    expect(document.querySelector('.byte-stage')).toBe(stage);
+    expect(stage?.textContent).toContain('Splendid! Nicely done.');
+    h.close();
+    expect(document.querySelector('.byte-stage')).toBeNull();
+  });
   it('forwards a confirmed XP delta from the answered card', async () => {
     loadDailyQuests.mockResolvedValue({ ok: true, value: [quest()] });
     const delta = { gained: [{ reason: 'quest', xp: 15 }], xp: 15, level: 1, levelBefore: 1, newChests: 0 };
@@ -206,7 +228,7 @@ describe('daily quest area', () => {
     });
     open();
     await flush();
-    expect(region().querySelector('img')).toBeNull();
+    expect(region().querySelector('.quest-list img')).toBeNull();
     expect(text()).toContain('<img src=x onerror=alert(1)>');
   });
 

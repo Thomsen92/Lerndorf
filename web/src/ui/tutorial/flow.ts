@@ -35,6 +35,8 @@ import {
   SAD_TEXT,
 } from './messages';
 import { openQuiz, type QuizApi } from './quizView';
+import type { TutorialGuide } from '../../mascot/marketByte';
+import type { Sound } from '../sound';
 
 /** The RPCs the flow needs; the default talks to Supabase, tests pass fakes. */
 export interface TutorialApi extends QuizApi {
@@ -61,6 +63,9 @@ export function tutorialApi(supabase: SupabaseClient): TutorialApi {
 
 /** What the flow needs from the 3D village. */
 export interface TutorialVillage {
+  byte?: TutorialGuide;
+  flyMarket?(reducedMotion: boolean): Promise<void>;
+  pauseForQuiz?(paused: boolean): void;
   /** Camera: panorama -> market -> own plot; resolves at the end (short and calm with reduced motion). */
   flyIntro(reducedMotion: boolean): Promise<void>;
   /** Camera: closer to the figure for the final scene. */
@@ -82,6 +87,7 @@ export interface TutorialVillage {
 }
 
 export interface TutorialContext {
+  sound?: Pick<Sound, 'enabled'>;
   onProgress?: (delta: ProgressDelta) => Promise<void>;
   supabase: SupabaseClient;
   state: TutorialState;
@@ -219,12 +225,22 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
     // 2. the village with the own plot; the figure waits in front of the house slot
     village = await ui.guard(ctx.village());
     village.placeFigure();
+    const guide = village.byte;
 
     // 3. camera flight, sad bubble, two messages
     if (state.step === 'intro') {
+      if (guide) {
+        await ui.guard(village.flyMarket?.(reduced()) ?? Promise.resolve());
+        await ui.guard(guide.ask('hello'));
+        await ui.guard(guide.ask('welcome'));
+        await ui.guard(guide.ask('toHouse'));
+        guide.atPlot();
+      }
       await ui.guard(village.flyIntro(reduced()));
       const sad = ui.bubble(SAD_TEXT, 'sad');
-      for (const text of MESSAGES) await ui.guard(ui.card(text, NEXT));
+      if (guide) {
+        for (const key of ['ruin', 'quests', 'coins'] as const) await ui.guard(guide.ask(key));
+      } else for (const text of MESSAGES) await ui.guard(ui.card(text, NEXT));
       // continueTutorial answers ok after errcode 22023 with a re-read state; if that is still
       // 'intro' (stale read), do not skip ahead: show the retry card and ask again
       state = await untilOk(ui, async () => {
@@ -234,14 +250,25 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
       });
       sad();
     } else {
+      guide?.atPlot();
       // resume: a short, calm move to the own plot
       await ui.guard(village.flyIntro(true));
     }
 
     // 4. quiz: the server knows the current question
     if (state.step === 'quiz') {
-      const quiz = openQuiz({ api, onCoins: (c) => ctx.onCoins(c) });
-      const close = ui.own(() => quiz.close());
+      guide?.hideBubble();
+      village.pauseForQuiz?.(true);
+      const quiz = openQuiz({
+        api,
+        onCoins: (c) => ctx.onCoins(c),
+        sound: ctx.sound,
+        reducedMotion: reduced,
+      });
+      const close = ui.own(() => {
+        quiz.close();
+        village?.pauseForQuiz?.(false);
+      });
       await ui.guard(quiz.done);
       close();
       state = { ...state, step: 'buy', answered: 5 };
@@ -249,12 +276,15 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
 
     // 5. buy the house (also when the shop is closed)
     if (state.step === 'buy') {
+      guide?.say('buy');
       await ui.guard(buyHouse(ui, api, ctx));
+      guide?.hideBubble();
       state = { ...state, step: 'place' };
     }
 
     // 6. place it in the house slot (also when building is closed)
     if (state.step === 'place') {
+      guide?.pointHouse();
       const v = village;
       for (;;) {
         const res = await ui.guard(
@@ -271,10 +301,12 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
 
     // 7. closing scene: closer camera, one dance, the final line, then the Daily Quests
     await ui.guard(village.flyCloseUp(reduced()));
-    const happy = ui.bubble(FINAL_TEXT, 'happy');
+    guide?.react('celebrate');
+    const happy = guide ? () => guide.hideBubble() : ui.bubble(FINAL_TEXT, 'happy');
     const dance = village.danceOnce();
     const finish = safe(() => api.finish());
     await ui.guard(dance);
+    guide?.say('final');
     await ui.guard(new Promise((r) => setTimeout(r, ctx.endPauseMs ?? 1500)));
     happy();
     let result = await ui.guard(finish);
@@ -290,6 +322,8 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
   } finally {
     ui.cleanup();
     village?.releaseFigure();
+    village?.byte?.restore();
+    village?.pauseForQuiz?.(false);
   }
   if (finished && !ctx.signal?.aborted) ctx.openDailyQuests();
 }

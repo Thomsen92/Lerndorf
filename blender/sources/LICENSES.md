@@ -2,6 +2,12 @@
 
 Nur CC0-Inhalte oder eigene (CLAUDE.md). Die Quellpakete selbst liegen nicht im Repository.
 
+## Sir Byte (25.10.2026)
+
+Figur, Code und vorhandene Sprachaufnahmen: eigene Werke des Auftraggebers, [Thomsen92/Sir-Byte](https://github.com/Thomsen92/Sir-Byte), Stand `ea10e0c16cd7b0adc4393d9da173df1317049f2c`. Die Stimme wurde vom Auftraggeber mit ElevenLabs erstellt. Vier Module liegen unverändert bis auf den Herkunftskommentar in `web/src/mascot/vendor/`; Anpassungen fürs Lerndorf liegen außerhalb dieser Kopie. Die sechs ermutigenden Aufnahmen liegen in `web/public/assets/sir-byte/voice/`. Die beiden spöttischen Aufnahmen und die lange Demo-Aufnahme werden nicht ausgeliefert. `web/public/assets/sir-byte/preview.png` ist ein 320-px-Standbild des übernommenen Modells, reproduzierbar mit `web/scripts/byte-preview.mjs`.
+
+## Weitere Quellen
+
 | Paket | Autor | Lizenz | Link | Verwendet in |
 | --- | --- | --- | --- | --- |
 | Interface Sounds 1.0 / Impact Sounds 1.0 | Kenney | CC0 1.0 | https://kenney.nl/assets/interface-sounds · https://kenney.nl/assets/impact-sounds | `web/public/assets/kenney/fx/place.mp3` (`drop_002.ogg`), `ding.mp3` (`confirmation_001.ogg`), `remove.mp3` (`impactSoft_heavy_000.ogg`), mono MP3 64 kbit/s |

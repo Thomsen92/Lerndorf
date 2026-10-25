@@ -474,6 +474,12 @@ Grundsatz: **Das Layout (Positionen von allem) entsteht im Code in `world/`, det
 - Eigener Avatar: kleiner Marker (z. B. Pfeil) über dem Kopf.
 - Spitznamen-Schild über dem Kopf, verdeckt durch Gebäude.
 
+## 11a. Sir Byte (Maskottchen)
+
+[Maskottchen-Design](superpowers/specs/2026-10-25-sir-byte-mascot-design.md) und [Umsetzungsplan](superpowers/plans/2026-10-25-sir-byte-mascot.md). Eine prozedurale Figur aus dem eigenen Prototyp, kompatibel mit Three.js 0.170.0. Sie steht neben der bestehenden Markttafel; Antippen zeigt auf die Quests, erneutes Antippen öffnet sie. Während des Tutorials begrüßt Sir Byte am Markt und begleitet die Figur zum Haus; die Kamera hält beide Figuren im Bild.
+
+Quiz und Daily Quests zeigen ein eigenes 3D-Fenster, während das Dorf pausiert. Fehler werden je Quest ermutigend beantwortet, richtige Antworten gefeiert; die deutsche Bedienung bleibt erhalten. Sprache nur Englisch, nur sechs vorhandene Aufnahmen, nach einer Nutzergeste und bei eingeschaltetem Ton; keine überlappenden Stimmen. „Anhören“ stoppt seine Stimme. Bei fehlendem WebGL bleibt ein Standbild mit funktionierenden Blasen; reduzierte Bewegung schaltet die Körpergesten ab. Keine neue Migration, kein externer Sprachdienst.
+
 ## 12. Oberfläche (Schüler)
 
 | Bildschirm | Inhalt |
@@ -482,7 +488,8 @@ Grundsatz: **Das Layout (Positionen von allem) entsteht im Code in `world/`, det
 | Dorf (Haupt) | 3D-Ansicht; Avatar-Feld mit Figurenbild, Rahmen, Level-Wappen, XP, Münzen und Serie; Hauptnavigation Dorf, Aufgaben, Mein Haus |
 | Mein Profil | Kompakter Fortschritt, Serie/Schild, Tagesziel, interaktive 3D-Truhen, Zugang zur Sammlung und Einstellungen (§8b) |
 | Meine Sammlung | Eigene Profil-Unterseite, Reiter Titel/Rahmen, freigeschaltete Auswahl und gesperrte Einträge mit benötigtem Level (§8b) |
-| Daily Quests (Knopf „Aufgaben“) | „Heute“ und „Nachholen von gestern“ mit Belohnung bzw. „gelöst ✓“; eine Quest aufklappen und lösen; Rückmeldung richtig/falsch mit englischem Tipp; Hören mit „▶ Anhören“ oder sichtbarem Text; Regelzeile „Münzen gibt es bei den ersten 3 Versuchen.“ (§9) |
+| Daily Quests (Knopf „Aufgaben“) | „Heute“ und „Nachholen von gestern“ mit Belohnung bzw. „gelöst ✓“; eine Quest aufklappen und lösen; kleines Sir-Byte-Fenster mit englischer Ermutigung; deutsche Rückmeldung richtig/falsch mit englischem Tipp; Hören mit „▶ Anhören“ oder sichtbarem Text (§9, §11a) |
+| Erststart-Tutorial | Sir Byte begrüßt am Markt und begleitet die Figur zur Ruine; Quiz mit kleinem 3D-Fenster, Haus kaufen und aufstellen, gemeinsame Abschluss-Szene; Buttons und Fehler Deutsch (§8a, §11a) |
 | Shop | Kategorien Deko / Avatar; Preis, „Kaufen“ (mit eigener Bestätigung, kein `confirm()`); ausgegraut wenn zu teuer |
 | Bauen | Kamera fährt zum eigenen Grundstück; Inventar-Leiste; Teil wählen → Raster erscheint → Feld antippen → Drehen/Entfernen; grün/rot für frei/belegt |
 | Mein Avatar | Vorschau, Kategorien, Farbwähler (feste Palette), gesperrte Teile mit Preis |

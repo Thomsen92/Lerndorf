@@ -1,0 +1,186 @@
+.byte-stage {
+  margin: 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  border: 1px solid #477c8b;
+  border-radius: 18px;
+  background: radial-gradient(ellipse at 28% 50%, #304b61, #1c2943 75%);
+  overflow: hidden;
+  color: #f4ecd9;
+}
+.byte-picture {
+  aspect-ratio: 1;
+  min-width: 0;
+}
+.byte-picture canvas,
+.byte-picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.byte-picture [hidden],
+.byte-bubble[hidden] {
+  display: none;
+}
+.byte-bubble {
+  position: relative;
+  background: #eafafa;
+  color: #193d4c;
+  border: 2px solid #38bfc9;
+  border-radius: 18px;
+  padding: 14px 18px;
+  font-family: 'Comic Neue', sans-serif;
+  box-shadow: 0 6px 20px #07152a30;
+  margin: 12px;
+  min-width: 0;
+}
+.byte-bubble::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 45%;
+  width: 16px;
+  height: 16px;
+  background: #eafafa;
+  border-left: 2px solid #38bfc9;
+  border-bottom: 2px solid #38bfc9;
+  transform: rotate(45deg);
+}
+.byte-label {
+  display: block;
+  font: 800 10px var(--font, sans-serif);
+  letter-spacing: 2px;
+  color: #35717b;
+}
+.byte-bubble p {
+  font-size: 19px;
+  line-height: 1.3;
+  margin: 6px 0 0;
+}
+.byte-bubble button {
+  margin-top: 12px;
+  min-height: 44px;
+}
+.byte-world-bubble > .byte-bubble {
+  position: fixed;
+  width: min(310px, calc(100vw - 24px));
+  margin: 0;
+  z-index: 35;
+  pointer-events: auto;
+  box-sizing: border-box;
+}
+.byte-world-bubble > .byte-bubble::before {
+  left: var(--byte-tip-x, calc(50% - 8px));
+  top: auto;
+  bottom: -10px;
+  transform: rotate(-45deg);
+}
+.byte-world-bubble {
+  pointer-events: none;
+}
+.byte-tutorial-dialog {
+  position: fixed;
+  z-index: 45;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  width: min(620px, calc(100vw - 24px));
+}
+.byte-tutorial-dialog .byte-bubble {
+  margin: 0;
+}
+.byte-tutorial-dialog .byte-bubble::before {
+  display: none;
+}
+.quests-with-byte {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.quests-with-byte > .byte-stage {
+  position: sticky;
+  top: 12px;
+  grid-template-columns: 1fr;
+}
+.quests-with-byte > .byte-stage .byte-picture {
+  width: 220px;
+  max-width: 100%;
+}
+.quests-with-byte > .byte-stage .byte-bubble::before {
+  left: 40%;
+  top: -10px;
+  transform: rotate(135deg);
+}
+.tutorial-quiz .byte-stage {
+  margin-bottom: 16px;
+}
+.quests-area,
+.tutorial-quiz {
+  --ink: #f4ecd9;
+  --muted: #bac9da;
+  --line: #4a5b79;
+  --lantern: #ffd16d;
+  color: #f4ecd9;
+  color-scheme: dark;
+}
+.overlay.quests-area .panel {
+  width: min(960px, 100%);
+  background: #1f2942;
+}
+.overlay.tutorial-quiz .panel {
+  background: #1f2942;
+  width: min(640px, 100%);
+}
+.quests-area .quest-card,
+.tutorial-quiz .quest-form {
+  background: #27344e;
+}
+.quests-area .quest-rule {
+  font-size: 13px;
+}
+.quests-area .quest-prompt,
+.tutorial-quiz .tutorial-prompt {
+  color: #f4ecd9;
+}
+@media (max-width: 700px) {
+  .quests-with-byte {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .quests-with-byte > .byte-stage {
+    position: relative;
+    top: 0;
+    grid-template-columns: 140px minmax(0, 1fr);
+  }
+  .quests-with-byte > .byte-stage .byte-picture {
+    width: 140px;
+  }
+  .quests-with-byte > .byte-stage .byte-bubble::before {
+    left: -10px;
+    top: 40%;
+    transform: rotate(45deg);
+  }
+  .byte-stage {
+    grid-template-columns: 130px minmax(0, 1fr);
+  }
+  .byte-bubble {
+    margin: 8px;
+    padding: 10px 12px;
+  }
+  .byte-bubble p {
+    font-size: 17px;
+  }
+  .byte-tutorial-dialog {
+    bottom: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .byte-stage * {
+    scroll-behavior: auto;
+  }
+}
