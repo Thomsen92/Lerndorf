@@ -108,12 +108,16 @@ Beides wird mit dem Level freigeschaltet und auf der Profilseite selbst gewählt
 | 28 | Village Legend |
 | 30 | Lerndorf Champion |
 
-**Rahmen (Avatar-Feld und Level-Abzeichen am Namensschild):** Holz (1), Bronze (5), Silber (10), Gold (15), Smaragd (20), Saphir (25), Regenbogen (30). Jeder Rahmen unterscheidet sich nicht nur durch die Farbe, sondern auch durch Muster und Stärke (Holz: schlicht, Bronze: doppelt, Silber: gepunktet, Gold: mit Zacken, Smaragd und Saphir: mit Edelstein-Punkten, Regenbogen: Farbverlauf, der sich bewegt, bei reduzierter Bewegung stehend). Sein Name steht als Text dabei. Standard: Holz; nach dem Freischalten wechselt der Rahmen nicht von selbst, die Level-Feier bietet aber „Jetzt anlegen“ an.
+**Rahmen (um das Figurenbild, wählbar):** Holz (1), Bronze (5), Silber (10), Gold (15), Smaragd (20), Saphir (25), Regenbogen (30). Die Rahmen sind verzierte Ringe wie in Handyspielen (Ergänzung 25.10.2026, Vorbild: Bild des Auftraggebers): Holz schlicht mit Maserung, Bronze mit Nieten, Silber mit kleinen Zacken, Gold mit Krone oben, Smaragd und Saphir mit eingefassten Edelsteinen, Regenbogen schimmernd (bei reduzierter Bewegung stehend). Sie unterscheiden sich also durch Form und Verzierung, nicht nur durch die Farbe; ihr Name steht als Text dabei. Standard: Holz; nach dem Freischalten wechselt der Rahmen nicht von selbst, die Level-Feier bietet aber „Jetzt anlegen“ an.
+
+**Level-Wappen (automatisch, nicht wählbar; Ergänzung 25.10.2026):** Ein Schild mit einem Band unten, darauf „Lv.<n>“. Die Stufe des Wappens folgt dem Level: Holz (1–4), Bronze (5–9), Silber (10–14), Gold (15–19), Smaragd (20–24), Saphir (25–29), Regenbogen (ab 30). Mit jeder Stufe wird es prächtiger: Holz einfacher Schild; Bronze mit Nieten; Silber mit kleinen Flügeln; Gold mit großen Flügeln und Zackenkrone; Smaragd und Saphir zusätzlich mit Edelstein in der Mitte; Regenbogen mit schimmerndem Verlauf. Für Screenreader: „Level 7, Wappen Bronze“. Das Wappen steht im Avatar-Feld rechts neben dem Figurenbild, groß auf der Profilseite und in der Level-Feier, klein am Namensschild im Dorf.
 
 ## 9. Oberfläche
 
 ### 9.1 Avatar-Feld (ersetzt die Statusanzeige oben rechts)
-Rundes Figurenbild (Junge/Mädchen aus der Figurenwahl) im gewählten **Rahmen**, daneben Spitzname, **Level-Zahl** im Abzeichen, ein schmaler **XP-Balken** zum nächsten Level, die Münzen und die Serie (🔥 6). Ein Punkt zeigt ungeöffnete Truhen an. Antippen öffnet die **Profilseite**. Ausnahme: Während des Tutorials öffnet es wie bisher die Einstellungen, damit Abmelden immer möglich bleibt. Mindestgröße 44 px, Name für Screenreader: „Profil: <Spitzname>, Level 6, 120 von 175 XP, 230 Münzen“.
+Aufbau wie das Vorbild des Auftraggebers: links das **runde Figurenbild** im gewählten verzierten **Rahmen**, rechts daneben das **Level-Wappen** mit dem Band „Lv.6“; darunter bzw. daneben kompakt Spitzname, ein schmaler **XP-Balken** zum nächsten Level, die Münzen und die Serie (🔥 6). Ein Punkt zeigt ungeöffnete Truhen an. Antippen öffnet die **Profilseite**. Ausnahme: Während des Tutorials öffnet es wie bisher die Einstellungen, damit Abmelden immer möglich bleibt. Mindestgröße 44 px, Name für Screenreader: „Profil: <Spitzname>, Level 6, 120 von 175 XP, 230 Münzen“.
+
+**Figurenbild (Ergänzung 25.10.2026):** ein gerendertes **Brustbild** (Kopf und Schultern) der eigenen 3D-Spielfigur, kein gezeichnetes Bild: **weißer Hintergrund**, **Dreiviertelansicht** (die Figur ist etwa 30° zur Seite gedreht, die Kamera etwas über Augenhöhe, also nicht frontal), **gutes, weiches Licht** (Hauptlicht schräg vorn oben, schwaches Aufhelllicht von der anderen Seite, leichtes Kantenlicht von hinten, damit sich Haare und Schultern vom Weiß abheben). Die Figur steht dabei in der ruhigen Grundhaltung (erstes Bild der Laufanimation), mit leicht freundlichem Blick zur Kamera, falls das Modell das hergibt. Gerendert wird einmal pro Figur und Sitzung mit einem unsichtbaren Renderer (wie die Vorschaubilder im Shop), dann zwischengespeichert. Bis es fertig ist, oder ohne WebGL, erscheint das bisherige Bild aus der Figurenwahl. Dieselbe Funktion liefert später auch das Bild für den Avatar-Editor (Stufe 2), dann mit dem Rezept des Schülers.
 
 ### 9.2 Profilseite (neuer Bereich, nicht modal, wie Shop)
 1. Kopf: großes Figurenbild im Rahmen, Spitzname, gewählter Titel, „Level 6“, XP-Balken mit „120 / 175 XP bis Level 7“.
@@ -137,7 +141,7 @@ Erreichbar über das Avatar-Feld. Die Hauptnavigation bleibt bei drei Knöpfen. 
 - **Barrierearm:** Alle Einblendungen werden zusätzlich über die Live-Region angesagt (`role="status"`). Die Level-Feier ist ein Dialog nach den Regeln von `ui/dialog.ts`. Nichts wird nur über Farbe vermittelt.
 
 ### 9.4 Im Dorf
-Namensschild am Haus und Schild über der Figur zeigen ein **Level-Abzeichen** (Zahl im Kreis, Rahmenfarbe und -muster des Besitzers) vor dem Spitznamen. Das Haus-Schild zeigt in einer zweiten, kleineren Zeile den **Titel**. Mitschüler sehen dafür nur Level, Titel und Rahmen, keine XP, keine Münzen, keine Serie.
+Namensschild am Haus und Schild über der Figur zeigen ein **kleines Level-Wappen** (Stufe und Zahl wie im Avatar-Feld) vor dem Spitznamen. Das Haus-Schild zeigt in einer zweiten, kleineren Zeile den **Titel**. Mitschüler sehen dafür nur Level, Wappen und Titel, keine XP, keine Münzen, keine Serie.
 
 ### 9.5 Tutorial
 Der Abschluss (`tutorial_finish`) bucht 50 XP und führt so zum ersten Level-Aufstieg. Die Level-2-Feier mit der ersten Truhe erscheint nach dem Tanz-Moment und bevor sich die Daily Quests öffnen. Das ist das erste „Wow“.
@@ -184,7 +188,7 @@ Neue Migration mit der nächsten freien Nummer (`<NNNN>_xp_levels.sql`).
 
 ## 12. Technik-Hinweise für den Bau
 
-- Neue Dateien im Browser: `api/progress.ts` (Typen + RPC-Aufrufe, injizierbar wie `ItemApi`), `ui/avatarBadge.ts` (Avatar-Feld, ersetzt den Status-Knopf in `gameNav.ts`), `ui/profileView.ts` (Bereich `profil`), `ui/levelUp.ts` (Feier + Truhe), `ui/xpToast.ts` (fliegende XP und Einblendungen), `ui/frames.ts` (Rahmen-Stile als CSS-Klassen, eine Quelle für Avatar-Feld und Namensschild-Farben).
+- Neue Dateien im Browser: `api/progress.ts` (Typen + RPC-Aufrufe, injizierbar wie `ItemApi`), `ui/avatarBadge.ts` (Avatar-Feld, ersetzt den Status-Knopf in `gameNav.ts`), `ui/profileView.ts` (Bereich `profil`), `ui/levelUp.ts` (Feier + Truhe), `ui/xpToast.ts` (fliegende XP und Einblendungen), `ui/frames.ts` (verzierte Rahmen als SVG), `ui/crest.ts` (Level-Wappen als SVG, dieselben Formen auch für das Namensschild-Canvas), `render/portrait.ts` (Brustbild der Figur).
 - `render/village.ts` / `render/crowd.ts`: Namensschild-Canvas mit Abzeichen und Titelzeile. Keine zusätzlichen Draw Calls (dasselbe Sprite, nur ein anderes Canvas). `npm run galerie` prüfen.
 - Kenney-Assets (CC0, `Kenny/`, nur lesen): Konfetti und Sterne aus *Particle Pack* (`star_*`, ≤ 3 Texturen, je ≤ 128 px), Fanfare und Münzton aus *Interface Sounds* bzw. *UI Pack Sounds*, umgewandelt nach MP3 wie in der Bau-Feedback-Spec §6.1; Truhe als einfaches eigenes 2D-Bild (CSS/SVG) oder Kenney-UI-Grafik. Jede Quelle in `blender/sources/LICENSES.md`.
 - Ton über `ui/sound.ts` aus dem Bau-Feedback-Plan (Aufgabe 2); gleicher Schalter „Töne: an/aus“.
