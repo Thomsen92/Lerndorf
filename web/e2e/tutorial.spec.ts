@@ -84,6 +84,7 @@ test('tutorial: figure, ride, messages, quiz, buy, place, dance, daily quests', 
   await page.waitForTimeout(2600);
   await shot('15-dance-final-bubble');
   await page.getByRole('heading', { name: 'Level 2!', exact: true }).waitFor({ timeout: 30_000 });
+  await expect(page.locator('.avatar-badge')).toHaveAttribute('aria-label', /Level 2/);
   await expect(page.locator('.quest-rule')).toHaveCount(0);
   await shot('16-level-2-celebration');
   await page.getByRole('button', { name: 'Weiter', exact: true }).click();
@@ -92,4 +93,26 @@ test('tutorial: figure, ride, messages, quiz, buy, place, dance, daily quests', 
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
   expect(errors).toEqual([]);
+});
+
+test('resumed placement confirms the XP badge and one chest payment before quests', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto('/dev/tutorial.html?step=place&answered=5&char=girl');
+  await page.locator('.build-bar--guided [data-item]').click();
+  await page.getByRole('button', { name: 'Haus hinstellen' }).click();
+  await page.getByRole('heading', { name: 'Level 2!', exact: true }).waitFor({ timeout: 30_000 });
+  await expect(page.locator('.avatar-badge')).toHaveAttribute('aria-label', /Level 2/);
+  await page.getByRole('button', { name: 'Truhe öffnen', exact: true }).click();
+  const chest = page.getByRole('dialog', { name: 'Deine Truhe', exact: true });
+  await chest.getByRole('button', { name: 'Truhe öffnen', exact: true }).click();
+  await expect(page.getByText('+30 Münzen', { exact: true })).toBeVisible();
+  await expect(page.locator('.avatar-badge')).toHaveAttribute('aria-label', /30 Münzen/);
+  await chest.getByRole('button', { name: 'Weiter', exact: true }).click();
+  await expect(page.locator('.quest-rule')).toHaveCount(0);
+  await page
+    .getByRole('dialog', { name: 'Level 2!', exact: true })
+    .getByRole('button', { name: 'Weiter', exact: true })
+    .click();
+  await expect(page.locator('.quest-rule')).toBeVisible();
 });
