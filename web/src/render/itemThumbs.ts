@@ -5,11 +5,17 @@
 import * as THREE from 'three';
 import type { ItemEntry, ItemKind } from '../api/items';
 import type { SlotKind } from '../world/plotPlan';
-import { configurePreviewRenderer, createPreviewScene, frameCameraToBox, PREVIEW_STILL_YAW } from './itemPreview';
+import {
+  configurePreviewRenderer,
+  createPreviewScene,
+  frameCameraToBox,
+  PREVIEW_STILL_YAW,
+} from './itemPreview';
 import { plotAsset, tintFor } from './plotAssets';
 
 /** Data URL (PNG) of the item, or null for items without a model (avatar) or on failure. */
-export type ThumbSource = (e: ItemEntry) => Promise<string | null>;
+export type ThumbItem = Pick<ItemEntry, 'id' | 'kind' | 'fits'>;
+export type ThumbSource = (e: ThumbItem) => Promise<string | null>;
 
 export const THUMB_PLACEHOLDER: Record<ItemKind, string> = {
   house: '🏠',
@@ -52,7 +58,10 @@ export function createThumbSource(
 }
 
 /** One lazily created offscreen renderer (256x192, alpha); null when WebGL is unavailable. */
-export function createWebGLThumbRender(): { render: (kind: SlotKind, itemId: string) => string; dispose(): void } | null {
+export function createWebGLThumbRender(): {
+  render: (kind: SlotKind, itemId: string) => string;
+  dispose(): void;
+} | null {
   let renderer: THREE.WebGLRenderer;
   try {
     const canvas = document.createElement('canvas');
@@ -116,7 +125,10 @@ export function resetSessionThumbs(): void {
  * Session-wide source: the data-URL cache lives for the whole session, the WebGL renderer only while an
  * area holds it. Without WebGL (or after release) thumbnails resolve to null, so cards keep placeholders.
  */
-export function acquireSessionThumbs(factory: ThumbRenderFactory = createWebGLThumbRender): { source: ThumbSource; release(): void } {
+export function acquireSessionThumbs(factory: ThumbRenderFactory = createWebGLThumbRender): {
+  source: ThumbSource;
+  release(): void;
+} {
   if (users === 0) currentFactory = factory;
   users++;
   sessionSource ??= createThumbSource((kind, id) => {

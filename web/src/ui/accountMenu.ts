@@ -16,6 +16,7 @@ export function openAccountMenu(opts: {
   nickname: string;
   coins: number;
   quality: QualityChoice;
+  sound?: { on: boolean; onChange: (on: boolean) => void };
   onQuality: (q: QualityChoice) => void;
   onLedger: () => void;
   /** opens the figure choice (boy or girl); omitted: no button */
@@ -73,5 +74,22 @@ export function openAccountMenu(opts: {
   logout.addEventListener('click', () => opts.onLogout());
 
   modal.body.append(who, group, ledger, ...(opts.onCharacter ? [figure] : []), logout);
+  if (opts.sound) {
+    const setting = opts.sound;
+    let on = setting.on;
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    const refreshSound = (): void => {
+      toggle.textContent = on ? 'Töne: an' : 'Töne: aus';
+      toggle.setAttribute('aria-pressed', String(on));
+    };
+    toggle.addEventListener('click', () => {
+      on = !on;
+      refreshSound();
+      setting.onChange(on);
+    });
+    refreshSound();
+    group.after(toggle);
+  }
   return modal;
 }

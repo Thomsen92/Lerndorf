@@ -1,6 +1,6 @@
 # Bau-Feedback für Lerndorf – Design
 
-**Stand:** 21.10.2026 · **Status:** vom Auftraggeber beauftragt; Umsetzungsplan `docs/superpowers/plans/2026-10-24-build-feedback.md` (24.10.2026). §6 geht §1–§5 vor.
+**Stand:** 25.10.2026 · **Status:** Umgesetzt laut Plan 2026-10-24; Abnahme durch die Lehrkraft (B.9) steht aus. Umsetzungsplan `docs/superpowers/plans/2026-10-24-build-feedback.md`. §6 geht §1–§5 vor.
 
 ## Ziel
 Bauen soll auf dem Tablet leicht zu bedienen sein und sich befriedigend anfühlen – mit minimalem Aufwand, ohne neue Dateien oder kostenpflichtige Dienste.

@@ -131,7 +131,23 @@ Spec: `docs/superpowers/specs/2026-10-21-tablet-ui-navigation-design.md`, Plan: 
 | [–] T.11 | – | Screenshot-Testseite | gestrichen (LK, 21.10.2026) |
 | [x] T.12 | LK | **Abnahme Tablet-UI** | abgenommen 21.10.2026 |
 
-Nächstes: Zwischenpaket B – Bau-Feedback (`docs/superpowers/specs/2026-10-21-build-feedback-design.md`).
+## Zwischenpaket B – Bau-Feedback
+
+Spec: `docs/superpowers/specs/2026-10-21-build-feedback-design.md`, Plan: `docs/superpowers/plans/2026-10-24-build-feedback.md`.
+
+| AP | Wer | Inhalt | Ergebnis |
+|---|---|---|---|
+| [x] B.1 | CC | Kenney-Töne und Rauchtextur | Drei MP3-Dateien, eine transparente 128 × 128-Textur; Lizenzen dokumentiert |
+| [x] B.2 | CC | Töne mit gespeichertem An/Aus-Schalter | Leise Wiedergabe nach Nutzeraktion; Audio- und Speicherfehler bleiben folgenlos |
+| [x] B.3 | CC | Großzügigere Tippflächen | Exakte Treffer zuerst, sonst nächster Platz bis 0,5 m |
+| [x] B.4 | CC | Aufstellen- und Wegräum-Effekte | Pop, Schrumpfen, höchstens acht Rauchpartikel; Aufräumen beim Verlassen |
+| [x] B.5 | CC | Rahmen und Symbole für Bauplätze | Pulsieren bei freien Plätzen; dicker Rahmen bei Auswahl; reduzierte Bewegung |
+| [x] B.6 | CC | Großes Platz-Menü mit Bildkarten | Aufstellen, Drehen, Wegräumen, Zurück; Fokus und Escape; Effekte erst nach RPC-Erfolg |
+| [x] B.7 | CC | Einbau ins Dorf und Tutorial | Kameraversatz, gemeinsame Vorschaubilder, Ton-Einstellungen und Lebensdauer |
+| [x] B.8 | CC | Browserbilder, Galerie und Abschlussprüfung | 744 Tests, Build, ESLint und 2 Playwright-Tests grün; 14 Bau-Screenshots und 36 Galeriebilder geprüft, unter `web/test-results/build-feedback/` und `web/test-results/build-gallery/` |
+| [ ] B.9 | LK | **Abnahme Bau-Feedback** auf dem Schul-Tablet: Plätze erkennbar, großes Platz-Menü, Plopp/Rauch/Töne beim Aufstellen und Wegräumen, Töne abschaltbar, reduzierte Bewegung | Notiz hier |
+
+Umsetzung 25.10.2026: Tutorial bereits in `main`, daher Zweig `feature/build-feedback` darauf aufgebaut. Kenney-Quellen aus dem externen Ordner `C:\Users\thoms\OneDrive\Desktop\Kenny`; keine Änderung der Quellpakete. Galerie unterstützt `GALLERY_OUTPUT_DIR`, damit `Konzept/` unverändert bleibt. Hochformat-Kamera nutzt die 52° aus LOOK; das Platz-Menü berücksichtigt zusätzlich den Platzbedarf der Navigation.
 
 ## Zwischenpaket E – Erststart-Tutorial
 

@@ -1,5 +1,16 @@
 # Bau-Feedback Implementation Plan
 
+## Ausführungsstand 25.10.2026
+
+- [x] Tasks 1–7 umgesetzt; 744 Tests, Produktions-Build und ESLint grün.
+- [x] Galerie: 36 Bilder unter `web/test-results/build-gallery/`, visuell gegen Soll und die Galerie vom 23.10. geprüft. Welt-Draw-Calls in allen 36 Ansichten unverändert (58–79; das bestehende Leistungsbudget ist damit noch nicht überall erreicht).
+- [x] Task 8: beide Tablet-Browserprüfungen (1180 × 820 und 820 × 1180) grün; alle 14 Screenshots geprüft. Aufstellen, Wegräumen, reduzierte Bewegung, Verlassen während der Animation und RPC-Fehler abgedeckt. Bilder: `web/test-results/build-feedback/`.
+- [ ] B.9: Abnahme durch die Lehrkraft auf dem Schul-Tablet.
+
+Ausführungsdetails: Das Tutorial war bereits in `main` enthalten; `feature/build-feedback` wurde davon abgezweigt. Die externen Kenney-Quellen liegen unter `C:\Users\thoms\OneDrive\Desktop\Kenny`. Das im ursprünglichen Plan genannte Superpowers-Werkzeug war hier nicht verfügbar; umgesetzt und geprüft wurde direkt mit den Projektwerkzeugen. Die Prüfungen wurden zusammengefasst statt als einzelne Red/Green-Commits ausgeführt. `npm run galerie` erhielt einen optionalen Ausgabeordner, damit `Konzept/` unverändert bleibt. Die Hochformat-Kamera verwendet den LOOK-Wert 52°; beim Menüversatz wird zusätzlich die Navigation berücksichtigt.
+
+Die folgenden Schrittlisten dokumentieren den ursprünglichen Ablauf; der tatsächliche Abschlussstand steht oben und in `docs/PLAN.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make building on the tablet easy and satisfying: clearly marked slots with a forgiving tap area, a big slot sheet with picture cards, and a pop/smoke/sound effect (Kenney CC0 assets) when an item is set or taken away, shown only to the pupil who builds.

@@ -26,12 +26,12 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      testIgnore: /(daily-quests|tutorial)\.spec\.ts/,
+      testIgnore: /(daily-quests|tutorial|build-feedback)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:4173/' },
     },
     {
       name: 'harness',
-      testMatch: /(daily-quests|tutorial)\.spec\.ts/,
+      testMatch: /(daily-quests|tutorial|build-feedback)\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         baseURL: 'http://localhost:5175/',
