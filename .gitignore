@@ -4,6 +4,7 @@ web/dist/
 web/coverage/
 web/test-results/
 web/playwright-report/
+web/.tools/
 
 # Blender source packs: large, third-party, not in the repo (see blender/sources/LICENSES.md)
 blender/sources/*

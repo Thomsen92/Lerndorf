@@ -4,6 +4,8 @@ Nur CC0-Inhalte oder eigene (CLAUDE.md). Die Quellpakete selbst liegen nicht im 
 
 | Paket | Autor | Lizenz | Link | Verwendet in |
 | --- | --- | --- | --- | --- |
+| Interface Sounds 1.0 / Impact Sounds 1.0 | Kenney | CC0 1.0 | https://kenney.nl/assets/interface-sounds · https://kenney.nl/assets/impact-sounds | `web/public/assets/kenney/fx/place.mp3` (`drop_002.ogg`), `ding.mp3` (`confirmation_001.ogg`), `remove.mp3` (`impactSoft_heavy_000.ogg`), mono MP3 64 kbit/s |
+| Smoke Particles | Kenney | CC0 1.0 | https://kenney.nl/assets/smoke-particles | `web/public/assets/kenney/fx/puff.png` (`PNG/White puff/whitePuff08.png`), 128 × 128 px RGBA |
 | Skyboxes 1.0 (14.07.2026) | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets/skyboxes | `web/public/sky/skybox-night.jpg` (aus `skybox-night.png`, auf 2048 × 1024 verkleinert, JPEG) |
 | Foliage Sprites (08.02.2020) | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets/foliage-sprites | `web/public/foliage/grass-atlas.png` (Sprites 0001, 0002, 0003, 0004, 0011, 0012, 0016, 0018 aus `Kenny/Foliage/PNG/Flat`, zugeschnitten, als Atlas 4 × 2 zu je 256 px) |
 | Forest Kit (14.07.2026) | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets | `web/public/assets/kenney/forests/` (tree, tree-high, Textures/colormap.png; unverändert) |

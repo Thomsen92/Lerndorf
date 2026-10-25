@@ -43,6 +43,11 @@ import { openLedger } from './ledgerView';
 import { openAccountMenu } from './accountMenu';
 import { openCharacterPicker } from './characterPicker';
 import { BuildMode, type EnterOptions } from '../render/buildMode';
+import { BuildFx, loadPuffTexture } from '../render/buildFx';
+import { createSound } from './sound';
+import { acquireSessionThumbs } from '../render/itemThumbs';
+import type { SlotId } from '../world/plotPlan';
+import { sheetViewOffset } from '../render/houseCamera';
 import { FLIGHT_SECONDS, houseView, lerpPose, onPlot, type CameraPose } from '../render/houseCamera';
 import { closeUpPath, introPath, type CameraPath } from '../render/introCamera';
 import { getTutorialState, type TutorialState } from '../api/tutorial';
@@ -121,6 +126,13 @@ export async function mountVillage(
   let nav: GameNav | null = null;
   let areas: AreaController | null = null;
   let buildMode: BuildMode | null = null;
+  const sound = createSound();
+  const unlockSound = (): void => sound.unlock();
+  window.addEventListener('pointerdown', unlockSound);
+  window.addEventListener('keydown', unlockSound);
+  let fx: BuildFx | null = null;
+  let puffTexture: THREE.Texture | null = null;
+  const thumbs = acquireSessionThumbs();
   /** true while the first-login tutorial runs: no areas, no camera control */
   let inTutorial = false;
   const tutorialAbort = new AbortController();
@@ -138,6 +150,12 @@ export async function mountVillage(
     // close the current area (the build preview reverts via exit) and every open modal, so no `inert` is left behind
     void areas?.select('dorf');
     buildMode?.dispose();
+    fx?.dispose();
+    puffTexture?.dispose();
+    thumbs.release();
+    sound.dispose();
+    window.removeEventListener('pointerdown', unlockSound);
+    window.removeEventListener('keydown', unlockSound);
     modals.closeAll();
     document.querySelectorAll('.overlay:not(.modal), .house-menu').forEach((el) => el.remove());
     nav?.el.remove();
@@ -158,12 +176,28 @@ export async function mountVillage(
   const activity = ['pointerdown', 'keydown', 'touchstart'] as const;
   const onActivity = (): void => autoLogout.touch();
   const cameraRef = new THREE.PerspectiveCamera(38, 1, 0.1, 400);
+  const applySheetOffset = (open: boolean): void => {
+    if (!open) {
+      cameraRef.clearViewOffset();
+      return;
+    }
+    const w = window.innerWidth,
+      h = window.innerHeight;
+    const off = sheetViewOffset(w, h);
+    // Navigation also occupies space: centre the plot in the actually usable area.
+    const navBounds = nav?.el.getBoundingClientRect();
+    if (w >= h) off.x -= (navBounds?.width ?? 0) / 2;
+    else off.y += (navBounds?.height ?? 0) / 2;
+    cameraRef.setViewOffset(w, h, off.x, off.y, w, h);
+  };
   const resize = (): void => {
     if (!renderer) return;
     const w = window.innerWidth;
     const h = window.innerHeight;
     renderer.setSize(w, h, false);
     cameraRef.aspect = w / h;
+    cameraRef.fov = w < h ? 52 : 38;
+    if (buildMode?.sheetOpen) applySheetOffset(true);
     cameraRef.updateProjectionMatrix();
     renderOnce?.();
   };
@@ -318,7 +352,10 @@ export async function mountVillage(
   // camera flight into the house view (animation loop advances it)
   let flight: { from: CameraPose; to: CameraPose; t: number } | null = null;
   let paused = false;
-  const reducedMotion = (): boolean => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  const reducedMotion = (): boolean =>
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  puffTexture = loadPuffTexture();
+  fx = new BuildFx(scene, { texture: puffTexture, reducedMotion });
   const applyControls = (area: NavArea): void => {
     if (!HOUSE_AREAS.has(area)) {
       flight = null; // leaving the house cancels a running flight
@@ -414,6 +451,24 @@ export async function mountVillage(
       plot: home,
       supabase,
       uid: profile.id,
+      reducedMotion,
+      thumbs: thumbs.source,
+      onShop: () => void areas?.select('shop'),
+      onSheet: applySheetOffset,
+      onFx: (event) => {
+        if (!running) return;
+        const object = (
+          village.userData.ownSlotObject as ((slot: SlotId) => THREE.Object3D | null) | undefined
+        )?.(event.slot);
+        if (event.type === 'remove') {
+          if (object) fx?.remove(object, event.kind);
+          sound.play('remove');
+        } else if (event.type === 'place') {
+          if (object) fx?.place(object, event.kind);
+          sound.play('place');
+          sound.play('ding', 120);
+        } else sound.play('ding');
+      },
       onSlots: (s) => (village.userData.updateOwnPlot as ((s: SlotMap) => void) | undefined)?.(s),
       onDone: () => void areas?.select('haus'),
     });
@@ -433,7 +488,12 @@ export async function mountVillage(
       return null;
     }
     const mode = buildMode;
-    return { close: () => mode.exit() };
+    return {
+      close: () => {
+        mode.exit();
+        fx?.clear();
+      },
+    };
   };
   const showNotice = (text: string): void => {
     if (!notice) return;
@@ -469,6 +529,7 @@ export async function mountVillage(
         nickname: profile.nickname,
         coins: coinsNow,
         quality: choice,
+        sound: { on: sound.enabled, onChange: (on) => sound.setEnabled(on) },
         onQuality: (q) => {
           choice = q;
           applyQuality();
@@ -541,12 +602,18 @@ export async function mountVillage(
       setPose(path.at(0));
       camPath = { path, t: 0, done: resolve };
     });
-  const currentPose = (): CameraPose => ({ position: camera.position.clone(), target: controls.target.clone() });
+  const currentPose = (): CameraPose => ({
+    position: camera.position.clone(),
+    target: controls.target.clone(),
+  });
   const headPoint = new THREE.Vector3();
   const tutorialSide: TutorialVillage = {
-    flyIntro: (reduced) => (ownPlot === null ? Promise.resolve() : playPath(introPath(layout, ownPlot, reduced))),
+    flyIntro: (reduced) =>
+      ownPlot === null ? Promise.resolve() : playPath(introPath(layout, ownPlot, reduced)),
     flyCloseUp: (reduced) =>
-      ownPlot === null ? Promise.resolve() : playPath(pathFrom(currentPose(), closeUpPath(layout, ownPlot, reduced))),
+      ownPlot === null
+        ? Promise.resolve()
+        : playPath(pathFrom(currentPose(), closeUpPath(layout, ownPlot, reduced))),
     placeFigure: () => {
       if (ownPlot !== null) crowd.placeOwnInFrontOfHouse(ownPlot);
     },
@@ -555,7 +622,8 @@ export async function mountVillage(
     figureScreen: () => {
       if (!crowd.ownHeadPoint(headPoint)) return null;
       headPoint.project(camera);
-      if (headPoint.z < -1 || headPoint.z > 1 || Math.abs(headPoint.x) > 1.2 || Math.abs(headPoint.y) > 1.2) return null;
+      if (headPoint.z < -1 || headPoint.z > 1 || Math.abs(headPoint.x) > 1.2 || Math.abs(headPoint.y) > 1.2)
+        return null;
       const rect = gl.domElement.getBoundingClientRect();
       const w = rect.width || window.innerWidth;
       const h = rect.height || window.innerHeight;
@@ -605,6 +673,7 @@ export async function mountVillage(
     camPath?.done();
     camPath = null;
     if (buildMode?.isActive) buildMode.exit();
+    fx?.clear();
     setTutorialMode(false);
     if (openQuests) void ctl.select('aufgaben');
   };
@@ -658,6 +727,8 @@ export async function mountVillage(
     crowd.updateLabels(camera);
     controls.update();
     rig.follow(controls.target);
+    buildMode?.update(now / 1000);
+    fx?.update(dt, camera);
     gl.render(scene, camera);
   });
 

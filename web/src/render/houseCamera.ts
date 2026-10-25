@@ -44,3 +44,6 @@ export function onPlot(plot: Plot, p: THREE.Vector3): boolean {
   const lz = dx * Math.sin(plot.face) + dz * Math.cos(plot.face);
   return Math.abs(lx) <= plot.w / 2 && Math.abs(lz) <= plot.d / 2;
 }
+export function sheetViewOffset(w: number, h: number): { x: number; y: number } {
+  return w >= h ? { x: w * 0.2, y: 0 } : { x: 0, y: h * 0.2 };
+}
