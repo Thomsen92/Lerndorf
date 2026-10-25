@@ -30,7 +30,7 @@ for (const viewport of [
     for (const [i, line] of [
       "Hello! I'm Sir Byte.",
       'Welcome to Lerndorf, your class village!',
-      "Let's go to your house!",
+      'Ready when you are.',
     ].entries()) {
       await expect(page.locator('.byte-world-bubble')).toContainText(line, { timeout: 60_000 });
       await shot(`02-market-byte-${i}`);

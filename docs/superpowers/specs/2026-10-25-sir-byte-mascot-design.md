@@ -1,15 +1,15 @@
 # Sir Byte – Maskottchen im Lerndorf – Design
 
-**Stand:** 25.10.2026 · **Status:** Vom Auftraggeber zur selbständigen Umsetzung freigegeben und lokal umgesetzt. 814 Tests, Build und ESLint bestanden; Browserabläufe und 36 Galeriebilder geprüft. Veröffentlichung und Abnahme auf dem Schul-Tablet (PLAN B.7) stehen aus. Umsetzungsplan: `docs/superpowers/plans/2026-10-25-sir-byte-mascot.md`.
+**Stand:** 25.10.2026 · **Status:** Vom Auftraggeber zur selbständigen Umsetzung freigegeben und lokal umgesetzt. Nach der Hör-Rückmeldung: 817 Tests, Build und ESLint bestanden; fünf gezielte Browserprüfungen für Begrüßung, Lob, Ton und Tutorial grün. Die zuvor geprüften 36 Galeriebilder bleiben gültig (keine neue Geometrie). Veröffentlichung und Abnahme auf dem Schul-Tablet (PLAN B.7) stehen aus. Umsetzungsplan: `docs/superpowers/plans/2026-10-25-sir-byte-mascot.md`.
 
 ## Abgleich mit der Umsetzung
 
 - `createCompanion` in `mascot/mascotStage.ts` verbindet das kleine 3D-Fenster mit den Quest-Reaktionen; separate öffentliche `MascotStage`-/`QuestMascot`-Hüllen sind dadurch nicht nötig. Die Lernlogik und alle Serverprüfungen bleiben in den vorhandenen Ansichten.
 - Die Blasen haben eigene, lokal begrenzte Stile (`mascot/mascot.css` / `.byte-bubble`), damit die Schülerblasen und das übrige Dorf unverändert bleiben.
 - Am Markt und im Tutorial wird **dieselbe Figur umgesetzt**; es gibt keine zweite gleichzeitig sichtbare Dorfkopie. Die Kameraposen passen sich an beide Figuren und das Bildschirmformat an (`render/tutorialFraming.ts`).
-- Die neuen Begrüßungs- und Erklärsätze im Tutorial bleiben Text, da dafür keine passende Aufnahme existiert. „Ready when you are.“ wird als vorhandene Quest-Begrüßung verwendet. Es gibt keine künstliche Wartezeit auf eine Aufnahme; gesprochenes Englisch und angezeigter Satz stimmen immer überein.
+- Die neuen Begrüßungs- und Erklärsätze im Tutorial bleiben Text, da dafür keine passende kurze Aufnahme vorliegt. Nach „Hello“ und „Welcome“ spricht Sir Byte am Markt die vorhandene Aufnahme „Ready when you are.“; dieser Schritt ersetzt „Let's go to your house“, ohne zusätzlichen Weiter-Klick. Beim Weiterklicken stoppt auch eine noch ladende Aufnahme. Die Aufnahme wird außerdem zur Quest-Begrüßung verwendet. Gesprochenes Englisch und angezeigter Satz stimmen immer überein.
 - Das Ersatzbild ist ein neu gerendertes 320-px-Porträt desselben Modells statt eines verkleinerten Screenshots der gesamten Prototyp-Seite. Export: `web/scripts/byte-preview.mjs`.
-- Ein Tagesziel bei gleichzeitigem Level-Aufstieg zeigt die Überraschung vor der Level-Feier; die Feier hat Vorrang vor einer zusätzlichen Abschlussfolge. Auch nach einem Wechsel zu „Anhören“ oder einer neueren Reaktion darf keine alte Abschlusszeile nachlaufen.
+- Lob nach Rückmeldung vom 25.10.: acht wechselnde kurze englische Texte in `mascot/praise.ts`, mit Feier- und Überraschungspose. Nur zwei passende vorhandene Lob-Aufnahmen (`splendid`, `surprised`); Sprachlob wird frühestens nach 20 Sekunden wieder angefordert und dieselbe Aufnahme nicht direkt hintereinander gewählt. Dazwischen reagiert er mit Text und Geste. Die Folge gilt über Quest-Fenster und Tutorial hinweg. Am Tagesende kommt die Abschiedszeile ohne zweite gesprochene Lobkette. Ein gleichzeitiger Level-Aufstieg hat Vorrang. Auch nach „Anhören“ oder einer neueren Reaktion darf keine alte Abschlusszeile nachlaufen.
 - Galerie-Messung ohne Sir-Byte-Schatten (Qualität „Niedrig“): 19 zusätzliche Draw Calls / 25 594 sichtbare Dreiecke in Ruhe, 23 / 26 546 während der Gehstock-Geste, identisch auf allen drei Karten. Das vollständige Modell umfasst 24 Meshes / 26 930 Dreiecke. Gesamtbudget und echte Tablet-Bildrate bleiben gesonderte Abnahmepunkte.
 
 ## 1. Ziel
@@ -116,7 +116,7 @@ Nicht verwendet: `oh-dear.mp3`, `broken-clock.mp3` (Anti-Ziel), `sir-byte-splend
 Ablauf mit Sir Byte (der bestehende Ablauf bleibt, Sir Byte kommt dazu und ersetzt die Erzählkarten):
 
 1. Figurenwahl (unverändert).
-2. Die Kamerafahrt „Panorama → Marktplatz → Grundstück“ **hält am Marktplatz** vor Sir Byte. Er winkt (`surprise`-Pose ohne Ton), Blasen `hello` → `welcome` (je mit „Weiter“). Mit dem Tipp auf „Weiter“ ist der Ton freigeschaltet; dann `idle` mit Stimme „Ready when you are.“ und Blase `toHouse`.
+2. Die Kamerafahrt **hält am Marktplatz** vor Sir Byte. Blasen `hello` → `welcome` → `ready` (je mit „Weiter“). Durch die ersten Tipps ist der Ton freigeschaltet; `ready` zeigt und spricht „Ready when you are.“. Weiterklicken unterbricht die Aufnahme und führt direkt zur Hausfahrt.
 3. Sir Byte verschwindet mit dem Gehstock-„Plopp“ und erscheint am Grundstück neben dem Tor wieder (Tutorial-Kopie der Figur am Grundstück; am Marktplatz ist er so lange ausgeblendet). Die Kamera fährt weiter zum Grundstück.
 4. Die eigene Figur zeigt wie bisher ihre traurige Blase („Oh nein, mein Haus ist eine Ruine!“, deutsch, weil es der Schüler selbst sagt). Danach Sir Byte: `ruin`, `quests`, `coins` (ersetzen die bisherigen Erzählkarten `MESSAGES`), je mit „Weiter“.
 5. Quiz: Das Quiz-Fenster bekommt das kleine Sir-Byte-Fenster (§8.3). Blase `quiz` zu Beginn; Reaktionen auf Antworten wie in §8.3.
@@ -133,7 +133,7 @@ Bei Abbruch (Abmelden) oder Fortsetzen nach Neuladen beginnt Sir Byte an der Ste
 - **Öffnen:** einmal pro Tag `idle` mit Stimme „Ready when you are.“; sonst still. Er schaut zur aufgeklappten Quest.
 - **Absenden:** während der Server prüft → `think` ohne Stimme (Pose und Augen).
 - **Falsch:** erster Fehler bei dieser Quest → `cheeky` mit Stimme; jeder weitere Fehler → `support` mit Stimme. Die deutsche Rückmeldung („Leider falsch. Tipp: …“) bleibt unverändert unter der Aufgabe.
-- **Richtig:** `celebrate` mit Stimme (Siegespose mit Gehstock). War es die letzte heutige Quest → danach `surprise` mit Stimme und Blase `allDone`.
+- **Richtig:** wechselndes kurzes Lob, Feier- oder Überraschungspose; vorhandene Lob-Aufnahmen nur gelegentlich mit Sprechpause (§ „Abgleich mit der Umsetzung“). Bei der letzten heutigen Quest folgt `allDone` als Text, ohne zweiten gesprochenen Lob-Ausbruch.
 - Der Fehlerzähler gilt je Quest und beginnt bei einer anderen Quest neu (eigene Zählung in der Hülle, nicht der globale Zähler aus `behavior.mjs`).
 - Bei reduzierter Bewegung: keine Körpergesten, Augen und Blinzeln bleiben, Blasen und Stimme bleiben.
 - WebGL nicht verfügbar: Fenster zeigt das Standbild `preview.png` (aus dem Repo, verkleinert) und die Blasen funktionieren weiter.
@@ -166,7 +166,7 @@ Wenn das XP-Paket (`2026-10-24-xp-level-design.md`) vorhanden ist: Bei einem Lev
 ## 11. Abnahme
 
 1. Beim ersten Login begrüßt Sir Byte am Marktplatz auf Englisch, die Stimme ist nach dem ersten Tipp zu hören, er begleitet das ganze Tutorial mit Blasen, zeigt auf den Haus-Sockel und freut sich, wenn das Haus steht.
-2. In den Daily Quests sitzt er im kleinen Fenster: erster Fehler „Nearly. Have another go!“, weitere „Take your time. You've got this.“, richtig „Splendid! Nicely done.“, alle drei geschafft „Oh! Rather impressive.“.
+2. In den Daily Quests sitzt er im kleinen Fenster: erster Fehler „Nearly. Have another go!“, weitere „Take your time. You've got this.“. Richtige Antworten erhalten wechselndes Lob, nur gelegentlich eine der beiden passenden Aufnahmen; am Tagesende folgt die ruhige Abschiedszeile ohne zweite gesprochene Lobkette.
 3. Am Marktplatz schwebt er neben der Tafel; Antippen lässt ihn auf die Tafel zeigen.
 4. Keine frechen Sprüche, keine Stimme ohne vorherigen Tipp, Ton-Schalter wirkt, reduzierte Bewegung wird beachtet.
 5. Dorf auf dem ältesten Tablet weiterhin ≥ 30 fps mit Qualität „Auto“; Galerie-Bilder nicht schlechter als vorher.

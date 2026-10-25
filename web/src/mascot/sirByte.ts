@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { createSirByte, type Reaction } from './vendor/sir-byte.mjs';
 import { LINES, VOICE, bubbleSeconds, type LineKey } from './lines';
 import type { VoicePlayer } from './voice';
+import { nextPraise, type Praise } from './praise';
 export interface Say {
   text: string;
   voiced: boolean;
@@ -53,7 +54,10 @@ export function createMascot(opts: { voice: VoicePlayer; quality?: 'high' | 'low
     textDuration = clip ?? Math.min(5, 1 + text.length * 0.045);
     return { text, voiced: clip !== null, seconds: bubbleSeconds(text, clip) };
   };
-  const react = async (reaction: MascotReaction, options?: { silent?: boolean }): Promise<Say | null> => {
+  const react = async (
+    reaction: MascotReaction,
+    options?: { silent?: boolean; spoken?: boolean },
+  ): Promise<Say | null> => {
     if (!['idle', 'point', 'cheeky', 'celebrate', 'think', 'support', 'surprise'].includes(reaction))
       throw Error('Unsupported mascot reaction');
     if (disposed) return null;
@@ -61,18 +65,26 @@ export function createMascot(opts: { voice: VoicePlayer; quality?: 'high' | 'low
     opts.voice.stop();
     byte.behavior.react(reaction);
     if (options?.silent || reaction === 'point') return null;
-    const clip = await opts.voice.play(reaction);
+    const clip = options?.spoken === false ? null : await opts.voice.play(reaction);
     if (token !== revision || disposed) return null;
     return sayText(VOICE[reaction].line, clip);
+  };
+  const praise = async (choice: Praise = nextPraise()): Promise<Say | null> => {
+    const token = revision + 1;
+    const result = await react(choice.reaction, { spoken: !!choice.voice });
+    return result && !disposed && token === revision
+      ? sayText(choice.text, result.voiced ? result.seconds - 1.5 : null)
+      : null;
   };
   return {
     root: byte.root,
     react,
+    praise,
     async feedback(key: string, correct: boolean): Promise<Say> {
       const count = correct ? 0 : (mistakes.get(key) ?? 0) + 1;
       mistakes.set(key, count);
       return (
-        (await react(correct ? 'celebrate' : count === 1 ? 'cheeky' : 'support')) ?? {
+        (await (correct ? praise() : react(count === 1 ? 'cheeky' : 'support'))) ?? {
           text: '',
           voiced: false,
           seconds: 0,

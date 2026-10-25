@@ -4,7 +4,8 @@ import { readSoundSetting, type Sound } from '../ui/sound';
 import { createMascot } from './sirByte';
 import { createVoicePlayer } from './voice';
 import { createByteBubble } from './bubble';
-import { LINES, VOICE, bubbleSeconds, type LineKey, type VoicedReaction } from './lines';
+import { VOICE, bubbleSeconds, type LineKey, type VoicedReaction } from './lines';
+import { nextPraise } from './praise';
 export type Companion = ReturnType<typeof createCompanion>;
 export function createCompanion(
   opts: {
@@ -131,20 +132,28 @@ export function createCompanion(
       const count = correct ? 0 : (mistakes.get(key) ?? 0) + 1;
       mistakes.set(key, count);
       const requested = revision + 1;
-      await react(correct ? 'celebrate' : count === 1 ? 'cheeky' : 'support');
+      let seconds = 2.5;
+      if (correct) {
+        const choice = nextPraise();
+        const token = ++revision;
+        bubble.show({ text: choice.text, voiced: false, seconds: bubbleSeconds(choice.text, null) });
+        const said = await mascot.praise(choice);
+        if (!disposed && token === revision && said) {
+          bubble.show(said);
+          seconds = said.seconds;
+        }
+      } else await react(count === 1 ? 'cheeky' : 'support');
       if (allDone && !disposed && revision === requested) {
         const token = revision;
-        window.setTimeout(() => {
-          if (!disposed && revision === token) {
-            void react('surprise').then(() => {
-              if (!disposed && revision === token + 1)
-                window.setTimeout(() => {
-                  if (!disposed && revision === token + 1)
-                    bubble.show({ text: LINES.allDone, voiced: false, seconds: 8 });
-                }, 2600);
-            });
-          }
-        }, 3700);
+        window.setTimeout(
+          () => {
+            if (!disposed && revision === token) {
+              void mascot.react('surprise', { silent: true });
+              bubble.show(mascot.say('allDone'));
+            }
+          },
+          Math.max(2300, seconds * 1000),
+        );
       }
     },
     thinking() {

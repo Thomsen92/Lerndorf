@@ -230,6 +230,8 @@ Auftrag vom 25.10.2026: vorhandenen Sir Byte einbauen, Tutorial und Quests anpas
 
 Sir Byte erfordert keine Migration. Veröffentlichung und XP-Migration 0020 bleiben ausstehend.
 
+Nachbesserung 25.10.2026 nach Hörprobe: Lob rotiert durch acht Texte und zwei passende bestehende Aufnahmen, mit 20 Sekunden Abstand bei der Sprachauswahl und ohne direkt identische Lob-Aufnahmen. Keine zweite gesprochene Lobkette am Tagesende. Die vorhandene Begrüßung `ready.mp3` spielt jetzt auch am Markt im Tutorial, passend zur Blase „Ready when you are.“ und abbrechbar mit „Weiter“. Abgesichert durch Sequenz-, Integrations- und Browserprüfungen für tatsächlichen Audiostart und Unterbrechung. Abschluss: 817 Tests, Build und ESLint sowie fünf gezielte Browserprüfungen inklusive vollständigem Tutorial grün.
+
 Messung in derselben Szene auf allen drei Karten, Qualität „Niedrig“: Sir Byte zusätzlich 19 Draw Calls / 25 594 sichtbare Dreiecke in Ruhe, 23 / 26 546 bei der Gehstock-Geste. Außer Sicht bzw. weit entfernt keine Aktualisierung; jenseits 90 m ausgeblendet. Das vollständige Modell umfasst 24 Meshes / 26 930 Dreiecke. Das bisherige Gesamtbudget ist mit den vorhandenen Bewohnern bereits teilweise überschritten; die echte Tablet-Bildrate ist weiterhin nicht bestätigt. Bilder: `web/test-results/sir-byte/`, `web/test-results/tutorial/1024-*` und `820-*`, `web/test-results/layout-byte/`. Originalmodule bis auf Herkunftskommentar unverändert geprüft. Nach der eigenen Codeprüfung sind verspätete Abschlusszeilen nach „Anhören“ durch einen Regressionstest abgesichert; Blasen und Kamerarahmung verhindern Überlappungen mit der Schülerfigur.
 
 ## Stufe 5 – Probebetrieb

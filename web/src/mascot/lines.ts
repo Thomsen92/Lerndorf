@@ -8,6 +8,7 @@ export const VOICE = {
 } as const;
 export type VoicedReaction = keyof typeof VOICE;
 export const LINES = {
+  ready: VOICE.idle.line,
   hello: "Hello! I'm Sir Byte.",
   welcome: 'Welcome to Lerndorf, your class village!',
   toHouse: "Let's go to your house!",

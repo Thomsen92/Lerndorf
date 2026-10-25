@@ -268,6 +268,8 @@ Sir Byte ist der Roboter mit Melone neben der Aufgabentafel am Marktplatz. Einma
 
 Im Erststart-Tutorial begrüßt er neue Schüler am Markt und erklärt auf Englisch die nächsten Schritte. Bei den Fragen steht er in einem kleinen 3D-Fenster. Nach einer falschen Antwort ermutigt er zum nächsten Versuch, nach einer richtigen freut er sich. Die Knöpfe und Rückmeldungen bleiben Deutsch. „Anhören“ bei einer Hör-Aufgabe unterbricht seine Stimme.
 
+Zur Marktbegrüßung spricht er die vorhandene Aufnahme „Ready when you are.“. „Weiter“ kann sie sofort unterbrechen. Sein Lob wechselt zwischen acht kurzen Texten und verschiedenen Gesten; die zwei passenden Lob-Aufnahmen kommen mit mindestens 20 Sekunden Abstand bei der Auswahl und werden nicht direkt identisch wiederholt. Dazwischen bleibt das Lob stumm. Am Tagesende gibt es keine zweite gesprochene Lobkette.
+
 Es werden nur seine sechs vorhandenen Aufnahmen verwendet. Der Schalter **Töne** in den Einstellungen schaltet auch seine Stimme aus; vor dem ersten Klick bleibt er still. Bei **Weniger Bewegung** entfallen Körpergesten. Ohne 3D-Unterstützung erscheint ein Standbild, die Texte funktionieren weiter. Es gibt keinen Chat und keine zusätzlichen Schülerdaten. Sir Byte selbst braucht keine Datenbankänderung.
 
 Lokale Testansichten ohne Schülerkonto: `web/dev/byte.html` (Quests), `web/dev/tutorial.html` (gesamtes Tutorial), `web/dev/galerie.html?view=byte` (Markt-Nahansicht). Diese Testseiten sind kein Teil der veröffentlichten Website.

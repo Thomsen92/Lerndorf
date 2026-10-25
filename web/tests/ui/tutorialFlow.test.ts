@@ -212,7 +212,7 @@ describe('runTutorial', () => {
     expect(byte.ask.mock.calls.map((c) => c[0])).toEqual([
       'hello',
       'welcome',
-      'toHouse',
+      'ready',
       'ruin',
       'quests',
       'coins',

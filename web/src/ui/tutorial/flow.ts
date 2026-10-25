@@ -233,7 +233,7 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
         await ui.guard(village.flyMarket?.(reduced()) ?? Promise.resolve());
         await ui.guard(guide.ask('hello'));
         await ui.guard(guide.ask('welcome'));
-        await ui.guard(guide.ask('toHouse'));
+        await ui.guard(guide.ask('ready'));
         guide.atPlot();
       }
       await ui.guard(village.flyIntro(reduced()));

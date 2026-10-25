@@ -3,6 +3,60 @@ import { mkdirSync } from 'node:fs';
 import { writeFileSync } from 'node:fs';
 const shots = 'test-results/sir-byte';
 mkdirSync(shots, { recursive: true });
+test('market greeting actually plays the existing ready recording and stops on Weiter', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.addInitScript(() => {
+    const create = AudioContext.prototype.createBufferSource;
+    AudioContext.prototype.createBufferSource = function () {
+      const source = create.call(this),
+        start = source.start.bind(source),
+        stop = source.stop.bind(source);
+      source.start = (...args) => {
+        document.body.dataset.byteVoiceStarted = 'true';
+        start(...args);
+      };
+      source.stop = (...args) => {
+        document.body.dataset.byteVoiceStopped = 'true';
+        stop(...args);
+      };
+      return source;
+    };
+  });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/dev/tutorial.html?char=girl');
+  await expect(page.locator('.byte-world-bubble')).toContainText("Hello! I'm Sir Byte.", { timeout: 60000 });
+  await page.getByRole('button', { name: 'Weiter', exact: true }).click();
+  await expect(page.locator('.byte-world-bubble')).toContainText('Welcome to Lerndorf');
+  await page.getByRole('button', { name: 'Weiter', exact: true }).click();
+  await expect(page.locator('.byte-world-bubble')).toContainText('Ready when you are.');
+  await expect(page.locator('body')).toHaveAttribute('data-byte-voice-started', 'true');
+  await page.screenshot({ path: `${shots}/greeting-recorded.png` });
+  await page.getByRole('button', { name: 'Weiter', exact: true }).click();
+  await expect(page.locator('body')).toHaveAttribute('data-byte-voice-stopped', 'true');
+});
+
+test('fast correct answers vary the praise and use just one recording', async ({ page }) => {
+  const files: string[] = [];
+  page.on('request', (req) => {
+    if (req.url().includes('/sir-byte/voice/')) files.push(req.url().split('/').pop()!);
+  });
+  await page.goto('/dev/byte.html');
+  await page.locator('[data-open=q1]').click();
+  await page.locator('input[value=cat]').check();
+  await page.locator('#check').click();
+  await expect(page.locator('.byte-bubble')).toContainText('Splendid! Nicely done.');
+  await page.locator('[data-open=q2]').click();
+  await page.locator('#gap').fill('reads');
+  await page.locator('#check').click();
+  await expect(page.locator('.byte-bubble')).toContainText("That's right!");
+  await page.screenshot({ path: `${shots}/praise-variety.png` });
+  await page.locator('[data-open=q3]').click();
+  await page.locator('input[value=blue]').check();
+  await page.locator('#check').click();
+  await expect(page.locator('.byte-bubble')).toContainText('Nice work!');
+  await expect(page.locator('.byte-bubble')).toContainText("That's all for today.", { timeout: 10000 });
+  expect(files).toEqual(['splendid.mp3']);
+});
 test('phone tutorial keeps the guide, pupil and next button usable', async ({ page }) => {
   test.setTimeout(90_000);
   await page.setViewportSize({ width: 390, height: 844 });
@@ -11,7 +65,7 @@ test('phone tutorial keeps the guide, pupil and next button usable', async ({ pa
   for (const line of [
     "Hello! I'm Sir Byte.",
     'Welcome to Lerndorf, your class village!',
-    "Let's go to your house!",
+    'Ready when you are.',
   ]) {
     await expect(page.locator('.byte-world-bubble')).toContainText(line, { timeout: 60_000 });
     await page.getByRole('button', { name: 'Weiter', exact: true }).click();

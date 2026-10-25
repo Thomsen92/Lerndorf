@@ -2,6 +2,19 @@
 import { expect, it, vi } from 'vitest';
 import type * as THREE from 'three';
 import { createCompanion } from '../../src/mascot/mascotStage';
+it('varies consecutive successful answers instead of repeating Splendid', async () => {
+  const byte = createCompanion({ createRenderer: () => null });
+  try {
+    const phrases: string[] = [];
+    for (let i = 0; i < 8; i++) {
+      await byte.answer(`praise-${i}`, true);
+      phrases.push(byte.el.querySelector('[role=status]')!.textContent!);
+    }
+    expect(new Set(phrases).size).toBe(8);
+  } finally {
+    byte.dispose();
+  }
+});
 it('does not queue an old all-done line after a newer listening action', async () => {
   vi.useFakeTimers();
   const byte = createCompanion({ createRenderer: () => null });

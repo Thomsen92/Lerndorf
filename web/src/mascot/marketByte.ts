@@ -5,7 +5,8 @@ import type { Sound } from '../ui/sound';
 import { createMascot, type MascotReaction } from './sirByte';
 import { createVoicePlayer } from './voice';
 import { createByteBubble } from './bubble';
-import { LINES, type LineKey } from './lines';
+import { LINES, bubbleSeconds, type LineKey } from './lines';
+import { nextPraise } from './praise';
 export interface TutorialGuide {
   ask(key: LineKey): Promise<void>;
   say(key: LineKey): void;
@@ -69,7 +70,14 @@ export function createMarketByte(opts: {
   restore();
   const guide: TutorialGuide = {
     ask(key) {
-      ticket++;
+      const token = ++ticket;
+      if (key === 'ready') {
+        const next = bubble.ask(LINES.ready);
+        void mascot.react('idle');
+        return next.finally(() => {
+          if (token === ticket) mascot.stopVoice();
+        });
+      }
       mascot.say(key);
       return bubble.ask(LINES[key]);
     },
@@ -79,7 +87,10 @@ export function createMarketByte(opts: {
     },
     react(reaction) {
       const token = ++ticket;
-      void mascot.react(reaction).then((say) => {
+      const praise = reaction === 'celebrate' ? nextPraise() : null;
+      if (praise)
+        bubble.show({ text: praise.text, voiced: false, seconds: bubbleSeconds(praise.text, null) });
+      void (praise ? mascot.praise(praise) : mascot.react(reaction)).then((say) => {
         if (!disposed && token === ticket && say) bubble.show(say);
       });
     },

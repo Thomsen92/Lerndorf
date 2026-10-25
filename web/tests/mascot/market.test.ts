@@ -3,6 +3,21 @@ import { expect, it, vi } from 'vitest';
 import * as THREE from 'three';
 import { buildLayout } from '../../src/world/layout';
 import { createMarketByte, marketPose } from '../../src/mascot/marketByte';
+it('offers the recorded ready greeting with Weiter and stops it when the pupil continues', async () => {
+  const byte = createMarketByte({
+    scene: new THREE.Scene(),
+    layout: buildLayout(11, 34, 'tal'),
+    sound: { enabled: false },
+    openQuests: vi.fn(),
+  });
+  const stop = vi.spyOn(byte.mascot, 'stopVoice');
+  const ready = byte.guide.ask('ready');
+  expect(document.querySelector('.byte-world-bubble')?.textContent).toContain('Ready when you are.');
+  document.querySelector<HTMLButtonElement>('.byte-world-bubble button')!.click();
+  await ready;
+  expect(stop).toHaveBeenCalled();
+  byte.dispose();
+});
 it('points first, opens quests on the second tap and handles catch-up independently', async () => {
   const openQuests = vi.fn();
   const byte = createMarketByte({
