@@ -83,8 +83,12 @@ test('tutorial: figure, ride, messages, quiz, buy, place, dance, daily quests', 
   await page.locator('.speech-bubble--happy').waitFor({ timeout: 20_000 });
   await page.waitForTimeout(2600);
   await shot('15-dance-final-bubble');
+  await page.getByRole('heading', { name: 'Level 2!', exact: true }).waitFor({ timeout: 30_000 });
+  await expect(page.locator('.quest-rule')).toHaveCount(0);
+  await shot('16-level-2-celebration');
+  await page.getByRole('button', { name: 'Weiter', exact: true }).click();
   await page.locator('.quest-rule').waitFor({ timeout: 30_000 });
-  await shot('16-daily-quests');
+  await shot('17-daily-quests');
 
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
   expect(errors).toEqual([]);

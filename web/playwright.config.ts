@@ -5,6 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
 // dev/quests.html and dev/tutorial.html are not part of the build.
 export default defineConfig({
   testDir: './e2e',
+  outputDir: './test-results/playwright-artifacts',
   timeout: 30_000,
   use: {
     trace: 'retain-on-failure',
@@ -26,12 +27,12 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      testIgnore: /(daily-quests|tutorial|build-feedback)\.spec\.ts/,
+      testIgnore: /(daily-quests|tutorial|build-feedback|xp-level)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:4173/' },
     },
     {
       name: 'harness',
-      testMatch: /(daily-quests|tutorial|build-feedback)\.spec\.ts/,
+      testMatch: /(daily-quests|tutorial|build-feedback|xp-level)\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         baseURL: 'http://localhost:5175/',

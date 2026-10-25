@@ -12,6 +12,7 @@ const esc = (s: string): string =>
   );
 
 export const REASON_LABEL: Record<string, string> = {
+  chest: 'Truhe',
   task: 'Aufgabe gelöst',
   quest: 'Daily Quest gelöst',
   stamp: 'Wochenplan-Stempel',

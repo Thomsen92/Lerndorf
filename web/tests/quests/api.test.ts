@@ -18,8 +18,16 @@ describe('loadDailyQuests', () => {
     const { client, calls } = fakeClient({
       data: [
         {
-          key: 'q1', day: '2026-10-21', catch_up: true, type: 'gap', prompt: 'P', data: { a: 1 },
-          reward: 3, reward_left: 2, solved: false, attempts: 1,
+          key: 'q1',
+          day: '2026-10-21',
+          catch_up: true,
+          type: 'gap',
+          prompt: 'P',
+          data: { a: 1 },
+          reward: 3,
+          reward_left: 2,
+          solved: false,
+          attempts: 1,
         },
       ],
     });
@@ -29,8 +37,16 @@ describe('loadDailyQuests', () => {
       ok: true,
       value: [
         {
-          key: 'q1', day: '2026-10-21', catchUp: true, type: 'gap', prompt: 'P', data: { a: 1 },
-          reward: 3, rewardLeft: 2, solved: false, attempts: 1,
+          key: 'q1',
+          day: '2026-10-21',
+          catchUp: true,
+          type: 'gap',
+          prompt: 'P',
+          data: { a: 1 },
+          reward: 3,
+          rewardLeft: 2,
+          solved: false,
+          attempts: 1,
         },
       ],
     });
@@ -38,16 +54,36 @@ describe('loadDailyQuests', () => {
 
   it('returns a German message on failure', async () => {
     const { client } = fakeClient({ error: { message: 'boom' } });
-    expect(await loadDailyQuests(client)).toEqual({ ok: false, message: 'Die Quests konnten nicht geladen werden.' });
+    expect(await loadDailyQuests(client)).toEqual({
+      ok: false,
+      message: 'Die Quests konnten nicht geladen werden.',
+    });
   });
 
   it('tells a teacher account that only pupils can solve quests', async () => {
     const { client } = fakeClient({ error: { message: 'only pupils can answer' } });
-    expect(await loadDailyQuests(client)).toEqual({ ok: false, message: 'Nur Schülerkonten können Quests lösen.' });
+    expect(await loadDailyQuests(client)).toEqual({
+      ok: false,
+      message: 'Nur Schülerkonten können Quests lösen.',
+    });
   });
 });
 
 describe('submitQuestAnswer', () => {
+  it('passes the server-owned progress through to the feedback layer', async () => {
+    const { client } = fakeClient({
+      data: {
+        correct: true,
+        already_solved: false,
+        coins: 15,
+        reward: 5,
+        reward_left: 0,
+        progress: { gained: [{ reason: 'quest', xp: 15 }], xp: 65, level: 2, level_before: 2, new_chests: 0 },
+      },
+    });
+    const res = await submitQuestAnswer(client, 'q1', 'x');
+    expect(res.ok && res.value.progress?.xp).toBe(65);
+  });
   it('sends p_key and p_answer and maps the result', async () => {
     const { client, calls } = fakeClient({
       data: { correct: false, already_solved: false, coins: 5, reward: 3, reward_left: 1, hint: 'Think' },

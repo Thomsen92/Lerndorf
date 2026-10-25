@@ -19,6 +19,7 @@ import {
 import { saveCharacter } from '../../api/village';
 import type { CharacterKind } from '../../render/character';
 import type { ThumbSource } from '../../render/itemThumbs';
+import type { ProgressDelta } from '../../api/progress';
 import { openCharacterPicker } from '../characterPicker';
 import { openTutorialBuy } from '../shopView';
 import { createBubble, positionBubble, type BubbleMood } from '../speechBubble';
@@ -81,6 +82,7 @@ export interface TutorialVillage {
 }
 
 export interface TutorialContext {
+  onProgress?: (delta: ProgressDelta) => Promise<void>;
   supabase: SupabaseClient;
   state: TutorialState;
   /** Builds the village (once the pupil has a plot) and returns its tutorial side. */
@@ -271,10 +273,17 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
     await ui.guard(village.flyCloseUp(reduced()));
     const happy = ui.bubble(FINAL_TEXT, 'happy');
     const dance = village.danceOnce();
-    void safe(() => api.finish()); // the step is already 'done' on the server; this only stamps the end
+    const finish = safe(() => api.finish());
     await ui.guard(dance);
     await ui.guard(new Promise((r) => setTimeout(r, ctx.endPauseMs ?? 1500)));
     happy();
+    let result = await ui.guard(finish);
+    while (!result.ok) {
+      await ui.guard(ui.card(result.message, RETRY, 'error'));
+      result = await ui.guard(safe(() => api.finish()));
+    }
+    if (result.ok && result.value.progress && ctx.onProgress)
+      await ui.guard(ctx.onProgress(result.value.progress));
     finished = true;
   } catch (err) {
     if (!(err instanceof Aborted)) console.error('tutorial stopped', err);

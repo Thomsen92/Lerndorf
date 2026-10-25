@@ -28,6 +28,8 @@ Schüler sind 13–14 Jahre alt; teils schwächere Lesekompetenz. Oberfläche au
 9. **Lehrer-Bereich**: Konten anlegen/zurücksetzen, Stempel buchen, Münzen korrigieren, Shop/Baumodus sperren, Übersicht pro Klasse.
 10. **Quest-Pflege**: eine JSON-Datei je Woche in `content/daily-quests/` (7 Tage × 3 Quests, Ferienwochen als kurze Ferien-Datei), automatisch geprüft und in die Datenbank eingespielt. Die Dateien schreibt Claude im Wochenplan-Projekt nach `content/daily-quests/FORMAT.md`. Der Lehrer-Bereich zeigt, bis wann Quests vorhanden sind, meldet Fehler und zeigt die nächsten 7 Tage mit Lösungen.
 
+11. **XP, Level, Schultag-Serie, Truhen, Titel und Rahmen sowie eine Profilseite** (Zwischenpaket X, Design vom 24.10.2026). Fortschritt entsteht automatisch durch Lern- und Spielaktionen, ohne Rangliste.
+
 ## Ausdrücklich NICHT im Umfang
 
 - Steuerbare Avatare, Chat oder Nachrichten zwischen Schülern

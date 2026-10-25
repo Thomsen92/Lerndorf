@@ -57,7 +57,9 @@ const open = (onClose = vi.fn(), onCoins = vi.fn()) => {
 const region = (): HTMLElement => document.querySelector('section.overlay.area') as HTMLElement;
 const text = (): string => region()?.textContent ?? '';
 const button = (label: string): HTMLButtonElement | undefined =>
-  Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find((b) => b.textContent?.trim() === label);
+  Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find(
+    (b) => b.textContent?.trim() === label,
+  );
 const card = (key: string): HTMLElement => document.querySelector(`[data-quest="${key}"]`) as HTMLElement;
 /** Opens the quest card and returns its gap input (if any). */
 const openCard = async (key: string): Promise<HTMLInputElement | null> => {
@@ -84,11 +86,38 @@ afterEach(() => {
 });
 
 describe('daily quest area', () => {
+  it('forwards a confirmed XP delta from the answered card', async () => {
+    loadDailyQuests.mockResolvedValue({ ok: true, value: [quest()] });
+    const delta = { gained: [{ reason: 'quest', xp: 15 }], xp: 15, level: 1, levelBefore: 1, newChests: 0 };
+    submitQuestAnswer.mockResolvedValue({
+      ok: true,
+      value: result({ progress: delta as QuestAnswerResult['progress'] }),
+    });
+    const onProgress = vi.fn();
+    handles.push(
+      openDailyQuests({
+        supabase: {} as SupabaseClient,
+        coins: 5,
+        onCoins: vi.fn(),
+        onClose: vi.fn(),
+        onProgress,
+      }),
+    );
+    await flush();
+    typeGap(await openCard('q1'), 'reads');
+    button('Prüfen')?.click();
+    await flush();
+    expect(onProgress).toHaveBeenCalledTimes(1);
+    expect(onProgress.mock.calls[0][0]).toEqual(delta);
+    expect(onProgress.mock.calls[0][1]).toBeInstanceOf(HTMLElement);
+  });
   it('is a region; Schließen calls onClose, close() only removes', async () => {
     const { h, onClose } = open();
     await flush();
     expect(region().getAttribute('role')).toBe('region');
-    expect(document.getElementById(region().getAttribute('aria-labelledby') ?? '')?.textContent).toBe('Daily Quests');
+    expect(document.getElementById(region().getAttribute('aria-labelledby') ?? '')?.textContent).toBe(
+      'Daily Quests',
+    );
     button('Schließen')?.click();
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(region()).not.toBeNull();
@@ -121,7 +150,14 @@ describe('daily quest area', () => {
         quest({ key: 't1', prompt: 'Today one', reward: 10, rewardLeft: 10 }),
         quest({ key: 't2', prompt: 'Today two', rewardLeft: 0, attempts: 3 }),
         quest({ key: 't3', prompt: 'Today three', solved: true, rewardLeft: 0 }),
-        quest({ key: 'y1', day: '2026-10-20', catchUp: true, prompt: 'Yesterday', reward: 10, rewardLeft: 5 }),
+        quest({
+          key: 'y1',
+          day: '2026-10-20',
+          catchUp: true,
+          prompt: 'Yesterday',
+          reward: 10,
+          rewardLeft: 5,
+        }),
       ],
     });
     open();
@@ -164,7 +200,10 @@ describe('daily quest area', () => {
   });
 
   it('escapes quest text', async () => {
-    loadDailyQuests.mockResolvedValue({ ok: true, value: [quest({ prompt: '<img src=x onerror=alert(1)>' })] });
+    loadDailyQuests.mockResolvedValue({
+      ok: true,
+      value: [quest({ prompt: '<img src=x onerror=alert(1)>' })],
+    });
     open();
     await flush();
     expect(region().querySelector('img')).toBeNull();
@@ -318,7 +357,11 @@ describe('daily quest area', () => {
         quest({
           type: 'listening',
           prompt: 'Listen. Where is the girl going?',
-          data: { speak: 'The girl is going to the station.', mode: 'choice', options: ['the station', 'the park'] },
+          data: {
+            speak: 'The girl is going to the station.',
+            mode: 'choice',
+            options: ['the station', 'the park'],
+          },
         }),
       ],
     });

@@ -10,6 +10,21 @@ const MIGRATIONS = [
   '0003_seed.sql',
   '0004_rpc_teacher.sql',
   '0005_grants_hardening.sql',
+  '0006_avatar_shop_build.sql',
+  '0007_tasks_rpc.sql',
+  '0008_teacher_stats_catalog.sql',
+  '0009_instances.sql',
+  '0010_layout_maps.sql',
+  '0011_instance_rules.sql',
+  '0012_claim_plot.sql',
+  '0013_plot_slots.sql',
+  '0014_cat_sign_shop_asset.sql',
+  '0015_daily_quests.sql',
+  '0016_daily_quests_rpc.sql',
+  '0017_daily_quests_teacher.sql',
+  '0018_character_choice.sql',
+  '0019_first_login_tutorial.sql',
+  '0020_xp_levels.sql',
 ];
 const migrationDir = new URL('../../../supabase/migrations/', import.meta.url);
 
@@ -29,6 +44,7 @@ const AUTH_STUB = `
   $$;
   create role anon nologin;
   create role authenticated nologin;
+  create role service_role nologin;
   grant usage on schema public to anon, authenticated;
   grant usage on schema auth to anon, authenticated;
   grant execute on function auth.uid() to anon, authenticated;
@@ -70,8 +86,8 @@ beforeAll(async () => {
       ('${ANNA}', 'anna', 'student', '8a', 0, 0),
       ('${BEN}', 'ben', 'student', '8a', 1, 0),
       ('${CARLA}', 'carla', 'student', '8b', 0, 0);
-    insert into placements (player_id, item_id, cell_x, cell_z, rot)
-      values ('${BEN}', null, 1, 1, 0), ('${CARLA}', null, 2, 2, 0);
+    insert into placements (player_id, item_id, slot, rot)
+      values ('${BEN}', null, 'deco_1', 0), ('${CARLA}', null, 'deco_1', 0);
   `);
 });
 

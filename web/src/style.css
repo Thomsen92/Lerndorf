@@ -952,3 +952,405 @@ table.ledger td {
 @media (min-aspect-ratio: 1/1) {
   .build-bar--sheet { top: 0; bottom: 0; left: auto; right: 0; width: 40vw; height: auto; padding-top: max(70px, env(safe-area-inset-top)); padding-right: max(12px, env(safe-area-inset-right)); }
 }
+/* XP progression: parchment, dark ink, carved frames and heraldic rewards. */
+.avatar-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 76px;
+  padding: 0.35rem 0.7rem 0.35rem 0.35rem;
+  color: #453320;
+  border: 2px solid #9a794d;
+  border-radius: 18px;
+  background: #fff4d9;
+  box-shadow:
+    0 4px 0 #795637,
+    0 8px 18px #30241638;
+  max-width: 360px;
+  text-align: left;
+}
+.avatar-portrait {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  vertical-align: middle;
+  isolation: isolate;
+}
+.avatar-portrait--large {
+  width: 160px;
+  height: 160px;
+}
+.avatar-portrait img {
+  position: absolute;
+  inset: 12%;
+  width: 76%;
+  height: 76%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: white;
+}
+.avatar-portrait > .portrait-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.badge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 110px;
+}
+.badge-info strong {
+  font-family: Georgia, serif;
+  font-size: 1rem;
+}
+.badge-details {
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+.xp-bar {
+  height: 12px;
+  background: #e0cfad;
+  border: 1px solid #806641;
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 100px;
+  box-shadow: inset 0 1px 2px #49331a40;
+}
+.xp-bar > span {
+  display: block;
+  height: 100%;
+  background: #5f8d48;
+  border-right: 2px solid #daeaa5;
+  border-radius: 8px;
+}
+.chest-dot {
+  width: 13px;
+  height: 13px;
+  background: #b45a2c;
+  border: 2px solid #ffe6a5;
+  border-radius: 50%;
+  align-self: flex-start;
+}
+.chest-dot[hidden] {
+  display: none;
+}
+.level-crest {
+  flex: none;
+  overflow: visible;
+  filter: drop-shadow(0 2px 1px #30241630);
+}
+.frame-shimmer {
+  animation: frame-shimmer 3s ease-in-out infinite;
+}
+@keyframes frame-shimmer {
+  50% {
+    filter: brightness(1.25) saturate(1.3);
+  }
+}
+.profile-area .panel {
+  background: #fff5dd;
+  max-width: 920px;
+}
+.profile-area {
+  --ink: #493724;
+  --muted: #746044;
+  --line: #c6ac7b;
+  color: #493724;
+  color-scheme: light;
+}
+.profile-area button {
+  color: #493724;
+  background: #fff9eb;
+  border: 1px solid #9a794d;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.profile-area button:disabled {
+  color: #75664f;
+  background: #eee5d2;
+  opacity: 1;
+  cursor: default;
+}
+.profile-area .panel-head h2 {
+  color: #754b20;
+}
+.quest-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: #ffcb70;
+  color: #3b2b13;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.profile-content {
+  color: #493724;
+  padding: 1.25rem;
+}
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.25rem 0 1.75rem;
+  border-bottom: 2px solid #cfb784;
+}
+.profile-hero h3 {
+  font:
+    700 1.8rem Georgia,
+    serif;
+  margin: 0;
+}
+.profile-hero p {
+  margin: 0.35rem 0;
+}
+.profile-section {
+  padding: 1rem 0;
+  border-bottom: 1px solid #d9c69f;
+}
+.profile-section h3 {
+  font-family: Georgia, serif;
+  font-size: 1.3rem;
+  margin: 0.4rem 0 0.8rem;
+}
+.profile-section p {
+  margin: 0.4rem 0;
+}
+.profile-rewards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.7rem;
+}
+.profile-reward {
+  padding: 0.65rem;
+  border: 1px solid #d5bd8d;
+  border-radius: 10px;
+  background: #fff9eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.profile-reward button {
+  width: 100%;
+}
+.profile-chest {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0.5rem 0;
+}
+.profile-content button,
+.level-up button,
+.chest-dialog button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.profile-content button[aria-pressed="true"] {
+  border: 2px solid #65804a;
+  background: #e7edcb;
+}
+.profile-content dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem 1rem;
+}
+.profile-content dd {
+  margin: 0;
+  font-weight: bold;
+}
+.xp-fly {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 1.3rem;
+  color: #f8cf60;
+  text-shadow:
+    0 2px 1px #493724,
+    1px 0 #493724;
+}
+.xp-toasts {
+  position: fixed;
+  z-index: 80;
+  top: 110px;
+  right: 16px;
+  max-width: min(340px, calc(100vw - 32px));
+  pointer-events: none;
+}
+.xp-toasts p {
+  margin: 6px 0;
+  padding: 10px 16px;
+  background: #fff0c9;
+  color: #493724;
+  border: 2px solid #9a794d;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px #0003;
+  font-weight: 700;
+}
+.level-up {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.level-up > button {
+  margin: 0.4rem;
+}
+.reward-row {
+  position: relative;
+  z-index: 1;
+  padding: 0.8rem;
+  border-top: 1px solid #dfca9e;
+}
+.reward-row p {
+  font-family: Georgia, serif;
+  font-weight: bold;
+}
+.chest-dialog {
+  text-align: center;
+}
+.chest {
+  width: 220px;
+  max-width: 80%;
+  margin: 1rem auto;
+}
+.chest svg {
+  width: 100%;
+  overflow: visible;
+}
+.chest {
+  position: relative;
+}
+.chest-coins {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  pointer-events: none;
+}
+.chest-coins > span {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffcb4f;
+  border: 3px solid #b47a1f;
+  box-shadow: inset 0 0 0 2px #ffef9b;
+  animation: chest-coins 0.6s ease-out forwards;
+}
+.chest-count {
+  position: absolute;
+  left: 50%;
+  top: 70%;
+  transform: translateX(-50%);
+  padding: 3px 12px;
+  border-radius: 20px;
+  background: #fff0c9;
+  color: #754b20;
+  font-weight: 900;
+  font-size: 1.4rem;
+}
+@keyframes chest-coins {
+  to {
+    transform: translate(var(--coin-x), var(--coin-y)) rotate(160deg);
+    opacity: 0;
+  }
+}
+.chest--wobble {
+  animation: chest-wobble 0.3s ease-in-out infinite alternate;
+}
+.chest--open .chest-lid {
+  transform: translateY(-20px) rotate(-8deg);
+  transform-origin: center;
+  transition: transform 0.4s;
+}
+@keyframes chest-wobble {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+.xp-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.xp-confetti img {
+  position: absolute;
+  width: 24px;
+  top: -30px;
+  animation: xp-star 1.5s ease-out both;
+  animation-delay: calc(var(--i) * -0.015s);
+}
+@keyframes xp-star {
+  to {
+    transform: translateY(450px) rotate(240deg);
+    opacity: 0;
+  }
+}
+@media (max-width: 600px) {
+  .avatar-badge {
+    max-width: 270px;
+    gap: 0.1rem;
+    min-height: 64px;
+    padding: 0.25rem 0.4rem;
+  }
+  .avatar-badge .avatar-portrait {
+    width: 50px;
+    height: 50px;
+  }
+  .avatar-badge .level-crest {
+    width: 44px;
+    height: 44px;
+  }
+  .badge-info {
+    min-width: 95px;
+  }
+  .badge-details {
+    font-size: 0.68rem;
+  }
+  .profile-hero {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .profile-hero .avatar-portrait {
+    width: 120px;
+    height: 120px;
+  }
+  .profile-hero > .level-crest {
+    width: 90px;
+    height: 90px;
+  }
+  .profile-content dl {
+    font-size: 0.9rem;
+  }
+  .profile-area .panel-head {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .frame-shimmer,
+  .chest--wobble,
+  .xp-confetti img {
+    animation: none !important;
+  }
+  .chest--open .chest-lid {
+    transition: none;
+  }
+  .xp-fly {
+    display: none;
+  }
+}
+.reduced-motion .chest--wobble {
+  animation: none;
+}

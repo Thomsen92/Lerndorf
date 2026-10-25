@@ -1,10 +1,11 @@
+import type { AvatarBadge } from './avatarBadge';
 /**
  * Main navigation: three labelled buttons (Dorf, Aufgaben, Mein Haus) plus a status button with nickname and coins.
  * Bottom bar in portrait, left rail in landscape (see style.css). Not mounted by itself.
  */
 export type NavButton = 'dorf' | 'aufgaben' | 'haus';
 /** all areas; bauen, shop and inventar live under 'haus' */
-export type NavArea = NavButton | 'bauen' | 'shop' | 'inventar';
+export type NavArea = NavButton | 'bauen' | 'shop' | 'inventar' | 'profil';
 
 export const NAV_BUTTONS: readonly NavButton[] = ['dorf', 'aufgaben', 'haus'];
 
@@ -15,7 +16,8 @@ const LABELS: Record<NavButton, { icon: string; label: string }> = {
 };
 
 /** Nav button that is marked for an area: bauen/shop/inventar → 'haus'. */
-export function navButtonFor(area: NavArea): NavButton {
+export function navButtonFor(area: NavArea): NavButton | null {
+  if (area === 'profil') return null;
   return area === 'bauen' || area === 'shop' || area === 'inventar' ? 'haus' : area;
 }
 
@@ -24,11 +26,13 @@ export interface GameNav {
   status: HTMLElement;
   setActive(area: NavArea): void;
   setCoins(coins: number): void;
+  setQuestBadge(open: number | 'done' | null): void;
   /** Tutorial: the area buttons are aria-disabled and ignore taps; the status (account) button stays usable. */
   setLocked(locked: boolean): void;
 }
 
 export function createGameNav(opts: {
+  badge?: AvatarBadge;
   nickname: string;
   coins: number;
   onSelect: (area: NavButton, button: HTMLButtonElement) => void;
@@ -78,7 +82,8 @@ export function createGameNav(opts: {
   live.setAttribute('role', 'status');
   live.setAttribute('aria-live', 'polite');
 
-  el.append(status, live);
+  const statusElement = opts.badge?.el ?? status;
+  el.append(statusElement, live);
 
   let coinsNow = opts.coins;
   const renderStatus = (): void => {
@@ -89,7 +94,19 @@ export function createGameNav(opts: {
 
   return {
     el,
-    status,
+    status: statusElement,
+    setQuestBadge(open) {
+      const b = buttons.get('aufgaben')!;
+      b.querySelector('.quest-badge')?.remove();
+      b.removeAttribute('aria-label');
+      if (open === null) return;
+      const badge = document.createElement('span');
+      badge.className = 'quest-badge';
+      badge.textContent = open === 'done' ? '✓' : String(open);
+      badge.setAttribute('aria-hidden', 'true');
+      b.append(badge);
+      b.setAttribute('aria-label', open === 'done' ? 'Tagesziel geschafft' : `${open} Quests offen`);
+    },
     setActive(area) {
       const active = navButtonFor(area);
       for (const [name, b] of buttons) {
@@ -110,13 +127,14 @@ export function createGameNav(opts: {
       const diff = coins - coinsNow;
       coinsNow = coins;
       renderStatus();
+      opts.badge?.setCoins?.(coins);
       live.textContent = `Du hast jetzt ${coins} Münzen.`;
       if (diff > 0) {
         const tag = document.createElement('span');
         tag.className = 'gain';
         tag.setAttribute('aria-hidden', 'true');
         tag.textContent = `+${diff}`;
-        status.append(tag);
+        statusElement.append(tag);
         window.setTimeout(() => tag.remove(), 1400);
       }
     },

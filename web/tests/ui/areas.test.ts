@@ -26,6 +26,7 @@ function setup(refuse: Partial<Record<NavArea, boolean>> = {}) {
       shop: opener('shop'),
       inventar: opener('inventar'),
       bauen: opener('bauen'),
+      profil: opener('profil'),
     },
     onChange,
   });

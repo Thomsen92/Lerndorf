@@ -29,6 +29,7 @@ import {
   type SlotMap,
 } from '../api/build';
 import { RUIN_ID } from './ruin';
+import type { ProgressDelta } from '../api/progress';
 
 const LIFT = 0.2;
 const SLOT_COLOUR: Record<SlotDef['kind'], string> = {
@@ -71,6 +72,7 @@ export interface BuildFxEvent {
 }
 
 export interface BuildModeOptions {
+  onProgress?: (delta: ProgressDelta) => void;
   scene: THREE.Scene;
   plot: Plot;
   supabase: SupabaseClient;
@@ -575,9 +577,13 @@ export class BuildMode {
     const guided = this.guided;
     let res: { ok: true } | { ok: false; message: string };
     try {
-      res = guided
-        ? await guided.place()
-        : await placeInSlot(this.opts.supabase, pending.itemId, slot.id, pending.rot);
+      if (guided) res = await guided.place();
+      else {
+        const placed = await placeInSlot(this.opts.supabase, pending.itemId, slot.id, pending.rot);
+        res = placed;
+        if (placed.ok && placed.value !== true && placed.value.progress)
+          this.opts.onProgress?.(placed.value.progress);
+      }
     } catch (err) {
       console.error('placing failed', err);
       res = { ok: false, message: 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.' };

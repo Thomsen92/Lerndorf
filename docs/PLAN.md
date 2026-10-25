@@ -178,6 +178,29 @@ Spec: `docs/superpowers/specs/2026-10-20-daily-quests-design.md`, Plan: `docs/su
 | [x] Q.9 | CC | Doku (SPEC, SCOPE, PLAN, Anleitung „Daily Quests einspielen“), Screenshots, Reihenfolge fürs Einspielen | 557 Tests grün, Screenshots angesehen |
 | [ ] Q.10 | LK | **Abnahme durch die Lehrkraft** (Kriterien Spec §8): erst Migrationen 0015–0017 einspielen, dann das erste Paket | – |
 
+## Zwischenpaket X – XP und Level
+
+Spec: `docs/superpowers/specs/2026-10-24-xp-level-design.md`; Plan: `docs/superpowers/plans/2026-10-24-xp-level.md`; SPEC §8b. Umsetzung vom 25.10.2026 auf `main`.
+
+| AP | Wer | Inhalt | Ergebnis |
+| --- | --- | --- | --- |
+| [x] X.1 | CC | XP-Buchungen, Levelkurve, Truhen und Belohnungskatalog | Migration `0020_xp_levels.sql`, RLS und SQL-Tests |
+| [x] X.2 | CC | Quest-XP, Tagesziel und Schultag-Serie mit Wochenschild | Wiederholungs-, Wochenend- und Ferienfälle geprüft |
+| [x] X.3 | CC | Stempel, Tutorial, erstes Aufstellen, öffentliche Level und Nachberechnung | Historische Erfolge einmalig, höchstens drei Truhen |
+| [x] X.4 | CC | Fortschritt, Truhen öffnen, Titel und Rahmen wählen | Server prüft Eigentum/Level; Öffnen bucht nur einmal |
+| [x] X.5 | CC | Fortschritts-API und zusätzliche RPC-Rückgaben | Alte Serverantworten werden toleriert |
+| [x] X.6 | CC | Figuren-Brustbilder, sieben Rahmen und Wappen, Kenney-Töne/Sterne | Echte Geometrie bestimmt den Bildausschnitt; gültige MP3-Dateien |
+| [x] X.7 | CC | Avatar-Feld mit XP-Balken, Münzen, Serie und Truhenpunkt | Profil öffnet über das Figurenbild |
+| [x] X.8 | CC | XP-Einblendung, Level-Feier und Truhenöffnung | Serverantwort abwarten, Wiederholen bei Fehler, reduzierte Bewegung |
+| [x] X.9 | CC | Profilseite mit Serie, Truhen, Freischaltungen, Erfolgen und Hilfe | Auswahl- und Fehlerfälle getestet |
+| [x] X.10 | CC | Level-Wappen und Titel in vorhandenen Namensschildern | Keine zusätzlichen Sprites oder Draw Calls |
+| [x] X.11 | CC | Quests, Bauen, Tutorial, Willkommen-Karte und Lehrerübersicht verbinden | Ungesehene Buchungen bleiben erhalten; Tutorial-Feier vor Quests |
+| [x] X.12 | CC | Browserbilder, Galerie, Gesamtprüfung und Dokumentation | 796 Tests, Build und ESLint grün; Tablet-Bilder, Audio-Prüfung und Tutorial grün; 36 Galeriebilder plus Wappenvergleich |
+| [ ] X.13 | LK | Migration 0020 einspielen (Anleitung „Datenbank-Änderung 0020 einspielen“) | 0001–0019 online bestätigt; 0020 noch nicht eingespielt |
+| [ ] X.14 | LK | **Abnahme XP und Level** auf dem Schul-Tablet (Design §13) | Figurenbild, Fortschritt, Truhen, Titel/Rahmen, Töne, Bildrate |
+
+Die Browser-Vorschau steht unter `web/dev/profile.html`; Bilder unter `web/test-results/xp-gallery/`, Tutorial unter `web/test-results/tutorial/`, Dorf-Galerie unter `web/test-results/layout-xp/`. Vorschauen nutzen Testdaten und gehören nicht zum veröffentlichten Build.
+
 ## Stufe 5 – Probebetrieb
 
 | AP | Wer | Aufgabe | Fertig, wenn |
@@ -332,3 +355,5 @@ Spec: `docs/superpowers/specs/2026-10-20-daily-quests-design.md`, Plan: `docs/su
 | 21.10.2026 | Q Lehrer-Hinweise | Beim Bildercheck gefunden und behoben: Die Hinweise im Abschnitt „Daily Quests“ lagen übereinander oben am Rand, weil sie den Stil der Dorf-Meldung geerbt hatten (`teacher/teacher.css`) |
 | 21.10.2026 | Q Reihenfolge | Noch nicht hochgeladen. Reihenfolge: erst Migrationen 0015–0017 auf `main`, grünen Lauf „migrate“ abwarten, dann die erste Datei in `content/daily-quests/` und grünen Lauf „import-content“ prüfen (Anleitung „Daily Quests einspielen“). Abnahme Q.10 steht aus |
 | 23.10.2026 | E Erststart-Tutorial | Zweig `feature/first-login-tutorial`, **noch nicht auf `main`, Migration 0019 noch nirgends eingespielt**. Server: `tutorial_state/start/continue/question/answer/buy_house/place_house/finish`, Lösungen nur in `tutorial_solutions`, 50 Münzen einmalig (Unique-Index), `claim_plot` für Schüler gesperrt, `house_fachwerk` kein Starter mehr und 50 Münzen. Client: Ruine (`render/ruin.ts`) bis das Haus steht, Comic-Sprechblasen (Comic Neue), Kamerapfade (`render/introCamera.ts`), Ablauf `ui/tutorial/flow.ts`. Playwright-Durchlauf mit Bild je Schritt: `npx playwright test e2e/tutorial.spec.ts --project=harness` (Bilder in `web/test-results/tutorial/`). Bekannter Fehler außerhalb des Pakets: `tests/render/character.test.ts` (`rootTravel`) lässt `npm run build` am `tsc` scheitern (`vite build` läuft) |
+
+Hinweis XP-Abschluss 25.10.2026: Supabase-Trockenlauf sieht ausschließlich 0020; noch nicht angewendet. Galerie: Welt-Draw-Calls in allen 36 Ansichten identisch zum Stand 23.10.; Nahvergleich mit/ohne XP-Schilder jeweils 83 gesamt / 63 Welt. Das ursprüngliche Gesamtbudget unter 150 wird bereits im bisherigen Stand teils überschritten; keine bestätigte Bildrate auf dem Schul-Tablet. Eine unabhängige Prüfung fand ein Problem mit ungesehenen Buchungen; es ist durch Regressionstests für Stempel und mehr als 50 Buchungen abgesichert und behoben. Weitere Arbeiten ab der Rückmeldung des Auftraggebers sequenziell ohne Teilagenten.

@@ -371,12 +371,12 @@ function overviewSection(list: Pupil[]): string {
       (p) =>
         `<tr><td>${esc(p.nickname)}</td><td class="num">${p.coins}</td><td class="num">${
           p.plotIndex === null ? '–' : p.plotIndex + 1
-        }</td></tr>`,
+        }</td><td class="num">${p.level ?? 1}</td><td class="num">${p.xp ?? 0}</td><td class="num">${p.streak ?? 0}</td></tr>`,
     )
     .join('');
   return `<section><h2>Übersicht (${list.length} Schüler)</h2>
-    <table><thead><tr><th>Spitzname</th><th>Münzen</th><th>Grundstück</th></tr></thead>
-    <tbody>${rows || '<tr><td colspan="3">Noch keine Konten</td></tr>'}</tbody></table></section>`;
+    <table><thead><tr><th>Spitzname</th><th>Münzen</th><th>Grundstück</th><th>Level</th><th>XP</th><th>Serie</th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="6">Noch keine Konten</td></tr>'}</tbody></table></section>`;
 }
 
 function stampSection(list: Pupil[]): string {

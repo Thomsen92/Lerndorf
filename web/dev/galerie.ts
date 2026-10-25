@@ -79,21 +79,35 @@ const members = Array.from({ length: RESIDENTS }, (_, i) => {
   return {
     plotIndex: (i * 7) % PLOTS, // spread over the village
     nickname: NAMES[i % NAMES.length],
+    level: params.get('xp') === '1' ? [7, 15, 20, 30][i % 4] : undefined,
+    titleLabel:
+      params.get('xp') === '1'
+        ? ['Busy Bee', 'Vocab Hero', 'Village Star', 'Lerndorf Champion'][i % 4]
+        : undefined,
     slots,
   };
 });
 // ?ruin=1: the first plot still shows the ruin of the first-login tutorial
-if (params.get('ruin') === '1') members.find((m) => m.plotIndex === 0)!.slots.house = { itemId: 'ruin', rot: 0 };
+if (params.get('ruin') === '1')
+  members.find((m) => m.plotIndex === 0)!.slots.house = { itemId: 'ruin', rot: 0 };
 const village = buildVillage(layout, members, null);
 scene.add(village);
 const crowd = new Crowd(
   scene,
   layout,
-  members.map((m, i) => ({ nickname: m.nickname, character: i % 2 === 0 ? ('boy' as const) : ('girl' as const) })),
+  members.map((m, i) => ({
+    nickname: m.nickname,
+    level: m.level,
+    character: i % 2 === 0 ? ('boy' as const) : ('girl' as const),
+  })),
 );
 
 const camera = new THREE.PerspectiveCamera(38, 1280 / 800, 0.1, 400);
 const VIEWS: Record<string, { target: THREE.Vector3; offset: THREE.Vector3 }> = {
+  xp_tag: {
+    target: new THREE.Vector3(layout.plots[0].x, layout.plots[0].h + 5, layout.plots[0].z),
+    offset: new THREE.Vector3(9, 7, 12),
+  },
   overview: { target: new THREE.Vector3(-2, 0, 2), offset: new THREE.Vector3(34, 46, 62) },
   topdown: { target: new THREE.Vector3(0, 0, 0), offset: new THREE.Vector3(0, 110, 1) },
   marketplace: {
@@ -186,7 +200,11 @@ setView(viewName);
 step(20);
 renderer.render(scene, camera);
 // the picture is ready once the sky panorama is loaded
-void Promise.all([rig.skyReady, grassReady(), kenneyReady().then(() => new Promise((r) => setTimeout(r, 0)))]).then(([sky]) => {
+void Promise.all([
+  rig.skyReady,
+  grassReady(),
+  kenneyReady().then(() => new Promise((r) => setTimeout(r, 0))),
+]).then(([sky]) => {
   if (sky) (village.userData.setSky as ((t: THREE.Texture) => void) | undefined)?.(sky);
   renderer.render(scene, camera);
   window.galerie.ready = true;

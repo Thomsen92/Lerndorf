@@ -50,9 +50,13 @@ import type { SlotId } from '../world/plotPlan';
 import { sheetViewOffset } from '../render/houseCamera';
 import { FLIGHT_SECONDS, houseView, lerpPose, onPlot, type CameraPose } from '../render/houseCamera';
 import { closeUpPath, introPath, type CameraPath } from '../render/introCamera';
-import { getTutorialState, type TutorialState } from '../api/tutorial';
+import { finishTutorial, getTutorialState, type TutorialState } from '../api/tutorial';
 import { runTutorial, type TutorialVillage } from './tutorial/flow';
 import { PLACE_BUTTON, PLACE_HINT } from './tutorial/messages';
+import { supabaseProgressApi, type ProgressDelta } from '../api/progress';
+import { createAvatarBadge } from './avatarBadge';
+import { createProgressFlow } from './progressFlow';
+import { openProfile } from './profileView';
 import {
   AUTO_MEASURE_SECONDS,
   decideAuto,
@@ -97,6 +101,10 @@ async function load(supabase: SupabaseClient): Promise<Loaded> {
 async function loadTutorial(supabase: SupabaseClient): Promise<TutorialState | null> {
   const res = await getTutorialState(supabase);
   if (!res.ok) throw new Error(res.message);
+  if (!res.value.needed && res.value.step === 'done') {
+    // A reload after placement may have interrupted finish. The server grants XP only once.
+    await finishTutorial(supabase).catch(() => undefined);
+  }
   return res.value.needed ? res.value : null;
 }
 
@@ -157,7 +165,9 @@ export async function mountVillage(
     window.removeEventListener('pointerdown', unlockSound);
     window.removeEventListener('keydown', unlockSound);
     modals.closeAll();
-    document.querySelectorAll('.overlay:not(.modal), .house-menu').forEach((el) => el.remove());
+    document
+      .querySelectorAll('.overlay:not(.modal), .house-menu, .xp-toasts, .xp-fly')
+      .forEach((el) => el.remove());
     nav?.el.remove();
     document.removeEventListener('keydown', onEscape);
     removeWindowPointer?.();
@@ -218,6 +228,8 @@ export async function mountVillage(
   });
   tutorialVillage.catch(() => undefined);
   let worldOnCoins: (c: number) => void = () => undefined;
+  let worldOnProgress: (delta: ProgressDelta, from?: HTMLElement | null) => Promise<void> = async () =>
+    undefined;
   let endTutorial: (openQuests: boolean) => void = () => undefined;
   let tutorialOver = false;
 
@@ -240,6 +252,7 @@ export async function mountVillage(
           return tutorialVillage;
         },
         onCoins: (c) => worldOnCoins(c),
+        onProgress: (delta) => worldOnProgress(delta),
         openDailyQuests: () => endTutorial(true),
       });
       // whatever happens in the tutorial, the game is unlocked afterwards
@@ -304,7 +317,13 @@ export async function mountVillage(
   const ownPlot = profile.plotIndex;
   const labels = members
     .filter((m) => m.plotIndex !== null)
-    .map((m) => ({ plotIndex: m.plotIndex as number, nickname: m.nickname, slots: slots.get(m.id) ?? {} }));
+    .map((m) => ({
+      plotIndex: m.plotIndex as number,
+      nickname: m.nickname,
+      slots: slots.get(m.id) ?? {},
+      level: m.level,
+      titleLabel: m.titleLabel,
+    }));
   const village = buildVillage(layout, labels, ownPlot);
   scene.add(village);
   // the river reflects the sky panorama once it has loaded
@@ -316,7 +335,13 @@ export async function mountVillage(
   const crowd = new Crowd(
     scene,
     layout,
-    members.map((m) => ({ nickname: m.nickname, own: m.id === profile.id, character: m.character })),
+    members.map((m) => ({
+      nickname: m.nickname,
+      own: m.id === profile.id,
+      character: m.character,
+      level: m.level,
+      titleLabel: m.titleLabel,
+    })),
   );
 
   // quality: applied now, and again when Auto has measured
@@ -392,7 +417,7 @@ export async function mountVillage(
       flight = { from, to: houseView(home), t: 0 };
       if (reducedMotion()) finishFlight();
     }
-    paused = area === 'shop' || area === 'inventar' || area === 'aufgaben';
+    paused = area === 'shop' || area === 'inventar' || area === 'aufgaben' || area === 'profil';
     if (paused) finishFlight(); // the camera is in place before rendering stops
     applyControls(area);
   };
@@ -451,6 +476,7 @@ export async function mountVillage(
       plot: home,
       supabase,
       uid: profile.id,
+      onProgress: (delta) => void worldOnProgress(delta),
       reducedMotion,
       thumbs: thumbs.source,
       onShop: () => void areas?.select('shop'),
@@ -515,6 +541,7 @@ export async function mountVillage(
           if (!res.ok) return res.message;
           myCharacter = kind;
           crowd.setCharacter(profile.nickname, kind);
+          badge.updateCharacter?.(kind);
           return null;
         },
       }),
@@ -560,7 +587,30 @@ export async function mountVillage(
   const ctl = createAreaController({
     openers: {
       aufgaben: async () =>
-        openDailyQuests({ supabase, coins: coinsNow, onCoins, onClose: () => void areas?.select('dorf') }),
+        openDailyQuests({
+          supabase,
+          coins: coinsNow,
+          onCoins,
+          onProgress: (delta, from) => void worldOnProgress(delta, from),
+          onClose: () => void areas?.select('dorf'),
+        }),
+      profil: async () =>
+        openProfile({
+          api: progressApi,
+          nickname: profile.nickname,
+          character: myCharacter,
+          getCoins: () => coinsNow,
+          onCoins: (c) => {
+            onCoins(c);
+            void progressFlow.refresh();
+          },
+          onFrame: (id) => progressFlow.frameChanged(id),
+          onTitle: (label) => progressFlow.titleChanged(label),
+          onSettings: openSettings,
+          onClose: () => void areas?.select('dorf'),
+          sound,
+          reducedMotion: reducedMotion(),
+        }),
       haus: async () => {
         if (!home) {
           showNotice('Du hast noch kein Grundstück.');
@@ -583,14 +633,58 @@ export async function mountVillage(
   });
   areas = ctl;
 
+  const progressApi = supabaseProgressApi(supabase);
+  const badge = createAvatarBadge({
+    nickname: profile.nickname,
+    character: myCharacter,
+    onOpen: (b) => {
+      if (inTutorial) openSettings(b);
+      else void ctl.select('profil');
+    },
+    reducedMotion,
+  });
+  badge.update({
+    level: 1,
+    xp: 0,
+    levelXp: 0,
+    nextLevelXp: 50,
+    coins: coinsNow,
+    streak: 0,
+    chests: 0,
+    frameId: 'frame_wood',
+  });
   nav = createGameNav({
     nickname: profile.nickname,
     coins: coinsNow,
+    badge,
     onSelect: (area) => void ctl.select(area),
     onAccount: openSettings,
   });
   root.appendChild(nav.el);
   nav.setActive('dorf');
+  const xpLive = document.createElement('p');
+  xpLive.className = 'sr-only';
+  xpLive.setAttribute('role', 'status');
+  root.append(xpLive);
+  const progressFlow = createProgressFlow({
+    api: progressApi,
+    badge,
+    getCoins: () => coinsNow,
+    onCoins,
+    updateTag: (info) => {
+      const tag = { nickname: profile.nickname, ...info };
+      (village.userData.updateOwnTag as ((info: typeof tag) => void) | undefined)?.(tag);
+      crowd.setOwnTag?.(tag);
+    },
+    setQuestBadge: (n) => nav?.setQuestBadge(n),
+    live: xpLive,
+    sound,
+    reducedMotion,
+    track: (h) => modals.track(h),
+    isActive: () => running,
+  });
+  worldOnProgress = (delta, from) => progressFlow.onProgress(delta, from);
+  if (!inTutorial) void progressFlow.start();
   // fallback for a pupil without a figure who needs no tutorial; in the tutorial the choice is its first step
   if (myCharacter === null && !inTutorial) pickCharacter(true, null);
 

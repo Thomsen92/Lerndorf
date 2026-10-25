@@ -6,6 +6,9 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { mondayOf, parseIsoDate, weekLabel } from './week';
 
 export interface Pupil {
+  xp?: number;
+  level?: number;
+  streak?: number;
   id: string;
   nickname: string;
   coins: number;
@@ -45,11 +48,14 @@ export async function signInTeacher(
 export async function loadPupils(supabase: SupabaseClient, classId: string): Promise<Result<Pupil[]>> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, nickname, coins, plot_index')
+    .select('id, nickname, coins, plot_index, xp, level')
     .eq('class_id', classId)
     .eq('role', 'student')
     .order('nickname');
   if (error) return fail('Schülerliste konnte nicht geladen werden');
+  const { data: streaks, error: streakError } = await supabase.from('streaks').select('player_id, current');
+  if (streakError) return fail('Serien konnten nicht geladen werden');
+  const byPlayer = new Map((streaks ?? []).map((s) => [s.player_id, s.current as number]));
   return {
     ok: true,
     value: (data ?? []).map((r) => ({
@@ -57,6 +63,9 @@ export async function loadPupils(supabase: SupabaseClient, classId: string): Pro
       nickname: r.nickname,
       coins: r.coins,
       plotIndex: r.plot_index,
+      xp: r.xp ?? 0,
+      level: r.level ?? 1,
+      streak: byPlayer.get(r.id) ?? 0,
     })),
   };
 }
@@ -395,7 +404,8 @@ export function questNotices(s: QuestStatus): Array<{ level: 'ok' | 'warn' | 'er
     });
   }
   if (s.tomorrowMissing) out.push({ level: 'warn', text: 'Morgen gibt es noch keine Daily Quests.' });
-  if (s.coveredUntil) out.push({ level: 'ok', text: `Daily Quests vorhanden bis ${dayLabel(s.coveredUntil)}` });
+  if (s.coveredUntil)
+    out.push({ level: 'ok', text: `Daily Quests vorhanden bis ${dayLabel(s.coveredUntil)}` });
   for (const i of s.imports) {
     if (!i.ok) {
       out.push({

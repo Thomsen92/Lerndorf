@@ -5,10 +5,12 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { isCharacterKind, type CharacterKind } from '../render/character';
 import type { Result } from './build';
+import { parseProgressDelta, type ProgressDelta } from './progress';
 
 export type TutorialStep = 'intro' | 'quiz' | 'buy' | 'place' | 'done';
 
 export interface TutorialState {
+  progress?: ProgressDelta | null;
   needed: boolean;
   step: TutorialStep;
   plotIndex: number | null;
@@ -33,6 +35,7 @@ export interface TutorialAnswerResult {
 }
 
 interface RawState {
+  progress?: unknown;
   needed: boolean;
   step: TutorialStep;
   plot_index: number | null;
@@ -47,13 +50,16 @@ function toState(r: RawState): TutorialState {
     plotIndex: r.plot_index ?? null,
     character: isCharacterKind(r.character) ? r.character : null,
     answered: r.answered ?? 0,
+    ...('progress' in r ? { progress: parseProgressDelta(r.progress) } : {}),
   };
 }
 
 function explain(message: string): string {
-  if (message.includes('village is full')) return 'Das Dorf ist leider voll. Bitte sag deiner Lehrkraft Bescheid.';
+  if (message.includes('village is full'))
+    return 'Das Dorf ist leider voll. Bitte sag deiner Lehrkraft Bescheid.';
   if (message.includes('not enough coins')) return 'Dafür hast du noch nicht genug Münzen.';
-  if (message.includes('not the current question')) return 'Diese Frage ist nicht mehr dran. Bitte lade die Seite neu.';
+  if (message.includes('not the current question'))
+    return 'Diese Frage ist nicht mehr dran. Bitte lade die Seite neu.';
   if (message.includes('not at this step') || message.includes('not in the quiz'))
     return 'Das passt gerade nicht zum Schritt. Bitte lade die Seite neu.';
   if (message.includes('pupils only')) return 'Das gibt es nur für Schülerkonten.';
@@ -87,7 +93,10 @@ export function startTutorial(supabase: SupabaseClient): Promise<Result<Tutorial
  * Moves on from the given step. If the server already moved on (double click, second tab), the
  * call counts as success and the current state is returned.
  */
-export async function continueTutorial(supabase: SupabaseClient, from: 'intro'): Promise<Result<TutorialState>> {
+export async function continueTutorial(
+  supabase: SupabaseClient,
+  from: 'intro',
+): Promise<Result<TutorialState>> {
   const { data, error } = await supabase.rpc('tutorial_continue', { p_from: from });
   if (!error) return { ok: true, value: stateOf(data) };
   // 22023 = the server is not at this step (it moved on already); the message text is not relied on

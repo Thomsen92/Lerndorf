@@ -261,3 +261,33 @@ Im Lehrer-Bereich gibt es den Abschnitt **Daily Quests**:
 Mit einem Lehrkonto kann man im Dorf keine Quests lösen; dort steht dann „Nur Schülerkonten können Quests lösen.“ Zum Ansehen ist die Vorschau im Lehrer-Bereich da.
 
 Der Abschnitt **Aufgaben-Statistik** zeigt nur noch die alten Wochenaufgaben von früher.
+
+## XP, Level und Profil benutzen
+
+Schüler tippen oben rechts auf ihr Figurenbild. Im Profil sehen sie XP bis zum nächsten Level, ihre Schultag-Serie mit Schutzschild, Truhen und freigeschaltete Titel und Rahmen. Die drei Hauptknöpfe bleiben unverändert. Während des Tutorials öffnet das Figurenbild weiterhin die Einstellungen.
+
+Richtige Quests bringen auch nach dem dritten Versuch noch XP. Ein vollständiges Tagesziel bringt zusätzliche XP. Stempel geben automatisch 100 XP; dafür muss die Lehrkraft nichts zusätzlich buchen. In der Klassenübersicht stehen Level, XP und Serie. Die Liste bleibt nach Spitzname sortiert.
+
+Eine Truhe öffnet sich erst nach der Bestätigung des Servers. Bei einem Netzfehler kann der Schüler erneut versuchen; dieselbe Truhe bucht ihre Münzen höchstens einmal. Die Münzen stehen im Kontoauszug als „Truhe“. Titel und Rahmen sind erst ab dem angegebenen Level wählbar. XP werden nie abgezogen.
+
+### Datenbank-Änderung 0020 einspielen
+
+Die neue Oberfläche braucht die Datei `supabase/migrations/0020_xp_levels.sql`. Die Migrationen 0001–0019 sind am 25.10.2026 online geprüft und bereits vorhanden. Migration 0020 berechnet aus früher gelösten Daily Quests, Stempeln und abgeschlossenen Tutorials einmalig XP nach und vergibt dabei höchstens drei Truhen. Bestehende Münzen und Gegenstände bleiben erhalten.
+
+1. Zuerst die fertige Änderung samt Prüfung ansehen. Noch nicht allein die neue Oberfläche veröffentlichen.
+2. Im Lerndorf-Projekt die Supabase-CLI anmelden und mit dem vorhandenen Projekt verknüpfen, falls die Sitzung abgelaufen ist.
+3. Mit `npx supabase db push --linked --dry-run` prüfen: Als neue Datei darf nur `0020_xp_levels.sql` erscheinen.
+4. Mit `npx supabase db push --linked` die geprüfte Änderung anwenden. Anschließend mit `npx supabase migration list --linked` kontrollieren: 0020 muss lokal und online stehen. Alternativ übernimmt der vorhandene GitHub-Workflow „migrate“ das Einspielen, wenn die Änderung auf `main` veröffentlicht wird.
+5. Danach den passenden Website-Stand veröffentlichen und ein Schülerkonto prüfen: Profil öffnen, Quest lösen, gegebenenfalls eine Truhe öffnen. Mit einem neuen Testkonto zusätzlich das Tutorial bis zur Level-2-Feier durchlaufen.
+
+### Abnahme auf dem Schul-Tablet
+
+- Figurenbild, Rahmen, Wappen und XP-Balken sind gut lesbar. Das Profil ist bedienbar und lässt sich schließen.
+- Eine richtige Quest zeigt XP; ein Level-Aufstieg zeigt eine Feier mit Truhe.
+- Das Tutorial endet mit der Level-2-Feier vor den Daily Quests.
+- Truhenmünzen erscheinen genau einmal im Kontoauszug, auch bei erneutem Antippen.
+- Gesperrte Titel und Rahmen sind erkennbar; freigeschaltete lassen sich wählen.
+- Töne lassen sich ausschalten; reduzierte Bewegung wird beachtet.
+- Das Dorf läuft auf dem ältesten Tablet weiterhin flüssig (Ziel mindestens 30 Bilder pro Sekunde).
+
+Entwicklungsbilder: `web/test-results/xp-gallery/`; Tutorial: `web/test-results/tutorial/`; Dorf-Galerie: `web/test-results/layout-xp/`. Diese Prüfdateien bleiben lokal und werden nicht veröffentlicht.

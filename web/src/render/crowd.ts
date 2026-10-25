@@ -1,3 +1,4 @@
+import { nameTag, type TagInfo } from './village';
 /**
  * Villagers in the 3D scene: placeholder figures that walk, sit, wait and greet each other.
  * Behaviour comes from avatars/behaviour.ts; this file only moves and shows them.
@@ -63,6 +64,7 @@ const EMOTE_LOOPS = 2;
 const FADE = 0.25;
 
 interface Input {
+  level?: number;
   nickname: string;
   /** The pupil's own figure gets the marker and the highlighted name sign. */
   own?: boolean;
@@ -88,7 +90,7 @@ const TOPS = ['#e85d75', '#4b7bec', '#20bf6b', '#f7b731', '#8854d0', '#fd9644', 
 const HEAD_ANCHOR = new THREE.Vector3(0, 2.8, 0);
 
 /** Simple figure: legs, body, head, nickname sign. Colours come from the nickname, so they are stable. */
-function buildFigure(nickname: string, own: boolean): THREE.Group {
+function buildFigure(nickname: string, own: boolean, level?: number): THREE.Group {
   const h = hashString(nickname);
   const g = new THREE.Group();
   const skin = new THREE.MeshStandardMaterial({ color: SKIN[h % SKIN.length], roughness: 0.8 });
@@ -114,24 +116,7 @@ function buildFigure(nickname: string, own: boolean): THREE.Group {
   }
 
   // name sign above the head
-  const cv = document.createElement('canvas');
-  cv.width = 256;
-  cv.height = 64;
-  const cx = cv.getContext('2d');
-  if (cx) {
-    cx.fillStyle = own ? 'rgba(255,181,71,0.95)' : 'rgba(20,24,40,0.8)';
-    cx.beginPath();
-    cx.roundRect(6, 10, 244, 44, 22);
-    cx.fill();
-    cx.fillStyle = own ? '#2a1d05' : '#ffffff';
-    cx.font = 'bold 26px Atkinson Hyperlegible, Verdana, sans-serif';
-    cx.textAlign = 'center';
-    cx.textBaseline = 'middle';
-    cx.fillText(nickname, 128, 33, 236);
-  }
-  const sign = new THREE.Sprite(
-    new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthWrite: false, transparent: true }),
-  );
+  const sign = nameTag({ nickname, level }, own);
   sign.scale.set(1.6, 0.4, 1);
   sign.position.y = 2.0;
   sign.renderOrder = 10;
@@ -235,7 +220,7 @@ export class Crowd {
       const rng = createRng(hashString(input.nickname) ^ (layout.seed * 7919) ^ i);
       const start = input.startNode ?? wander[Math.floor(rng() * wander.length)];
       const own = input.own ?? false;
-      const group = buildFigure(input.nickname, own);
+      const group = buildFigure(input.nickname, own, input.level);
       scene.add(group);
       const v: Villager = {
         nickname: input.nickname,
@@ -288,6 +273,19 @@ export class Crowd {
   }
 
   /** Changes a villager's figure (after the pupil picked boy or girl). */
+  setOwnTag(info: TagInfo): void {
+    const v = this.villagers.find((x) => x.own);
+    if (!v) return;
+    const old = v.group.userData.sign as THREE.Sprite;
+    const fresh = nameTag({ nickname: info.nickname, level: info.level }, true);
+    fresh.position.copy(old.position);
+    fresh.scale.copy(old.scale);
+    v.group.remove(old);
+    old.material.map?.dispose();
+    old.material.dispose();
+    v.group.add(fresh);
+    v.group.userData.sign = fresh;
+  }
   setCharacter(nickname: string, kind: CharacterKind): void {
     const v = this.villagers.find((x) => x.nickname === nickname);
     if (!v || (v.character === kind && v.fig)) return;

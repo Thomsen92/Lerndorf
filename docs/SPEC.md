@@ -259,12 +259,14 @@ Alle RPCs lesen Belohnung, Tageslimit, Versuche und Raster aus der Zeile der Ins
 
 **Invariante:** `profiles.coins` = Summe von `coin_ledger.delta` des Spielers. Nur RPC-Funktionen schreiben beides in derselben Transaktion.
 
+**Erweiterung Migration 0020 – Fortschritt:** `profiles` erhält `xp`, `level`, `title_id`, `frame_id` und `progress_seen_id`. Neue Tabellen sind `xp_ledger` (positive, je Spieler/Grund/Referenz eindeutige Buchungen), `level_rewards` (Titel/Rahmen), `chests` (Truhen samt dauerhaftem Öffnungsergebnis) und `streaks` (aktuelle/beste Serie, letzter Schultag, Wochenschild). Schüler lesen ihre eigenen Fortschrittszeilen; die Lehrkraft liest alle. Den Belohnungskatalog lesen angemeldete Nutzer. Schreiben erfolgt ausschließlich durch serverseitige Funktionen. Die Summe der XP-Buchungen entspricht `profiles.xp`.
+
 ## 6. Row Level Security
 
 | Tabelle | Schüler lesen | Schüler schreiben | Lehrkraft |
 | --- | --- | --- | --- |
 | classes | eigene Klasse | – | alles |
-| profiles | Profile der eigenen Klasse: nur `id, nickname, plot_index, avatar` (über View `village_members`); eigenes Profil inkl. `coins` | – (nur RPC) | alles |
+| profiles | Profile der eigenen Klasse: nur `id, nickname, plot_index, avatar, level, title_label, frame_id` (über RPC `village_members`); eigenes Profil inkl. `coins` | – (nur RPC) | alles |
 | items | aktive Items | – | alles |
 | inventory | eigenes | – | alles |
 | placements | alle der eigenen Klasse | – | alles |
@@ -338,6 +340,21 @@ intro --tutorial_continue--> quiz --5x tutorial_answer richtig--> buy --tutorial
 | `tutorial_finish()` | Abschlussaufruf des Clients, wiederholbar, nur bei `done` |
 
 `tutorial_state_of(uuid)` und `tutorial_reward()` sind intern (nicht für Clients aufrufbar). Fehler „falscher Schritt“ ist `22023`. **`claim_plot` ist für alle gesperrt** (Fehler `forbidden: plot is assigned automatically`, Code `42501`): das Grundstück vergibt nur `tutorial_start`. `buy_item`, `place_in_slot` und `clear_slot` bleiben unverändert streng; die Tutorial-Funktionen sind die einzigen Ausnahmen für geschlossenen Shop und Baumodus, nur für das Fachwerkhaus im Sockel `house` im jeweiligen Schritt. Bis das Haus steht, zeigt der Client im Sockel die **Ruine** (`RUIN_ID`, kein Katalog-Eintrag).
+
+## 8b. XP, Level und Profil (Migration 0020)
+
+Produktregeln: [XP-Design](superpowers/specs/2026-10-24-xp-level-design.md); Umsetzung: [XP-Plan](superpowers/plans/2026-10-24-xp-level.md).
+
+- Richtige Quest: 15 XP im ersten, 10 XP im zweiten/dritten, 5 XP ab dem vierten Versuch; Nachholen halbiert und rundet auf. Alle drei heutigen Quests geben 15 XP extra. Ein heutiger Erfolg pro Schultag gibt zusätzlich Serien-XP. Stempel geben 100 XP, Tutorial-Abschluss 50 XP, erstes Aufstellen eines Gegenstands 10 XP.
+- Level-Grenzen und XP-Werte liegen in `xp_for_level`, `level_for_xp` und `xp_rule`. Jeder Level-Aufstieg erzeugt eine Truhe, jedes fünfte Level eine große Truhe. Keine XP-Abzüge und keine Rangliste.
+- Die Serie zählt nur Montag bis Freitag mit aktiven Quests; Wochenenden und Ferien unterbrechen sie nicht. Pro Kalenderwoche schützt ein Schild einen versäumten Schultag. Meilensteine geben große Truhen.
+- Neue Schüler-RPCs: `my_progress()`, `mark_progress_seen(p_id)`, `open_chest(p_id)`, `set_title(p_id|null)`, `set_frame(p_id)`. Truhenöffnung ist wiederholbar ohne zweite Münzbuchung; Inhalt und Freischaltungen entscheidet ausschließlich der Server.
+- `submit_quest_answer`, `tutorial_finish` und `place_in_slot` liefern zusätzlich `progress`; `place_in_slot` liefert jetzt `{ok, id, progress}`. `add_stamps` bucht die XP zusammen mit den Münzen. Interne Funktionen `grant_xp` und `touch_streak` sind für Clients nicht ausführbar.
+- `village_members` liefert zusätzlich nur `level`, `title_label`, `frame_id`; keine XP, Münzen oder Serie anderer Schüler. Haus- und Figuren-Schilder zeichnen das Level-Wappen im vorhandenen Sprite.
+- Das Avatar-Feld öffnet „Mein Profil“ mit gerendertem Figurenbild, verziertem Rahmen, Wappen, XP-Balken, Serie, Truhen und wählbaren Titeln/Rahmen. Während des Tutorials öffnet es weiter die Einstellungen. Das Profil pausiert das Dorf. Die Hauptnavigation behält drei Knöpfe; „Aufgaben“ zeigt die Zahl offener heutiger Quests.
+- XP-Gewinn, Level-Feier und Truhenöffnung beachten reduzierte Bewegung und den Ton-Schalter. Ungesehene Buchungen erscheinen beim Login als Willkommen-Karte. Nach dem Tutorial kommt die Level-2-Feier vor den Daily Quests.
+- Der Lehrerbereich zeigt Level, XP und Serie, weiterhin nach Spitzname sortiert. Es gibt keine manuelle XP-Vergabe.
+- Nachberechnung bestehender Schüler: 10 XP je bisher gelöster Daily Quest, 100 je Stempel, 50 für das abgeschlossene Tutorial; höchstens drei Truhen, keine rückwirkende Serie.
 
 ## 9. Aufgaben-Inhalte: Daily Quests
 
@@ -462,7 +479,8 @@ Grundsatz: **Das Layout (Positionen von allem) entsteht im Code in `world/`, det
 | Bildschirm | Inhalt |
 | --- | --- |
 | Login | Spitzname, Passwort, „Los geht's“; Fehlermeldung verständlich („Spitzname oder Passwort stimmt nicht“) |
-| Dorf (Haupt) | 3D-Ansicht; oben: Spitzname, Münzstand; unten: Knöpfe Aufgaben, Shop, Bauen, Mein Avatar, Abmelden |
+| Dorf (Haupt) | 3D-Ansicht; Avatar-Feld mit Figurenbild, Rahmen, Level-Wappen, XP, Münzen und Serie; Hauptnavigation Dorf, Aufgaben, Mein Haus |
+| Mein Profil | Fortschritt, Serie/Schild, Tagesziel, Truhen, Titel/Rahmen wählen, Erfolge, XP-Hilfe und Einstellungen (§8b) |
 | Daily Quests (Knopf „Aufgaben“) | „Heute“ und „Nachholen von gestern“ mit Belohnung bzw. „gelöst ✓“; eine Quest aufklappen und lösen; Rückmeldung richtig/falsch mit englischem Tipp; Hören mit „▶ Anhören“ oder sichtbarem Text; Regelzeile „Münzen gibt es bei den ersten 3 Versuchen.“ (§9) |
 | Shop | Kategorien Deko / Avatar; Preis, „Kaufen“ (mit eigener Bestätigung, kein `confirm()`); ausgegraut wenn zu teuer |
 | Bauen | Kamera fährt zum eigenen Grundstück; Inventar-Leiste; Teil wählen → Raster erscheint → Feld antippen → Drehen/Entfernen; grün/rot für frei/belegt |
@@ -474,7 +492,7 @@ Touch-Ziele mind. 44 px; einfache Sprache; keine Emojis als Bedienelemente.
 ## 13. Lehrer-Bereich (`/lehrer`)
 
 - **Instanz-Umschalter** (8a / 8b) oben; alle folgenden Ansichten gelten für die gewählte Instanz.
-- Klassen-Übersicht: Spitzname, Münzen, letzte Anmeldung, Aufgaben diese Woche gelöst.
+- Klassen-Übersicht: Spitzname, Münzen, Grundstück, Level, XP und aktuelle Serie; nach Spitzname sortiert. Keine XP-Bearbeitung.
 - Spielregeln der Instanz bearbeiten (Stempel-Belohnung, Tageslimit, Versuche) und Gegenstände je Instanz sperren.
 - **Stempel buchen:** Klasse + Woche (Montag) wählen → Liste mit Häkchen → „Stempel buchen“. Bereits gebuchte Stempel sind markiert. Ziel: eine Klasse < 3 Min.
 - Konten: anlegen (einzeln/Liste), Passwort zurücksetzen, löschen; Druckansicht „Zugangskärtchen“ (Spitzname + Passwort, zum Ausschneiden).
@@ -496,6 +514,8 @@ Touch-Ziele mind. 44 px; einfache Sprache; keine Emojis als Bedienelemente.
 | Alte Wochenaufgaben (Geschichte) | Tageslimit 60 Münzen, 3 Versuche pro Aufgabe und Tag (`classes`) |
 | Deko | 20–250 Münzen |
 | Avatar-Teile | 30–300 Münzen, seltene bis 500 |
+| XP | Werte und Kurve in `xp_rule` / `xp_for_level`; kein Abzug, nur serverseitige Buchungen (§8b) |
+| Truhe | 20 + 5 × Level Münzen; große Truhe ×3; Serverwurf 70 % einfach / 25 % doppelt / 5 % dreifach; einmalige Buchung |
 
 Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3–6 Wochen. **[OFFEN]** Beträge mit der Lehrkraft final abstimmen.
 

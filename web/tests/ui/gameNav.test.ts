@@ -18,6 +18,19 @@ beforeEach(() => {
 });
 
 describe('gameNav', () => {
+  it('shows remaining quests or a completed day without selecting a profile nav entry', () => {
+    nav.setQuestBadge(2);
+    expect(nav.el.querySelector('.quest-badge')?.textContent).toBe('2');
+    expect(nav.el.querySelector('[data-area=aufgaben]')?.getAttribute('aria-label')).toContain(
+      '2 Quests offen',
+    );
+    nav.setQuestBadge('done');
+    expect(nav.el.querySelector('.quest-badge')?.textContent).toBe('✓');
+    nav.setQuestBadge(null);
+    expect(nav.el.querySelector('.quest-badge')).toBeNull();
+    nav.setActive('profil');
+    expect(nav.el.querySelector('[aria-current=page]')).toBeNull();
+  });
   it('maps areas to nav buttons', () => {
     expect(NAV_BUTTONS).toEqual(['dorf', 'aufgaben', 'haus']);
     expect(navButtonFor('bauen')).toBe('haus');
@@ -34,7 +47,11 @@ describe('gameNav', () => {
       expect(b.querySelector('[aria-hidden="true"]')).not.toBeNull();
       expect(b.querySelector('.nav-label')?.textContent?.length).toBeGreaterThan(0);
     }
-    expect(buttons().map((b) => b.querySelector('.nav-label')?.textContent)).toEqual(['Dorf', 'Aufgaben', 'Mein Haus']);
+    expect(buttons().map((b) => b.querySelector('.nav-label')?.textContent)).toEqual([
+      'Dorf',
+      'Aufgaben',
+      'Mein Haus',
+    ]);
   });
 
   it('marks exactly one button active', () => {

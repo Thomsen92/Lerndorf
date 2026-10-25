@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>XP und Profil – Entwicklung</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <style>
+      body {
+        background: #fff;
+        overflow: auto;
+        color: #493724;
+      }
+      #app {
+        padding: 24px;
+        max-width: 1180px;
+        margin: auto;
+      }
+      .preview-tiers {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .preview-tier {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 10px;
+        background: white;
+      }
+      .preview-tier h2 {
+        width: 100%;
+        font-size: 18px;
+        text-align: center;
+        margin: 0;
+      }
+      .preview-tier .avatar-portrait {
+        width: 88px;
+        height: 88px;
+      }
+      @media (max-width: 900px) {
+        .preview-tiers {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app"></main>
+    <script type="module" src="./profile.ts"></script>
+  </body>
+</html>

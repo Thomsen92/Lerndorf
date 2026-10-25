@@ -5,6 +5,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { RUIN_ID, STARTER, type SlotId } from '../world/plotPlan';
+import { parseProgressDelta, type ProgressDelta } from './progress';
 
 export interface BuildItem {
   id: string;
@@ -97,10 +98,18 @@ export async function placeInSlot(
   itemId: string,
   slot: SlotId,
   rot: number,
-): Promise<Result<true>> {
-  const { error } = await supabase.rpc('place_in_slot', { p_item_id: itemId, p_slot: slot, p_rot: rot });
+): Promise<Result<true | { ok: true; progress: ProgressDelta | null }>> {
+  const { data, error } = await supabase.rpc('place_in_slot', {
+    p_item_id: itemId,
+    p_slot: slot,
+    p_rot: rot,
+  });
   if (error) return { ok: false, message: explain(error.message) };
-  return { ok: true, value: true };
+  return {
+    ok: true,
+    value:
+      data && typeof data === 'object' ? { ok: true, progress: parseProgressDelta(data.progress) } : true,
+  };
 }
 
 export async function clearSlot(supabase: SupabaseClient, slot: SlotId): Promise<Result<true>> {

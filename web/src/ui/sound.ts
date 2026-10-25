@@ -1,5 +1,9 @@
-export type SoundName = 'place' | 'ding' | 'remove';
+export type SoundName = 'place' | 'ding' | 'remove' | 'xp' | 'levelup' | 'chest' | 'coins';
 export const SOUND_FILES: Record<SoundName, string> = {
+  xp: 'assets/kenney/fx/xp.mp3',
+  levelup: 'assets/kenney/fx/levelup.mp3',
+  chest: 'assets/kenney/fx/chest.mp3',
+  coins: 'assets/kenney/fx/coins.mp3',
   place: 'assets/kenney/fx/place.mp3',
   ding: 'assets/kenney/fx/ding.mp3',
   remove: 'assets/kenney/fx/remove.mp3',

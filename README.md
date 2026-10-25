@@ -37,14 +37,15 @@ Bedienung: Ein Finger verschiebt, zwei Finger drehen und zoomen, Figur antippen 
 
 ## Stand und nächste Schritte
 
-| Stufe | Inhalt | Stand |
+Stand 25.10.2026. Maßgeblich sind die Arbeitspakete und Abnahmen in [docs/PLAN.md](docs/PLAN.md).
+
+| Bereich | Stand | Nächster Schritt |
 | --- | --- | --- |
-| 0 · Prototyp | Dorf aus Platzhaltern, Figuren auf dem Wegenetz, Tablet-Test | erledigt |
-| Stil-Test | CC0-Modelle (z. B. Kenney, Quaternius) per Blender-Skript umfärben, Licht einbacken, als GLB einbauen; eine animierte Figur | als Nächstes |
-| 1 · Fundament | Supabase, Login mit Spitznamen, Lehrer-Seite, Weck-Auftrag | offen |
-| 2 · Dorf | echte Modelle, Avatar-Baukasten, Animationen | offen |
-| 3 · Aufgaben | Aufgabentafel, serverseitige Prüfung, Tageslimit | offen |
-| 4 · Bauen | Shop, Inventar, Baumodus | offen |
+| Grundfunktionen, Dorf, Daily Quests, Shop/Bauen und Erststart-Tutorial | im Code vorhanden; Migrationen 0001–0019 online bestätigt | offene Abnahmen laut PLAN |
+| XP, Level und Profil | lokal umgesetzt; 796 Tests, Build, ESLint und Browser-Prüfungen grün | Migration 0020 einspielen, auf dem Schul-Tablet abnehmen |
+| Lehrerbereich überarbeiten | Design und Umsetzungsplan vorhanden | nächstes geplantes Funktionspaket |
+| Sir Byte als Begleiter | Design und Umsetzungsplan vorhanden | anschließend umsetzen |
+| Avatar-Baukasten und weitere Asset-Arbeit | Restumfang in Stufe 2 | nach PLAN und Abnahme |
 
 Offen: Klassengröße 8a und 8b (Anzahl Grundstücke), Münzbeträge und Tageslimit, ältestes Tablet-Modell.
 

@@ -17,3 +17,13 @@ Nur CC0-Inhalte oder eigene (CLAUDE.md). Die Quellpakete selbst liegen nicht im 
 | Junge und Mädchen (23.10.2026) | eigene Erstellung der Lehrkraft mit Tripo AI (Rig und Animationen walk, Catwalk, Tänze) | **Tarif/Lizenz bei Tripo prüfen** (Projektregel: nur CC0 oder eigene Modelle) | – | `web/public/assets/characters/boy.glb`, `girl.glb` (unverändert); Vorschaubilder `boy.png`, `girl.png` daraus gerendert |
 | UI Pack 2.0 | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets/ui-pack | `web/public/assets/kenney/ui/` (`bubble.png` = `PNG/Grey/Default/button_rectangle_depth_border.png`, `bubble-tip.png` = `PNG/Grey/Default/arrow_basic_s.png`, `tap-a.ogg` = `Sounds/tap-a.ogg`; unverändert, in CSS hell eingefärbt) |
 | Comic Neue 2.3 (über das npm-Paket `@fontsource/comic-neue` 5.3.0, Latin-Teilmenge) | Craig Rozynski / The Comic Neue Project Authors | SIL Open Font License 1.1 | https://github.com/crozynski/comicneue | `web/public/fonts/ComicNeue-Regular.woff2`, `ComicNeue-Bold.woff2` (unverändert); Lizenztext: `web/public/fonts/OFL.txt` |
+
+## XP-Rückmeldung (25.10.2026)
+
+| Datei | Quelle und Verarbeitung | Lizenz | Link |
+| --- | --- | --- | --- |
+| `web/public/assets/kenney/fx/xp.mp3` | Kenney Interface Sounds, `pluck_001.ogg`; mono MP3 64 kbps | CC0 | https://kenney.nl/assets/interface-sounds |
+| `web/public/assets/kenney/fx/levelup.mp3` | Kenney Interface Sounds, `confirmation_003.ogg`; mono MP3 64 kbps | CC0 | https://kenney.nl/assets/interface-sounds |
+| `web/public/assets/kenney/fx/chest.mp3` | Kenney Interface Sounds, `open_002.ogg`; mono MP3 64 kbps | CC0 | https://kenney.nl/assets/interface-sounds |
+| `web/public/assets/kenney/fx/coins.mp3` | Kenney Interface Sounds, `glass_002.ogg`; mono MP3 64 kbps | CC0 | https://kenney.nl/assets/interface-sounds |
+| `web/public/assets/kenney/fx/star.png` | Kenney Particle Pack, `star_06.png`; resized to 64 × 64 RGBA | CC0 | https://kenney.nl/assets/particle-pack |

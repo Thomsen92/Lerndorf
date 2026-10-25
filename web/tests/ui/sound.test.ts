@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { expect, it, vi } from 'vitest';
-import { createSound, readSoundSetting, writeSoundSetting } from '../../src/ui/sound';
+import { createSound, readSoundSetting, writeSoundSetting, SOUND_FILES } from '../../src/ui/sound';
 const flush = () => new Promise((r) => setTimeout(r, 0));
 function fake() {
   const start = vi.fn(),
@@ -47,7 +47,7 @@ it('loads once after a gesture, plays quietly with the ding delay, and remembers
   sound.unlock();
   await flush();
   expect(f.factory).toHaveBeenCalledTimes(1);
-  expect(f.fetchFn).toHaveBeenCalledTimes(3);
+  expect(f.fetchFn).toHaveBeenCalledTimes(Object.keys(SOUND_FILES).length);
   sound.play('place');
   expect(f.gain.gain.value).toBe(0.35);
   expect(f.start).toHaveBeenLastCalledWith(3);

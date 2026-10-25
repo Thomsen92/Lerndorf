@@ -3,6 +3,7 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Outcome } from './economy';
+import { parseProgressDelta, type ProgressDelta } from './progress';
 
 export type QuestType = 'choice' | 'gap' | 'match' | 'order' | 'listening';
 
@@ -22,6 +23,7 @@ export interface DailyQuest {
 }
 
 export interface QuestAnswerResult {
+  progress?: ProgressDelta | null;
   correct: boolean;
   alreadySolved: boolean;
   coins: number;
@@ -94,6 +96,7 @@ export async function submitQuestAnswer(
     reward: number;
     reward_left: number;
     hint?: string | null;
+    progress?: unknown;
   };
   return {
     ok: true,
@@ -104,6 +107,7 @@ export async function submitQuestAnswer(
       reward: r.reward,
       rewardLeft: r.reward_left,
       hint: r.hint ?? null,
+      ...('progress' in r ? { progress: parseProgressDelta(r.progress) } : {}),
     },
   };
 }

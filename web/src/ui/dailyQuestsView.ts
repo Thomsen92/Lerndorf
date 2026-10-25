@@ -15,8 +15,10 @@ import { answerMode, buildAnswer, type AnswerState } from '../tasks/answer';
 import { answerForm, bindAnswerForm, emptyState, type AnswerFormSpec } from './answerForms';
 import type { AreaHandle } from './areas';
 import { esc } from './esc';
+import type { ProgressDelta } from '../api/progress';
 
 export interface DailyQuestsOptions {
+  onProgress?: (delta: ProgressDelta, from: HTMLElement) => void;
   supabase: SupabaseClient;
   coins: number;
   onCoins: (coins: number) => void;
@@ -60,7 +62,8 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
     </header>
     <p class="quest-rule">Münzen gibt es bei den ersten 3 Versuchen.</p>`;
 
-  const bindClose = (): void => overlay.querySelector('#close')?.addEventListener('click', () => opts.onClose());
+  const bindClose = (): void =>
+    overlay.querySelector('#close')?.addEventListener('click', () => opts.onClose());
 
   const load = async (): Promise<void> => {
     overlay.innerHTML = `<section class="panel">${head()}<p>Lädt …</p></section>`;
@@ -225,6 +228,7 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
       }
       coins = res.value.coins;
       opts.onCoins(coins);
+      if (res.value.progress) opts.onProgress?.(res.value.progress, card);
       if (res.value.correct || res.value.alreadySolved) {
         q.solved = true;
         q.rewardLeft = 0;

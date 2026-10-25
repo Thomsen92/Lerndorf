@@ -17,7 +17,7 @@ const INV = [
   { item_id: 'deco_bench', qty: 1 },
 ];
 
-let rpcResult: Promise<{ error: { message: string } | null }>;
+let rpcResult: Promise<{ error: { message: string } | null; data?: unknown }>;
 let rpc: ReturnType<typeof vi.fn>;
 let placements: Array<{ item_id: string; slot: string; rot: number }>;
 
@@ -70,6 +70,26 @@ beforeEach(() => {
 afterEach(() => mode.dispose());
 
 describe('build bar', () => {
+  it('forwards only confirmed placement XP to the progression loop', async () => {
+    mode.dispose();
+    const onProgress = vi.fn();
+    mode = new BuildMode({ scene: new THREE.Scene(), plot, supabase: fakeSupabase(), uid: 'u1', onProgress });
+    const delta = {
+      gained: [{ reason: 'first_place', xp: 10 }],
+      xp: 10,
+      level: 1,
+      level_before: 1,
+      new_chests: 0,
+    };
+    rpcResult = Promise.resolve({ data: { ok: true, progress: delta }, error: null });
+    await mode.enter();
+    btn('Deko-Platz 2').click();
+    btn('Katzenschild').click();
+    btn('Aufstellen').click();
+    await flush();
+    expect(onProgress).toHaveBeenCalledWith(expect.objectContaining({ xp: 10, levelBefore: 1 }));
+    expect(onProgress).toHaveBeenCalledTimes(1);
+  });
   it('opens a non-modal sheet, loads thumbnails and returns keyboard focus', async () => {
     mode.dispose();
     const onSheet = vi.fn(),

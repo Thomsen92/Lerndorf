@@ -1,6 +1,6 @@
 # XP, Level, Truhen und Profil für Lerndorf – Design
 
-**Stand:** 24.10.2026 · **Status:** Grundrichtung vom Auftraggeber vorgegeben (Antworten 24.10.2026, siehe §2); Details „Entscheidung Claude“ (freie Hand), Prüfung durch den Auftraggeber steht aus. Umsetzungsplan: `docs/superpowers/plans/2026-10-24-xp-level.md`.
+**Stand:** 25.10.2026 · **Status:** Umgesetzt laut Plan 2026-10-24; Migration einspielen (X.13) und Abnahme (X.14) stehen aus. Umsetzungsplan: `docs/superpowers/plans/2026-10-24-xp-level.md`.
 
 ## 1. Ziel
 

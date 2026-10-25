@@ -1,3 +1,4 @@
+import { CREST_COLOURS, CREST_PATHS, crestParts, crestTier, type CrestTier } from '../ui/crest';
 /**
  * Builds the 3D village from a Layout: terrain, river, lanes, bridges, plaza and plots.
  * Placeholder models only (boxes and cones). The comic models come in Stufe 2.
@@ -188,35 +189,89 @@ function riverMesh(river: Point2[]): THREE.Mesh {
   return mesh;
 }
 
+export interface TagInfo {
+  nickname: string;
+  level?: number;
+  titleLabel?: string | null;
+}
+export function drawTagCrest(
+  cx: CanvasRenderingContext2D,
+  level: number,
+  x: number,
+  y: number,
+  size: number,
+): void {
+  const tier = crestTier(level);
+  cx.save();
+  cx.translate(x, y);
+  cx.scale(size / 100, size / 100);
+  cx.fillStyle = CREST_COLOURS[tier];
+  cx.strokeStyle = '#493724';
+  cx.lineWidth = 3;
+  for (const key of crestParts(level)) {
+    cx.fillStyle =
+      key === 'ribbon' || key === 'rivets' ? '#fff0c9' : key === 'crown' ? '#f5d479' : CREST_COLOURS[tier];
+    const shape = new Path2D(CREST_PATHS[key]);
+    cx.fill(shape);
+    cx.stroke(shape);
+  }
+  cx.fillStyle = '#302416';
+  cx.font = 'bold 24px Georgia';
+  cx.textAlign = 'center';
+  cx.textBaseline = 'middle';
+  cx.fillText(`Lv.${level}`, 50, 75, 70);
+  cx.restore();
+}
+export function nameTagLayout(
+  info: TagInfo,
+  _own: boolean,
+): { width: number; height: number; lines: string[]; crest: { text: string; tier: CrestTier } | null } {
+  return {
+    width: 256,
+    height: info.titleLabel ? 96 : 64,
+    lines: info.titleLabel ? [info.nickname, info.titleLabel] : [info.nickname],
+    crest: info.level ? { text: `Lv.${info.level}`, tier: crestTier(info.level) } : null,
+  };
+}
 export interface VillageMember {
   /** Plot index in the class village (profiles.plot_index). */
   plotIndex: number;
   nickname: string;
+  level?: number;
+  titleLabel?: string | null;
+  frameId?: string;
   /** What stands in the slots of the plot (house and garage fall back to the starters). */
   slots?: SlotMap;
 }
 
 /** Floating name label above a house. Canvas texture, so no HTML inside the 3D scene. */
-function nameTag(text: string, own: boolean): THREE.Sprite {
+export function nameTag(info: TagInfo | string, own: boolean): THREE.Sprite {
+  const data = typeof info === 'string' ? { nickname: info } : info;
+  const layout = nameTagLayout(data, own);
   const cv = document.createElement('canvas');
   cv.width = 256;
-  cv.height = 64;
+  cv.height = layout.height;
   const cx = cv.getContext('2d');
   if (cx) {
     cx.fillStyle = own ? 'rgba(255,181,71,0.95)' : 'rgba(20,24,40,0.8)';
     cx.beginPath();
-    cx.roundRect(6, 10, 244, 44, 22);
+    cx.roundRect(6, 10, 244, layout.height - 20, 22);
     cx.fill();
     cx.fillStyle = own ? '#2a1d05' : '#ffffff';
     cx.font = 'bold 26px Atkinson Hyperlegible, Verdana, sans-serif';
     cx.textAlign = 'center';
     cx.textBaseline = 'middle';
-    cx.fillText(text, 128, 33, 236);
+    if (layout.crest) drawTagCrest(cx, data.level!, 12, 14, 44);
+    cx.fillText(data.nickname, layout.crest ? 151 : 128, 33, layout.crest ? 184 : 236);
+    if (data.titleLabel) {
+      cx.font = '20px Georgia, serif';
+      cx.fillText(data.titleLabel, 128, 68, 230);
+    }
   }
   const sprite = new THREE.Sprite(
     new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), depthWrite: false, transparent: true }),
   );
-  sprite.scale.set(2.4, 0.6, 1);
+  sprite.scale.set(2.4, (layout.height / 64) * 0.6, 1);
   sprite.renderOrder = 10;
   return sprite;
 }
@@ -479,7 +534,7 @@ function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): TH
   g.position.set(p.x, p.h, p.z);
   g.rotation.y = p.face;
   const house = rectCentre(SLOTS[0]);
-  const tag = nameTag(member.nickname, own);
+  const tag = nameTag(member, own);
   tag.position.set(house.lx, 7.2, house.lz);
   tag.userData = { house: true, own };
   g.add(tag);
@@ -544,6 +599,17 @@ export function buildVillage(
   };
   root.userData.ownSlotObject = (slot: SlotId): THREE.Object3D | null =>
     ownGroup?.getObjectByName('contents')?.children.find((object) => object.userData.slot === slot) ?? null;
+  root.userData.updateOwnTag = (info: TagInfo): void => {
+    const old = ownGroup?.children.find((o) => o instanceof THREE.Sprite && o.userData.house) as
+      THREE.Sprite | undefined;
+    if (!ownGroup || !old) return;
+    const fresh = nameTag(info, true);
+    old.material.map?.dispose();
+    old.material.map = fresh.material.map;
+    old.material.needsUpdate = true;
+    old.scale.copy(fresh.scale);
+    fresh.material.dispose();
+  };
   root.add(buildNature(layout));
   root.add(buildVegetation(layout));
   root.add(buildLandmarks(layout));

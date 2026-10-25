@@ -85,9 +85,11 @@ vi.mock('../../src/api/build', async (importOriginal) => ({
   loadClassSlots: async () => new Map(),
 }));
 const tutorialState = vi.fn();
+const finishTutorial = vi.fn();
 vi.mock('../../src/api/tutorial', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../src/api/tutorial')>()),
   getTutorialState: (...a: unknown[]) => tutorialState(...a),
+  finishTutorial: (...a: unknown[]) => finishTutorial(...a),
 }));
 const runTutorial = vi.fn();
 vi.mock('../../src/ui/tutorial/flow', () => ({ runTutorial: (ctx: TutorialContext) => runTutorial(ctx) }));
@@ -135,17 +137,16 @@ beforeEach(() => {
   root = document.getElementById('app') as HTMLElement;
   signOut = vi.fn().mockResolvedValue({ error: null });
   supabase = { auth: { signOut }, rpc: vi.fn(), from: vi.fn() } as unknown as SupabaseClient;
-  profile
-    .mockReset()
-    .mockResolvedValue({
-      id: 'u1',
-      nickname: 'Fuchs',
-      classId: '8a',
-      plotIndex: 0,
-      coins: 0,
-      character: 'boy',
-    });
+  profile.mockReset().mockResolvedValue({
+    id: 'u1',
+    nickname: 'Fuchs',
+    classId: '8a',
+    plotIndex: 0,
+    coins: 0,
+    character: 'boy',
+  });
   tutorialState.mockReset();
+  finishTutorial.mockReset().mockResolvedValue({ ok: true });
   runTutorial.mockReset();
   openDailyQuests.mockReset();
   crowdCalls.length = 0;
@@ -164,6 +165,7 @@ describe('village and tutorial', () => {
     });
     handle = await mountVillage(root, supabase, vi.fn());
     expect(runTutorial).not.toHaveBeenCalled();
+    expect(finishTutorial).toHaveBeenCalledWith(supabase);
     expect(document.body.textContent).not.toContain('freies Grundstück');
     expect(document.body.textContent).not.toContain('Wiese');
     expect(navButtons().length).toBe(3);
