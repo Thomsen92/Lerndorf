@@ -144,7 +144,7 @@ Der Abschluss (`tutorial_finish`) bucht 50 XP und führt so zum ersten Level-Auf
 
 ## 10. Daten und Server (Entscheidung Claude)
 
-Neue Migration `0020_xp_levels.sql` (nach 0019).
+Neue Migration mit der nächsten freien Nummer (`<NNNN>_xp_levels.sql`).
 
 - `profiles` bekommt `xp int not null default 0 check (xp >= 0)`, `level int` (gespeichert, nur von `grant_xp` geschrieben, = `level_for_xp(xp)`), `title_id text null`, `frame_id text not null default 'frame_wood'`, `progress_seen_id bigint not null default 0` (letzte gesehene XP-Buchung, für „Willkommen zurück“).
 - `xp_ledger (id bigserial, player_id uuid, delta int > 0, reason text, ref text, created_at)`, `unique (player_id, reason, ref)`. Gründe: `quest`, `day_goal`, `streak`, `stamp`, `tutorial`, `first_place`, `backfill`. **Invariante:** `profiles.xp` = Summe `xp_ledger.delta`.

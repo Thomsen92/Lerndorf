@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Read `CLAUDE.md` first. Do not touch `Konzept/`, `Prototyp/`, `Kenny/`, `../Referenz`, `Thomsen92/English-Club-8`. Do **not** change the `Thomsen92/Sir-Byte` repository; only read it (clone to a temporary folder outside Lerndorf).
-- **Order:** needs `web/src/ui/sound.ts` (build-feedback plan Task 2: `Sound.enabled`, toggle „Töne: an/aus“). Branch `feature/sir-byte` from the newest branch that contains it. If it is missing, implement build-feedback Task 2 first, unchanged. The XP feature is optional (Task 6 Step 5 only if `api/progress.ts` exists).
+- **Order:** needs `web/src/ui/sound.ts` (build-feedback plan Task 2: `Sound.enabled`, toggle „Töne: an/aus“). Work on `main` (single branch). If it is missing, implement build-feedback Task 2 first, unchanged. The XP feature is optional (Task 6 Step 5 only if `api/progress.ts` exists).
 - No migration, no RPC, no new table, no network call except loading the voice files from the own site. No new npm dependency.
 - Source of the copy: `https://github.com/Thomsen92/Sir-Byte` at commit `ea10e0c`. Copy `sir-byte.mjs`, `behavior.mjs`, `speech-motion.mjs`, `voice-clips.mjs` byte-identical except a header comment and the relative import paths. Never edit vendor logic; Lerndorf behaviour goes into the wrapper.
 - Allowed reactions in Lerndorf: `idle`, `point`, `cheeky`, `celebrate`, `think`, `support`, `surprise`. **Never** `dry` or `smug`. Voice files used: `ready.mp3`, `splendid.mp3`, `nearly.mp3`, `support.mp3`, `thinking.mp3`, `surprised.mp3` → `web/public/assets/sir-byte/voice/`.
