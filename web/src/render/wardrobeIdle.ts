@@ -13,9 +13,9 @@ export function createWardrobeIdle(root: Object3D): (seconds: number, enabled: b
       bone.quaternion.copy(rest);
       if (!enabled) continue;
       angles.set(
-        head ? Math.sin(seconds * 0.8) * 0.012 : Math.sin(seconds * 1.65) * 0.009,
-        head ? Math.sin(seconds * 0.46) * 0.025 : 0,
-        head ? Math.sin(seconds * 0.6) * 0.008 : Math.sin(seconds * 0.7) * 0.006,
+        head ? Math.sin(seconds * 0.9) * 0.03 : Math.sin(seconds * 1.65) * 0.022,
+        head ? Math.sin(seconds * 0.55) * 0.065 : Math.sin(seconds * 0.65) * 0.018,
+        head ? Math.sin(seconds * 0.7) * 0.02 : Math.sin(seconds * 0.85) * 0.02,
       );
       bone.quaternion.multiply(delta.setFromEuler(angles));
     }
