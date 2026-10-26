@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 import { isMonday } from '../src/teacher/week.ts';
 import { packageToRows, validatePackage, type WeekPackage } from './quests.ts';
+import { missingListening, PUBLIC_DIR } from './listening.ts';
 
 export interface QuestRpc {
   rpc(fn: string, args: Record<string, unknown>): Promise<{ error: { message: string } | null }>;
@@ -24,7 +25,11 @@ function weekFromFileName(file: string): string | null {
   return m && isMonday(m[1]) ? m[1] : null;
 }
 
-export async function importQuestDir(dir: URL, client: QuestRpc): Promise<ImportReport> {
+export async function importQuestDir(
+  dir: URL,
+  client: QuestRpc,
+  publicDir = PUBLIC_DIR,
+): Promise<ImportReport> {
   const report: ImportReport = { imported: [], failed: [] };
   let files: string[];
   try {
@@ -52,9 +57,7 @@ export async function importQuestDir(dir: URL, client: QuestRpc): Promise<Import
             all.push(`Fehler konnte nicht im Lehrer-Bereich gespeichert werden: ${rec.error.message}`);
           }
         } catch (err) {
-          all.push(
-            `Fehler konnte nicht im Lehrer-Bereich gespeichert werden: ${(err as Error).message}`,
-          );
+          all.push(`Fehler konnte nicht im Lehrer-Bereich gespeichert werden: ${(err as Error).message}`);
         }
       }
       report.failed.push({ file, errors: all });
@@ -74,6 +77,14 @@ export async function importQuestDir(dir: URL, client: QuestRpc): Promise<Import
     }
     const pkg = json as WeekPackage;
     const { quests, solutions } = packageToRows(pkg);
+    const missing = missingListening(quests, publicDir);
+    if (missing.length) {
+      await fail(
+        [`Hörtext ohne Audiodatei: ${missing.join(', ')}. Bitte web/stimmen.cmd ausführen.`],
+        pkg.week,
+      );
+      continue;
+    }
     let rpcError: string | null = null;
     try {
       const { error } = await client.rpc('import_quest_week', {
