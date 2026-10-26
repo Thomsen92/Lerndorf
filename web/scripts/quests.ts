@@ -1,6 +1,6 @@
 /**
  * Validation and conversion of a week of daily quests. Pure functions, no network.
- * A week file looks like content/daily-quests/2026-11-09.json (7 days x 3�4 quests) or is a
+ * A week file looks like content/daily-quests/2026-11-09.json (7 days x 3-4 quests) or is a
  * holiday file {"week": "...", "holiday": true}. The solution never goes to the client:
  * `packageToRows` splits each quest into the public row (`data`) and the private solution row.
  */
@@ -26,6 +26,7 @@ export interface QuestSpec {
   hint: string;
   reward: number;
   options?: string[];
+  bank?: string[];
   solution?: string | string[];
   pairs?: Array<[string, string]>;
   speak?: string;
@@ -61,6 +62,9 @@ function validateTypeFields(q: Record<string, unknown>, type: QuestType, where: 
     }
   };
   const gapFields = () => {
+    if (q.bank !== undefined && (!isStrList(q.bank, 2, 6) || new Set(q.bank).size !== q.bank.length)) {
+      errors.push(`${where}.bank: 2 bis 6 verschiedene Wörter`);
+    }
     if (!isStrList(q.solution, 1, 10)) errors.push(`${where}.solution: Liste mit mindestens einer Lösung`);
     if (typeof q.prompt === 'string' && !q.prompt.includes(GAP)) {
       errors.push(`${where}.prompt: muss ${GAP} enthalten`);
@@ -248,7 +252,7 @@ export function packageToRows(pkg: WeekPackage): { quests: QuestRow[]; solutions
           solution = q.solution;
           break;
         case 'gap':
-          data = {};
+          data = q.bank ? { bank: q.bank } : {};
           solution = q.solution;
           break;
         case 'match': {
@@ -270,6 +274,7 @@ export function packageToRows(pkg: WeekPackage): { quests: QuestRow[]; solutions
         case 'listening':
           data = { speak: q.speak, mode: q.mode };
           if (q.mode === 'choice') data.options = q.options;
+          if (q.mode === 'gap' && q.bank) data.bank = q.bank;
           solution = q.solution;
           break;
       }
