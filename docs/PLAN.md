@@ -1,5 +1,16 @@
 # Lerndorf – Umsetzungsplan
 
+### Spielsprache – 26.10.2026
+
+| AP | Status | Ergebnis |
+| --- | --- | --- |
+| Sprache 1 | [x] | Englisch als Standard; Deutsch über Settings / Einstellungen wählbar und im Browser gespeichert |
+| Sprache 2 | [x] | Spielertexte, Anzeigenamen und Beschriftungen übersetzt; Lerndorf, Backend, IDs, Lerninhalte und Lehrerbereich erhalten |
+| Sprache 3 | [x] | 880 Tests, Produktionsbuild und ESLint erfolgreich; 12 Browserprüfungen für Sprachwechsel und Kleiderschrank, abschließende drei Sprachprüfungen erneut erfolgreich |
+| Sprache 4 | [ ] | Sichtabnahme durch den Auftraggeber, auf dessen Wunsch selbst durchgeführt |
+
+Details: [Sprachwahl](PLAYER_LANGUAGES.md). 36 Dorfansichten für die Sichtkontrolle unter `web/test-results/layout-languages/` erzeugt. Lokal auf `codex/player-languages`, keine Datenbank- oder Inhaltsänderung, kein Deployment.
+
 Stand: 17.10.2026 · gehört zu [SCOPE.md](SCOPE.md) und [SPEC.md](SPEC.md)
 
 So liest man den Plan: Jede Stufe besteht aus nummerierten Arbeitspaketen (AP). Ein AP ist eine Arbeitssitzung oder kleiner. Spalte **Wer**: **CC** = Claude Code, **LK** = Lehrkraft. Ein AP gilt als erledigt, wenn sein **Fertig-Kriterium** geprüft ist. Am Ende jeder Stufe steht eine Abnahme durch die Lehrkraft auf einem Schul-Tablet; erst danach beginnt die nächste Stufe.

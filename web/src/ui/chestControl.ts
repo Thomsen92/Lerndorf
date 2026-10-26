@@ -1,10 +1,11 @@
+import { msg, tr } from '../i18n';
 import type { Chest, ProgressApi } from '../api/progress';
 import { createChestPreview, type ChestPreview } from '../render/chestPreview';
 import type { Sound } from './sound';
 import './chest.css';
 
 export function chestResultText(coins: number, roll: 'normal' | 'double' | 'triple'): string {
-  return `+${coins} Münzen${roll === 'double' ? ' – Super!' : roll === 'triple' ? ' – Jackpot!' : ''}`;
+  return msg`+${coins} Münzen${roll === 'double' ? tr(' – Super!') : roll === 'triple' ? tr(' – Jackpot!') : ''}`;
 }
 export interface ChestControl {
   el: HTMLElement;
@@ -31,8 +32,8 @@ export function createChestControl(opts: {
   const hit = document.createElement('button');
   hit.type = 'button';
   hit.className = 'chest-hit';
-  const label = opts.chest.size === 'big' ? 'Große Truhe' : 'Truhe';
-  hit.setAttribute('aria-label', `${label} öffnen`);
+  const label = opts.chest.size === 'big' ? tr('Große Truhe') : tr('Truhe');
+  hit.setAttribute('aria-label', msg`${label} öffnen`);
   const visual = document.createElement('span');
   visual.className = 'loot-visual';
   visual.setAttribute('aria-hidden', 'true');
@@ -130,7 +131,7 @@ export function createChestControl(opts: {
     el.dataset.state = 'pending';
     hit.setAttribute('aria-busy', 'true');
     hit.setAttribute('aria-disabled', 'true');
-    status.textContent = 'Die Truhe wird geöffnet …';
+    status.textContent = tr('Die Truhe wird geöffnet …');
     preview?.setState('pending');
     opts.sound?.play('chest');
     opts.onPending?.(true);
@@ -145,8 +146,8 @@ export function createChestControl(opts: {
       preview?.setState('open');
       hover();
       status.textContent = chestResultText(result.value.coinsWon, result.value.roll);
-      hit.setAttribute('aria-label', `${label} geöffnet`);
-      caption.textContent = 'Geöffnet';
+      hit.setAttribute('aria-label', msg`${label} geöffnet`);
+      caption.textContent = tr('Geöffnet');
       opts.sound?.play('coins');
       animateCoins(result.value.coinsWon);
     } catch {
@@ -154,7 +155,7 @@ export function createChestControl(opts: {
       el.dataset.state = 'closed';
       preview?.setState('closed');
       hit.removeAttribute('aria-disabled');
-      status.textContent = 'Das hat nicht geklappt. Tippe die Truhe noch einmal an.';
+      status.textContent = tr('Das hat nicht geklappt. Tippe die Truhe noch einmal an.');
     } finally {
       pending = false;
       if (!disposed) {

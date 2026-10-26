@@ -1,3 +1,4 @@
+import { html } from '../i18n';
 /**
  * Answer forms for choice, gap, match and order (SPEC §12), shared by the areas that ask questions.
  * Renders HTML from the public task data and writes the pupil's input into an AnswerState.
@@ -39,7 +40,13 @@ export function answerForm(form: AnswerFormSpec, state: AnswerState): string {
         )
         .join('')}</div>`;
     case 'gap':
-      return `<input id="gap" type="text" autocomplete="off" autocapitalize="off" placeholder="Antwort" />`;
+      return html`<input
+        id="gap"
+        type="text"
+        autocomplete="off"
+        autocapitalize="off"
+        placeholder="Antwort"
+      />`;
     case 'match': {
       const rights = stringList(form.data, 'right');
       return `<div class="matches">${stringList(form.data, 'left')
@@ -54,11 +61,12 @@ export function answerForm(form: AnswerFormSpec, state: AnswerState): string {
     case 'order': {
       const words = stringList(form.data, 'words');
       const used = state.type === 'order' ? state.sequence : [];
-      return `
-        <p class="hint">Antippen in der richtigen Reihenfolge: ${used.map(esc).join(' ') || '–'}</p>
-        <div class="words">${words
-          .map((w) => `<button type="button" data-word="${esc(w)}">${esc(w)}</button>`)
-          .join('')}</div>
+      return html` <p class="hint">
+          Antippen in der richtigen Reihenfolge: ${used.map(esc).join(' ') || '–'}
+        </p>
+        <div class="words">
+          ${words.map((w) => `<button type="button" data-word="${esc(w)}">${esc(w)}</button>`).join('')}
+        </div>
         <button type="button" id="reset">Neu anfangen</button>`;
     }
   }

@@ -2,6 +2,7 @@
 import { it, expect, vi, afterEach } from 'vitest';
 import { openWardrobe } from '../../src/ui/wardrobeView';
 import { emptyLook, DEFAULT_COLORS } from '../../src/avatars/look';
+import { setLocale } from '../../src/i18n';
 const data = {
   character: 'boy' as const,
   wardrobe: { v: 1 as const, revision: 0, boy: emptyLook(), girl: emptyLook() },
@@ -14,6 +15,33 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 const tick = () => new Promise((r) => setTimeout(r, 0));
+it('offers conflict recovery in English without depending on translated error wording', async () => {
+  setLocale('en');
+  const load = vi.fn(async () => ({ ok: true as const, value: data }));
+  const h = openWardrobe({
+    api: {
+      load,
+      save: async () => ({
+        ok: false,
+        code: 'revision_conflict',
+        message: 'Your look has changed elsewhere.',
+      }),
+    },
+    onClose: vi.fn(),
+    onShop: vi.fn(),
+    onSaved: vi.fn(),
+    stageFactory: async () => stage,
+  });
+  await tick();
+  document.querySelector<HTMLButtonElement>('[data-action="done"]')!.click();
+  await tick();
+  const reload = document.querySelector<HTMLButtonElement>('[data-reload]');
+  expect(reload?.textContent).toBe('Reload saved look');
+  reload!.click();
+  await tick();
+  expect(load).toHaveBeenCalledTimes(2);
+  h.close();
+});
 it('aborts a stage that is still loading when the room is closed', async () => {
   let signal: AbortSignal | undefined, resolve!: (s: typeof stage) => void;
   const pending = new Promise<typeof stage>((r) => {

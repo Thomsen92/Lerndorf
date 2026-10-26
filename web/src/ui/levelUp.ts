@@ -1,3 +1,4 @@
+import { tr, msg } from '../i18n';
 import type { Chest, ProgressApi, Reward } from '../api/progress';
 import { PROGRESS_ERROR } from '../api/progress';
 import { openModal, type ModalHandle } from './dialog';
@@ -23,7 +24,7 @@ export function openChestDialog(opts: {
 }): ModalHandle {
   let card: ChestControl | null = null;
   const modal = openModal({
-    title: opts.chest.size === 'big' ? 'Große Truhe' : 'Deine Truhe',
+    title: opts.chest.size === 'big' ? tr('Große Truhe') : tr('Deine Truhe'),
     opener: opts.opener,
     canClose: () => !card?.pending,
     onClose: () => {
@@ -31,7 +32,7 @@ export function openChestDialog(opts: {
       opts.onDone();
     },
   });
-  const done = button('Weiter', () => modal.close());
+  const done = button(tr('Weiter'), () => modal.close());
   done.hidden = true;
   card = createChestControl({
     ...opts,
@@ -62,7 +63,7 @@ export interface CelebrationOptions {
 export function openLevelUp(opts: CelebrationOptions): ModalHandle {
   const cards: ChestControl[] = [];
   const modal = openModal({
-    title: `Level ${opts.levelTo}!`,
+    title: msg`Level ${opts.levelTo}!`,
     opener: opts.opener,
     canClose: () => !cards.some((card) => card.pending),
     onClose: () => {
@@ -79,19 +80,19 @@ export function openLevelUp(opts: CelebrationOptions): ModalHandle {
     const row = document.createElement('div');
     row.className = 'reward-row';
     const label = document.createElement('p');
-    label.textContent = `Neuer ${reward.kind === 'title' ? 'Titel' : 'Rahmen'}: ${reward.label}`;
+    label.textContent = msg`Neuer ${reward.kind === 'title' ? tr('Titel') : tr('Rahmen')}: ${reward.label}`;
     const error = document.createElement('p');
     error.setAttribute('role', 'status');
     row.append(
       label,
-      button(reward.kind === 'title' ? 'Jetzt wählen' : 'Jetzt anlegen', (b) => {
+      button(reward.kind === 'title' ? tr('Jetzt wählen') : tr('Jetzt anlegen'), (b) => {
         b.disabled = true;
         void (reward.kind === 'title' ? opts.api.setTitle(reward.id) : opts.api.setFrame(reward.id))
           .then((result) => {
             if (!modal.isOpen) return;
             if (result.ok) {
               opts.onEquip(reward);
-              b.textContent = 'Gewählt';
+              b.textContent = tr('Gewählt');
             } else {
               error.textContent = PROGRESS_ERROR;
               b.disabled = false;
@@ -109,7 +110,7 @@ export function openLevelUp(opts: CelebrationOptions): ModalHandle {
     rewards.append(row);
   }
   modal.body.append(rewards);
-  const done = button('Weiter', () => {
+  const done = button(tr('Weiter'), () => {
     if (!cards.some((card) => card.pending)) modal.close();
   });
   if (opts.chests.length) {

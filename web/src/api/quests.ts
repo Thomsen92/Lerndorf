@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * Daily quests for the pupil. Reads and answers go through RPCs only.
  */
@@ -35,13 +36,13 @@ export interface QuestAnswerResult {
 const fail = (message: string): { ok: false; message: string } => ({ ok: false, message });
 
 /** Message when a quest is gone (day over, deactivated); the area reloads its list then. */
-export const QUEST_NOT_OPEN = 'Diese Quest ist nicht mehr offen.';
+export const QUEST_NOT_OPEN = tr('Diese Quest ist nicht mehr offen.');
 
 /** Turns the database error into a short German message for the pupil. */
 export function explainQuestError(message: string): string {
   if (message.includes('quest not available')) return QUEST_NOT_OPEN;
-  if (message.includes('only pupils')) return 'Nur Schülerkonten können Quests lösen.';
-  return 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.';
+  if (message.includes('only pupils')) return tr('Nur Schülerkonten können Quests lösen.');
+  return tr('Das hat leider nicht geklappt. Bitte noch einmal versuchen.');
 }
 
 interface QuestRow {
@@ -62,7 +63,7 @@ export async function loadDailyQuests(supabase: SupabaseClient): Promise<Outcome
   if (error) {
     // a teacher account is refused by the server: say why instead of a generic failure
     const why = error.message.includes('only pupils') ? explainQuestError(error.message) : null;
-    return fail(why ?? 'Die Quests konnten nicht geladen werden.');
+    return fail(why ?? tr('Die Quests konnten nicht geladen werden.'));
   }
   const rows = (data ?? []) as QuestRow[];
   return {

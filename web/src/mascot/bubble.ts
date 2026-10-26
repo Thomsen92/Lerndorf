@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 import type { Say } from './sirByte';
 import './mascot.css';
 type AvoidRect = { left: number; top: number; right: number; bottom: number };
@@ -67,7 +68,7 @@ export function createByteBubble(host: HTMLElement) {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'primary tutorial-action';
-      button.textContent = 'Weiter';
+      button.textContent = tr('Weiter');
       el.append(button);
       button.focus();
       return new Promise((resolve) => {

@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * The fixed plan of every pupil plot (docs/ASSET_VERTRAG.md, Fassung 2, approved 20.10.2026).
  * The same layout on every plot: house, garage with driveway, a car pedestal in the driveway,
@@ -35,13 +36,13 @@ export interface SlotDef extends CellRect {
 }
 
 export const SLOTS: readonly SlotDef[] = [
-  { id: 'house', kind: 'house', nameDe: 'Haus', x: 1, z: 0, w: 6, d: 4 },
-  { id: 'garage', kind: 'garage', nameDe: 'Garage', x: 8, z: 0, w: 3, d: 4 },
-  { id: 'car', kind: 'car', nameDe: 'Auto-Platz', x: 8, z: 4, w: 3, d: 5 },
-  { id: 'deco_1', kind: 'deco', nameDe: 'Deko-Platz 1', x: 0, z: 4, w: 3, d: 3 },
-  { id: 'deco_2', kind: 'deco', nameDe: 'Deko-Platz 2', x: 5, z: 4, w: 3, d: 3 },
-  { id: 'deco_3', kind: 'deco', nameDe: 'Deko-Platz 3', x: 0, z: 8, w: 3, d: 3 },
-  { id: 'deco_4', kind: 'deco', nameDe: 'Deko-Platz 4', x: 5, z: 8, w: 3, d: 3 },
+  { id: 'house', kind: 'house', nameDe: tr('Haus'), x: 1, z: 0, w: 6, d: 4 },
+  { id: 'garage', kind: 'garage', nameDe: tr('Garage'), x: 8, z: 0, w: 3, d: 4 },
+  { id: 'car', kind: 'car', nameDe: tr('Auto-Platz'), x: 8, z: 4, w: 3, d: 5 },
+  { id: 'deco_1', kind: 'deco', nameDe: tr('Deko-Platz 1'), x: 0, z: 4, w: 3, d: 3 },
+  { id: 'deco_2', kind: 'deco', nameDe: tr('Deko-Platz 2'), x: 5, z: 4, w: 3, d: 3 },
+  { id: 'deco_3', kind: 'deco', nameDe: tr('Deko-Platz 3'), x: 0, z: 8, w: 3, d: 3 },
+  { id: 'deco_4', kind: 'deco', nameDe: tr('Deko-Platz 4'), x: 5, z: 8, w: 3, d: 3 },
 ];
 
 /** Areas that belong to the plot itself and never take an asset. */

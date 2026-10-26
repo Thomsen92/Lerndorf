@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * Figure choice (boy or girl): shown once on the first login, and again from the settings
  * ("Figur wechseln"). On the first login it cannot be closed without a choice.
@@ -16,14 +17,14 @@ export function openCharacterPicker(opts: {
   let busy = false;
   let chosen = false;
   const modal = openModal({
-    title: opts.required ? 'Wähle deine Figur' : 'Figur wechseln',
+    title: opts.required ? tr('Wähle deine Figur') : tr('Figur wechseln'),
     opener: opts.opener ?? null,
     canClose: () => !busy && (chosen || !opts.required),
   });
   const text = document.createElement('p');
   text.textContent = opts.required
-    ? 'Mit dieser Figur läufst du durchs Dorf. Du kannst sie später in den Einstellungen wechseln.'
-    : 'Tippe auf die Figur, die du haben möchtest.';
+    ? tr('Mit dieser Figur läufst du durchs Dorf. Du kannst sie später in den Einstellungen wechseln.')
+    : tr('Tippe auf die Figur, die du haben möchtest.');
   const row = document.createElement('div');
   row.className = 'character-choices';
   const status = document.createElement('p');
@@ -46,7 +47,7 @@ export function openCharacterPicker(opts: {
       if (busy) return;
       busy = true;
       buttons.forEach((x) => (x.disabled = true));
-      status.textContent = 'Wird gespeichert …';
+      status.textContent = tr('Wird gespeichert …');
       const error = await opts.onPick(kind);
       busy = false;
       buttons.forEach((x) => (x.disabled = false));

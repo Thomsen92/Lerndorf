@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * The village screen for a logged-in pupil: 3D village, villagers, own house marked,
  * main navigation (Dorf / Aufgaben / Mein Haus), the areas behind it (house menu, shop, inventory,
@@ -287,13 +288,13 @@ export async function mountVillage(
     console.error(err);
     if (notice) {
       notice.hidden = false;
-      notice.textContent = 'Das Dorf konnte nicht geladen werden. Bitte die Seite neu laden.';
+      notice.textContent = tr('Das Dorf konnte nicht geladen werden. Bitte die Seite neu laden.');
     }
     // the session must stay endable on a shared tablet
     const out = document.createElement('button');
     out.type = 'button';
     out.className = 'primary load-logout';
-    out.textContent = 'Abmelden';
+    out.textContent = tr('Abmelden');
     out.addEventListener('click', () => void logout());
     root.appendChild(out);
     return { dispose: stop };
@@ -555,11 +556,11 @@ export async function mountVillage(
   }
   const enterBuild = async (opts?: EnterOptions): Promise<AreaHandle | null> => {
     if (!buildMode) {
-      showNotice('Du hast noch kein Grundstück.');
+      showNotice(tr('Du hast noch kein Grundstück.'));
       return null;
     }
     if (!buildOpen) {
-      showNotice('Das Bauen ist gerade geschlossen.');
+      showNotice(tr('Das Bauen ist gerade geschlossen.'));
       return null;
     }
     const err = await buildMode.enter(opts);
@@ -691,7 +692,7 @@ export async function mountVillage(
         }),
       haus: async () => {
         if (!home) {
-          showNotice('Du hast noch kein Grundstück.');
+          showNotice(tr('Du hast noch kein Grundstück.'));
           return null;
         }
         return openHouseMenu({
@@ -870,7 +871,7 @@ export async function mountVillage(
     },
     placeHouse: async (place) => {
       const mode = buildMode;
-      if (!mode || !home) return { ok: false, message: 'Du hast noch kein Grundstück.' };
+      if (!mode || !home) return { ok: false, message: tr('Du hast noch kein Grundstück.') };
       const seconds = reducedMotion() ? 0.01 : FLIGHT_SECONDS;
       const from = currentPose();
       const to = houseView(home);

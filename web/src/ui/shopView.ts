@@ -1,3 +1,4 @@
+import { tr, msg } from '../i18n';
 /**
  * Shop and inventory areas (non-modal, SPEC §12): a category bar and a grid of item cards.
  * A card opens the shared detail dialog (purchase flow or inventory actions). After a change the list is
@@ -41,7 +42,7 @@ export function openShop(opts: ItemAreaOptions): AreaHandle {
 }
 
 export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHandle {
-  const title = origin === 'shop' ? 'Shop' : 'Inventar';
+  const title = origin === 'shop' ? tr('Shop') : tr('Inventar');
   const titleId = `area-title-${++counter}`;
 
   const area = document.createElement('section');
@@ -58,7 +59,7 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
   coinsEl.className = 'coins';
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
-  closeBtn.textContent = 'Schließen';
+  closeBtn.textContent = tr('Schließen');
   closeBtn.addEventListener('click', () => opts.onClose());
   head.append(h2, coinsEl, closeBtn);
   const content = document.createElement('div');
@@ -112,7 +113,7 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
     origin === 'shop' ? [...KIND_ORDER] : KIND_ORDER.filter((k) => visible().some((e) => e.kind === k));
 
   function draw(focusKind?: ItemKind): void {
-    coinsEl.textContent = `${opts.getCoins()} Münzen`;
+    coinsEl.textContent = msg`${opts.getCoins()} Münzen`;
     content.replaceChildren();
     if (error !== null) {
       const p = document.createElement('p');
@@ -120,21 +121,21 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
       p.textContent = error;
       const retry = document.createElement('button');
       retry.type = 'button';
-      retry.textContent = 'Nochmal versuchen';
+      retry.textContent = tr('Nochmal versuchen');
       retry.addEventListener('click', () => void load(false));
       content.append(p, retry);
       return;
     }
     if (book === null) {
       const p = document.createElement('p');
-      p.textContent = 'Lädt …';
+      p.textContent = tr('Lädt …');
       content.appendChild(p);
       return;
     }
     if (origin === 'shop' && !opts.shopOpen) {
       const p = document.createElement('p');
       p.className = 'notice-in';
-      p.textContent = 'Der Shop ist gerade geschlossen.';
+      p.textContent = tr('Der Shop ist gerade geschlossen.');
       content.appendChild(p);
     }
     const available = kinds();
@@ -142,8 +143,8 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
       const p = document.createElement('p');
       p.textContent =
         origin === 'shop'
-          ? 'In dieser Kategorie gibt es gerade nichts.'
-          : 'Du hast noch keine eigenen Sachen. Im Shop kannst du welche kaufen.';
+          ? tr('In dieser Kategorie gibt es gerade nichts.')
+          : tr('Du hast noch keine eigenen Sachen. Im Shop kannst du welche kaufen.');
       content.appendChild(p);
       return;
     }
@@ -153,7 +154,7 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
     const bar = document.createElement('div');
     bar.className = 'category-bar';
     bar.setAttribute('role', 'group');
-    bar.setAttribute('aria-label', 'Kategorien');
+    bar.setAttribute('aria-label', tr('Kategorien'));
     for (const kind of available) {
       const b = document.createElement('button');
       b.type = 'button';
@@ -172,7 +173,7 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
     const list = visible().filter((e) => e.kind === current);
     if (list.length === 0) {
       const p = document.createElement('p');
-      p.textContent = 'In dieser Kategorie gibt es gerade nichts.';
+      p.textContent = tr('In dieser Kategorie gibt es gerade nichts.');
       content.appendChild(p);
     } else {
       const grid = document.createElement('div');
@@ -233,7 +234,7 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
       res = await opts.api.loadBook();
     } catch (err) {
       console.error('loadBook failed', err);
-      res = { ok: false, message: 'Das hat nicht geklappt. Versuch es nochmal.' };
+      res = { ok: false, message: tr('Das hat nicht geklappt. Versuch es nochmal.') };
     }
     if (closed || id !== loadId) return;
     if (res.ok) {
@@ -264,7 +265,7 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
 export const TUTORIAL_HOUSE: ItemEntry = {
   id: 'house_fachwerk',
   kind: 'house',
-  nameDe: 'Fachwerkhaus',
+  nameDe: tr('Fachwerkhaus'),
   price: 50,
   starter: false,
   owned: 0,
@@ -314,7 +315,7 @@ export function openTutorialBuy(opts: TutorialBuyOptions): AreaHandle {
   name.textContent = TUTORIAL_HOUSE.nameDe;
   const price = document.createElement('span');
   price.className = 'item-price';
-  price.textContent = `${TUTORIAL_HOUSE.price} Münzen`;
+  price.textContent = msg`${TUTORIAL_HOUSE.price} Münzen`;
   card.append(thumb, name, price);
   const buy = document.createElement('button');
   buy.type = 'button';
@@ -346,13 +347,13 @@ export function openTutorialBuy(opts: TutorialBuyOptions): AreaHandle {
     if (busy) return;
     busy = true;
     buy.disabled = true;
-    status.textContent = 'Wird gekauft …';
+    status.textContent = tr('Wird gekauft …');
     let res: Awaited<ReturnType<TutorialBuyOptions['buy']>>;
     try {
       res = await opts.buy();
     } catch (err) {
       console.error('tutorial buy failed', err);
-      res = { ok: false, message: 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.' };
+      res = { ok: false, message: tr('Das hat leider nicht geklappt. Bitte noch einmal versuchen.') };
     }
     busy = false;
     if (closed) return;
@@ -361,7 +362,7 @@ export function openTutorialBuy(opts: TutorialBuyOptions): AreaHandle {
       status.textContent = res.message;
       return;
     }
-    status.textContent = 'Gekauft!';
+    status.textContent = tr('Gekauft!');
     opts.onBought(res.value.coins);
   });
   buy.focus();

@@ -1,12 +1,13 @@
+import { tr, msg } from '../i18n';
 export type CrestTier = 'wood' | 'bronze' | 'silver' | 'gold' | 'emerald' | 'sapphire' | 'rainbow';
 export const CREST_TIER_LABEL: Record<CrestTier, string> = {
-  wood: 'Holz',
-  bronze: 'Bronze',
-  silver: 'Silber',
-  gold: 'Gold',
-  emerald: 'Smaragd',
-  sapphire: 'Saphir',
-  rainbow: 'Regenbogen',
+  wood: tr('Holz'),
+  bronze: tr('Bronze'),
+  silver: tr('Silber'),
+  gold: tr('Gold'),
+  emerald: tr('Smaragd'),
+  sapphire: tr('Saphir'),
+  rainbow: tr('Regenbogen'),
 };
 const TIERS: CrestTier[] = ['wood', 'bronze', 'silver', 'gold', 'emerald', 'sapphire', 'rainbow'];
 export function crestTier(level: number): CrestTier {
@@ -53,7 +54,7 @@ export function crestSvg(level: number, size: number): SVGSVGElement {
   svg.setAttribute('width', String(size));
   svg.setAttribute('height', String(size));
   svg.setAttribute('role', 'img');
-  svg.setAttribute('aria-label', `Level ${level}, Wappen ${CREST_TIER_LABEL[tier]}`);
+  svg.setAttribute('aria-label', msg`Level ${level}, Wappen ${CREST_TIER_LABEL[tier]}`);
   svg.classList.add('level-crest');
   const path = (key: keyof typeof CREST_PATHS, fill: string) =>
     `<path data-part="${key}" d="${CREST_PATHS[key]}" fill="${fill}" stroke="#493724" stroke-width="2"/>`;

@@ -1,3 +1,4 @@
+import { html, tr, msg } from '../i18n';
 /**
  * Item cards and the detail dialog shared by shop and inventory.
  * The card is a single button; the dialog shows a 3D preview, the purchase flow (own confirmation step,
@@ -38,13 +39,13 @@ export function itemCard(
   btn.dataset.item = e.id;
   const info =
     origin === 'shop'
-      ? `<span class="item-price">${e.price} Münzen</span>${(() => {
-          const s = purchaseState(e, ctx.coins, ctx.shopOpen);
-          return s.reason ? `<span class="item-reason">${esc(s.reason)}</span>` : '';
-        })()}`
+      ? html`<span class="item-price">${e.price} Münzen</span>${(() => {
+            const s = purchaseState(e, ctx.coins, ctx.shopOpen);
+            return s.reason ? `<span class="item-reason">${esc(s.reason)}</span>` : '';
+          })()}`
       : e.kind === 'avatar'
-        ? `<span class="item-count">In deinem Inventar</span>`
-        : `<span class="item-count">Besitz: ${e.owned} · aufgestellt: ${e.placedIn.length}</span>`;
+        ? html(`<span class="item-count">In deinem Inventar</span>`)
+        : html`<span class="item-count">Besitz: ${e.owned} · aufgestellt: ${e.placedIn.length}</span>`;
   btn.innerHTML = `<span class="item-thumb" aria-hidden="true">${THUMB_PLACEHOLDER[e.kind]}</span><span class="item-name">${esc(e.nameDe)}</span><span class="item-kind">${esc(
     KIND_LABEL[e.kind],
   )}</span>${info}`;
@@ -154,7 +155,7 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
     if (!hasSlot) {
       const p = document.createElement('p');
       p.className = 'preview-hint';
-      p.textContent = 'Vorschau gibt es mit dem Avatar-Editor.';
+      p.textContent = tr('Vorschau gibt es mit dem Avatar-Editor.');
       previewBox.appendChild(p);
       return;
     }
@@ -164,8 +165,8 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       previewBox.replaceChildren();
       const p = document.createElement('p');
       p.className = 'preview-hint';
-      p.textContent = 'Die Vorschau konnte nicht geladen werden.';
-      const retry = button('Nochmal versuchen', () => {
+      p.textContent = tr('Die Vorschau konnte nicht geladen werden.');
+      const retry = button(tr('Nochmal versuchen'), () => {
         renderPreview();
         focusIn(actionButton());
       });
@@ -200,17 +201,17 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
     if (mode === 'confirm') {
       const t = document.createElement('p');
       t.className = 'confirm-text';
-      t.textContent = `Für ${entry.price} Münzen „${entry.nameDe}“ kaufen?`;
+      t.textContent = msg`Für ${entry.price} Münzen „${entry.nameDe}“ kaufen?`;
       actions.append(
         t,
-        button('Abbrechen', () => {
+        button(tr('Abbrechen'), () => {
           if (busy) return;
           mode = 'detail';
           setStatus('');
           renderActions();
           focusIn(actionButton());
         }),
-        button('Ja, kaufen', () => void doBuy(), 'primary'),
+        button(tr('Ja, kaufen'), () => void doBuy(), 'primary'),
       );
       return;
     }
@@ -218,7 +219,7 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       if (entry.kind === 'avatar' && partById(entry.id) && opts.onWardrobe) {
         actions.append(
           button(
-            'Zum Kleiderschrank',
+            tr('Zum Kleiderschrank'),
             () => {
               modal.close();
               opts.onWardrobe!(entry.id);
@@ -229,7 +230,7 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
         return;
       }
       actions.append(
-        button('Zum Inventar', () => {
+        button(tr('Zum Inventar'), () => {
           modal.close();
           opts.onOpenInventory();
         }),
@@ -237,7 +238,7 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       if (hasSlot && opts.buildOpen) {
         actions.append(
           button(
-            'Jetzt aufstellen',
+            tr('Jetzt aufstellen'),
             () => {
               modal.close();
               opts.onBuild(entry.id);
@@ -252,12 +253,12 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       const s = purchaseState(entry, coins, opts.shopOpen);
       actions.append(
         button(
-          `Kaufen für ${entry.price} Münzen`,
+          msg`Kaufen für ${entry.price} Münzen`,
           () => {
             mode = 'confirm';
             setStatus('');
             renderActions();
-            focusIn(actionButton('Ja, kaufen'));
+            focusIn(actionButton(tr('Ja, kaufen')));
           },
           'primary',
           !s.canBuy,
@@ -272,7 +273,7 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       if (part && opts.onWardrobe && (!opts.character || part.character === opts.character))
         actions.append(
           button(
-            'Anziehen',
+            tr('Anziehen'),
             () => {
               modal.close();
               opts.onWardrobe!(entry.id);
@@ -284,8 +285,8 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
         actions.append(
           note(
             part
-              ? 'Für deine andere Figur.'
-              : 'Für diesen Gegenstand ist noch kein tragbares Modell verfügbar.',
+              ? tr('Für deine andere Figur.')
+              : tr('Für diesen Gegenstand ist noch kein tragbares Modell verfügbar.'),
           ),
         );
     }
@@ -293,7 +294,7 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       const canBuild = opts.buildOpen && entry.free > 0;
       actions.append(
         button(
-          'Aufstellen',
+          tr('Aufstellen'),
           () => {
             modal.close();
             opts.onBuild(entry.id);
@@ -302,13 +303,13 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
           !canBuild,
         ),
       );
-      if (!opts.buildOpen) actions.append(note('Das Bauen ist gerade geschlossen.'));
-      else if (entry.free === 0) actions.append(note('Alles ist schon aufgestellt.'));
+      if (!opts.buildOpen) actions.append(note(tr('Das Bauen ist gerade geschlossen.')));
+      else if (entry.free === 0) actions.append(note(tr('Alles ist schon aufgestellt.')));
     }
     for (const id of entry.placedIn) {
       const slot = slotById(id);
       actions.append(
-        button(`Zum Platz: ${slot?.nameDe ?? id}`, () => {
+        button(msg`Zum Platz: ${slot?.nameDe ?? id}`, () => {
           modal.close();
           opts.onShowSlot(id);
         }),
@@ -320,25 +321,25 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
     if (busy) return;
     busy = true;
     for (const b of actions.querySelectorAll('button')) b.disabled = true;
-    setStatus('Einen Moment …');
+    setStatus(tr('Einen Moment …'));
     let res: Awaited<ReturnType<ItemApi['buy']>>;
     try {
       res = await opts.api.buy(entry.id);
     } catch (err) {
       console.error('buy failed', err);
-      res = { ok: false, message: 'Das hat nicht geklappt. Versuch es nochmal.' };
+      res = { ok: false, message: tr('Das hat nicht geklappt. Versuch es nochmal.') };
     }
     busy = false;
     if (res.ok) {
       mode = 'bought';
-      setStatus(`„${entry.nameDe}“ gekauft. Du hast jetzt ${res.value.coins} Münzen.`);
+      setStatus(msg`„${entry.nameDe}“ gekauft. Du hast jetzt ${res.value.coins} Münzen.`);
     } else {
       mode = 'confirm';
       setStatus(res.message, true);
     }
     if (modal.isOpen) {
       renderActions();
-      focusIn(actionButton(res.ok ? undefined : 'Ja, kaufen'));
+      focusIn(actionButton(res.ok ? undefined : tr('Ja, kaufen')));
     }
     if (res.ok) {
       // callbacks last: a throwing callback must not leave the dialog stuck

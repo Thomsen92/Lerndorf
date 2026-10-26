@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /** Data the village needs: own profile, class settings and classmates. Read-only (SPEC §6). */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { isCharacterKind, type CharacterKind } from '../render/character';
@@ -52,7 +53,10 @@ export async function saveCharacter(
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   const { error } = await supabase.rpc('set_character', { p_character: character });
   if (error)
-    return { ok: false, message: 'Die Figur konnte nicht gespeichert werden. Bitte noch einmal versuchen.' };
+    return {
+      ok: false,
+      message: tr('Die Figur konnte nicht gespeichert werden. Bitte noch einmal versuchen.'),
+    };
   return { ok: true };
 }
 

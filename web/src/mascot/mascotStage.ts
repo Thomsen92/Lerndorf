@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 import * as THREE from 'three';
 import { configurePreviewRenderer } from '../render/itemPreview';
 import { readSoundSetting, type Sound } from '../ui/sound';
@@ -16,7 +17,7 @@ export function createCompanion(
 ) {
   const el = document.createElement('figure');
   el.className = 'byte-stage';
-  el.setAttribute('aria-label', 'Sir Byte begleitet dich');
+  el.setAttribute('aria-label', tr('Sir Byte begleitet dich'));
   const picture = document.createElement('div');
   picture.className = 'byte-picture';
   const canvas = document.createElement('canvas');

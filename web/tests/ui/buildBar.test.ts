@@ -44,7 +44,7 @@ let mode: BuildMode;
 
 const btn = (label: string): HTMLButtonElement => {
   const b = Array.from(document.querySelectorAll<HTMLButtonElement>('.build-bar button')).find((x) =>
-    (x.textContent ?? '').startsWith(label),
+    (x.textContent ?? '').trimStart().startsWith(label),
   );
   if (!b) throw new Error(`button ${label} not found`);
   return b;

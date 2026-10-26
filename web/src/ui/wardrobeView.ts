@@ -1,3 +1,4 @@
+import { tr, html } from '../i18n';
 import './wardrobe.css';
 import type { WardrobeApi, WardrobeData } from '../api/wardrobe';
 import { avatarCatalog, partById, partUrl } from '../avatars/catalog';
@@ -18,8 +19,10 @@ export function openWardrobe(opts: {
   el.className = 'wardrobe-view';
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
-  el.setAttribute('aria-label', 'Kleiderschrank');
-  el.innerHTML = `<header class="wardrobe-head"><button type="button" data-action="back">← Zurück</button><h1>Kleiderschrank</h1><button type="button" class="wardrobe-done" data-action="done" disabled>Fertig</button></header><div class="wardrobe-layout"><div class="wardrobe-scene"><div class="wardrobe-stage"></div><div class="wardrobe-rotate"><button type="button" aria-label="Nach links drehen">↶</button><span>Ziehe, um dich zu drehen</span><button type="button" aria-label="Nach rechts drehen">↷</button></div><button type="button" class="wardrobe-reset">Ansicht zurücksetzen</button></div><aside class="wardrobe-inventory" aria-label="Deine Sachen"><nav class="wardrobe-tabs" aria-label="Auswahlbereiche"></nav><div class="wardrobe-list"></div></aside></div><p class="wardrobe-status" role="status" aria-live="polite">Dein Kleiderschrank wird vorbereitet …</p>`;
+  el.setAttribute('aria-label', tr('Kleiderschrank'));
+  el.innerHTML = html(
+    `<header class="wardrobe-head"><button type="button" data-action="back">← Zurück</button><h1>Kleiderschrank</h1><button type="button" class="wardrobe-done" data-action="done" disabled>Fertig</button></header><div class="wardrobe-layout"><div class="wardrobe-scene"><div class="wardrobe-stage"></div><div class="wardrobe-rotate"><button type="button" aria-label="Nach links drehen">↶</button><span>Ziehe, um dich zu drehen</span><button type="button" aria-label="Nach rechts drehen">↷</button></div><button type="button" class="wardrobe-reset">Ansicht zurücksetzen</button></div><aside class="wardrobe-inventory" aria-label="Deine Sachen"><nav class="wardrobe-tabs" aria-label="Auswahlbereiche"></nav><div class="wardrobe-list"></div></aside></div><p class="wardrobe-status" role="status" aria-live="polite">Dein Kleiderschrank wird vorbereitet …</p>`,
+  );
   document.body.append(el);
   const list = el.querySelector<HTMLElement>('.wardrobe-list')!,
     tabs = el.querySelector<HTMLElement>('.wardrobe-tabs')!,
@@ -69,10 +72,10 @@ export function openWardrobe(opts: {
     tabs.replaceChildren();
     list.replaceChildren();
     const labels: Record<Tab, string> = {
-      head: 'Kopf',
-      clothing: 'Kleidung',
-      extras: 'Extras',
-      colors: 'Farben',
+      head: tr('Kopf'),
+      clothing: tr('Kleidung'),
+      extras: tr('Extras'),
+      colors: tr('Farben'),
     };
     for (const t of all) {
       const b = button(labels[t], () => {
@@ -90,11 +93,11 @@ export function openWardrobe(opts: {
           ? ['top', 'bottoms', 'shoes', 'hair', 'skin']
           : ['bottoms', 'shoes', 'hair', 'skin'];
       const names: Record<ColorChannel, string> = {
-        top: 'Oberteil',
-        bottoms: 'Hose / Rock',
-        shoes: 'Schuhe',
-        hair: 'Haare',
-        skin: 'Haut',
+        top: tr('Oberteil'),
+        bottoms: tr('Hose / Rock'),
+        shoes: tr('Schuhe'),
+        hair: tr('Haare'),
+        skin: tr('Haut'),
       };
       for (const c of channels) {
         const group = document.createElement('fieldset'),
@@ -105,7 +108,7 @@ export function openWardrobe(opts: {
         palette.className = 'wardrobe-swatches';
         for (const value of [null, ...(data.allowedColors[c] ?? [])]) {
           const b = button(
-            value ? '' : 'Original',
+            value ? '' : tr('Original'),
             () => {
               const colors = { ...desired.colors };
               if (value) colors[c] = value;
@@ -129,7 +132,7 @@ export function openWardrobe(opts: {
       const grid = document.createElement('div');
       grid.className = 'wardrobe-grid';
       const reset = button(
-        tab === 'clothing' ? 'Originalkleidung' : 'Ohne Extras',
+        tab === 'clothing' ? tr('Originalkleidung') : tr('Ohne Extras'),
         () =>
           void apply({
             ...desired,
@@ -137,7 +140,7 @@ export function openWardrobe(opts: {
           }),
         'wardrobe-card wardrobe-original-card',
       );
-      reset.setAttribute('aria-label', tab === 'clothing' ? 'Originalkleidung' : 'Ohne Extras');
+      reset.setAttribute('aria-label', tab === 'clothing' ? tr('Originalkleidung') : tr('Ohne Extras'));
       reset.dataset.key = `original-${tab}`;
       reset.setAttribute(
         'aria-pressed',
@@ -171,10 +174,10 @@ export function openWardrobe(opts: {
     if (!owned().length) {
       const empty = document.createElement('p');
       empty.className = 'wardrobe-empty';
-      empty.textContent = 'Deine Grundausstattung ist bereit. Weitere Sachen findest du im Shop.';
+      empty.textContent = tr('Deine Grundausstattung ist bereit. Weitere Sachen findest du im Shop.');
       list.append(
         empty,
-        button('Zum Shop', () => leave(opts.onShop), 'wardrobe-shop'),
+        button(tr('Zum Shop'), () => leave(opts.onShop), 'wardrobe-shop'),
       );
     }
     done.disabled = busy || saving;
@@ -189,19 +192,19 @@ export function openWardrobe(opts: {
     desired = structuredClone(next);
     busy = true;
     done.disabled = true;
-    message('Wird angezogen …');
+    message(tr('Wird angezogen …'));
     try {
       await stage.applyLook(next);
       if (closed || mine !== op) return;
       look = structuredClone(next);
       busy = false;
-      message('Dein Look ist bereit.');
+      message(tr('Dein Look ist bereit.'));
       draw();
     } catch {
       if (closed || mine !== op) return;
       desired = structuredClone(look);
       busy = false;
-      message('Das Teil konnte nicht geladen werden. Bitte noch einmal versuchen.');
+      message(tr('Das Teil konnte nicht geladen werden. Bitte noch einmal versuchen.'));
       draw();
     }
   }
@@ -215,14 +218,14 @@ export function openWardrobe(opts: {
     const guard = document.createElement('div');
     guard.className = 'wardrobe-guard';
     guard.setAttribute('role', 'alertdialog');
-    guard.setAttribute('aria-label', 'Änderungen verwerfen?');
+    guard.setAttribute('aria-label', tr('Änderungen verwerfen?'));
     const text = document.createElement('p');
-    text.textContent = 'Deine Änderungen sind noch nicht gespeichert.';
-    const stay = button('Weiter anziehen', () => guard.remove());
+    text.textContent = tr('Deine Änderungen sind noch nicht gespeichert.');
+    const stay = button(tr('Weiter anziehen'), () => guard.remove());
     guard.append(
       text,
       stay,
-      button('Verwerfen', () => {
+      button(tr('Verwerfen'), () => {
         guard.remove();
         action();
       }),
@@ -233,19 +236,19 @@ export function openWardrobe(opts: {
   async function load(): Promise<void> {
     busy = true;
     done.disabled = true;
-    message('Dein Kleiderschrank wird vorbereitet …');
+    message(tr('Dein Kleiderschrank wird vorbereitet …'));
     list.replaceChildren();
     let result: Awaited<ReturnType<WardrobeApi['load']>>;
     try {
       result = await opts.api.load();
     } catch {
-      result = { ok: false, message: 'Der Kleiderschrank konnte nicht geladen werden.' };
+      result = { ok: false, message: tr('Der Kleiderschrank konnte nicht geladen werden.') };
     }
     if (closed) return;
     if (!result.ok) {
       busy = false;
       message(result.message);
-      list.append(button('Erneut versuchen', () => void load()));
+      list.append(button(tr('Erneut versuchen'), () => void load()));
       return;
     }
     data = result.value;
@@ -282,22 +285,22 @@ export function openWardrobe(opts: {
     } catch {
       if (closed) return;
       busy = false;
-      message('Die Vorschau konnte nicht geladen werden.');
-      list.replaceChildren(button('Erneut versuchen', () => void load()));
+      message(tr('Die Vorschau konnte nicht geladen werden.'));
+      list.replaceChildren(button(tr('Erneut versuchen'), () => void load()));
     }
   }
   done.onclick = async () => {
     if (!data || busy || saving || closed) return;
     saving = true;
     done.disabled = true;
-    message('Dein Look wird gespeichert …');
+    message(tr('Dein Look wird gespeichert …'));
     let result: Awaited<ReturnType<WardrobeApi['save']>>;
     try {
       result = await opts.api.save(data.character, look, data.wardrobe.revision);
     } catch {
       result = {
         ok: false,
-        message: 'Dein Look konnte nicht gespeichert werden. Bitte noch einmal versuchen.',
+        message: tr('Dein Look konnte nicht gespeichert werden. Bitte noch einmal versuchen.'),
       };
     }
     if (closed) return;
@@ -309,8 +312,11 @@ export function openWardrobe(opts: {
     } else {
       message(result.message);
       done.disabled = false;
-      if (result.message.includes('inzwischen') && !list.querySelector('[data-reload]')) {
-        const b = button('Gespeicherten Look laden', () => void load());
+      if (
+        (result.code === 'revision_conflict' || result.message.includes('inzwischen')) &&
+        !list.querySelector('[data-reload]')
+      ) {
+        const b = button(tr('Gespeicherten Look laden'), () => void load());
         b.dataset.reload = 'true';
         list.prepend(b);
       }

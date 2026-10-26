@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * Accessible modal dialog shared by the item detail and the settings menu.
  * role="dialog" + aria-modal, everything behind it is made inert, Escape and the close button close it
@@ -46,7 +47,7 @@ export function openModal(opts: ModalOptions): ModalHandle {
   h2.textContent = opts.title;
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
-  closeBtn.textContent = 'Schließen';
+  closeBtn.textContent = tr('Schließen');
   head.append(h2, closeBtn);
 
   const body = document.createElement('div');

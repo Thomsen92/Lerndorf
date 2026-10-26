@@ -1,10 +1,11 @@
+import { tr } from '../../i18n';
 // Template 'fluss_mitte': the river runs west-east through the middle, the plaza lies north of it.
 // A footbridge crosses the river south of the plaza; the lanes south of the river reach the water edge.
 import type { MapDef } from './index';
 
 export const FLUSS_MITTE: MapDef = {
   id: 'fluss_mitte',
-  name: 'Fluss in der Mitte',
+  name: tr('Fluss in der Mitte'),
   plaza: { x: 0, z: -14 },
   river: [
     { x: -72, z: -2 },

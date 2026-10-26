@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * Pupil login: nickname + password. The nickname is turned into the login address
  * `<nickname>@lerndorf.local` (SPEC §4). Public sign-up is disabled in Supabase.
@@ -5,7 +6,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { loginEmail, nicknameError } from '../../../supabase/functions/admin-accounts/validate';
 
-export const LOGIN_FAILED = 'Spitzname oder Passwort stimmt nicht';
+export const LOGIN_FAILED = tr('Spitzname oder Passwort stimmt nicht');
 
 /** Returns null on success, or a message for the pupil in German. */
 export async function signInPupil(

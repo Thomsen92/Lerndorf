@@ -1,10 +1,11 @@
+import { tr } from '../../i18n';
 // Template 'bach_norden': a narrow creek runs along the north edge; the plaza lies east of the
 // valley centre with lanes in all directions. Lanes north of the plaza cross the creek.
 import type { MapDef } from './index';
 
 export const BACH_NORDEN: MapDef = {
   id: 'bach_norden',
-  name: 'Bach im Norden',
+  name: tr('Bach im Norden'),
   plaza: { x: 6, z: 6 },
   river: [
     { x: 60, z: -40 },

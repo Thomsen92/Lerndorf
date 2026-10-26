@@ -1,3 +1,4 @@
+import { tr, msg } from '../i18n';
 import type { CharacterKind } from '../render/character';
 import type { PortraitSource } from '../render/portrait';
 import type { AvatarLook } from '../avatars/look';
@@ -46,7 +47,7 @@ export function createAvatarBadge(opts: {
   who.textContent = opts.nickname;
   bar.className = 'xp-bar';
   bar.setAttribute('role', 'progressbar');
-  bar.setAttribute('aria-label', 'Erfahrung');
+  bar.setAttribute('aria-label', tr('Erfahrung'));
   bar.append(fill);
   details.className = 'badge-details';
   dot.className = 'chest-dot';
@@ -85,18 +86,18 @@ export function createAvatarBadge(opts: {
     bar.setAttribute('aria-valuemax', String(span));
     bar.setAttribute('aria-valuemin', '0');
     fill.style.width = `${Math.min(100, span > 0 ? (100 * into) / span : 0)}%`;
-    details.textContent = `${p.coins} Münzen · 🔥 ${p.streak}`;
+    details.textContent = msg`${p.coins} Münzen · 🔥 ${p.streak}`;
     dot.hidden = p.chests === 0;
     dot.textContent = '';
     if (p.chests) {
       const hidden = document.createElement('span');
       hidden.className = 'sr-only';
-      hidden.textContent = `${p.chests} Truhen ungeöffnet`;
+      hidden.textContent = msg`${p.chests} Truhen ungeöffnet`;
       dot.append(hidden);
     }
     el.setAttribute(
       'aria-label',
-      `Profil: ${opts.nickname}, Level ${p.level}, ${into} von ${span} XP, ${p.coins} Münzen`,
+      msg`Profil: ${opts.nickname}, Level ${p.level}, ${into} von ${span} XP, ${p.coins} Münzen`,
     );
   };
   update(current);

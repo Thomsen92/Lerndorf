@@ -1,3 +1,4 @@
+import { tr, html, msg } from '../i18n';
 /**
  * Daily Quest area: today's quests and yesterday's catch-up quests, one open at a time.
  * Never shows a solution or an attempt counter; coins only within the first attempts (D11).
@@ -29,7 +30,7 @@ export interface DailyQuestsOptions {
 }
 
 const TITLE = 'Daily Quests';
-const LOAD_FAILED = 'Die Quests konnten nicht geladen werden.';
+const LOAD_FAILED = tr('Die Quests konnten nicht geladen werden.');
 
 let areaCounter = 0;
 
@@ -58,19 +59,22 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
   /** Result line shown in a card after it was solved (HTML, already escaped). */
   let solvedNote: { key: string; html: string } | null = null;
 
-  const head = (): string => `
-    <header class="panel-head">
-      <h2 id="${titleId}">${TITLE}</h2>
-      <span class="coins">${coins} Münzen</span>
-      <button type="button" id="close">Schließen</button>
-    </header>
-    <p class="quest-rule">Münzen gibt es bei den ersten 3 Versuchen.</p>`;
+  const head = (): string =>
+    html` <header class="panel-head">
+        <h2 id="${titleId}">${TITLE}</h2>
+        <span class="coins">${coins} Münzen</span>
+        <button type="button" id="close">Schließen</button>
+      </header>
+      <p class="quest-rule">Münzen gibt es bei den ersten 3 Versuchen.</p>`;
 
   const bindClose = (): void =>
     overlay.querySelector('#close')?.addEventListener('click', () => opts.onClose());
 
   const load = async (): Promise<void> => {
-    overlay.innerHTML = `<section class="panel">${head()}<p>Lädt …</p></section>`;
+    overlay.innerHTML = html`<section class="panel">
+      ${head()}
+      <p>Lädt …</p>
+    </section>`;
     bindClose();
     let res: Awaited<ReturnType<typeof loadDailyQuests>>;
     try {
@@ -102,24 +106,31 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
     const catchUp = quests.filter((q) => q.catchUp);
     const todayHtml =
       today.length === 0
-        ? '<p class="quest-empty">Heute gibt es keine neuen Quests.</p>'
+        ? html('<p class="quest-empty">Heute gibt es keine neuen Quests.</p>')
         : `<ul class="quest-list">${today.map(cardHtml).join('')}</ul>${
-            today.every((q) => q.solved) ? '<p class="quest-done">Alle Quests für heute geschafft!</p>' : ''
+            today.every((q) => q.solved)
+              ? html('<p class="quest-done">Alle Quests für heute geschafft!</p>')
+              : ''
           }`;
-    overlay.innerHTML = `
-      <section class="panel quests">
-        ${head()}
-        <p class="status" id="status" role="status">${esc(listMessage)}</p>
-        <div class="quests-with-byte"><div class="byte-slot"></div><div class="quests-content">
-        <h3>Heute</h3>
-        ${todayHtml}
-        ${
-          catchUp.length === 0
-            ? ''
-            : `<h3>Nachholen von gestern</h3><ul class="quest-list">${catchUp.map(cardHtml).join('')}</ul>`
-        }
-        </div></div>
-      </section>`;
+    overlay.innerHTML = html` <section class="panel quests">
+      ${head()}
+      <p class="status" id="status" role="status">${esc(listMessage)}</p>
+      <div class="quests-with-byte">
+        <div class="byte-slot"></div>
+        <div class="quests-content">
+          <h3>Heute</h3>
+          ${todayHtml}
+          ${
+            catchUp.length === 0
+              ? ''
+              : html`<h3>Nachholen von gestern</h3>
+                  <ul class="quest-list">
+                    ${catchUp.map(cardHtml).join('')}
+                  </ul>`
+          }
+        </div>
+      </div>
+    </section>`;
     overlay.querySelector('.byte-slot')?.replaceWith(byte!.el);
     bindClose();
     overlay.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((btn) =>
@@ -145,12 +156,14 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
   };
 
   const cardHtml = (q: DailyQuest): string => {
-    const badge = q.catchUp ? '<span class="quest-badge">Nachholen · halbe Münzen</span>' : '';
+    const badge = q.catchUp ? html('<span class="quest-badge">Nachholen · halbe Münzen</span>') : '';
     const prompt = `<span class="quest-prompt" lang="en">${esc(q.prompt)}</span>`;
     if (q.solved) {
       const note = solvedNote?.key === q.key ? `<p class="status quest-feedback">${solvedNote.html}</p>` : '';
-      return `<li class="quest-card solved" data-quest="${esc(q.key)}">
-        <div class="quest-head">${prompt}<span class="quest-meta">${badge}<span class="quest-reward">gelöst ✓</span></span></div>
+      return html`<li class="quest-card solved" data-quest="${esc(q.key)}">
+        <div class="quest-head">
+          ${prompt}<span class="quest-meta">${badge}<span class="quest-reward">gelöst ✓</span></span>
+        </div>
         ${note}
       </li>`;
     }
@@ -163,11 +176,13 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
     </li>`;
   };
 
-  const bodyHtml = (q: DailyQuest, s: AnswerState): string => `
-    <div class="quest-body">
+  const bodyHtml = (q: DailyQuest, s: AnswerState): string =>
+    html` <div class="quest-body">
       ${
         q.type === 'listening'
-          ? '<button type="button" class="quest-listen" data-listen>▶ Anhören</button><p class="quest-fallback" hidden></p>'
+          ? html(
+              '<button type="button" class="quest-listen" data-listen>▶ Anhören</button><p class="quest-fallback" hidden></p>',
+            )
           : ''
       }
       <div class="quest-form">${answerForm(formSpec(q), s)}</div>
@@ -198,7 +213,8 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
       void speakEnglish(speak).then((ok) => {
         const box = card.querySelector<HTMLElement>('.quest-fallback');
         if (ok || !box) return;
-        box.innerHTML = `Dein Gerät kann nicht vorlesen. Lies den Text: <span lang="en">${esc(speak)}</span>`;
+        box.innerHTML = html`Dein Gerät kann nicht vorlesen. Lies den Text:
+          <span lang="en">${esc(speak)}</span>`;
         box.hidden = false;
       });
     });
@@ -208,7 +224,7 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
       if (pending) return;
       const answer = buildAnswer(s);
       if (answer === null) {
-        if (feedback) feedback.textContent = 'Bitte zuerst alles ausfüllen.';
+        if (feedback) feedback.textContent = tr('Bitte zuerst alles ausfüllen.');
         return;
       }
       pending = true;
@@ -220,7 +236,7 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
         res = await submitQuestAnswer(opts.supabase, q.key, answer);
       } catch (err) {
         console.error('quest answer failed', err);
-        res = { ok: false, message: 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.' };
+        res = { ok: false, message: tr('Das hat leider nicht geklappt. Bitte noch einmal versuchen.') };
       } finally {
         pending = false;
       }
@@ -270,11 +286,11 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
       const label = card.querySelector<HTMLElement>('.quest-reward');
       if (label) label.textContent = rewardLabel(q);
       const coinsBox = overlay.querySelector<HTMLElement>('.coins');
-      if (coinsBox) coinsBox.textContent = `${coins} Münzen`;
+      if (coinsBox) coinsBox.textContent = msg`${coins} Münzen`;
       if (feedback) {
         feedback.innerHTML = res.value.hint
-          ? `Leider falsch. Tipp: <span lang="en">${esc(res.value.hint)}</span>`
-          : 'Leider falsch.';
+          ? html`Leider falsch. Tipp: <span lang="en">${esc(res.value.hint)}</span>`
+          : tr('Leider falsch.');
       }
     });
   };
@@ -295,11 +311,11 @@ function formSpec(q: DailyQuest): AnswerFormSpec {
 }
 
 function rewardLabel(q: DailyQuest): string {
-  if (q.solved) return 'gelöst ✓';
-  return q.rewardLeft > 0 ? `${q.rewardLeft} Münzen` : 'Keine Münzen mehr – üben geht trotzdem.';
+  if (q.solved) return tr('gelöst ✓');
+  return q.rewardLeft > 0 ? msg`${q.rewardLeft} Münzen` : tr('Keine Münzen mehr – üben geht trotzdem.');
 }
 
 function solvedText(r: QuestAnswerResult): string {
-  if (r.alreadySolved) return 'Diese Quest hast du schon gelöst.';
-  return r.reward > 0 ? `Richtig! +${r.reward} Münzen` : 'Richtig! Diesmal ohne Münzen.';
+  if (r.alreadySolved) return tr('Diese Quest hast du schon gelöst.');
+  return r.reward > 0 ? msg`Richtig! +${r.reward} Münzen` : tr('Richtig! Diesmal ohne Münzen.');
 }

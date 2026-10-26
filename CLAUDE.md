@@ -27,7 +27,7 @@ Eine Englisch-Lehrkraft, kein Entwickler. Erkläre Schritte, die sie selbst ausf
 ## Konventionen
 
 - TypeScript strict, Vite, three.js 0.170.x gepinnt.
-- UI-Texte Deutsch, einfache Sprache; Aufgaben-Inhalte Englisch; Code und Kommentare Englisch.
+- Spieleroberfläche standardmäßig Englisch, in den Einstellungen auf Deutsch umschaltbar; einfache Sprache. Lehrerbereich Deutsch. Aufgaben-Inhalte und Lösungen bleiben unverändert; Code und Kommentare Englisch. Namen, IDs und Backend bleiben bestehen (Nutzerauftrag 26.10.2026; Details `docs/PLAYER_LANGUAGES.md`).
 - Datumsangaben für Schüler als Montag der Woche (z. B. „Woche ab 09.11.“), **nie „KW“**.
 - Zeitzone Europe/Berlin für Tageslimits und Wochenwechsel.
 - Kleine, überprüfbare Schritte; jede Stufe endet deploybar.

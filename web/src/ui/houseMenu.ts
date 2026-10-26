@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /** Small non-modal house menu: Bauen / Shop / Inventar / Einstellungen / Zurück. The house stays visible beside it. */
 import type { AreaHandle } from './areas';
 
@@ -20,7 +21,7 @@ export function openHouseMenu(opts: HouseMenuOptions): AreaHandle {
   el.setAttribute('aria-labelledby', titleId);
   const h = document.createElement('h2');
   h.id = titleId;
-  h.textContent = 'Mein Haus';
+  h.textContent = tr('Mein Haus');
   el.append(h);
 
   const make = (label: string, run: (b: HTMLButtonElement) => void): HTMLButtonElement => {
@@ -31,12 +32,12 @@ export function openHouseMenu(opts: HouseMenuOptions): AreaHandle {
     el.append(b);
     return b;
   };
-  const build = make('Bauen', () => opts.onBuild());
-  if (opts.onWardrobe) make('Kleiderschrank', opts.onWardrobe);
-  make('Shop', () => opts.onShop());
-  make('Inventar', () => opts.onInventory());
-  make('Einstellungen', (b) => opts.onSettings(b));
-  make('Zurück', () => opts.onBack());
+  const build = make(tr('Bauen'), () => opts.onBuild());
+  if (opts.onWardrobe) make(tr('Kleiderschrank'), opts.onWardrobe);
+  make(tr('Shop'), () => opts.onShop());
+  make(tr('Inventar'), () => opts.onInventory());
+  make(tr('Einstellungen'), (b) => opts.onSettings(b));
+  make(tr('Zurück'), () => opts.onBack());
 
   el.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {

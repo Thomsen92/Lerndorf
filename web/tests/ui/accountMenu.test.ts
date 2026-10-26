@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { openAccountMenu } from '../../src/ui/accountMenu';
+import { getLocale, setLocale } from '../../src/i18n';
 import type { ModalHandle } from '../../src/ui/dialog';
 
 let handle: ModalHandle | null = null;
@@ -36,6 +37,18 @@ afterEach(() => {
 });
 
 describe('openAccountMenu', () => {
+  it('offers English and German and stores a choice without calling any game write', () => {
+    setLocale('en');
+    const onLanguageChange = vi.fn();
+    const { opts } = setup({ onLanguageChange });
+    expect(document.querySelector('h2')?.textContent).toBe('Settings');
+    expect(btn('English').getAttribute('aria-pressed')).toBe('true');
+    btn('Deutsch').click();
+    expect(getLocale()).toBe('de');
+    expect(onLanguageChange).toHaveBeenCalledWith('de');
+    expect(opts.onLogout).not.toHaveBeenCalled();
+    expect(opts.onQuality).not.toHaveBeenCalled();
+  });
   it('offers an optional persistent sound toggle', () => {
     const onChange = vi.fn();
     setup({ sound: { on: true, onChange } });
@@ -55,7 +68,7 @@ describe('openAccountMenu', () => {
 
   it('offers three quality buttons with the current choice pressed', () => {
     setup({ quality: 'low' });
-    const group = document.querySelector('[role="group"]');
+    const group = document.querySelector('.quality-group');
     expect(group?.getAttribute('aria-label')).toBe('Grafik-Qualität');
     expect(group?.classList.contains('seg')).toBe(true);
     expect(group?.querySelectorAll('button')).toHaveLength(3);

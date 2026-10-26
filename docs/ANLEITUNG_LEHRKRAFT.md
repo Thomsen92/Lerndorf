@@ -4,6 +4,8 @@ Diese Anleitung zeigt Schritt für Schritt, wie Lerndorf eingerichtet wird und w
 
 Teil 1 (Einrichtung) macht man einmal. Teil 2 (Alltag) braucht man jede Woche.
 
+**Spielsprache:** Lerndorf startet auf Englisch. Über das Profilmenü → Settings / Einstellungen lässt sich English oder Deutsch wählen. Die Wahl bleibt für diesen Browser gespeichert und gilt auf geteilten Tablets auch für die nächste Anmeldung. Beim Wechsel lädt die Seite neu; Anmeldung und gespeicherter Fortschritt bleiben erhalten. Der Lehrerbereich bleibt Deutsch.
+
 ---
 
 ## Teil 1: Einrichtung

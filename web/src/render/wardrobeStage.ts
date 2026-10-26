@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 import * as T from 'three';
 import { instantiate, loadCharacter, type CharacterKind } from './character';
 import { configurePreviewRenderer } from './itemPreview';
@@ -25,7 +26,7 @@ export async function createWardrobeStage(
   const gl = new T.WebGLRenderer({ antialias: true, alpha: false });
   configurePreviewRenderer(gl);
   gl.setPixelRatio(Math.min(devicePixelRatio, opts.maxPixelRatio ?? 1.5, 1.5));
-  gl.domElement.setAttribute('aria-label', 'Deine Figur. Zum Drehen nach links oder rechts ziehen.');
+  gl.domElement.setAttribute('aria-label', tr('Deine Figur. Zum Drehen nach links oder rechts ziehen.'));
   gl.domElement.tabIndex = 0;
   host.append(gl.domElement);
   let room: Awaited<ReturnType<typeof createWardrobeRoom>> | undefined,

@@ -1,3 +1,4 @@
+import { tr, itemName } from '../i18n';
 /**
  * Build mode data on the fixed plot plan (docs/ASSET_VERTRAG.md): what the pupil owns per kind and
  * what stands in each of the seven slots. Writes go through place_in_slot and clear_slot, which
@@ -32,13 +33,13 @@ export interface BuildState {
 export type Result<T> = { ok: true; value: T } | { ok: false; message: string };
 
 function explain(message: string): string {
-  if (message.includes('building is closed')) return 'Das Bauen ist gerade geschlossen.';
-  if (message.includes('no free copy')) return 'Davon hast du gerade keines mehr frei.';
-  if (message.includes('does not fit')) return 'Das passt nicht auf diesen Platz.';
+  if (message.includes('building is closed')) return tr('Das Bauen ist gerade geschlossen.');
+  if (message.includes('no free copy')) return tr('Davon hast du gerade keines mehr frei.');
+  if (message.includes('does not fit')) return tr('Das passt nicht auf diesen Platz.');
   if (message.includes('cannot be empty'))
-    return 'Haus und Garage bleiben immer stehen. Du kannst sie nur austauschen.';
-  if (message.includes('rotation')) return 'So kann man das nicht drehen.';
-  return 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.';
+    return tr('Haus und Garage bleiben immer stehen. Du kannst sie nur austauschen.');
+  if (message.includes('rotation')) return tr('So kann man das nicht drehen.');
+  return tr('Das hat leider nicht geklappt. Bitte noch einmal versuchen.');
 }
 
 /** Loads the items of the plot kinds the pupil may use and the own slots. */
@@ -52,7 +53,7 @@ export async function loadBuildState(supabase: SupabaseClient, uid: string): Pro
     loadOwnSlots(supabase, uid),
   ]);
   if (items.error || inv.error || !own.ok) {
-    return { ok: false, message: 'Die Sachen konnten nicht geladen werden.' };
+    return { ok: false, message: tr('Die Sachen konnten nicht geladen werden.') };
   }
   const owned: Record<string, number> = {};
   for (const r of inv.data ?? []) owned[r.item_id] = r.qty;
@@ -60,7 +61,7 @@ export async function loadBuildState(supabase: SupabaseClient, uid: string): Pro
     .map((r) => ({
       id: r.id as string,
       kind: r.kind as string,
-      nameDe: r.name_de as string,
+      nameDe: itemName(r.id, r.name_de as string),
       starter: Boolean(r.starter),
       owned: r.starter ? 1 : (owned[r.id as string] ?? 0),
     }))
@@ -71,7 +72,7 @@ export async function loadBuildState(supabase: SupabaseClient, uid: string): Pro
 /** The own slots (placements of the signed-in pupil). */
 export async function loadOwnSlots(supabase: SupabaseClient, uid: string): Promise<Result<SlotMap>> {
   const { data, error } = await supabase.from('placements').select('item_id, slot, rot').eq('player_id', uid);
-  if (error) return { ok: false, message: 'Die Sachen konnten nicht geladen werden.' };
+  if (error) return { ok: false, message: tr('Die Sachen konnten nicht geladen werden.') };
   return { ok: true, value: slotMap(data ?? []) };
 }
 

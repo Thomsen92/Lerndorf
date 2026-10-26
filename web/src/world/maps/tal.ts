@@ -1,9 +1,10 @@
+import { tr } from '../../i18n';
 // Template 'tal': the Stufe-0 valley (river to the south, plaza in the middle). From the prototype.
 import type { MapDef } from './index';
 
 export const TAL: MapDef = {
   id: 'tal',
-  name: 'Tal',
+  name: tr('Tal'),
   plaza: { x: -2, z: 4 },
   river: [
     { x: -70, z: -6 },

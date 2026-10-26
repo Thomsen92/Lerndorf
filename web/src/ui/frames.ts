@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 import { characterAssetUrl, type CharacterKind } from '../render/character';
 import type { PortraitSource } from '../render/portrait';
 import type { AvatarLook } from '../avatars/look';
@@ -11,13 +12,13 @@ export interface FrameStyle {
 }
 export const FRAMES: Record<string, FrameStyle> = Object.fromEntries(
   [
-    ['wood', 'Holz', '#a77142', '#e4bb79', 'grain'],
-    ['bronze', 'Bronze', '#8d4725', '#efb56c', 'rivets'],
-    ['silver', 'Silber', '#708491', '#e9f1f5', 'spikes'],
-    ['gold', 'Gold', '#b77a18', '#ffe399', 'crown'],
-    ['emerald', 'Smaragd', '#17644c', '#77e2a0', 'gems'],
-    ['sapphire', 'Saphir', '#234f9a', '#a4cbff', 'gems'],
-    ['rainbow', 'Regenbogen', '#ba5a9a', '#8be4cf', 'shimmer'],
+    ['wood', tr('Holz'), '#a77142', '#e4bb79', 'grain'],
+    ['bronze', tr('Bronze'), '#8d4725', '#efb56c', 'rivets'],
+    ['silver', tr('Silber'), '#708491', '#e9f1f5', 'spikes'],
+    ['gold', tr('Gold'), '#b77a18', '#ffe399', 'crown'],
+    ['emerald', tr('Smaragd'), '#17644c', '#77e2a0', 'gems'],
+    ['sapphire', tr('Saphir'), '#234f9a', '#a4cbff', 'gems'],
+    ['rainbow', tr('Regenbogen'), '#ba5a9a', '#8be4cf', 'shimmer'],
   ].map(([id, label, a, b, ornament]) => [
     `frame_${id}`,
     { id: `frame_${id}`, label, colours: [a, b], ornament },

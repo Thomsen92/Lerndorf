@@ -1,3 +1,4 @@
+import { tr, msg } from '../../i18n';
 /**
  * Tutorial quiz: three tap-to-answer questions in a non-modal panel (the account menu
  * stays reachable). Wrong answers show the English hint and may be repeated; the solution is never
@@ -88,7 +89,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
   };
 
   const showError = (message: string): void => {
-    heading('Fragen');
+    heading(tr('Fragen'));
     const status = el('p', 'status error', message);
     status.setAttribute('role', 'status');
     const retry = button(RETRY, true, () => void load());
@@ -97,8 +98,8 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
   };
 
   const load = async (): Promise<void> => {
-    heading('Fragen');
-    panel.append(el('p', undefined, 'Lädt …'));
+    heading(tr('Fragen'));
+    panel.append(el('p', undefined, tr('Lädt …')));
     const res = await safe(() => opts.api.question());
     if (closed) return;
     if (!res.ok) {
@@ -110,7 +111,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
 
   const render = (q: TutorialQuestion): void => {
     const data = (q.data && typeof q.data === 'object' ? q.data : {}) as Record<string, unknown>;
-    heading(`Frage ${q.nr} von ${q.total}`);
+    heading(msg`Frage ${q.nr} von ${q.total}`);
     if (q.nr === 1) panel.append(el('p', 'quest-rule', QUIZ_INTRO));
     const prompt = el('p', 'tutorial-prompt', q.prompt);
     prompt.lang = 'en';
@@ -125,14 +126,14 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
         byte.listen();
         void speakEnglish(speak).then((ok) => {
           if (ok || closed) return;
-          fallback.textContent = 'Dein Gerät kann nicht vorlesen. Lies den Text: ';
+          fallback.textContent = tr('Dein Gerät kann nicht vorlesen. Lies den Text: ');
           const t = el('span', undefined, speak);
           t.lang = 'en';
           fallback.append(t);
           fallback.hidden = false;
         });
       };
-      const listen = button('▶ Anhören', false, play);
+      const listen = button(tr('▶ Anhören'), false, play);
       listen.className = 'quest-listen';
       listen.dataset.listen = '';
       panel.append(listen, fallback);
@@ -141,22 +142,26 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
 
     const formBox = el('div', 'quest-form tutorial-answers');
     formBox.setAttribute('role', 'group');
-    formBox.setAttribute('aria-label', 'Antwort antippen');
+    formBox.setAttribute('aria-label', tr('Antwort antippen'));
     const feedback = el('p', 'status quest-feedback');
     feedback.setAttribute('role', 'status');
     let pending = false;
     panel.append(formBox, feedback);
     const choices: HTMLButtonElement[] = [];
-    const lock = (on: boolean): void => { choices.forEach(b => { b.disabled = on; }); };
+    const lock = (on: boolean): void => {
+      choices.forEach((b) => {
+        b.disabled = on;
+      });
+    };
     const submit = async (answer: string, selected: HTMLButtonElement): Promise<void> => {
       if (pending) return;
       pending = true;
-      choices.forEach(b => b.classList.remove('is-wrong', 'is-correct'));
+      choices.forEach((b) => b.classList.remove('is-wrong', 'is-correct'));
       synth?.cancel();
       byte.thinking();
       lock(true);
       formBox.setAttribute('aria-busy', 'true');
-      feedback.textContent = 'Wird geprüft …';
+      feedback.textContent = tr('Wird geprüft …');
       const res = await safe(() => opts.api.answer(q.nr, answer));
       pending = false;
       if (closed) {
@@ -176,7 +181,9 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
         lock(false);
         selected.classList.add('is-wrong');
         selected.focus();
-        feedback.textContent = r.hint ? 'Leider falsch. Tipp: ' : 'Leider falsch. Versuch es noch einmal.';
+        feedback.textContent = r.hint
+          ? tr('Leider falsch. Tipp: ')
+          : tr('Leider falsch. Versuch es noch einmal.');
         if (r.hint) {
           const hint = el('span', undefined, r.hint);
           hint.lang = 'en';
@@ -193,7 +200,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
         next.focus();
         return;
       }
-      feedback.textContent = 'Richtig!';
+      feedback.textContent = tr('Richtig!');
       const next = button(NEXT, true, () => void load());
       panel.append(next);
       next.focus();

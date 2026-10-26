@@ -13,7 +13,7 @@ Schüler der Klassen 8a und 8b sollen motivierter Englisch üben. Dafür bekommt
 | Schüler | 8a und 8b, je bis zu 32 | ca. 40 gesamt | geteilte Schul-Tablets (Browser), auch Handy/PC zu Hause |
 | Lehrkraft | eine Person (später evtl. Kollegen) | 1–3 | PC, Tablet, digitale Tafel |
 
-Schüler sind 13–14 Jahre alt; teils schwächere Lesekompetenz. Oberfläche auf Deutsch, Aufgaben auf Englisch.
+Schüler sind 13–14 Jahre alt; teils schwächere Lesekompetenz. Spieleroberfläche standardmäßig Englisch, über Einstellungen auf Deutsch umschaltbar (Nutzerauftrag 26.10.2026). Aufgaben und Lösungen bleiben in ihrer vorgegebenen Sprache, der Lehrerbereich bleibt Deutsch. Siehe [Sprachwahl](PLAYER_LANGUAGES.md).
 
 ## Im Umfang (MVP = Stufen 1–4)
 

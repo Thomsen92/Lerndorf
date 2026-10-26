@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /** Server-owned progression. Components use this adapter so UI previews never need live accounts. */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Outcome } from './economy';
@@ -54,7 +55,7 @@ export interface ProgressApi {
   setFrame(id: string): Promise<Outcome<true>>;
 }
 
-export const PROGRESS_ERROR = 'Das hat nicht geklappt. Nochmal versuchen';
+export const PROGRESS_ERROR = tr('Das hat nicht geklappt. Nochmal versuchen');
 const REASONS = new Set(['quest', 'day_goal', 'streak', 'stamp', 'tutorial', 'first_place', 'backfill']);
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -107,15 +108,15 @@ export function unlockedAt(rewards: Reward[], from: number, to: number): Reward[
 }
 
 export const XP_HELP: ReadonlyArray<readonly [string, string]> = [
-  ['Quest beim ersten Versuch', '15 XP'],
-  ['Quest beim zweiten oder dritten Versuch', '10 XP'],
-  ['Quest ab dem vierten Versuch', '5 XP'],
-  ['Ältere Quest nachholen', 'Halbe XP, aufgerundet'],
-  ['Alle heutigen Quests geschafft', '15 XP extra'],
-  ['Ein heutiger Quest-Erfolg am Schultag', '5 XP × Serie, höchstens 25 XP'],
-  ['Wochenplan-Stempel', '100 XP'],
-  ['Tutorial geschafft', '50 XP'],
-  ['Einen Gegenstand zum ersten Mal hinstellen', '10 XP'],
+  [tr('Quest beim ersten Versuch'), '15 XP'],
+  [tr('Quest beim zweiten oder dritten Versuch'), '10 XP'],
+  [tr('Quest ab dem vierten Versuch'), '5 XP'],
+  [tr('Ältere Quest nachholen'), tr('Halbe XP, aufgerundet')],
+  [tr('Alle heutigen Quests geschafft'), '15 XP extra'],
+  [tr('Ein heutiger Quest-Erfolg am Schultag'), tr('5 XP × Serie, höchstens 25 XP')],
+  [tr('Wochenplan-Stempel'), '100 XP'],
+  [tr('Tutorial geschafft'), '50 XP'],
+  [tr('Einen Gegenstand zum ersten Mal hinstellen'), '10 XP'],
 ];
 
 interface ProgressRow {
@@ -178,7 +179,7 @@ export function supabaseProgressApi(supabase: SupabaseClient): ProgressApi {
             .select('id, kind, level, label')
             .order('sort');
           if (error) throw error;
-          return (data ?? []) as Reward[];
+          return ((data ?? []) as Reward[]).map((reward) => ({ ...reward, label: tr(reward.label) }));
         })().catch((error) => {
           catalogue = null;
           throw error;

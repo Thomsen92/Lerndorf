@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * Animated villager models (boy and girl, generated with Tripo, Mixamo rig). Each model is loaded
  * once and cloned per villager. Clips: walk, catwalk (single tap) and celebrations (double tap).
@@ -11,7 +12,7 @@ export type CharacterKind = 'boy' | 'girl';
 export const CHARACTER_KINDS: readonly CharacterKind[] = ['boy', 'girl'];
 /** Figure without a choice yet (until the pupil picks one). */
 export const DEFAULT_CHARACTER: CharacterKind = 'boy';
-export const CHARACTER_LABEL: Record<CharacterKind, string> = { boy: 'Junge', girl: 'Mädchen' };
+export const CHARACTER_LABEL: Record<CharacterKind, string> = { boy: tr('Junge'), girl: tr('Mädchen') };
 
 const CATWALK = 'gravious sassy catwalk of a  model';
 /** Clip names inside each GLB. */

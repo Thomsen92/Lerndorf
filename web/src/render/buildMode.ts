@@ -1,3 +1,4 @@
+import { tr, html, msg } from '../i18n';
 /**
  * Build mode on the pupil's own plot (SPEC §12, docs/ASSET_VERTRAG.md). The plot has seven fixed
  * slots: house, garage, car pedestal and four decoration pedestals. The pupil taps a slot, picks one
@@ -113,7 +114,7 @@ function realItem(slots: SlotMap, slot: SlotId, kind: string): ReturnType<typeof
   return c?.itemId === RUIN_ID ? undefined : c;
 }
 
-const PREVIEW_HINT = 'Vorschau – noch nicht gespeichert';
+const PREVIEW_HINT = tr('Vorschau – noch nicht gespeichert');
 
 export class BuildMode {
   private readonly group = new THREE.Group();
@@ -411,19 +412,23 @@ export class BuildMode {
     const st = this.state;
     const slot = this.slot;
     const nameOf = (id: string): string => st.items.find((i) => i.id === id)?.nameDe ?? id;
-    const slotList = `<div class="build-items" role="group" aria-label="Plätze">${SLOTS.map((s) => {
-      const cur = realItem(st.slots, s.id, s.kind);
-      const picked = slot?.id === s.id;
-      return `<button type="button" data-slot="${s.id}" aria-pressed="${picked}" class="${picked ? 'primary' : ''}"><strong>${escape(
-        s.nameDe,
-      )}</strong>: ${cur ? escape(nameOf(cur.itemId)) : 'leer'}</button>`;
-    }).join('')}</div>`;
+    const slotList = html`<div class="build-items" role="group" aria-label="Plätze">
+      ${SLOTS.map((s) => {
+        const cur = realItem(st.slots, s.id, s.kind);
+        const picked = slot?.id === s.id;
+        return `<button type="button" data-slot="${s.id}" aria-pressed="${picked}" class="${picked ? 'primary' : ''}"><strong>${escape(
+          s.nameDe,
+        )}</strong>: ${cur ? escape(nameOf(cur.itemId)) : 'leer'}</button>`;
+      }).join('')}
+    </div>`;
 
     if (!slot) {
-      this.bar.innerHTML = `
-        <p class="build-info" role="status">${escape(
-          this.message ?? 'Wähle einen Platz: Haus, Garage, Auto-Platz oder einen der vier Deko-Plätze.',
-        )}</p>
+      this.bar.innerHTML = html` <p class="build-info" role="status">
+          ${escape(
+            this.message ??
+              tr('Wähle einen Platz: Haus, Garage, Auto-Platz oder einen der vier Deko-Plätze.'),
+          )}
+        </p>
         ${slotList}
         <div class="build-actions"><button type="button" id="done">Fertig</button></div>`;
       this.wireBar();
@@ -439,10 +444,13 @@ export class BuildMode {
     const canTurn = ROTATIONS[slot.kind].length > 1 && Boolean(pending ?? placed);
     const canClear = (slot.kind === 'deco' || slot.kind === 'car') && Boolean(placed);
     const unchanged = !pending || (current?.itemId === pending.itemId && (current?.rot ?? 0) === pending.rot);
-    this.bar.innerHTML = `
-      <section class="build-sheet" role="region" aria-labelledby="build-slot-title">
-      <header><h2 id="build-slot-title" tabindex="-1">${escape(slot.nameDe)}</h2>
-      <p class="build-info">${current ? `Jetzt: „${escape(nameOf(current.itemId))}“` : 'Noch leer'}</p></header>
+    this.bar.innerHTML = html` <section class="build-sheet" role="region" aria-labelledby="build-slot-title">
+      <header>
+        <h2 id="build-slot-title" tabindex="-1">${escape(slot.nameDe)}</h2>
+        <p class="build-info">
+          ${current ? msg`Jetzt: „${escape(nameOf(current.itemId))}“` : tr('Noch leer')}
+        </p>
+      </header>
       <p class="build-info" role="status">${escape(this.message ?? '')}</p>
       ${pending && !unchanged ? `<p class="build-info">${PREVIEW_HINT} – „${escape(nameOf(pending.itemId))}“</p>` : ''}
       <div class="build-items build-cards" role="group" aria-label="Passende Sachen">
@@ -454,17 +462,21 @@ export class BuildMode {
               const chosen = shown?.itemId === i.id;
               return `<button type="button" data-item="${escape(i.id)}" aria-pressed="${chosen}" class="${chosen ? 'primary' : ''}" ${
                 free <= 0 || this.busy ? 'disabled' : ''
-              }><strong>${escape(i.nameDe)}</strong><span class="item-thumb" aria-hidden="true"></span><span>${here ? 'steht hier' : free > 0 ? `frei: ${free}` : 'alle aufgestellt'}</span></button>`;
+              }><strong>${escape(i.nameDe)}</strong><span class="item-thumb" aria-hidden="true"></span><span>${here ? tr('steht hier') : free > 0 ? msg`frei: ${free}` : tr('alle aufgestellt')}</span></button>`;
             })
-            .join('') || '<p>Du hast dafür noch nichts.</p><button type="button" id="shop">Zum Shop</button>'
+            .join('') ||
+          html('<p>Du hast dafür noch nichts.</p><button type="button" id="shop">Zum Shop</button>')
         }
       </div>
       <div class="build-actions">
-        <button type="button" id="save" class="primary" ${unchanged || this.busy ? 'disabled' : ''}>Aufstellen</button>
-        ${canTurn ? `<button type="button" id="rot" ${this.busy ? 'disabled' : ''}>Drehen</button>` : ''}
-        ${canClear ? `<button type="button" id="clear" ${this.busy ? 'disabled' : ''}>Wegräumen</button>` : ''}
+        <button type="button" id="save" class="primary" ${unchanged || this.busy ? 'disabled' : ''}>
+          Aufstellen
+        </button>
+        ${canTurn ? html`<button type="button" id="rot" ${this.busy ? 'disabled' : ''}>Drehen</button>` : ''}
+        ${canClear ? html`<button type="button" id="clear" ${this.busy ? 'disabled' : ''}>Wegräumen</button>` : ''}
         <button type="button" id="cancel" ${this.busy ? 'disabled' : ''}>Zurück</button>
-      </div></section>`;
+      </div>
+    </section>`;
     this.wireBar();
     for (const button of this.bar.querySelectorAll<HTMLButtonElement>('[data-item]')) {
       const item = fitting.find((i) => i.id === button.dataset.item);
@@ -507,14 +519,13 @@ export class BuildMode {
         ? `<button type="button" data-item="${escape(item.id)}" aria-pressed="${chosen}" class="${
             chosen ? 'primary' : 'tutorial-highlight'
           }" ${this.busy ? 'disabled' : ''}>${escape(item.nameDe)}</button>`
-        : '<span>Das Haus ist noch nicht im Inventar.</span>';
-    this.bar.innerHTML = `
-      <p class="build-info" role="status">${escape(this.message ?? g.hint)}</p>
-      <div class="build-items" role="group" aria-label="Plätze"><button type="button" data-slot="${escape(
-        g.slotId,
-      )}" aria-pressed="true" class="primary"><strong>${escape(slot?.nameDe ?? 'Haus')}</strong>: ${
-        shownName ? escape(shownName) : 'leer'
-      }</button></div>
+        : html('<span>Das Haus ist noch nicht im Inventar.</span>');
+    this.bar.innerHTML = html` <p class="build-info" role="status">${escape(this.message ?? g.hint)}</p>
+      <div class="build-items" role="group" aria-label="Plätze">
+        <button type="button" data-slot="${escape(g.slotId)}" aria-pressed="true" class="primary">
+          <strong>${escape(slot?.nameDe ?? tr('Haus'))}</strong>: ${shownName ? escape(shownName) : 'leer'}
+        </button>
+      </div>
       <div class="build-items" role="group" aria-label="Passende Sachen">${itemBtn}</div>
       ${
         placed
@@ -586,10 +597,16 @@ export class BuildMode {
       }
     } catch (err) {
       console.error('placing failed', err);
-      res = { ok: false, message: 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.' };
+      res = { ok: false, message: tr('Das hat leider nicht geklappt. Bitte noch einmal versuchen.') };
     }
     await this.after(
-      res.ok ? (guided ? 'Dein Haus steht!' : type === 'turn' ? 'Gedreht.' : 'Aufgestellt!') : res.message,
+      res.ok
+        ? guided
+          ? tr('Dein Haus steht!')
+          : type === 'turn'
+            ? tr('Gedreht.')
+            : tr('Aufgestellt!')
+        : res.message,
       res.ok,
       { type, slot: slot.id, kind: slot.kind },
       pending,
@@ -606,10 +623,10 @@ export class BuildMode {
     try {
       res = await clearSlot(this.opts.supabase, slot.id);
     } catch {
-      res = { ok: false, message: 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.' };
+      res = { ok: false, message: tr('Das hat leider nicht geklappt. Bitte noch einmal versuchen.') };
     }
     await this.after(
-      res.ok ? 'Weggeräumt. Es ist wieder im Inventar.' : res.message,
+      res.ok ? tr('Weggeräumt. Es ist wieder im Inventar.') : res.message,
       res.ok,
       { type: 'remove', slot: slot.id, kind: slot.kind },
       null,

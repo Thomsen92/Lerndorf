@@ -1,4 +1,5 @@
 // Entry point. Without a session: login. With a session: the village.
+import { tr } from './i18n';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabase } from './api/client';
 import { renderLogin } from './ui/loginView';
@@ -17,7 +18,7 @@ async function main(): Promise<void> {
   try {
     supabase = createSupabase();
   } catch (err) {
-    root.textContent = 'Die Verbindung zum Server ist nicht eingerichtet. Bitte die Lehrkraft fragen.';
+    root.textContent = tr('Die Verbindung zum Server ist nicht eingerichtet. Bitte die Lehrkraft fragen.');
     console.error(err);
     return;
   }
@@ -35,10 +36,26 @@ async function main(): Promise<void> {
     const { data } = await supabase.auth.getSession();
     if (data.session) {
       const id = new URLSearchParams(location.search).get('ansehen');
-      if (id && await isTeacherSession(supabase)) {
-        const { data: p, error } = await supabase.from('profiles').select('id,nickname,class_id,plot_index').eq('id',id).eq('role','student').maybeSingle();
-        if (error || !p) { root.textContent = 'Dieser Schüler wurde nicht gefunden.'; return; }
-        village = await mountVillage(root,supabase,()=>void show(),{readOnly:{pupilId:p.id,nickname:p.nickname,classId:p.class_id,plotIndex:p.plot_index,onExit:()=>location.assign(`/lehrer/#${p.class_id}/schueler/${encodeURIComponent(p.id)}`)}});
+      if (id && (await isTeacherSession(supabase))) {
+        const { data: p, error } = await supabase
+          .from('profiles')
+          .select('id,nickname,class_id,plot_index')
+          .eq('id', id)
+          .eq('role', 'student')
+          .maybeSingle();
+        if (error || !p) {
+          root.textContent = 'Dieser Schüler wurde nicht gefunden.';
+          return;
+        }
+        village = await mountVillage(root, supabase, () => void show(), {
+          readOnly: {
+            pupilId: p.id,
+            nickname: p.nickname,
+            classId: p.class_id,
+            plotIndex: p.plot_index,
+            onExit: () => location.assign(`/lehrer/#${p.class_id}/schueler/${encodeURIComponent(p.id)}`),
+          },
+        });
       } else {
         village = await mountVillage(root, supabase, () => void show());
       }

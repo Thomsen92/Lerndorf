@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * Market plaza (LOOK §5, SPEC §10.7): paving with ring pattern, stone fountain, quest board with a
  * red roof and pinned notes, three market stalls with striped awnings, four benches, two tubs.
@@ -137,25 +138,52 @@ function board(layout: Layout): THREE.Group {
 }
 
 /** One removable draw call; the board keeps its existing click role after static baking. */
-export function setBoardNote(plaza:THREE.Object3D,text:string|null):void {
- const board=plaza.getObjectByName('questBoard');if(!board)return;
- const old=board.getObjectByName('boardNote') as THREE.Mesh<THREE.PlaneGeometry,THREE.MeshBasicMaterial>|undefined;
- if(old){old.material.map?.dispose();old.material.dispose();old.geometry.dispose();old.removeFromParent();}
- if(!text)return;
- const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=512;
- const ctx=canvas.getContext('2d');if(!ctx)return;
- ctx.fillStyle='#fff3cf';ctx.fillRect(0,0,1024,512);ctx.fillStyle='#654b31';ctx.font='bold 44px sans-serif';ctx.fillText('Nachricht von deiner Lehrkraft',48,70);ctx.font='42px sans-serif';
- let line='',y=145;
- for(const word of text.split(/\s+/)){
-  for(const chunk of word.match(/.{1,24}/gu)??[]){
-   if(ctx.measureText(line+chunk).width>920){ctx.fillText(line.trim(),48,y);line='';y+=62;}
-   line+=chunk+' ';
+export function setBoardNote(plaza: THREE.Object3D, text: string | null): void {
+  const board = plaza.getObjectByName('questBoard');
+  if (!board) return;
+  const old = board.getObjectByName('boardNote') as
+    THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial> | undefined;
+  if (old) {
+    old.material.map?.dispose();
+    old.material.dispose();
+    old.geometry.dispose();
+    old.removeFromParent();
   }
- }
- ctx.fillText(line.trim(),48,y);
- const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;
- const mesh=new THREE.Mesh(new THREE.PlaneGeometry(2.8,1.4),new THREE.MeshBasicMaterial({map,toneMapped:false}));
- mesh.name='boardNote';mesh.userData.kind='board';mesh.position.set(0,Number(board.userData.boardHeight),.19);board.add(mesh);
+  if (!text) return;
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  ctx.fillStyle = '#fff3cf';
+  ctx.fillRect(0, 0, 1024, 512);
+  ctx.fillStyle = '#654b31';
+  ctx.font = 'bold 44px sans-serif';
+  ctx.fillText(tr('Nachricht von deiner Lehrkraft'), 48, 70);
+  ctx.font = '42px sans-serif';
+  let line = '',
+    y = 145;
+  for (const word of text.split(/\s+/)) {
+    for (const chunk of word.match(/.{1,24}/gu) ?? []) {
+      if (ctx.measureText(line + chunk).width > 920) {
+        ctx.fillText(line.trim(), 48, y);
+        line = '';
+        y += 62;
+      }
+      line += chunk + ' ';
+    }
+  }
+  ctx.fillText(line.trim(), 48, y);
+  const map = new THREE.CanvasTexture(canvas);
+  map.colorSpace = THREE.SRGBColorSpace;
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.8, 1.4),
+    new THREE.MeshBasicMaterial({ map, toneMapped: false }),
+  );
+  mesh.name = 'boardNote';
+  mesh.userData.kind = 'board';
+  mesh.position.set(0, Number(board.userData.boardHeight), 0.19);
+  board.add(mesh);
 }
 
 /** A market stall with counter, posts and a striped awning. Front faces the plaza. */
@@ -170,8 +198,26 @@ const GOODS: Record<Goods, { name: string; scale: number; spots: Array<[number, 
       [x + 0.15, 0.42],
     ]) as Array<[number, number]>,
   },
-  pumpkins: { name: 'pumpkin', scale: 1.5, spots: [[-0.85, 0.15], [-0.4, 0.4], [0.45, 0.15], [0.9, 0.4]] },
-  bread: { name: 'loaf-round', scale: 0.7, spots: [[-0.8, 0.2], [-0.4, 0.45], [0.4, 0.2], [0.85, 0.45]] },
+  pumpkins: {
+    name: 'pumpkin',
+    scale: 1.5,
+    spots: [
+      [-0.85, 0.15],
+      [-0.4, 0.4],
+      [0.45, 0.15],
+      [0.9, 0.4],
+    ],
+  },
+  bread: {
+    name: 'loaf-round',
+    scale: 0.7,
+    spots: [
+      [-0.8, 0.2],
+      [-0.4, 0.45],
+      [0.4, 0.2],
+      [0.85, 0.45],
+    ],
+  },
 };
 /** Kenney stall (Fantasy Town Kit, 1 m) scaled to the size of the prototype stall. */
 const STALL_SCALE = 2.3;
@@ -205,7 +251,7 @@ function placeholderStall(stripe: string, colours: string[]): THREE.Group {
   colours.forEach((col, k) => {
     part(new THREE.SphereGeometry(0.17, 6, 5), mat(col), -0.8 + k * 0.32, 1.0, 0.1 + (k % 2) * 0.2, g);
   });
-    g.traverse((o) => {
+  g.traverse((o) => {
     if (o instanceof THREE.Mesh) o.userData.kind = 'live'; // replaced later: not merged
   });
   return g;

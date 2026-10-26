@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * Client side of the first-login tutorial (migration 0019). Every call is one RPC; the server owns
  * the step, the plot and the coins. Solutions are never sent to the client.
@@ -56,15 +57,15 @@ function toState(r: RawState): TutorialState {
 
 function explain(message: string): string {
   if (message.includes('village is full'))
-    return 'Das Dorf ist leider voll. Bitte sag deiner Lehrkraft Bescheid.';
-  if (message.includes('not enough coins')) return 'Dafür hast du noch nicht genug Münzen.';
+    return tr('Das Dorf ist leider voll. Bitte sag deiner Lehrkraft Bescheid.');
+  if (message.includes('not enough coins')) return tr('Dafür hast du noch nicht genug Münzen.');
   if (message.includes('not the current question'))
-    return 'Diese Frage ist nicht mehr dran. Bitte lade die Seite neu.';
+    return tr('Diese Frage ist nicht mehr dran. Bitte lade die Seite neu.');
   if (message.includes('not at this step') || message.includes('not in the quiz'))
-    return 'Das passt gerade nicht zum Schritt. Bitte lade die Seite neu.';
-  if (message.includes('pupils only')) return 'Das gibt es nur für Schülerkonten.';
-  if (message.includes('no free copy')) return 'Das Haus ist nicht mehr frei. Bitte lade die Seite neu.';
-  return 'Das hat leider nicht geklappt. Bitte noch einmal versuchen.';
+    return tr('Das passt gerade nicht zum Schritt. Bitte lade die Seite neu.');
+  if (message.includes('pupils only')) return tr('Das gibt es nur für Schülerkonten.');
+  if (message.includes('no free copy')) return tr('Das Haus ist nicht mehr frei. Bitte lade die Seite neu.');
+  return tr('Das hat leider nicht geklappt. Bitte noch einmal versuchen.');
 }
 
 async function call<T>(

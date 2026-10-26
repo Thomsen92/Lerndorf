@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { CharacterKind } from '../render/character';
 import {
@@ -28,9 +29,9 @@ export function supabaseWardrobeApi(s: SupabaseClient, uid: string): WardrobeApi
       s.from('settings').select('avatar_palette,avatar_skin_palette').eq('id', 1).single(),
     ]);
     if (profile.error || !inventory.ok || settings.error)
-      return { ok: false, message: 'Der Kleiderschrank konnte nicht geladen werden.' };
+      return { ok: false, message: tr('Der Kleiderschrank konnte nicht geladen werden.') };
     const kind = profile.data?.avatar?.character;
-    if (kind !== 'boy' && kind !== 'girl') return { ok: false, message: 'Wähle zuerst deine Figur aus.' };
+    if (kind !== 'boy' && kind !== 'girl') return { ok: false, message: tr('Wähle zuerst deine Figur aus.') };
     const cloth = settings.data.avatar_palette as string[],
       skin = settings.data.avatar_skin_palette as string[];
     return {
@@ -49,7 +50,7 @@ export function supabaseWardrobeApi(s: SupabaseClient, uid: string): WardrobeApi
       if (result.ok) snapshot = result.value;
       return result;
     } catch {
-      return { ok: false, message: 'Der Kleiderschrank konnte nicht geladen werden.' };
+      return { ok: false, message: tr('Der Kleiderschrank konnte nicht geladen werden.') };
     }
   };
   return {
@@ -63,17 +64,21 @@ export function supabaseWardrobeApi(s: SupabaseClient, uid: string): WardrobeApi
       if (error)
         return {
           ok: false,
+          code:
+            error.message.includes('revision conflict') || error.message.includes('character changed')
+              ? 'revision_conflict'
+              : undefined,
           message:
             error.message.includes('revision conflict') || error.message.includes('character changed')
-              ? 'Dein Look wurde inzwischen geändert. Lade den gespeicherten Look neu.'
-              : 'Dein Look konnte nicht gespeichert werden. Bitte noch einmal versuchen.',
+              ? tr('Dein Look wurde inzwischen geändert. Lade den gespeicherten Look neu.')
+              : tr('Dein Look konnte nicht gespeichert werden. Bitte noch einmal versuchen.'),
         };
       // Read fresh possession/palettes, but always publish the authoritative write response first.
       const previous = snapshot;
       const fresh = await load();
       const current = fresh.ok ? fresh.value : previous;
       if (!current)
-        return { ok: false, message: 'Der Look ist gespeichert. Bitte lade den Kleiderschrank neu.' };
+        return { ok: false, message: tr('Der Look ist gespeichert. Bitte lade den Kleiderschrank neu.') };
       return {
         ok: true,
         value: {

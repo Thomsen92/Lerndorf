@@ -1,3 +1,4 @@
+import { tr, msg } from '../i18n';
 import type { AvatarBadge } from './avatarBadge';
 /**
  * Two accessible shortcuts beside the avatar in the top right. No village/market shortcut or rail.
@@ -11,9 +12,9 @@ export const NAV_BUTTONS: readonly NavButton[] = ['aufgaben', 'haus'];
 const LABELS: Record<NavButton, { icon: string; label: string }> = {
   aufgaben: {
     icon: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h4"/>',
-    label: 'Aufgaben',
+    label: tr('Aufgaben'),
   },
-  haus: { icon: '<path d="m3 11 9-8 9 8M5 10v11h14V10M10 21v-7h4v7"/>', label: 'Mein Haus' },
+  haus: { icon: '<path d="m3 11 9-8 9 8M5 10v11h14V10M10 21v-7h4v7"/>', label: tr('Mein Haus') },
 };
 
 /** Nav button that is marked for an area: bauen/shop/inventar → 'haus'. */
@@ -43,7 +44,7 @@ export function createGameNav(opts: {
 }): GameNav {
   const el = document.createElement('nav');
   el.className = 'game-nav';
-  el.setAttribute('aria-label', 'Hauptmenü');
+  el.setAttribute('aria-label', tr('Hauptmenü'));
 
   const buttons = new Map<NavButton, HTMLButtonElement>();
   let locked = false;
@@ -92,8 +93,8 @@ export function createGameNav(opts: {
 
   let coinsNow = opts.coins;
   const renderStatus = (): void => {
-    coinsEl.textContent = `${coinsNow} Münzen`;
-    status.setAttribute('aria-label', `${opts.nickname}, ${coinsNow} Münzen – Einstellungen öffnen`);
+    coinsEl.textContent = msg`${coinsNow} Münzen`;
+    status.setAttribute('aria-label', msg`${opts.nickname}, ${coinsNow} Münzen – Einstellungen öffnen`);
   };
   renderStatus();
 
@@ -103,7 +104,7 @@ export function createGameNav(opts: {
     setQuestBadge(open) {
       const b = buttons.get('aufgaben')!;
       b.querySelector('.quest-badge')?.remove();
-      b.setAttribute('aria-label', 'Aufgaben');
+      b.setAttribute('aria-label', tr('Aufgaben'));
       if (open === null) return;
       const badge = document.createElement('span');
       badge.className = 'quest-badge';
@@ -112,7 +113,7 @@ export function createGameNav(opts: {
       b.append(badge);
       b.setAttribute(
         'aria-label',
-        open === 'done' ? 'Aufgaben, Tagesziel geschafft' : `Aufgaben, ${open} Quests offen`,
+        open === 'done' ? tr('Aufgaben, Tagesziel geschafft') : msg`Aufgaben, ${open} Quests offen`,
       );
     },
     setActive(area) {
@@ -136,7 +137,7 @@ export function createGameNav(opts: {
       coinsNow = coins;
       renderStatus();
       opts.badge?.setCoins?.(coins);
-      live.textContent = `Du hast jetzt ${coins} Münzen.`;
+      live.textContent = msg`Du hast jetzt ${coins} Münzen.`;
       if (diff > 0) {
         const tag = document.createElement('span');
         tag.className = 'gain';

@@ -16,6 +16,7 @@ export default defineConfig({
     },
   },
   test: {
+    setupFiles: ['tests/localeSetup.ts'],
     environment: 'node',
     include: ['tests/**/*.test.ts'],
   },

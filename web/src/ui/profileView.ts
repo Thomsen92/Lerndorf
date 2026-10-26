@@ -1,3 +1,4 @@
+import { tr, msg } from '../i18n';
 import { PROGRESS_ERROR, levelFraction, type Progress, type ProgressApi, type Reward } from '../api/progress';
 import type { CharacterKind } from '../render/character';
 import { avatarPortrait, frameSvg } from './frames';
@@ -55,10 +56,10 @@ export function openProfile(opts: {
     parent.append(el);
     return el;
   };
-  const back = button('← Profil', () => show('overview'));
-  back.setAttribute('aria-label', 'Zurück zum Profil');
-  const settings = button('Einstellungen', opts.onSettings, 'profile-settings');
-  head.append(back, title, settings, button('Schließen', opts.onClose));
+  const back = button(tr('← Profil'), () => show('overview'));
+  back.setAttribute('aria-label', tr('Zurück zum Profil'));
+  const settings = button(tr('Einstellungen'), opts.onSettings, 'profile-settings');
+  head.append(back, title, settings, button(tr('Schließen'), opts.onClose));
   const content = document.createElement('div');
   content.className = 'area-content profile-content';
   panel.append(head, content);
@@ -86,8 +87,8 @@ export function openProfile(opts: {
     const hero = document.createElement('section');
     hero.className = 'profile-player';
     const portrait = button('', () => show('collection', 'frame'), 'profile-portrait-button');
-    portrait.setAttribute('aria-label', 'Rahmen ändern');
-    portrait.title = 'Rahmen ändern';
+    portrait.setAttribute('aria-label', tr('Rahmen ändern'));
+    portrait.title = tr('Rahmen ändern');
     portrait.append(
       avatarPortrait({ character: opts.character, look: opts.look, frameId: p.frameId, size: 'large' }),
     );
@@ -97,22 +98,22 @@ export function openProfile(opts: {
     identity.className = 'profile-identity';
     text(identity, 'h3', opts.nickname);
     const titleButton = button(
-      rewards.find((r) => r.id === p.titleId)?.label ?? 'Titel auswählen',
+      rewards.find((r) => r.id === p.titleId)?.label ?? tr('Titel auswählen'),
       () => show('collection', 'title'),
       'profile-current-title',
     );
-    titleButton.title = 'Titel ändern';
+    titleButton.title = tr('Titel ändern');
     identity.append(titleButton);
-    text(identity, 'p', `${opts.getCoins()} Münzen`, 'profile-wallet');
+    text(identity, 'p', msg`${opts.getCoins()} Münzen`, 'profile-wallet');
     hero.append(portrait, identity, crestSvg(p.level, 96));
     content.append(hero);
     const xp = document.createElement('div');
     xp.className = 'profile-progress';
-    text(xp, 'p', `Noch ${Math.max(0, p.nextLevelXp - p.xp)} XP bis Level ${p.level + 1}`);
+    text(xp, 'p', msg`Noch ${Math.max(0, p.nextLevelXp - p.xp)} XP bis Level ${p.level + 1}`);
     const bar = document.createElement('div');
     bar.className = 'xp-bar';
     bar.setAttribute('role', 'progressbar');
-    bar.setAttribute('aria-label', 'Fortschritt zum nächsten Level');
+    bar.setAttribute('aria-label', tr('Fortschritt zum nächsten Level'));
     bar.setAttribute('aria-valuemin', '0');
     bar.setAttribute('aria-valuenow', String(p.xp - p.levelXp));
     bar.setAttribute('aria-valuemax', String(p.nextLevelXp - p.levelXp));
@@ -125,20 +126,20 @@ export function openProfile(opts: {
     daily.className = 'profile-daily';
     const streak = document.createElement('div');
     streak.className = 'profile-milestone';
-    text(streak, 'span', 'Deine Serie', 'profile-small-label');
-    text(streak, 'strong', `🔥 ${p.streak.current} Tage`);
+    text(streak, 'span', tr('Deine Serie'), 'profile-small-label');
+    text(streak, 'strong', msg`🔥 ${p.streak.current} Tage`);
     if (p.streak.shieldLeft) {
-      const shield = text(streak, 'span', 'Geschützt', 'profile-shield');
-      shield.title = 'Ein Schutzschild ist bereit.';
+      const shield = text(streak, 'span', tr('Geschützt'), 'profile-shield');
+      shield.title = tr('Ein Schutzschild ist bereit.');
     }
     const today = opts.onQuests ? button('', () => opts.onQuests?.()) : document.createElement('div');
     today.className = 'profile-milestone profile-today';
-    text(today, 'span', 'Heute', 'profile-small-label');
-    text(today, 'strong', p.today.total ? `${p.today.solved} von ${p.today.total}` : 'Pause');
+    text(today, 'span', tr('Heute'), 'profile-small-label');
+    text(today, 'strong', p.today.total ? msg`${p.today.solved} von ${p.today.total}` : tr('Pause'));
     text(
       today,
       'span',
-      p.today.total ? 'Quests geschafft' : 'Bald gibt es neue Quests',
+      p.today.total ? tr('Quests geschafft') : tr('Bald gibt es neue Quests'),
       'profile-small-label',
     );
     const dots = document.createElement('span');
@@ -154,11 +155,11 @@ export function openProfile(opts: {
     content.append(daily);
     const loot = document.createElement('section');
     loot.className = 'profile-loot';
-    const heading = text(loot, 'h3', 'Deine Truhen');
+    const heading = text(loot, 'h3', tr('Deine Truhen'));
     if (p.chests.length) text(heading, 'span', String(p.chests.length), 'profile-loot-count');
-    if (!p.chests.length) text(loot, 'p', `Nächste Truhe bei Level ${p.level + 1}.`, 'profile-empty');
+    if (!p.chests.length) text(loot, 'p', msg`Nächste Truhe bei Level ${p.level + 1}.`, 'profile-empty');
     else {
-      text(loot, 'p', 'Tippe eine Truhe an.', 'profile-small-label');
+      text(loot, 'p', tr('Tippe eine Truhe an.'), 'profile-small-label');
       const row = document.createElement('div');
       row.className = 'loot-grid';
       for (const chest of p.chests) {
@@ -171,7 +172,7 @@ export function openProfile(opts: {
             opts.onCoins(coins);
             if (closed) return;
             const wallet = content.querySelector('.profile-wallet');
-            if (wallet) wallet.textContent = `${coins} Münzen`;
+            if (wallet) wallet.textContent = msg`${coins} Münzen`;
           },
           onOpened: (id) => {
             if (progress) {
@@ -193,11 +194,11 @@ export function openProfile(opts: {
     }
     content.append(loot);
     const collection = button('', () => show('collection'), 'profile-collection-link');
-    collection.setAttribute('aria-label', 'Sammlung ansehen');
+    collection.setAttribute('aria-label', tr('Sammlung ansehen'));
     collection.append(frameSvg(p.frameId, 48));
     const label = document.createElement('span');
-    text(label, 'strong', 'Sammlung');
-    text(label, 'span', 'Titel und Rahmen');
+    text(label, 'strong', tr('Sammlung'));
+    text(label, 'span', tr('Titel und Rahmen'));
     collection.append(label);
     text(collection, 'span', '→', 'profile-collection-arrow');
     content.append(collection);
@@ -237,13 +238,13 @@ export function openProfile(opts: {
     const tabs = document.createElement('div');
     tabs.className = 'collection-tabs';
     tabs.setAttribute('role', 'tablist');
-    tabs.setAttribute('aria-label', 'Sammlungskategorien');
+    tabs.setAttribute('aria-label', tr('Sammlungskategorien'));
     const panelId = `${titleId}-collection`;
     const focusTab = (): void => {
       content.querySelector<HTMLButtonElement>('[role=tab][aria-selected=true]')?.focus();
     };
     for (const kind of ['title', 'frame'] as const) {
-      const tab = button(kind === 'title' ? 'Titel' : 'Rahmen', () => {
+      const tab = button(kind === 'title' ? tr('Titel') : tr('Rahmen'), () => {
         category = kind;
         render();
         focusTab();
@@ -293,7 +294,7 @@ export function openProfile(opts: {
       b.dataset.reward = reward?.id ?? 'none';
       b.setAttribute(
         'aria-label',
-        `${reward?.label ?? 'Kein Titel'}${locked ? `, ab Level ${reward!.level}` : selected ? ', gewählt' : ', wählen'}`,
+        `${reward?.label ?? tr('Kein Titel')}${locked ? msg`, ab Level ${reward!.level}` : selected ? tr(', gewählt') : tr(', wählen')}`,
       );
       b.setAttribute('aria-pressed', String(selected));
       b.disabled = locked || busy;
@@ -303,11 +304,11 @@ export function openProfile(opts: {
         const emblem = text(b, 'span', reward ? 'Aa' : '—', 'collection-title-emblem');
         emblem.setAttribute('aria-hidden', 'true');
       }
-      text(b, 'strong', reward?.label ?? 'Kein Titel');
+      text(b, 'strong', reward?.label ?? tr('Kein Titel'));
       text(
         b,
         'span',
-        locked ? `🔒 Level ${reward!.level}` : selected ? '✓ Gewählt' : 'Wählen',
+        locked ? msg`🔒 Level ${reward!.level}` : selected ? tr('✓ Gewählt') : tr('Wählen'),
         'collection-card-state',
       );
       card.append(b, error);
@@ -319,7 +320,7 @@ export function openProfile(opts: {
     if (!progress || closed) return;
     clearChests();
     content.replaceChildren();
-    title.textContent = page === 'overview' ? 'Mein Profil' : 'Meine Sammlung';
+    title.textContent = page === 'overview' ? tr('Mein Profil') : tr('Meine Sammlung');
     area.dataset.page = page;
     back.hidden = page !== 'collection';
     settings.hidden = page !== 'overview';
@@ -341,15 +342,15 @@ export function openProfile(opts: {
       const error = text(content, 'p', PROGRESS_ERROR);
       error.setAttribute('role', 'status');
       content.append(
-        button('Nochmal versuchen', () => {
+        button(tr('Nochmal versuchen'), () => {
           void load();
         }),
       );
     }
   }
-  title.textContent = 'Mein Profil';
+  title.textContent = tr('Mein Profil');
   back.hidden = true;
-  text(content, 'p', 'Profil wird geladen …');
+  text(content, 'p', tr('Profil wird geladen …'));
   void load();
   return {
     close() {

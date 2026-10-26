@@ -1,3 +1,4 @@
+import { tr, msg, getLocale, setLocale, type Locale } from '../i18n';
 /**
  * Settings menu ("Einstellungen"): nickname and coins, graphics quality, ledger, logout.
  * Built on the shared modal; the ledger action closes the menu first so the two modals never stack.
@@ -7,8 +8,8 @@ import { openModal, type ModalHandle } from './dialog';
 
 const QUALITY_LABEL: ReadonlyArray<readonly [QualityChoice, string]> = [
   ['auto', 'Auto'],
-  ['high', 'Hoch'],
-  ['low', 'Niedrig'],
+  ['high', tr('Hoch')],
+  ['low', tr('Niedrig')],
 ];
 
 export function openAccountMenu(opts: {
@@ -22,17 +23,46 @@ export function openAccountMenu(opts: {
   /** opens the figure choice (boy or girl); omitted: no button */
   onCharacter?: () => void;
   onLogout: () => void;
+  onLanguageChange?: (locale: Locale) => void;
 }): ModalHandle {
-  const modal = openModal({ title: 'Einstellungen', opener: opts.opener });
+  const modal = openModal({ title: tr('Einstellungen'), opener: opts.opener });
+  const language = document.createElement('div');
+  language.className = 'seg language-group';
+  language.setAttribute('role', 'group');
+  language.setAttribute('aria-label', tr('Sprache'));
+  for (const [value, label] of [
+    ['en', 'English'],
+    ['de', 'Deutsch'],
+  ] as const) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    b.dataset.language = value;
+    b.setAttribute('aria-pressed', String(getLocale() === value));
+    b.addEventListener('click', () => {
+      if (getLocale() === value) return;
+      setLocale(value);
+      if (opts.onLanguageChange) {
+        opts.onLanguageChange(value);
+        return;
+      }
+      const url = new URL(location.href);
+      url.searchParams.set('lang', value);
+      history.replaceState(null, '', url);
+      location.reload();
+    });
+    language.append(b);
+  }
+  modal.body.append(language);
 
   const who = document.createElement('p');
   who.className = 'account-who';
-  who.textContent = `${opts.nickname} · ${opts.coins} Münzen`;
+  who.textContent = msg`${opts.nickname} · ${opts.coins} Münzen`;
 
   const group = document.createElement('div');
   group.className = 'seg quality-group';
   group.setAttribute('role', 'group');
-  group.setAttribute('aria-label', 'Grafik-Qualität');
+  group.setAttribute('aria-label', tr('Grafik-Qualität'));
   const buttons = new Map<QualityChoice, HTMLButtonElement>();
   let current = opts.quality;
   const refresh = (): void => {
@@ -54,7 +84,7 @@ export function openAccountMenu(opts: {
 
   const ledger = document.createElement('button');
   ledger.type = 'button';
-  ledger.textContent = 'Kontoauszug';
+  ledger.textContent = tr('Kontoauszug');
   ledger.addEventListener('click', () => {
     modal.close();
     opts.onLedger();
@@ -62,7 +92,7 @@ export function openAccountMenu(opts: {
 
   const figure = document.createElement('button');
   figure.type = 'button';
-  figure.textContent = 'Figur wechseln';
+  figure.textContent = tr('Figur wechseln');
   figure.addEventListener('click', () => {
     modal.close();
     opts.onCharacter?.();
@@ -70,7 +100,7 @@ export function openAccountMenu(opts: {
 
   const logout = document.createElement('button');
   logout.type = 'button';
-  logout.textContent = 'Abmelden';
+  logout.textContent = tr('Abmelden');
   logout.addEventListener('click', () => opts.onLogout());
 
   modal.body.append(who, group, ledger, ...(opts.onCharacter ? [figure] : []), logout);
@@ -80,7 +110,7 @@ export function openAccountMenu(opts: {
     const toggle = document.createElement('button');
     toggle.type = 'button';
     const refreshSound = (): void => {
-      toggle.textContent = on ? 'Töne: an' : 'Töne: aus';
+      toggle.textContent = on ? tr('Töne: an') : tr('Töne: aus');
       toggle.setAttribute('aria-pressed', String(on));
     };
     toggle.addEventListener('click', () => {

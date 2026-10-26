@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * Item model shared by shop, inventory and build views: catalogue, own inventory and own slots
  * merged into one list. Pure functions plus a thin Supabase adapter; writes only via buyItem.
@@ -29,11 +30,11 @@ export interface ItemEntry {
 export const KIND_ORDER: readonly ItemKind[] = ['house', 'garage', 'car', 'deco', 'avatar'];
 
 export const KIND_LABEL: Record<ItemKind, string> = {
-  house: 'Häuser',
-  garage: 'Garagen',
-  car: 'Autos',
-  deco: 'Garten-Deko',
-  avatar: 'Für deinen Avatar',
+  house: tr('Häuser'),
+  garage: tr('Garagen'),
+  car: tr('Autos'),
+  deco: tr('Garten-Deko'),
+  avatar: tr('Für deinen Avatar'),
 };
 
 /** Kinds a pupil can own only once. */
@@ -74,9 +75,9 @@ export function purchaseState(
   shopOpen: boolean,
 ): { canBuy: boolean; reason: string | null } {
   if ((ONCE.has(e.kind) || e.kind === 'avatar') && e.owned > 0)
-    return { canBuy: false, reason: 'Hast du schon.' };
-  if (!shopOpen) return { canBuy: false, reason: 'Der Shop ist gerade geschlossen.' };
-  if (coins < e.price) return { canBuy: false, reason: 'Dafür reichen die Münzen nicht.' };
+    return { canBuy: false, reason: tr('Hast du schon.') };
+  if (!shopOpen) return { canBuy: false, reason: tr('Der Shop ist gerade geschlossen.') };
+  if (coins < e.price) return { canBuy: false, reason: tr('Dafür reichen die Münzen nicht.') };
   return { canBuy: true, reason: null };
 }
 

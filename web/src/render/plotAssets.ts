@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 /**
  * Placeholder models for the plot slots (docs/ASSET_VERTRAG.md): houses, garages, cars and the
  * decoration scenes. They follow the asset contract exactly, so the Blender models can replace
@@ -380,7 +381,7 @@ const DECO: Record<string, () => THREE.Group> = {
       k: ['10001', '10010', '10100', '11000', '10100', '10010', '10001'],
       '!': ['00100', '00100', '00100', '00100', '00100', '00000', '00100'],
     };
-    const phrase = 'Hallo Malik!';
+    const phrase = tr('Hallo Malik!');
     const cellW = 0.032;
     const cellH = 0.055;
     const advance = 0.18;

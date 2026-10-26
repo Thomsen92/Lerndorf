@@ -1,4 +1,5 @@
 import manifest from '../../../content/avatar/wardrobe.json';
+import { tr } from '../i18n';
 import type { CharacterKind } from '../render/character';
 import type { AvatarSlot } from './look';
 export interface AvatarPart {
@@ -19,7 +20,10 @@ export interface AvatarPart {
   triangles: number;
   bytes: number;
 }
-export const avatarCatalog = manifest.items as AvatarPart[];
+export const avatarCatalog = (manifest.items as AvatarPart[]).map((part) => ({
+  ...part,
+  name: tr(part.name),
+}));
 export const partById = (id: string): AvatarPart | undefined => avatarCatalog.find((i) => i.id === id);
 export function partUrl(part: AvatarPart, thumbnail = false): string {
   return `${import.meta.env.BASE_URL}assets/characters/wardrobe/${part.character}/${thumbnail ? part.thumbnail : part.url}`;

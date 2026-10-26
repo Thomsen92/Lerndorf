@@ -1,3 +1,4 @@
+import { tr } from '../i18n';
 import type { ClassNotice } from '../api/notice';
 import { openModal, type ModalHandle } from './dialog';
 export function noticeSeenKey(n: ClassNotice): string {
@@ -21,7 +22,7 @@ export function openNoticeCard(
     /* Shared devices can disable storage. */
   }
   const card = openModal({
-    title: 'Nachricht von deiner Lehrkraft',
+    title: tr('Nachricht von deiner Lehrkraft'),
     onClose: () => {
       try {
         store?.setItem(noticeSeenKey(n), '1');

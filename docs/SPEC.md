@@ -4,6 +4,8 @@ Stand: 17.10.2026 · gehört zu [SCOPE.md](SCOPE.md) · Referenz-Implementierung
 
 Markierung offener Punkte: **[OFFEN]** = mit der Lehrkraft klären; bis dahin den genannten Standardwert verwenden und konfigurierbar halten.
 
+**Sprachregel ab 26.10.2026:** Spielertexte standardmäßig Englisch, in Einstellungen zwischen English und Deutsch umschaltbar. Die früheren deutschen UI-Beispiele unten beschreiben weiterhin den deutschen Modus. Lehrerbereich, Backend, Datenbank, Lerninhalte und der Name Lerndorf bleiben bestehen. Die Wahl wird nur im Browser gespeichert; Details und technische Grenzen: [PLAYER_LANGUAGES.md](PLAYER_LANGUAGES.md).
+
 ---
 
 ## 1. Architektur
@@ -88,7 +90,7 @@ Lerndorf/
 
 | Bereich | Wahl | Hinweis |
 | --- | --- | --- |
-| Sprache | TypeScript (strict) | UI-Texte Deutsch, Code/Kommentare Englisch |
+| Sprache | TypeScript (strict) | Spieler-UI Englisch/Deutsch, Standard Englisch; Lehrer-UI Deutsch; Code/Kommentare Englisch |
 | Build | Vite | `base: '/'` für Cloudflare Pages (Wurzel der Domain) |
 | 3D | three.js **0.170.x** (fest gepinnt) | wie im Prototyp |
 | UI | Vanilla TS + CSS (kein Framework nötig); Preact nur falls UI-Umfang es erfordert | |

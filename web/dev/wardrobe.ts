@@ -1,5 +1,7 @@
 import { openWardrobe } from '../src/ui/wardrobeView';
 import { openHouseMenu } from '../src/ui/houseMenu';
+import { openAccountMenu } from '../src/ui/accountMenu';
+import { tr } from '../src/i18n';
 import { openShop } from '../src/ui/shopView';
 import type { AreaHandle } from '../src/ui/areas';
 import { avatarCatalog } from '../src/avatars/catalog';
@@ -22,7 +24,7 @@ const api: WardrobeApi = {
     if (params.has('fail'))
       return {
         ok: false,
-        message: 'Dein Look konnte nicht gespeichert werden. Bitte noch einmal versuchen.',
+        message: tr('Dein Look konnte nicht gespeichert werden. Bitte noch einmal versuchen.'),
       };
     if (rev !== data.wardrobe.revision) return { ok: false, message: 'Dein Look wurde inzwischen geändert.' };
     data = { ...data, wardrobe: { ...data.wardrobe, [kind]: look, revision: rev + 1 } };
@@ -37,14 +39,24 @@ function home() {
   document.body.querySelector('#home-note')?.remove();
   const p = document.createElement('p');
   p.id = 'home-note';
-  p.textContent = 'Mein Haus';
+  p.textContent = tr('Mein Haus');
   document.body.append(p);
   current = openHouseMenu({
     onBuild: () => {},
     onInventory: shop,
     onShop: shop,
     onWardrobe: () => open(),
-    onSettings: () => {},
+    onSettings: (opener) =>
+      openAccountMenu({
+        opener,
+        nickname: 'Fuchs',
+        coins,
+        quality: 'auto',
+        onQuality: () => {},
+        onLedger: () => {},
+        onLogout: () => {},
+        sound: { on: true, onChange: () => {} },
+      }),
     onBack: () => {
       current?.close();
     },

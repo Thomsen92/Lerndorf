@@ -1,14 +1,15 @@
+import { msg, tr } from '../i18n';
 import type { ProgressDelta } from '../api/progress';
 import type { AvatarBadge } from './avatarBadge';
 import type { Sound } from './sound';
 export function toastLines(delta: ProgressDelta): string[] {
   return delta.gained.map((g) =>
     g.reason === 'day_goal'
-      ? `Tagesziel geschafft! +${g.xp} XP`
+      ? msg`Tagesziel geschafft! +${g.xp} XP`
       : g.reason === 'streak'
         ? delta.streak?.restarted
-          ? 'Neue Serie: 1 Tag 🔥 – weiter so!'
-          : `🔥 Serie: ${delta.streak?.current ?? 1} Tage! +${g.xp} XP`
+          ? tr('Neue Serie: 1 Tag 🔥 – weiter so!')
+          : msg`🔥 Serie: ${delta.streak?.current ?? 1} Tage! +${g.xp} XP`
         : `+${g.xp} XP`,
   );
 }

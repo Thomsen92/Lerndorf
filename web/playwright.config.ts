@@ -8,6 +8,13 @@ export default defineConfig({
   outputDir: './test-results/playwright-artifacts',
   timeout: 30_000,
   use: {
+    storageState: {
+      cookies: [],
+      origins: ['http://localhost:5175', 'http://localhost:4173'].map((origin) => ({
+        origin,
+        localStorage: [{ name: 'lerndorf.language', value: 'de' }],
+      })),
+    },
     trace: 'retain-on-failure',
   },
   webServer: [
@@ -27,12 +34,14 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      testIgnore: /(daily-quests|tutorial|build-feedback|xp-level|sir-byte|teacher|wardrobe)\.spec\.ts/,
+      testIgnore:
+        /(daily-quests|tutorial|build-feedback|xp-level|sir-byte|teacher|wardrobe|languages)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:4173/' },
     },
     {
       name: 'harness',
-      testMatch: /(daily-quests|tutorial|build-feedback|xp-level|sir-byte|teacher|wardrobe)\.spec\.ts/,
+      testMatch:
+        /(daily-quests|tutorial|build-feedback|xp-level|sir-byte|teacher|wardrobe|languages)\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         baseURL: 'http://localhost:5175/',
