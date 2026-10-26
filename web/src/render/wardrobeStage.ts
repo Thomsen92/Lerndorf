@@ -4,6 +4,7 @@ import { configurePreviewRenderer } from './itemPreview';
 import { createWardrobeRoom } from './wardrobeRoom';
 import { AvatarCustomizer } from '../avatars/customizer';
 import type { AvatarLook } from '../avatars/look';
+import { createWardrobeIdle } from './wardrobeIdle';
 export interface WardrobeStage {
   applyLook(look: AvatarLook): Promise<void>;
   rotateBy(angle: number): void;
@@ -61,6 +62,7 @@ export async function createWardrobeStage(
     customizer = new AvatarCustomizer(figure.root, opts.character);
     await customizer.applyLook(opts.look);
     if (closed) throw new DOMException('Closed', 'AbortError');
+    const idle = createWardrobeIdle(figure.root);
     const scene = new T.Scene(),
       camera = new T.PerspectiveCamera(32, 1, 0.01, 50);
     scene.add(figure.root);
@@ -90,7 +92,7 @@ export async function createWardrobeStage(
       uniforms: { map: { value: rt.texture }, step: { value: new T.Vector2() } },
       vertexShader: 'varying vec2 uv0;void main(){uv0=uv;gl_Position=vec4(position.xy,0.,1.);}',
       fragmentShader:
-        'uniform sampler2D map;uniform vec2 step;varying vec2 uv0;void main(){vec4 c=texture2D(map,uv0)*.2;for(int i=1;i<=4;i++){c+=(texture2D(map,uv0+step*float(i))+texture2D(map,uv0-step*float(i)))*.1;}gl_FragColor=c;}',
+        'uniform sampler2D map;uniform vec2 step;varying vec2 uv0;void main(){vec4 c=texture2D(map,uv0)*.4;c+=(texture2D(map,uv0+vec2(step.x,0.))+texture2D(map,uv0-vec2(step.x,0.))+texture2D(map,uv0+vec2(0.,step.y))+texture2D(map,uv0-vec2(0.,step.y)))*.15;float l=dot(c.rgb,vec3(.2126,.7152,.0722));c.rgb=mix(c.rgb,vec3(l),.10);gl_FragColor=c;}',
     });
     const quad = new T.Mesh(new T.PlaneGeometry(2, 2), shader);
     quadScene.add(quad);
@@ -110,13 +112,13 @@ export async function createWardrobeStage(
       roomCamera.position.set(0.25, 1.25, 4.9);
       roomCamera.lookAt(-0.2, 1, -0.5);
       roomCamera.updateProjectionMatrix();
-      const rw = Math.min(768, w),
+      const rw = Math.min(1280, Math.round(w * gl.getPixelRatio())),
         rh = Math.max(1, Math.round((rw * h) / w));
       rt.setSize(rw, rh);
       blurred.setSize(rw, rh);
       gl.setRenderTarget(rt);
       gl.render(room!.scene, roomCamera);
-      shader.uniforms.step.value.set(2.6 / rw, 1.6 / rh);
+      shader.uniforms.step.value.set(0.55 / rw, 0.55 / rh);
       gl.setRenderTarget(blurred);
       gl.render(quadScene, quadCamera);
       gl.setRenderTarget(null);
@@ -149,10 +151,29 @@ export async function createWardrobeStage(
     gl.domElement.addEventListener('pointerup', up);
     gl.domElement.addEventListener('pointercancel', up);
     gl.domElement.addEventListener('keydown', key);
-    document.addEventListener('visibilitychange', render);
+    let frameId = 0,
+      lastFrame = 0;
+    const animate = (now: number) => {
+      if (closed || document.hidden) return;
+      frameId = requestAnimationFrame(animate);
+      if (now - lastFrame < 1000 / 30) return;
+      lastFrame = now;
+      idle(now / 1000, !drag);
+      render();
+    };
+    const visibility = () => {
+      cancelAnimationFrame(frameId);
+      if (!document.hidden && !closed) {
+        lastFrame = 0;
+        if (!opts.reducedMotion) frameId = requestAnimationFrame(animate);
+        render();
+      }
+    };
+    document.addEventListener('visibilitychange', visibility);
     const observer = new ResizeObserver(resize);
     observer.observe(host);
     resize();
+    if (!opts.reducedMotion) frameId = requestAnimationFrame(animate);
     const handle: WardrobeStage = {
       async applyLook(look) {
         await customizer!.applyLook(look);
@@ -171,7 +192,8 @@ export async function createWardrobeStage(
         closed = true;
         opts.signal?.removeEventListener('abort', abort);
         observer.disconnect();
-        document.removeEventListener('visibilitychange', render);
+        cancelAnimationFrame(frameId);
+        document.removeEventListener('visibilitychange', visibility);
         customizer!.dispose();
         figure.mixer.stopAllAction();
         figure.mixer.uncacheRoot(figure.root);

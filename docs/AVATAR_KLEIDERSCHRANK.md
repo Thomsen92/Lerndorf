@@ -59,3 +59,6 @@ Abschlussstand: 871 Tests in 120 Dateien, Produktionsbuild und ESLint erfolgreic
 - Finale Dorf-Galerie: `web/test-results/layout-wardrobe/`, alle 36 Ansichten selbst geprüft. Der Galerie-Ready-Zustand wartet nun auch auf die geladenen Charaktere, statt deren mögliche Platzhalter zu messen.
 
 Keine Cloth-Simulation und kein Nachweis für beliebige künftige Animationsclips. Getestete Clips bleiben die bestehenden Spielclips. Parallelität der Kauf-Sperre ist im SQL durch eine Profilsperre abgesichert; lokale PGlite-Prüfungen ersetzen keinen zusätzlichen Mehrverbindungstest auf echtem PostgreSQL.
+
+
+Änderung 26.10.2026 nach Nutzer-Review: Hintergrund mit nur noch dezentem Fokusabstand statt starker Unschärfe; höhere Auflösung des einmal gerenderten Raumhintergrunds. Die Figur atmet und bewegt den Kopf ruhig im Stand (maximal 30 Renderbilder/s). Beim Drehen pausiert die Zusatzbewegung, bei reduzierter Bewegung bleibt die Figur still. Verdeckte Tabs und Schließen stoppen die Animationsschleife.
