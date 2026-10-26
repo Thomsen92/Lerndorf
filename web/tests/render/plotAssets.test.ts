@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { MODEL_IDS, plotAsset } from '../../src/render/plotAssets';
 import { MAX_SIZE, type SlotKind } from '../../src/world/plotPlan';
+import { setLocale } from '../../src/i18n';
 
 // Asset contract (docs/ASSET_VERTRAG.md B): every model stays inside the highest visible size of its
 // kind, stands on the ground (y = 0) and has its origin in the middle of its footprint.
@@ -21,6 +22,19 @@ describe('placeholder models follow the asset contract', () => {
       });
     }
   }
+});
+
+// The English default translates sign phrases; every model must still build without a missing glyph.
+describe('every plot model builds in English too', () => {
+  it('builds each model without throwing', () => {
+    setLocale('en');
+    for (const kind of Object.keys(MODEL_IDS) as SlotKind[]) {
+      for (const id of MODEL_IDS[kind]) {
+        expect(() => plotAsset(kind, id), id).not.toThrow();
+      }
+    }
+    setLocale('de');
+  });
 });
 
 // Every plot item of the catalogue (migrations) has a model, so no slot shows a stand-in.

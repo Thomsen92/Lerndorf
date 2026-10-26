@@ -375,6 +375,7 @@ const DECO: Record<string, () => THREE.Group> = {
       H: ['10001', '10001', '10001', '11111', '10001', '10001', '10001'],
       a: ['00000', '01110', '00001', '01111', '10001', '10011', '01101'],
       l: ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+      e: ['01110', '10001', '10000', '11111', '10000', '10001', '01110'],
       o: ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
       M: ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
       i: ['00100', '00000', '01100', '00100', '00100', '00100', '01110'],
@@ -400,6 +401,9 @@ const DECO: Record<string, () => THREE.Group> = {
         continue;
       }
       const rows = glyphs[char];
+      // A translated phrase may use a letter the block font does not have yet; skip it instead of
+      // crashing the whole village build.
+      if (!rows) continue;
       for (let row = 0; row < rows.length; row++) {
         for (let col = 0; col < rows[row].length; col++) {
           if (rows[row][col] !== '1') continue;
