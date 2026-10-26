@@ -125,7 +125,6 @@ export async function mountVillage(
   onLogout: () => void,
 ): Promise<VillageHandle> {
   root.innerHTML = `
-    <div class="dorf-actions"><button type="button" id="toMarket">Marktplatz</button></div>
     <p class="notice" id="notice" hidden></p>
   `;
   const notice = root.querySelector<HTMLParagraphElement>('#notice');
@@ -245,8 +244,6 @@ export async function mountVillage(
     if (tutorial) {
       inTutorial = true;
       // nothing of the game shows behind the figure choice
-      const actions = root.querySelector<HTMLElement>('.dorf-actions');
-      if (actions) actions.hidden = true;
       let wantVillage: () => void = () => undefined;
       const villageWanted = new Promise<void>((r) => (wantVillage = r));
       const run = runTutorial({
@@ -291,8 +288,6 @@ export async function mountVillage(
   // the tutorial may have ended before the village stood (e.g. an error): then play normally
   if (tutorialOver) {
     inTutorial = false;
-    const actions = root.querySelector<HTMLElement>('.dorf-actions');
-    if (actions) actions.hidden = false;
   }
   const { profile, layoutSeed, mapId, shopOpen, buildOpen, members, slots } = loaded;
   let coinsNow = profile.coins;
@@ -390,12 +385,6 @@ export async function mountVillage(
   controls.minDistance = 12;
   controls.maxDistance = 150;
   controls.maxPolarAngle = 1.2;
-  const jumpTo = (t: THREE.Vector3): void => {
-    const offset = camera.position.clone().sub(controls.target);
-    controls.target.copy(t);
-    camera.position.copy(t).add(offset);
-  };
-  root.querySelector<HTMLButtonElement>('#toMarket')?.addEventListener('click', () => jumpTo(marketTarget));
   controls.update();
 
   // camera flight into the house view (animation loop advances it)
@@ -434,8 +423,6 @@ export async function mountVillage(
     if (!running) return;
     if (inTutorial) return;
     nav?.setActive(area);
-    const dorfActions = root.querySelector<HTMLElement>('.dorf-actions');
-    if (dorfActions) dorfActions.hidden = area !== 'dorf';
     if (home && HOUSE_AREAS.has(area) && !HOUSE_AREAS.has(previous)) {
       const from: CameraPose = { position: camera.position.clone(), target: controls.target.clone() };
       flight = { from, to: houseView(home), t: 0 };
@@ -833,11 +820,9 @@ export async function mountVillage(
     },
   };
   worldOnCoins = onCoins;
-  const dorfActionsEl = root.querySelector<HTMLElement>('.dorf-actions');
   const setTutorialMode = (on: boolean): void => {
     inTutorial = on;
     nav?.setLocked(on);
-    if (dorfActionsEl) dorfActionsEl.hidden = on;
     controls.enabled = !on;
   };
   endTutorial = (openQuests) => {

@@ -7,6 +7,39 @@ import { join } from 'node:path';
 const SHOTS = process.env.SHOTS_DIR ?? 'test-results/tutorial';
 mkdirSync(SHOTS, { recursive: true });
 
+for (const width of [1180, 820, 390, 320]) {
+  test(`compact navigation ${width}`, async ({ page }) => {
+    await page.setViewportSize({ width, height: width === 820 ? 1180 : 844 });
+    await page.goto('/dev/tutorial.html?step=done&char=girl');
+    const nav = page.getByRole('navigation', { name: 'Hauptmenü' });
+    await expect(nav.locator('.nav-btn')).toHaveCount(2);
+    await expect(page.locator('#toMarket, .dorf-actions, [data-area="dorf"]')).toHaveCount(0);
+    for (const button of await nav.locator('.nav-btn').all()) {
+      const box = (await button.boundingBox())!;
+      expect(box.width).toBeGreaterThanOrEqual(44);
+      expect(box.height).toBeGreaterThanOrEqual(44);
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(width);
+      await expect(button.locator('svg')).toBeVisible();
+    }
+    const avatar = (await nav.locator('.avatar-badge').boundingBox())!;
+    const house = (await nav.getByRole('button', { name: 'Mein Haus', exact: true }).boundingBox())!;
+    expect(avatar.x).toBeGreaterThan(house.x + house.width);
+    expect(avatar.x + avatar.width).toBeLessThanOrEqual(width);
+    expect(Math.abs(avatar.y + avatar.height / 2 - house.y - house.height / 2)).toBeLessThan(2);
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--nav-left').trim())).toBe('0px');
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--nav-bottom').trim())).toBe('0px');
+    await page.screenshot({ path: join(SHOTS, `nav-${width}.png`) });
+    await nav.getByRole('button', { name: 'Mein Haus', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Bauen', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Zurück', exact: true }).click();
+    await nav.getByRole('button', { name: /^Aufgaben/ }).click();
+    await expect(page.getByRole('button', { name: 'Schließen', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Schließen', exact: true }).click();
+    await expect(nav).toBeVisible();
+  });
+}
+
 for (const viewport of [
   { width: 1024, height: 768 },
   { width: 820, height: 1180 },

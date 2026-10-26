@@ -44,7 +44,8 @@ for (const viewport of [
     await page.getByRole('button', { name: 'Wegräumen', exact: true }).click();
     await page.waitForFunction(() => (window as unknown as { __fxTime: number }).__fxTime >= 0.2);
     await shot('06-shrink');
-    await page.getByRole('button', { name: 'Dorf', exact: true }).click();
+    await page.getByRole('button', { name: 'Mein Haus', exact: true }).click();
+    await page.getByRole('button', { name: 'Zurück', exact: true }).click();
     await page.waitForFunction(() => !(window as unknown as { __fxBusy: boolean }).__fxBusy);
     await page.evaluate(() => {
       (window as unknown as { __captureFxAt: number | null }).__captureFxAt = null;

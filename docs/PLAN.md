@@ -119,7 +119,8 @@ Spec: `docs/superpowers/specs/2026-10-21-tablet-ui-navigation-design.md`, Plan: 
 |---|---|---|---|
 | [x] T.1 | CC | Gegenstands-Modell (`api/items.ts`) | Tests grün |
 | [x] T.2 | CC | Barrierearme Dialoge (`ui/dialog.ts`), happy-dom | Tests grün |
-| [x] T.3 | CC | Navigation Dorf / Aufgaben / Mein Haus | Tests grün |
+| [x] T.3 | CC | Navigation: Aufgaben / Mein Haus als Symbole neben dem Avatar (26.10. vereinfacht) | Tests grün |
+| [x] T.3b | CC | Dorf- und Marktplatz-Schaltfläche sowie blaue Navigationsleiste entfernen | Kompakte obere Navigation, mindestens 44 px große Touch-Ziele |
 | [x] T.4 | CC | Einstellungen (Kontoauszug, Grafik, Abmelden) | Tests grün |
 | [x] T.5 | CC | 3D-Vorschau im Detailfenster | Tests grün |
 | [x] T.6 | CC | Gegenstandskarten + Detailansicht mit Kauf | Tests grün |

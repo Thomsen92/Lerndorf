@@ -32,23 +32,26 @@ describe('gameNav', () => {
     expect(nav.el.querySelector('[aria-current=page]')).toBeNull();
   });
   it('maps areas to nav buttons', () => {
-    expect(NAV_BUTTONS).toEqual(['dorf', 'aufgaben', 'haus']);
+    expect(NAV_BUTTONS).toEqual(['aufgaben', 'haus']);
     expect(navButtonFor('bauen')).toBe('haus');
     expect(navButtonFor('shop')).toBe('haus');
     expect(navButtonFor('inventar')).toBe('haus');
-    expect(navButtonFor('dorf')).toBe('dorf');
+    expect(navButtonFor('dorf')).toBeNull();
   });
 
-  it('is a labelled nav with three text buttons in order', () => {
+  it('has just two accessible icon buttons beside the avatar status', () => {
     expect(nav.el.tagName).toBe('NAV');
     expect(nav.el.getAttribute('aria-label')).toBe('Hauptmenü');
-    expect(buttons().map((b) => b.textContent?.trim())).toEqual(['🏘Dorf', '📋Aufgaben', '🏠Mein Haus']);
+    expect(buttons()).toHaveLength(2);
+    expect(buttons().map(b => b.getAttribute('aria-label'))).toEqual(['Aufgaben', 'Mein Haus']);
+    expect(nav.el.querySelector('[data-area=dorf]')).toBeNull();
     for (const b of buttons()) {
       expect(b.querySelector('[aria-hidden="true"]')).not.toBeNull();
       expect(b.querySelector('.nav-label')?.textContent?.length).toBeGreaterThan(0);
+      expect(b.querySelector('svg')).not.toBeNull();
+      expect(b.querySelector('.nav-label')?.classList.contains('sr-only')).toBe(true);
     }
     expect(buttons().map((b) => b.querySelector('.nav-label')?.textContent)).toEqual([
-      'Dorf',
       'Aufgaben',
       'Mein Haus',
     ]);
@@ -66,7 +69,7 @@ describe('gameNav', () => {
   });
 
   it('calls onSelect with the area and button', () => {
-    const haus = buttons()[2]!;
+    const haus = buttons()[1]!;
     haus.click();
     expect(onSelect).toHaveBeenCalledWith('haus', haus);
   });

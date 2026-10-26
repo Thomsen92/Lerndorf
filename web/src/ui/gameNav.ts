@@ -1,23 +1,21 @@
 import type { AvatarBadge } from './avatarBadge';
 /**
- * Main navigation: three labelled buttons (Dorf, Aufgaben, Mein Haus) plus a status button with nickname and coins.
- * Bottom bar in portrait, left rail in landscape (see style.css). Not mounted by itself.
+ * Two accessible shortcuts beside the avatar in the top right. No village/market shortcut or rail.
  */
-export type NavButton = 'dorf' | 'aufgaben' | 'haus';
+export type NavButton = 'aufgaben' | 'haus';
 /** all areas; bauen, shop and inventar live under 'haus' */
-export type NavArea = NavButton | 'bauen' | 'shop' | 'inventar' | 'profil';
+export type NavArea = NavButton | 'dorf' | 'bauen' | 'shop' | 'inventar' | 'profil';
 
-export const NAV_BUTTONS: readonly NavButton[] = ['dorf', 'aufgaben', 'haus'];
+export const NAV_BUTTONS: readonly NavButton[] = ['aufgaben', 'haus'];
 
 const LABELS: Record<NavButton, { icon: string; label: string }> = {
-  dorf: { icon: '🏘', label: 'Dorf' },
-  aufgaben: { icon: '📋', label: 'Aufgaben' },
-  haus: { icon: '🏠', label: 'Mein Haus' },
+  aufgaben: { icon: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h4"/>', label: 'Aufgaben' },
+  haus: { icon: '<path d="m3 11 9-8 9 8M5 10v11h14V10M10 21v-7h4v7"/>', label: 'Mein Haus' },
 };
 
 /** Nav button that is marked for an area: bauen/shop/inventar → 'haus'. */
 export function navButtonFor(area: NavArea): NavButton | null {
-  if (area === 'profil') return null;
+  if (area === 'profil' || area === 'dorf') return null;
   return area === 'bauen' || area === 'shop' || area === 'inventar' ? 'haus' : area;
 }
 
@@ -49,12 +47,14 @@ export function createGameNav(opts: {
     b.type = 'button';
     b.className = 'nav-btn';
     b.dataset.area = area;
+    b.setAttribute('aria-label', LABELS[area].label);
+    b.title = LABELS[area].label;
     const icon = document.createElement('span');
     icon.className = 'nav-icon';
     icon.setAttribute('aria-hidden', 'true');
-    icon.textContent = LABELS[area].icon;
+    icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" focusable="false">${LABELS[area].icon}</svg>`;
     const label = document.createElement('span');
-    label.className = 'nav-label';
+    label.className = 'nav-label sr-only';
     label.textContent = LABELS[area].label;
     b.append(icon, label);
     b.addEventListener('click', () => {
@@ -98,14 +98,14 @@ export function createGameNav(opts: {
     setQuestBadge(open) {
       const b = buttons.get('aufgaben')!;
       b.querySelector('.quest-badge')?.remove();
-      b.removeAttribute('aria-label');
+      b.setAttribute('aria-label', 'Aufgaben');
       if (open === null) return;
       const badge = document.createElement('span');
       badge.className = 'quest-badge';
       badge.textContent = open === 'done' ? '✓' : String(open);
       badge.setAttribute('aria-hidden', 'true');
       b.append(badge);
-      b.setAttribute('aria-label', open === 'done' ? 'Tagesziel geschafft' : `${open} Quests offen`);
+      b.setAttribute('aria-label', open === 'done' ? 'Aufgaben, Tagesziel geschafft' : `Aufgaben, ${open} Quests offen`);
     },
     setActive(area) {
       const active = navButtonFor(area);

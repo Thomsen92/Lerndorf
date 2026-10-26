@@ -168,7 +168,8 @@ describe('village and tutorial', () => {
     expect(finishTutorial).toHaveBeenCalledWith(supabase);
     expect(document.body.textContent).not.toContain('freies Grundstück');
     expect(document.body.textContent).not.toContain('Wiese');
-    expect(navButtons().length).toBe(3);
+    expect(navButtons().length).toBe(2);
+    expect(document.querySelector('#toMarket')).toBeNull();
     expect(navButtons().some((b) => b.hasAttribute('aria-disabled'))).toBe(false);
     document.querySelector<HTMLButtonElement>('.nav-btn[data-area="aufgaben"]')?.click();
     await until(() => openDailyQuests.mock.calls.length === 1, 'quests open');
@@ -195,7 +196,7 @@ describe('village and tutorial', () => {
     document.querySelector<HTMLButtonElement>('.nav-btn[data-area="aufgaben"]')?.click();
     await tick();
     expect(openDailyQuests).not.toHaveBeenCalled();
-    expect(root.querySelector<HTMLElement>('.dorf-actions')?.hidden).toBe(true);
+    expect(root.querySelector('.dorf-actions')).toBeNull();
     side.placeFigure();
     side.releaseFigure();
     expect(crowdCalls).toEqual(['place', 'still:false']);
