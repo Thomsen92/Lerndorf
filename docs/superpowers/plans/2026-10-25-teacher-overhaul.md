@@ -72,15 +72,15 @@
   ```
   `p_week` must be a Monday (else `22023 week must be a Monday`). Quests of the week: `daily_quests` with `day` in `[p_week, least(p_week+6, quest_today())]`, `active`; solved = `daily_quest_results.solved_at is not null` for those keys; `holiday_week` = no active quests in the whole week. `tutorial_step`: `tutorial_progress.step` unless `done`; no row and no house placement → `'not_started'`; house placed → `null`. `last_sign_in_at` from `auth.users`.
 
-- [ ] **Step 1: Write the failing tests** (PGlite; extend the auth stub with `auth.users.last_sign_in_at timestamptz`; seed 8a with ANNA (done, house), BEN (tutorial at quiz), CARLA (no row, no house), one 8b pupil; quests Mon–Sun of a week with `quest_today()` fixed to Wednesday):
+- [x] **Step 1: Write the failing tests** (PGlite; extend the auth stub with `auth.users.last_sign_in_at timestamptz`; seed 8a with ANNA (done, house), BEN (tutorial at quiz), CARLA (no row, no house), one 8b pupil; quests Mon–Sun of a week with `quest_today()` fixed to Wednesday):
   - `teacher_class_pupils('8a', monday)` as teacher → three rows, 8b pupil absent; ANNA `tutorial_step null`, BEN `'quiz'`, CARLA `'not_started'`; `quests_offered_week = 9` (Mon–Wed × 3), solved counts match seeded results; catch-up solved on Tuesday for a Monday quest counts once; `last_answer_at` = latest `daily_quest_results` update; holiday week → `holiday_week true`, offered 0.
   - as pupil → `42501`; non-Monday → `22023`.
   - `teacher_pupil_detail(ANNA)` → slots with item names, unplaced = inventory minus placements, week rows, ledger newest first, max 50.
   - `adjust_coins_many([ANNA,BEN], 10, 'Schnellbuchung +10')` → 2, two `coin_ledger` rows `reason teacher`, `created_by` teacher; `[ANNA,BEN], -500` with BEN too poor → error `insufficient coins: BEN`, **no** row for ANNA either (Review Focus 2); duplicate ids → error; empty list → error; a teacher id in the list → error `pupil not found`; empty note → `a note is required`.
-- [ ] **Step 2: Run** `npx vitest run tests/sql/teacher-overhaul.test.ts` — FAIL.
-- [ ] **Step 3: Implement** the three functions (`adjust_coins_many` locks all profiles `for update` in id order to avoid deadlocks, checks all, then books).
-- [ ] **Step 4: Run** — PASS; add the migration to `migrations.test.ts`; `npm test` green.
-- [ ] **Step 5: Commit** `git add supabase/migrations/*_teacher_overhaul.sql web/tests/sql/teacher-overhaul.test.ts web/tests/sql/migrations.test.ts && git commit -m "feat(db): teacher rpcs for pupil overview, detail and multi booking"`
+- [x] **Step 2: Run** `npx vitest run tests/sql/teacher-overhaul.test.ts` — FAIL.
+- [x] **Step 3: Implement** the three functions (`adjust_coins_many` locks all profiles `for update` in id order to avoid deadlocks, checks all, then books).
+- [x] **Step 4: Run** — PASS; add the migration to `migrations.test.ts`; `npm test` green.
+- [x] **Step 5: Commit** `git add supabase/migrations/*_teacher_overhaul.sql web/tests/sql/teacher-overhaul.test.ts web/tests/sql/migrations.test.ts && git commit -m "feat(db): teacher rpcs for pupil overview, detail and multi booking"`
 
 ---
 

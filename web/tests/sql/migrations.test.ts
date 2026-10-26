@@ -25,6 +25,8 @@ const MIGRATIONS = [
   '0018_character_choice.sql',
   '0019_first_login_tutorial.sql',
   '0020_xp_levels.sql',
+  '0021_tutorial_tap_questions.sql',
+  '0022_teacher_overhaul.sql',
 ];
 const migrationDir = new URL('../../../supabase/migrations/', import.meta.url);
 
