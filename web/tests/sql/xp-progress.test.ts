@@ -70,7 +70,7 @@ it('chests roll on server, pay by source, and replay exactly once', async () => 
     await user();
     const r = await result(`open_chest(${row.id})`);
     const factor = { normal: 1, double: 2, triple: 3 }[r.roll as 'normal' | 'double' | 'triple'];
-    expect(r.coins_won).toBe((row.size === 'big' ? 3 * (20 + 5 * 3) : 50) * factor);
+    expect(r.coins_won).toBe((row.size === 'big' ? 3 * (10 + 3 * 3) : 10 + 3 * 6) * factor);
     expect(await result(`open_chest(${row.id})`)).toEqual(r);
     await user(B);
     await expect(db.query(`select open_chest(${row.id})`)).rejects.toThrow(/chest not found/);
