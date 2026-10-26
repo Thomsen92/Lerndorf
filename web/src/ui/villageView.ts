@@ -60,6 +60,10 @@ import { PLACE_BUTTON, PLACE_HINT } from './tutorial/messages';
 import { supabaseProgressApi, type ProgressDelta } from '../api/progress';
 import { createAvatarBadge } from './avatarBadge';
 import { createProgressFlow } from './progressFlow';
+import { loadClassNotice } from '../api/notice';
+import { openNoticeCard } from './noticeCard';
+import { setBoardNote } from '../render/plaza';
+import type { ReadOnlyView } from './readOnlyVillage';
 import { openProfile } from './profileView';
 import {
   AUTO_MEASURE_SECONDS,
@@ -123,7 +127,12 @@ export async function mountVillage(
   root: HTMLElement,
   supabase: SupabaseClient,
   onLogout: () => void,
+  opts: { readOnly?: ReadOnlyView } = {},
 ): Promise<VillageHandle> {
+  if (opts.readOnly) {
+    const { mountReadOnlyVillage } = await import('./readOnlyVillage');
+    return mountReadOnlyVillage(root, supabase, opts.readOnly);
+  }
   root.innerHTML = `
     <p class="notice" id="notice" hidden></p>
   `;
@@ -328,6 +337,18 @@ export async function mountVillage(
     }));
   const village = buildVillage(layout, labels, ownPlot);
   scene.add(village);
+  const classNotice = loadClassNotice(supabase, profile.classId).then(n => {
+    if (running) setBoardNote(village, n?.text ?? null);
+    return n;
+  });
+  const showClassNotice = async (): Promise<void> => {
+    const n = await classNotice;
+    if (!n || !running) return;
+    await new Promise<void>(resolve => {
+      const card = openNoticeCard(n, { onDone: resolve });
+      if (card) modals.track(card); else resolve();
+    });
+  };
   marketByte = createMarketByte({
     scene,
     layout,
@@ -708,7 +729,7 @@ export async function mountVillage(
     isActive: () => running,
   });
   worldOnProgress = (delta, from) => progressFlow.onProgress(delta, from);
-  if (!inTutorial) void progressFlow.start();
+  if (!inTutorial) void showClassNotice().then(async () => { if (running) await progressFlow.start(); });
   // fallback for a pupil without a figure who needs no tutorial; in the tutorial the choice is its first step
   if (myCharacter === null && !inTutorial) pickCharacter(true, null);
 
@@ -832,7 +853,7 @@ export async function mountVillage(
     if (buildMode?.isActive) buildMode.exit();
     fx?.clear();
     setTutorialMode(false);
-    if (openQuests) void ctl.select('aufgaben');
+    void showClassNotice().then(async () => { if (running && openQuests) await ctl.select('aufgaben'); });
   };
   if (inTutorial) {
     setTutorialMode(true);

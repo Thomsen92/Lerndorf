@@ -14,7 +14,9 @@ export async function teacherDb() {
     grant execute on function auth.uid() to anon,authenticated;
     alter default privileges in schema public grant select,insert,update,delete on tables to anon,authenticated;`);
   const dir = new URL('../../supabase/migrations/', import.meta.url);
-  for (const f of readdirSync(dir).filter(f => /^\d{4}_.*\.sql$/.test(f)).sort())
+  for (const f of readdirSync(dir)
+    .filter((f) => /^\d{4}_.*\.sql$/.test(f))
+    .sort())
     await db.exec(readFileSync(new URL(f, dir), 'utf8'));
   await db.exec(`create or replace function quest_today() returns date language sql stable as $$ select '2026-10-28'::date $$;
     insert into auth.users(id,last_sign_in_at) values ('${T}',null),('${A}','2026-10-28T08:00Z'),('${B}',null),('${C}',null),('${D}',null);
@@ -31,8 +33,10 @@ export async function teacherDb() {
   return db;
 }
 export async function asUser(db: PGlite, id = T) {
-  await db.exec(`reset role; select set_config('request.jwt.claim.sub','${id}',false); set role authenticated;`);
+  await db.exec(
+    `reset role; select set_config('request.jwt.claim.sub','${id}',false); set role authenticated;`,
+  );
 }
 export async function rpc(db: PGlite, sql: string) {
-  return (await db.query<{v: Record<string, unknown>}>(`select ${sql} v`)).rows[0].v;
+  return (await db.query<{ v: Record<string, unknown> }>(`select ${sql} v`)).rows[0].v;
 }

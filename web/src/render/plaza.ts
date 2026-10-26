@@ -102,6 +102,8 @@ function fountain(layout: Layout, onTop: (innerWater: number, outerWater: number
 function board(layout: Layout): THREE.Group {
   const g = new THREE.Group();
   const y = layout.plazaHeight;
+  g.name = 'questBoard';
+  g.userData.boardHeight = y + 1.9;
   part(new THREE.BoxGeometry(0.2, 3.0, 0.2), mat(POST), -1.6, y + 1.5, 0, g);
   part(new THREE.BoxGeometry(0.2, 3.0, 0.2), mat(POST), 1.6, y + 1.5, 0, g);
   // the board itself: the click target of the task board (villageView checks userData.kind)
@@ -132,6 +134,28 @@ function board(layout: Layout): THREE.Group {
     part(new THREE.BoxGeometry(0.08, 0.08, 0.04), mat('#d64545'), nx, y + ny + 0.3, 0.12, g);
   });
   return g;
+}
+
+/** One removable draw call; the board keeps its existing click role after static baking. */
+export function setBoardNote(plaza:THREE.Object3D,text:string|null):void {
+ const board=plaza.getObjectByName('questBoard');if(!board)return;
+ const old=board.getObjectByName('boardNote') as THREE.Mesh<THREE.PlaneGeometry,THREE.MeshBasicMaterial>|undefined;
+ if(old){old.material.map?.dispose();old.material.dispose();old.geometry.dispose();old.removeFromParent();}
+ if(!text)return;
+ const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=512;
+ const ctx=canvas.getContext('2d');if(!ctx)return;
+ ctx.fillStyle='#fff3cf';ctx.fillRect(0,0,1024,512);ctx.fillStyle='#654b31';ctx.font='bold 44px sans-serif';ctx.fillText('Nachricht von deiner Lehrkraft',48,70);ctx.font='42px sans-serif';
+ let line='',y=145;
+ for(const word of text.split(/\s+/)){
+  for(const chunk of word.match(/.{1,24}/gu)??[]){
+   if(ctx.measureText(line+chunk).width>920){ctx.fillText(line.trim(),48,y);line='';y+=62;}
+   line+=chunk+' ';
+  }
+ }
+ ctx.fillText(line.trim(),48,y);
+ const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;
+ const mesh=new THREE.Mesh(new THREE.PlaneGeometry(2.8,1.4),new THREE.MeshBasicMaterial({map,toneMapped:false}));
+ mesh.name='boardNote';mesh.userData.kind='board';mesh.position.set(0,Number(board.userData.boardHeight),.19);board.add(mesh);
 }
 
 /** A market stall with counter, posts and a striped awning. Front faces the plaza. */

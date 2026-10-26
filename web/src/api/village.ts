@@ -116,3 +116,9 @@ export async function loadMembers(supabase: SupabaseClient): Promise<Member[]> {
     }),
   );
 }
+
+export async function loadMembersAsTeacher(s:SupabaseClient,classId:string):Promise<Member[]> {
+ const {data,error}=await s.rpc('teacher_village_members',{p_class_id:classId});
+ if(error)throw new VillageLoadError('Diese Ansicht ist nur für Lehrkräfte verfügbar.');
+ return (data??[]).map((r:{id:string;nickname:string;plot_index:number|null;avatar:unknown;level:number;title_label:string|null;frame_id:string})=>({id:r.id,nickname:r.nickname,plotIndex:r.plot_index,character:characterOf(r.avatar),level:r.level,titleLabel:r.title_label,frameId:r.frame_id}));
+}

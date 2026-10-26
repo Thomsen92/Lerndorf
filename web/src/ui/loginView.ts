@@ -1,8 +1,9 @@
 /** Login screen for pupils. Plain German, large touch targets (SPEC §12). */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { signInPupil } from '../auth/login';
+import type { LoginCredentials } from '../auth/qrLogin';
 
-export function renderLogin(root: HTMLElement, supabase: SupabaseClient, onLoggedIn: () => void): void {
+export function renderLogin(root: HTMLElement, supabase: SupabaseClient, onLoggedIn: () => void, credentials?: LoginCredentials): void {
   root.innerHTML = `
     <main class="login">
       <h1>Lerndorf</h1>
@@ -24,15 +25,12 @@ export function renderLogin(root: HTMLElement, supabase: SupabaseClient, onLogge
   const submit = form?.querySelector<HTMLButtonElement>('button');
   if (!form || !error || !submit) return;
 
-  form.addEventListener('submit', async (ev) => {
-    ev.preventDefault();
-    const data = new FormData(form);
+  const login = async (nickname: string, password: string): Promise<void> => {
+    if (submit.disabled) return;
     submit.disabled = true;
-    const message = await signInPupil(
-      supabase,
-      String(data.get('nickname') ?? ''),
-      String(data.get('password') ?? ''),
-    );
+    let message: string | null;
+    try { message = await signInPupil(supabase, nickname, password); }
+    catch { message = 'Keine Verbindung. Bitte noch einmal versuchen.'; }
     submit.disabled = false;
     if (message) {
       error.textContent = message;
@@ -40,5 +38,14 @@ export function renderLogin(root: HTMLElement, supabase: SupabaseClient, onLogge
       return;
     }
     onLoggedIn();
+  };
+  form.addEventListener('submit', ev => {
+    ev.preventDefault();
+    const data = new FormData(form);
+    void login(String(data.get('nickname') ?? ''), String(data.get('password') ?? ''));
   });
+  if (credentials) {
+    form.querySelector<HTMLInputElement>('[name=nickname]')!.value = credentials.nickname;
+    void login(credentials.nickname, credentials.password);
+  }
 }

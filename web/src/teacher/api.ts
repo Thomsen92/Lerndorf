@@ -24,6 +24,116 @@ export interface ClassFlags {
 export type Result<T> = { ok: true; value: T } | { ok: false; message: string };
 
 const fail = (message: string): { ok: false; message: string } => ({ ok: false, message });
+function teacherError(message: string): string {
+  if (message.includes('insufficient coins') || message.includes('profiles_coins_check'))
+    return 'Nicht genug Münzen. Es wurde nichts gebucht.';
+  if (message.includes('pupil not found')) return 'Dieses Schülerkonto wurde nicht gefunden.';
+  if (message.includes('a note is required')) return 'Bitte eine Notiz zur Buchung eingeben.';
+  if (message.includes('forbidden') || message.includes('not logged in'))
+    return 'Bitte erneut mit deinem Lehrkonto anmelden.';
+  if (message.includes('notice must')) return 'Die Nachricht braucht 1 bis 140 Zeichen.';
+  return message;
+}
+
+export type TutorialStepId = 'not_started' | 'intro' | 'quiz' | 'buy' | 'place';
+export interface PupilRow extends Pupil {
+  tutorialStep: TutorialStepId | null;
+  lastSignInAt: string | null;
+  lastAnswerAt: string | null;
+  questsSolvedWeek: number;
+  questsOfferedWeek: number;
+  holidayWeek: boolean;
+}
+export interface PupilDetail {
+  tutorial_step: TutorialStepId | null;
+  slots: Array<{ slot: string; item_id: string; name_de: string; rot: number }> | null;
+  unplaced: Array<{ item_id: string; name_de: string; qty: number }> | null;
+  week: Array<{ day: string; key: string; solved: boolean; catch_up: boolean; attempts: number }> | null;
+  ledger: Array<{ at: string; delta: number; reason: string; ref: string | null }> | null;
+}
+export interface ClassBoard {
+  week: string;
+  solvedWeek: number;
+  goalWeek: number;
+  solvedToday: number;
+  classStreak: number;
+  stampsWeek: number;
+  notice: string | null;
+}
+async function teacherCall<T>(
+  s: SupabaseClient,
+  name: string,
+  args: Record<string, unknown>,
+  map: (data: unknown) => T,
+): Promise<Result<T>> {
+  try {
+    const { data, error } = await s.rpc(name, args);
+    return error ? fail(teacherError(error.message)) : { ok: true, value: map(data) };
+  } catch {
+    return fail('Keine Verbindung. Bitte noch einmal versuchen.');
+  }
+}
+export function loadClassPupils(
+  s: SupabaseClient,
+  classId: string,
+  week: string,
+): Promise<Result<PupilRow[]>> {
+  return teacherCall(s, 'teacher_class_pupils', { p_class_id: classId, p_week: week }, (data) =>
+    ((data as Array<Record<string, unknown>>) ?? []).map((r) => ({
+      id: String(r.id),
+      nickname: String(r.nickname),
+      coins: Number(r.coins),
+      plotIndex: r.plot_index === null ? null : Number(r.plot_index),
+      tutorialStep: r.tutorial_step as TutorialStepId | null,
+      lastSignInAt: r.last_sign_in_at as string | null,
+      lastAnswerAt: r.last_answer_at as string | null,
+      questsSolvedWeek: Number(r.quests_solved_week),
+      questsOfferedWeek: Number(r.quests_offered_week),
+      holidayWeek: Boolean(r.holiday_week),
+      level: Number(r.level ?? 1),
+      xp: Number(r.xp ?? 0),
+      streak: Number(r.streak ?? 0),
+    })),
+  );
+}
+export function loadPupilDetail(s: SupabaseClient, id: string): Promise<Result<PupilDetail>> {
+  return teacherCall(s, 'teacher_pupil_detail', { p_player_id: id }, (d) => d as PupilDetail);
+}
+export function adjustCoinsMany(
+  s: SupabaseClient,
+  ids: string[],
+  delta: number,
+  note: string,
+): Promise<Result<number>> {
+  return teacherCall(s, 'adjust_coins_many', { p_player_ids: ids, p_delta: delta, p_note: note }, Number);
+}
+export function loadClassBoard(s: SupabaseClient, classId: string): Promise<Result<ClassBoard>> {
+  return teacherCall(s, 'class_board', { p_class_id: classId }, (data) => {
+    const r = data as Record<string, unknown>;
+    return {
+      week: String(r.week),
+      solvedWeek: Number(r.solved_week),
+      goalWeek: Number(r.goal_week),
+      solvedToday: Number(r.solved_today),
+      classStreak: Number(r.class_streak),
+      stampsWeek: Number(r.stamps_week),
+      notice: r.notice as string | null,
+    };
+  });
+}
+export function setClassNotice(
+  s: SupabaseClient,
+  classId: string,
+  text: string | null,
+  validUntil: string | null,
+): Promise<Result<true>> {
+  return teacherCall(
+    s,
+    'set_class_notice',
+    { p_class_id: classId, p_text: text, p_valid_until: validUntil },
+    () => true,
+  );
+}
 
 /** Teacher login: a real e-mail address and password, role checked after login. */
 export async function signInTeacher(
@@ -120,7 +230,7 @@ export async function adjustCoins(
     p_delta: delta,
     p_note: note,
   });
-  if (error) return fail(error.message);
+  if (error) return fail(teacherError(error.message));
   return { ok: true, value: Number(data) };
 }
 
@@ -143,14 +253,18 @@ export async function adminCall<T = unknown>(
   supabase: SupabaseClient,
   body: Record<string, unknown>,
 ): Promise<Result<T>> {
-  const { data, error } = await supabase.functions.invoke('admin-accounts', { body });
-  if (error) return fail(error.message);
-  const payload = data as { error?: string; details?: string[] } & T;
-  if (payload && typeof payload === 'object' && 'error' in payload && payload.error) {
-    const details = payload.details?.length ? `: ${payload.details.join(' · ')}` : '';
-    return fail(`${payload.error}${details}`);
+  try {
+    const { data, error } = await supabase.functions.invoke('admin-accounts', { body });
+    if (error) return fail(error.message);
+    const payload = data as { error?: string; details?: string[] } & T;
+    if (payload && typeof payload === 'object' && 'error' in payload && payload.error) {
+      const details = payload.details?.length ? `: ${payload.details.join(' · ')}` : '';
+      return fail(`${payload.error}${details}`);
+    }
+    return { ok: true, value: payload };
+  } catch {
+    return fail('Keine Verbindung. Bitte noch einmal versuchen.');
   }
-  return { ok: true, value: payload };
 }
 
 /** True if the current session belongs to a teacher. */

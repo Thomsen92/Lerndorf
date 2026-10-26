@@ -35,3 +35,7 @@ Die interaktiven 3D-Truhen (`web/src/render/chestPreview.ts`) und ihre SVG-Ersat
 | `web/public/assets/kenney/fx/chest.mp3` | Kenney Interface Sounds, `open_002.ogg`; mono MP3 64 kbps | CC0 | https://kenney.nl/assets/interface-sounds |
 | `web/public/assets/kenney/fx/coins.mp3` | Kenney Interface Sounds, `glass_002.ogg`; mono MP3 64 kbps | CC0 | https://kenney.nl/assets/interface-sounds |
 | `web/public/assets/kenney/fx/star.png` | Kenney Particle Pack, `star_06.png`; resized to 64 × 64 RGBA | CC0 | https://kenney.nl/assets/particle-pack |
+
+## Software – QR-Zugangskarten
+
+- qrcode-generator 1.4.4, Kazuhiko Arase, MIT. Quelle: https://github.com/kazuhikoarase/qrcode-generator. Nur im Lehrer-Bundle für gedruckte Zugangskarten; Lizenz: `web/node_modules/qrcode-generator/LICENSE`.
