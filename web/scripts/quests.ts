@@ -153,7 +153,7 @@ export function validatePackage(input: unknown, fileName?: string): string[] {
       const expected = addDays(p.week as string, i);
       if (day.date !== expected) errors.push(`${dayWhere}.date: ${expected} erwartet`);
     }
-    if (!Array.isArray(day.quests) || (day.quests.length < 3 || day.quests.length > 4)) {
+    if (!Array.isArray(day.quests) || day.quests.length < 3 || day.quests.length > 4) {
       errors.push(`${dayWhere}.quests: 3 bis 4 Aufgaben`);
       return;
     }
@@ -175,7 +175,11 @@ export function validatePackage(input: unknown, fileName?: string): string[] {
         errors.push(`${where}.type: choice, gap, match, order oder listening`);
         return;
       }
-      if (!Number.isInteger(q.reward) || (q.reward as number) < REWARD_MIN || (q.reward as number) > REWARD_MAX) {
+      if (
+        !Number.isInteger(q.reward) ||
+        (q.reward as number) < REWARD_MIN ||
+        (q.reward as number) > REWARD_MAX
+      ) {
         errors.push(`${where}.reward: ganze Zahl von ${REWARD_MIN} bis ${REWARD_MAX}`);
       }
       if (!isStr(q.prompt) || q.prompt.length > MAX_PROMPT) {

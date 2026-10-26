@@ -367,7 +367,7 @@ Produktregeln: [XP-Design](superpowers/specs/2026-10-24-xp-level-design.md); Ums
 
 Seit 21.10.2026 ersetzen die **Daily Quests** die alten Wochenaufgaben. Produktregeln: `docs/superpowers/specs/2026-10-20-daily-quests-design.md`; Umsetzung: `docs/superpowers/plans/2026-10-21-daily-quests.md`; Arbeitspakete: PLAN „Zwischenpaket Q“.
 
-- **Paket:** eine Datei je Woche `content/daily-quests/<Montag>.json` mit 7 Tagen (Mo–So) × genau 3 Quests, gleiches Paket für alle Klassen. Format und Beispiele: `content/daily-quests/FORMAT.md`; Prüfer: `web/scripts/quests.ts` (`validatePackage`, deutsche Fehlermeldungen mit Pfad).
+- **Paket:** eine Datei je Woche `content/daily-quests/<Montag>.json` mit 7 Tagen (Mo–So) × 3 oder 4 Quests, gleiches Paket für alle Klassen. Format und Beispiele: `content/daily-quests/FORMAT.md`; Prüfer: `web/scripts/quests.ts` (`validatePackage`, deutsche Fehlermeldungen mit Pfad).
 - **Typen:** `choice`, `gap`, `match`, `order`, `listening`. Jede Quest hat `prompt`, einen kurzen englischen `hint` (nicht leer) und `reward` (1–20).
 - **Import:** Workflow `import-content.yml` bei Push auf `content/**` (`web/scripts/import-quests.ts`, Service-Key nur als GitHub-Secret). Der öffentliche Teil geht in `daily_quests`, die Lösungen in `daily_quest_solutions`.
 - **Freischaltung:** eine Quest ist an ihrem Kalendertag ab 00:00 Europe/Berlin offen (der Server entscheidet über `quest_today()`), am Folgetag noch als **Nachholen** zur halben Belohnung (aufgerundet), danach verfällt sie.
@@ -388,10 +388,18 @@ Seit 21.10.2026 ersetzen die **Daily Quests** die alten Wochenaufgaben. Produktr
 | D7 | Inhaltskontrolle ohne Freigabe | der Lehrer-Bereich zeigt die nächsten 7 Tage mit Lösungen (nur lesen, kein Freigabeschritt) |
 | D8 | „Paket fehlt“ erkennen | live im Lehrer-Bereich aus den Daten (`quest_status()`), nicht im Workflow (der läuft nur beim Push) |
 | D9 | Mischen bei `order`/`match` | gesätes Mischen, das nie die Lösungsreihenfolge ergibt |
-| D10 | Stimme | zuerst `en-GB`, sonst irgendeine `en*`-Stimme, sonst sichtbarer Text („Dein Gerät kann nicht vorlesen. Lies den Text: …“) |
+| D10 | Stimme | Vorproduzierte MP3-Dateien: Edge-TTS 7.3, `en-GB-SoniaNeural`, `-10%`; gemeinsames `listeningPath(data.speak)`; bei Wiedergabefehler sichtbarer Hörtext |
 | D11 | Versuche und Raten | **Entscheidung der Lehrkraft 21.10.2026:** Versuche unbegrenzt, Münzen nur, wenn die richtige Antwort unter den ersten **3** Versuchen dieses Schülers für diese Quest ist (heute und Nachholen zählen zusammen, die richtige Antwort zählt mit). Danach gilt die Quest als gelöst mit `reward_paid = 0`, ohne Buchung. Die Zahl steht nur in `public.quest_paid_attempts()`; wer sie ändert, muss auch die Zeile „Münzen gibt es bei den ersten 3 Versuchen.“ in `web/src/ui/dailyQuestsView.ts` anpassen. `my_daily_quests` und `submit_quest_answer` liefern zusätzlich `reward_left` (was eine richtige Antwort jetzt noch bringt) |
 
 Weitere Festlegungen aus der Umsetzung (PLAN, Fortschrittsnotizen 21.10.2026): Lehrkonten können keine Quests lösen (`my_daily_quests` lehnt ab, im Dorf erscheint „Nur Schülerkonten können Quests lösen.“); die Lösungstabelle ist auch für die Lehrkraft nicht direkt lesbar, nur über `teacher_quest_preview`; ein fehlerhafter Re-Import einer schon eingespielten Woche (auch einer Ferienwoche) zählt weiter als abgedeckt.
+
+### Daten-/Server-Erweiterung 26.10.2026 (0024–0025)
+
+- Slot 1–4; alte Wochen mit drei Quests bleiben gültig. Tagesziel: einmal 15 XP nach allen aktiven Quests des heutigen Tages, dynamisch für drei oder vier. Nachholen zählt nicht zum heutigen Tagesziel.
+- `gap` und `listening` mit `mode: "gap"`: optional `bank` (2–6 verschiedene, nicht leere Wörter) in den öffentlichen Daten. Lösungen bleiben ausschließlich in `daily_quest_solutions`.
+- Hördateien aus `web/stimmen.cmd` / `scripts/generate-listening.ts`; kein `data.audio`. Gemeinsames Pfadmodul `src/quests/listening.ts`, Tutorial-Hörtext ebenfalls erzeugt. Import prüft fehlende/leere MP3s vor dem Import-RPC und protokolliert Fehler ohne Ersetzen der bisherigen Woche. Dateien zuerst veröffentlichen, danach neue Wochen importieren; lokale Dateiprüfung beweist keine abgeschlossene Veröffentlichung.
+- Wirtschaft: Wochenstempel 50 Münzen (weiterhin 100 XP); nur bisherige Standardklassen mit 100 Münzen werden umgestellt, andere Klassenregeln bleiben bestehen. Truhenformel `(10 + 3 × Level) × Größenfaktor × Wurffaktor`, groß ×3 und unveränderte 70/25/5-Prozent-Würfe. Landhaus 600, Villa 1.000, Kleinwagen 350, Camper 600; `acc_04` im Shop verborgen. Bestehende Guthaben, Besitz, bezahlte Truhen und historische Buchungen werden nicht verändert.
+- Preisrichtwerte neuer Ware: Garten-Deko 15–60, besondere Deko 80–120, Avatar 30–120, Haus/Auto 600–1.000. Konkrete Bestandspreise haben Vorrang. Diese Regeln ersetzen die älteren Drei-Quest-/Wirtschaftswerte in §8b und §14.
 
 ## 10. Dorf (Welt)
 
@@ -503,6 +511,8 @@ Quiz und Daily Quests zeigen ein eigenes 3D-Fenster, während das Dorf pausiert.
 | Kontoauszug | letzte 30 Buchungen |
 
 Touch-Ziele mind. 44 px; einfache Sprache; keine Emojis als Bedienelemente.
+
+Datenschnittstelle ab Teil 1: Tageslisten enthalten drei oder vier Quests; `data.bank` ist optional und enthält Auswahlwörter, keine markierte Lösung. Hördateien liegen unter `import.meta.env.BASE_URL + listeningPath(data.speak)` mit britischer Sonia-Stimme bei `-10%`. Die Browseranbindung und Wortkacheln gehören zum separaten Oberfläche-Teil.
 
 ## 13. Lehrer-Bereich (`/lehrer/`)
 

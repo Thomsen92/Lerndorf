@@ -10,7 +10,7 @@ Eine Datei pro Woche, benannt nach dem **Montag** der Woche: `2026-11-09.json`. 
 
 - `week`: Montag, Format `JJJJ-MM-TT`.
 - `days`: **genau 7 Tage** (Montag bis Sonntag), jeder mit `date` (Montag + 0 bis 6 Tage) und `quests`.
-- `quests`: **genau 3 Aufgaben** pro Tag. Die Reihenfolge der Aufgaben im Tag ist ihr Platz (Slot 1 bis 3). Eine korrigierte Datei darf die Aufgaben eines Tages umsortieren.
+- `quests`: **3 oder 4 Aufgaben** pro Tag. Die Reihenfolge der Aufgaben im Tag ist ihr Platz (Slot 1 bis 4). Eine korrigierte Datei darf die Aufgaben eines Tages umsortieren.
 - Jede `id` kommt in der ganzen Datei nur **einmal** vor. Schema: Tageskürzel plus Nummer, z. B. `tue-2`. Erlaubt sind Kleinbuchstaben, Ziffern und Bindestrich (max. 31 Zeichen).
 
 Gemeinsame Felder jeder Aufgabe:
@@ -55,7 +55,7 @@ Versuche sind unbegrenzt. Münzen gibt es nur, wenn die richtige Antwort **inner
 
 ### gap (Lückentext)
 
-Der `prompt` enthält `___` (drei Unterstriche). `solution` ist eine Liste erlaubter Antworten (1 bis 10).
+Der `prompt` enthält `___` (drei Unterstriche). `solution` ist eine Liste erlaubter Antworten (1 bis 10). Optional: `bank` mit 2 bis 6 verschiedenen, nicht leeren Wörtern. Die Wortbank wird als Auswahl weitergegeben; `solution` bleibt getrennt und privat. Ohne `bank` bleibt Texteingabe möglich.
 
 ```json
 {
@@ -64,6 +64,7 @@ Der `prompt` enthält `___` (drei Unterstriche). `solution` ist eine Liste erlau
   "prompt": "Yesterday we ___ to Brooklyn.",
   "hint": "Think of the past of go.",
   "reward": 10,
+  "bank": ["went", "go", "gone"],
   "solution": ["went"]
 }
 ```
@@ -103,7 +104,7 @@ Der `prompt` enthält `___` (drei Unterstriche). `solution` ist eine Liste erlau
 `speak` ist der Text, der vorgelesen wird (höchstens 400 Zeichen). `mode` ist `choice` oder `gap` (nicht `match`, nicht `order`).
 
 - `mode: "choice"`: wie bei choice mit `options` und `solution` (Text).
-- `mode: "gap"`: wie bei gap, der `prompt` enthält `___`, `solution` ist eine Liste.
+- `mode: "gap"`: wie bei gap, der `prompt` enthält `___`, `solution` ist eine Liste; optional dieselbe `bank` mit 2–6 verschiedenen Wörtern.
 
 ```json
 {
@@ -142,4 +143,21 @@ Für Wochen ohne Aufgaben genügt eine Datei mit genau diesen Feldern, **ohne** 
 
 ## Prüfen
 
-Der Validator (`web/scripts/quests.ts`, Funktion `validatePackage`) liefert deutsche Fehlermeldungen mit Pfad, z. B. `days[2].date: 2026-11-11 erwartet` oder `days[0].quests: genau 3 Aufgaben`. Eine Datei ist nur gültig, wenn keine Meldung erscheint. Eine vollständige Beispielwoche liegt in `web/tests/fixtures/quests/2026-11-09.json`.
+Der Validator (`web/scripts/quests.ts`, Funktion `validatePackage`) liefert deutsche Fehlermeldungen mit Pfad, z. B. `days[2].date: 2026-11-11 erwartet` oder `days[0].quests: 3 bis 4 Aufgaben`. Eine Datei ist nur gültig, wenn keine Meldung erscheint. Eine vollständige Beispielwoche liegt in `web/tests/fixtures/quests/2026-11-09.json`.
+
+
+## Hördateien erzeugen und mitliefern
+
+Vor dem Import einer neuen Woche `web/stimmen.cmd` doppelklicken (oder im Ordner `web`: `node scripts/generate-listening.ts`). Voraussetzung: Node 24 und `edge-tts` 7.3 im PATH; bei Bedarf `python -m pip install edge-tts==7.3.1`. Stimme mit `edge-tts --list-voices` prüfen. Es werden vorhandene Wochen und der Tutorial-Hörtext mit `en-GB-SoniaNeural` bei `-10%` erzeugt. Der Aufruf übermittelt ausschließlich die Hörtexte an den TTS-Dienst; er benötigt keine Schülerdaten und keinen Supabase-Schlüssel.
+
+`listeningPath(text, voice?, rate?)` aus `web/src/quests/listening.ts` bestimmt den Pfad `assets/listening/<8-stelliger Hash>.mp3`. Es gibt kein `data.audio`-Feld. Änderungen an Text, Stimme oder Tempo ergeben einen neuen Pfad. Vorhandene, nicht leere Dateien werden wiederverwendet; fehlgeschlagene Erzeugungen hinterlassen keine fertige Datei.
+
+Neue MP3s unter `web/public/assets/listening/` zusammen mit den Wochen-Dateien versionieren und veröffentlichen. Erst die Audiodateien auf Cloudflare bereitstellen, dann die neue Woche in die Datenbank importieren. Der Import prüft lokal das Vorhandensein und die Dateigröße; er kann nicht prüfen, ob Cloudflare die neue Version bereits veröffentlicht hat. Fehlende oder leere Hördateien verhindern den Import der betroffenen Woche und werden im Lehrerbereich gemeldet. Eine bereits veröffentlichte Wochenfassung bleibt erhalten; andere gültige Wochen können weiter importiert werden.
+
+## Wirtschaft ab Migration 0025
+
+3–4 Quests pro Tag; Belohnungen weiterhin 1–20 Münzen pro Quest. Der Tagesbonus von 15 XP wird einmal nach allen aktiven heutigen Quests gebucht. Wochenstempel: standardmäßig 50 Münzen, weiterhin 100 XP. Bestehende abweichende Klassenregeln bleiben erhalten.
+
+Truhen: `(10 + 3 × Level) × Größenfaktor × Wurffaktor`; große Truhe ×3, Serverwurf weiterhin 70 % einfach / 25 % doppelt / 5 % dreifach. Landhaus 600, Villa 1.000, Kleinwagen 350, Camper 600 Münzen. Die alte Goldkette `acc_04` ist im Shop verborgen; Besitz und Guthaben bleiben bestehen.
+
+Preisrichtwerte für neue Ware: Garten-Deko 15–60, besondere Deko 80–120, Avatar 30–120, Haus/Auto 600–1.000 Münzen. Die oben genannten konkreten Bestandspreise haben Vorrang.
