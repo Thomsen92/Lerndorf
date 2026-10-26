@@ -104,9 +104,9 @@
   public.teacher_pupil_quests(p_player_id uuid) returns jsonb  -- today + yesterday: [{key, day, catch_up, type, prompt, solved, attempts}], never hint or solution
   ```
 
-- [ ] **Step 1: Write the failing tests:** `class_board` totals for a seeded week; the JSON has exactly the keys above (Review Focus 3: no array of pupils, no nicknames anywhere in the text of the result); class streak: Mon–Wed with ≥ half solving → 3, a Tuesday with less than half → streak counts from Wednesday, weekend/holiday days skipped; `set_class_notice` as teacher stores, as pupil fails; text of 141 chars fails; pupil of 8a reads the 8a notice, not the 8b one, and nothing after `valid_until`; `set_class_notice(…, null, null)` deletes; `teacher_village_members('8b')` returns 8b members without coins; `teacher_pupil_quests` contains no `hint`, `solution` or `answer` keys.
-- [ ] **Step 2: Run** — FAIL. **Step 3: Implement.** **Step 4: Run** — PASS, `npm test` green.
-- [ ] **Step 5: Commit** `git add supabase/migrations/*_teacher_overhaul.sql web/tests/sql/teacher-board.test.ts && git commit -m "feat(db): class board, class notice and read-only teacher views"`
+- [x] **Step 1: Write the failing tests:** `class_board` totals for a seeded week; the JSON has exactly the keys above (Review Focus 3: no array of pupils, no nicknames anywhere in the text of the result); class streak: Mon–Wed with ≥ half solving → 3, a Tuesday with less than half → streak counts from Wednesday, weekend/holiday days skipped; `set_class_notice` as teacher stores, as pupil fails; text of 141 chars fails; pupil of 8a reads the 8a notice, not the 8b one, and nothing after `valid_until`; `set_class_notice(…, null, null)` deletes; `teacher_village_members('8b')` returns 8b members without coins; `teacher_pupil_quests` contains no `hint`, `solution` or `answer` keys.
+- [x] **Step 2: Run** — FAIL. **Step 3: Implement.** **Step 4: Run** — PASS, `npm test` green.
+- [x] **Step 5: Commit** `git add supabase/migrations/*_teacher_overhaul.sql web/tests/sql/teacher-board.test.ts && git commit -m "feat(db): class board, class notice and read-only teacher views"`
 
 ---
 
