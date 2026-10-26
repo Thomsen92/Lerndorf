@@ -2,7 +2,7 @@
  * Figure choice (boy or girl): shown once on the first login, and again from the settings
  * ("Figur wechseln"). On the first login it cannot be closed without a choice.
  */
-import { CHARACTER_KINDS, CHARACTER_LABEL, type CharacterKind } from '../render/character';
+import { CHARACTER_KINDS, CHARACTER_LABEL, characterAssetUrl, type CharacterKind } from '../render/character';
 import { openModal, type ModalHandle } from './dialog';
 
 export function openCharacterPicker(opts: {
@@ -37,7 +37,7 @@ export function openCharacterPicker(opts: {
     b.dataset.character = kind;
     b.setAttribute('aria-pressed', String(opts.current === kind));
     const img = document.createElement('img');
-    img.src = `${import.meta.env.BASE_URL}assets/characters/${kind}.png`;
+    img.src = characterAssetUrl(kind, 'png');
     img.alt = '';
     const label = document.createElement('span');
     label.textContent = CHARACTER_LABEL[kind];

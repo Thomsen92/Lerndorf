@@ -416,3 +416,14 @@ Messung in derselben Szene auf allen drei Karten, Qualität „Niedrig“: Sir B
 | 23.10.2026 | E Erststart-Tutorial | Zweig `feature/first-login-tutorial`, **noch nicht auf `main`, Migration 0019 noch nirgends eingespielt**. Server: `tutorial_state/start/continue/question/answer/buy_house/place_house/finish`, Lösungen nur in `tutorial_solutions`, 50 Münzen einmalig (Unique-Index), `claim_plot` für Schüler gesperrt, `house_fachwerk` kein Starter mehr und 50 Münzen. Client: Ruine (`render/ruin.ts`) bis das Haus steht, Comic-Sprechblasen (Comic Neue), Kamerapfade (`render/introCamera.ts`), Ablauf `ui/tutorial/flow.ts`. Playwright-Durchlauf mit Bild je Schritt: `npx playwright test e2e/tutorial.spec.ts --project=harness` (Bilder in `web/test-results/tutorial/`). Bekannter Fehler außerhalb des Pakets: `tests/render/character.test.ts` (`rootTravel`) lässt `npm run build` am `tsc` scheitern (`vite build` läuft) |
 
 Hinweis XP-Abschluss 25.10.2026: Supabase-Trockenlauf sieht ausschließlich 0020; noch nicht angewendet. Galerie: Welt-Draw-Calls in allen 36 Ansichten identisch zum Stand 23.10.; Nahvergleich mit/ohne XP-Schilder jeweils 83 gesamt / 63 Welt. Das ursprüngliche Gesamtbudget unter 150 wird bereits im bisherigen Stand teils überschritten; keine bestätigte Bildrate auf dem Schul-Tablet. Eine unabhängige Prüfung fand ein Problem mit ungesehenen Buchungen; es ist durch Regressionstests für Stempel und mehr als 50 Buchungen abgesichert und behoben. Weitere Arbeiten ab der Rückmeldung des Auftraggebers sequenziell ohne Teilagenten.
+
+### Standard-Junge – Austausch am 26.10.2026
+
+| Status | Umsetzung und Nachweis |
+| --- | --- |
+| [x] | Gelieferte Datei `../Assets/Characters/cartoon+boy+3d+model.glb` ersetzt `web/public/assets/characters/boy.glb`. Mädchen unverändert. |
+| [x] | Laufen und Catwalk übernommen; vorhandene Jubel-Aktion verwendet „froehliches springen hopsen“. Auswahlbild neu gerendert, Modell und Bild mit gemeinsamer Cache-Version. Profilporträt aus dem neuen Modell geprüft. |
+| [x] | Lokale Modellprüfung: 1,64 m Figurenhöhe, Füße auf Bodenhöhe, drei Animationen ohne Browserfehler. Wiederholbar über `web/dev/character.html` und `web/scripts/character-preview.mjs` (laufender Vite-Server auf Port 5175). |
+| [x] | 848 Tests, TypeScript/Produktionsbuild und ESLint erfolgreich. Alle 36 Dorfansichten in `web/test-results/layout-standard-boy/` erzeugt und angesehen; keine auffälligen Darstellungsfehler. |
+
+Der angekündigte Implementationsplan für den Avatar-Editor steht noch aus; dieser Austausch nimmt ihn nicht vorweg. Kein Deployment und keine Datenbankänderung.

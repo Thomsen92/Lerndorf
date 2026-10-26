@@ -1,4 +1,4 @@
-import type { CharacterKind } from '../render/character';
+import { characterAssetUrl, type CharacterKind } from '../render/character';
 import type { PortraitSource } from '../render/portrait';
 import { sessionPortraitSource } from '../render/portrait';
 export type Ornament = 'grain' | 'rivets' | 'spikes' | 'crown' | 'gems' | 'shimmer';
@@ -66,7 +66,7 @@ export function avatarPortrait(opts: {
   const img = document.createElement('img');
   img.alt = '';
   const kind = opts.character ?? 'boy';
-  img.src = `${import.meta.env.BASE_URL}assets/characters/${kind}.png`;
+  img.src = characterAssetUrl(kind, 'png');
   el.append(img, frameSvg(opts.frameId, opts.size === 'large' ? 160 : 64));
   void (opts.portraits ?? sessionPortraitSource)(kind)
     .then((url) => {

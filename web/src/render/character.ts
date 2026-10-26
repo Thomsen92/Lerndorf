@@ -1,6 +1,6 @@
 /**
  * Animated villager models (boy and girl, generated with Tripo, Mixamo rig). Each model is loaded
- * once and cloned per villager. Clips: walk, catwalk (single tap) and one or more dances (double tap).
+ * once and cloned per villager. Clips: walk, catwalk (single tap) and celebrations (double tap).
  * Sitting and waving are left out for now; standing uses the first frame of the walk clip.
  */
 import * as THREE from 'three';
@@ -16,7 +16,7 @@ export const CHARACTER_LABEL: Record<CharacterKind, string> = { boy: 'Junge', gi
 const CATWALK = 'gravious sassy catwalk of a  model';
 /** Clip names inside each GLB. */
 export const CLIP_NAMES: Record<CharacterKind, { walk: string; catwalk: string; dances: string[] }> = {
-  boy: { walk: 'walk', catwalk: CATWALK, dances: ['dance_03'] },
+  boy: { walk: 'walk', catwalk: CATWALK, dances: ['froehliches springen hopsen'] },
   girl: { walk: 'walk', catwalk: CATWALK, dances: ['dance_04', 'sexy dance'] },
 };
 /** Same height as the old placeholder figure (head top at 1.64 m). */
@@ -75,11 +75,16 @@ export function rootTravel(clip: THREE.AnimationClip): number {
 
 const pending = new Map<CharacterKind, Promise<CharacterAsset | null>>();
 
+/** Keep the model and its static selection image on the same asset revision. */
+export function characterAssetUrl(kind: CharacterKind, format: 'glb' | 'png'): string {
+  return `${import.meta.env.BASE_URL}assets/characters/${kind}.${format}${kind === 'boy' ? '?v=20261026' : ''}`;
+}
+
 /** Loads a model once; resolves null if loading fails (the placeholder stays then). */
 export function loadCharacter(kind: CharacterKind): Promise<CharacterAsset | null> {
   let p = pending.get(kind);
   if (p) return p;
-  const url = `${import.meta.env.BASE_URL}assets/characters/${kind}.glb`;
+  const url = characterAssetUrl(kind, 'glb');
   p = new GLTFLoader()
     .loadAsync(url)
     .then((gltf): CharacterAsset | null => {
