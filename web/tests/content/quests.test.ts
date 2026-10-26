@@ -32,7 +32,7 @@ describe('validatePackage', () => {
     expect(errorsAfter((w) => (w.days[2].date = '2026-11-12'))).toContain(
       'days[2].date: 2026-11-11 erwartet',
     );
-    expect(errorsAfter((w) => w.days[0].quests.pop())).toContain('days[0].quests: genau 3 Aufgaben');
+    expect(errorsAfter((w) => w.days[0].quests.pop())).toContain('days[0].quests: 3 bis 4 Aufgaben');
     expect(errorsAfter((w) => (w.days[1].quests[0].id = 'mon-1'))).toContain('kommt doppelt vor');
     expect(errorsAfter((w) => (w.days[0].quests[0].type = 'essay'))).toContain('days[0].quests[0].type');
   });

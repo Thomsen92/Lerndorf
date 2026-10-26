@@ -1,6 +1,6 @@
 /**
  * Validation and conversion of a week of daily quests. Pure functions, no network.
- * A week file looks like content/daily-quests/2026-11-09.json (7 days x 3 quests) or is a
+ * A week file looks like content/daily-quests/2026-11-09.json (7 days x 3–4 quests) or is a
  * holiday file {"week": "...", "holiday": true}. The solution never goes to the client:
  * `packageToRows` splits each quest into the public row (`data`) and the private solution row.
  */
@@ -149,8 +149,8 @@ export function validatePackage(input: unknown, fileName?: string): string[] {
       const expected = addDays(p.week as string, i);
       if (day.date !== expected) errors.push(`${dayWhere}.date: ${expected} erwartet`);
     }
-    if (!Array.isArray(day.quests) || day.quests.length !== 3) {
-      errors.push(`${dayWhere}.quests: genau 3 Aufgaben`);
+    if (!Array.isArray(day.quests) || (day.quests.length < 3 || day.quests.length > 4)) {
+      errors.push(`${dayWhere}.quests: 3 bis 4 Aufgaben`);
       return;
     }
     day.quests.forEach((raw, j) => {
@@ -190,7 +190,7 @@ export interface QuestRow {
   key: string; // "2026-11-10-tue-2"
   week: string;
   day: string;
-  slot: 1 | 2 | 3;
+  slot: 1 | 2 | 3 | 4;
   qid: string;
   type: QuestType;
   prompt: string;
@@ -277,7 +277,7 @@ export function packageToRows(pkg: WeekPackage): { quests: QuestRow[]; solutions
         key,
         week: pkg.week,
         day: day.date,
-        slot: (index + 1) as 1 | 2 | 3,
+        slot: (index + 1) as 1 | 2 | 3 | 4,
         qid: q.id,
         type: q.type,
         prompt: q.prompt,
