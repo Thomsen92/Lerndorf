@@ -152,10 +152,11 @@ Umsetzung 25.10.2026: Tutorial bereits in `main`, daher Zweig `feature/build-fee
 
 ## Zwischenpaket E – Erststart-Tutorial
 
-Spec: `docs/superpowers/specs/2026-10-21-first-login-tutorial-design.md`, Plan: `docs/superpowers/plans/2026-10-23-first-login-tutorial.md`, SPEC §8a. Beim ersten Login: Figur, Kamerafahrt, zwei Nachrichten, fünf Fragen, Fachwerkhaus kaufen und hinstellen, Tanz, Daily Quests.
+Spec: `docs/superpowers/specs/2026-10-21-first-login-tutorial-design.md`, Plan: `docs/superpowers/plans/2026-10-23-first-login-tutorial.md`, SPEC §8a. Beim ersten Login: Figur, Kamerafahrt, zwei Nachrichten, drei Fragen mit direkter Antwort per Antippen, Fachwerkhaus kaufen und hinstellen, Tanz, Daily Quests.
 
 | AP | Wer | Inhalt | Ergebnis |
 |---|---|---|---|
+| [x] E.1b | CC | Tablet-Tutorial: drei Fragen, große Antwortknöpfe, direkte Prüfung; Migration 0021 | 819 Tests grün; von der Lehrkraft am 26.10.2026 getestet und abgenommen; Live-Migration noch ausstehend |
 | [x] E.1 | CC | Migration `0019_first_login_tutorial.sql` (Tabellen, fünf Fragen, RPCs, automatisches Grundstück, Haus kostet 50) | SQL-Tests grün |
 | [x] E.2 | CC | Ruine im Haus-Sockel, Sprechblasen im Comic-Stil, Kamerapfade, Tanz | Tests grün, Bilder angesehen |
 | [x] E.3 | CC | Ablauf in der Oberfläche (`ui/tutorial/`), Kaufdialog, geführter Baumodus, Einbau ins Dorf; manuelle Grundstückswahl entfernt | Tests grün |

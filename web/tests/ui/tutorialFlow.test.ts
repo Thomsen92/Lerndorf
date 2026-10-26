@@ -84,8 +84,8 @@ function fakeServer(init: Partial<TutorialState> & { failNext?: string[] } = {})
         ok: true,
         value:
           nr === 2
-            ? { nr, total: 5, type: 'gap', prompt: 'My name ___ Tom.', data: {} }
-            : { nr, total: 5, type: 'choice', prompt: `Question ${nr}`, data: { options: ['yes', 'no'] } },
+            ? { nr, total: 3, type: 'choice', prompt: 'My name ___ Tom.', data: { options: [SECRET, 'are', 'am'] } }
+            : { nr, total: 3, type: 'choice', prompt: `Question ${nr}`, data: { options: ['yes', 'no'] } },
       };
     },
     answer: async (nr, a) => {
@@ -98,13 +98,13 @@ function fakeServer(init: Partial<TutorialState> & { failNext?: string[] } = {})
           value: { correct: false, hint: 'Think again.', answered: s.answered, done: false, coins: s.coins },
         };
       s.answered += 1;
-      if (s.answered === 5) {
+      if (s.answered === 3) {
         s.coins += 50;
         s.step = 'buy';
       }
       return {
         ok: true,
-        value: { correct: true, hint: null, answered: s.answered, done: s.answered === 5, coins: s.coins },
+        value: { correct: true, hint: null, answered: s.answered, done: s.answered === 3, coins: s.coins },
       };
     },
     buyHouse: async () => {
@@ -167,22 +167,9 @@ function run(f: ReturnType<typeof fakeServer>, extra: { signal?: AbortSignal } =
 }
 
 async function answerAll(from: number): Promise<void> {
-  for (let nr = from; nr <= 5; nr++) {
-    await until(() => document.querySelector('h2')?.textContent === `Frage ${nr} von 5`, `question ${nr}`);
-    if (nr === 2) {
-      const input = document.querySelector<HTMLInputElement>('#gap');
-      if (input) {
-        input.value = SECRET;
-        input.dispatchEvent(new Event('input'));
-      }
-    } else {
-      const yes = document.querySelector<HTMLInputElement>('input[value="yes"]');
-      if (yes) {
-        yes.checked = true;
-        yes.dispatchEvent(new Event('change'));
-      }
-    }
-    await click('Prüfen');
+  for (let nr = from; nr <= 3; nr++) {
+    await until(() => document.querySelector('h2')?.textContent === `Frage ${nr} von 3`, `question ${nr}`);
+    await click(nr === 2 ? SECRET : 'yes');
     await click('Weiter');
   }
 }
@@ -331,7 +318,7 @@ describe('runTutorial', () => {
   it('resumes the quiz at question 3 after a reload', async () => {
     const f = fakeServer({ step: 'quiz', answered: 2, character: 'boy', plotIndex: 4 });
     run(f);
-    await until(() => document.querySelector('h2')?.textContent === 'Frage 3 von 5', 'question 3');
+    await until(() => document.querySelector('h2')?.textContent === 'Frage 3 von 3', 'question 3');
     expect(f.log).not.toContain('start');
     expect(f.log).not.toContain('continue');
     expect(f.log).toContain('camera:reduced');
@@ -341,17 +328,11 @@ describe('runTutorial', () => {
   it('a wrong answer shows the hint, allows a retry and never shows the solution', async () => {
     const f = fakeServer({ step: 'quiz', answered: 1, character: 'boy', plotIndex: 0 });
     run(f);
-    await until(() => document.querySelector('#gap') !== null, 'gap form');
-    const input = document.querySelector<HTMLInputElement>('#gap') as HTMLInputElement;
-    input.value = 'are';
-    input.dispatchEvent(new Event('input'));
-    await click('Prüfen');
+    await click('are');
     await until(() => document.body.textContent?.includes('Think again.') ?? false, 'hint');
-    expect(document.body.textContent).not.toContain(SECRET);
-    expect(button('Prüfen')?.disabled).toBe(false);
-    input.value = SECRET;
-    input.dispatchEvent(new Event('input'));
-    await click('Prüfen');
+    expect(button(SECRET)?.disabled).toBe(false);
+    expect(document.querySelector('.quest-feedback')?.textContent).not.toContain(SECRET);
+    await click(SECRET);
     await until(() => document.body.textContent?.includes('Richtig!') ?? false, 'correct');
     expect(f.s.answered).toBe(2);
   });
@@ -359,16 +340,12 @@ describe('runTutorial', () => {
   it('a network error shows a message and keeps the button usable, without losing the step', async () => {
     const f = fakeServer({ step: 'quiz', answered: 0, character: 'boy', plotIndex: 0, failNext: ['answer'] });
     run(f);
-    await until(() => document.querySelector('input[value="yes"]') !== null, 'choice');
-    const yes = document.querySelector<HTMLInputElement>('input[value="yes"]') as HTMLInputElement;
-    yes.checked = true;
-    yes.dispatchEvent(new Event('change'));
-    await click('Prüfen');
+    await click('yes');
     await until(() => document.body.textContent?.includes('Bitte noch einmal versuchen') ?? false, 'error');
     expect(f.s.answered).toBe(0);
-    expect(document.querySelector('h2')?.textContent).toBe('Frage 1 von 5');
-    expect(button('Prüfen')?.disabled).toBe(false);
-    await click('Prüfen');
+    expect(document.querySelector('h2')?.textContent).toBe('Frage 1 von 3');
+    expect(button('yes')?.disabled).toBe(false);
+    await click('yes');
     await until(() => f.s.answered === 1, 'answered after retry');
   });
 
@@ -431,7 +408,7 @@ describe('runTutorial', () => {
 
   describe('runTutorial resume and replay', () => {
     it('step buy (coins already granted) goes straight to the buy dialog, then place', async () => {
-      const f = fakeServer({ step: 'buy', character: 'boy', plotIndex: 0, answered: 5 });
+      const f = fakeServer({ step: 'buy', character: 'boy', plotIndex: 0, answered: 3 });
       f.s.coins = 50;
       const r = run(f);
       await until(() => Boolean(button('Haus kaufen')), 'buy dialog');
@@ -445,7 +422,7 @@ describe('runTutorial', () => {
     });
 
     it('step place with the house bought goes straight to the guided placement', async () => {
-      const f = fakeServer({ step: 'place', character: 'boy', plotIndex: 0, answered: 5 });
+      const f = fakeServer({ step: 'place', character: 'boy', plotIndex: 0, answered: 3 });
       const r = run(f);
       await r.done;
       expect(f.log).not.toContain('buy');
@@ -455,7 +432,7 @@ describe('runTutorial', () => {
 
     it('lost response after placing: server already at done, the replayed placement still ends with dance, bubble and finish', async () => {
       // the client never got the answer of tutorial_place_house; the state it read still said "place"
-      const f = fakeServer({ step: 'place', character: 'boy', plotIndex: 0, answered: 5 });
+      const f = fakeServer({ step: 'place', character: 'boy', plotIndex: 0, answered: 3 });
       const r = run(f); // the state is read here: still "place"
       f.s.step = 'done';
       await r.done;
@@ -480,7 +457,7 @@ describe('runTutorial', () => {
       expect(f.log).not.toContain('question1');
       expect(f.log).not.toContain('buy');
       await click('Noch einmal versuchen');
-      await until(() => document.querySelector('h2')?.textContent === 'Frage 1 von 5', 'question 1');
+      await until(() => document.querySelector('h2')?.textContent === 'Frage 1 von 3', 'question 1');
       expect(calls).toBe(2);
     });
 
@@ -514,7 +491,7 @@ describe('runTutorial', () => {
         endPauseMs: 0,
       });
       for (let i = 0; i < MESSAGES.length; i++) await click('Weiter');
-      await until(() => document.querySelector('h2')?.textContent === 'Frage 1 von 5', 'quiz after replay');
+      await until(() => document.querySelector('h2')?.textContent === 'Frage 1 von 3', 'quiz after replay');
       expect(rpc).toHaveBeenCalledWith('tutorial_state', undefined);
     });
   });

@@ -271,7 +271,7 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
       });
       await ui.guard(quiz.done);
       close();
-      state = { ...state, step: 'buy', answered: 5 };
+      state = { ...state, step: 'buy', answered: 3 };
     }
 
     // 5. buy the house (also when the shop is closed)

@@ -43,7 +43,7 @@ it('keeps English feedback usable without WebGL and counts mistakes per question
   document.body.append(byte.el);
   expect(byte.el.querySelector('img')?.alt).toBe('Sir Byte');
   byte.say('quiz');
-  expect(byte.el.textContent).toContain('Answer five easy questions.');
+  expect(byte.el.textContent).toContain('Answer three easy questions.');
   await byte.answer('q1', false);
   expect(byte.el.textContent).toContain('Nearly. Have another go!');
   await byte.answer('q1', false);

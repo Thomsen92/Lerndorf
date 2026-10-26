@@ -147,6 +147,43 @@
 .tutorial-quiz .tutorial-prompt {
   color: #f4ecd9;
 }
+.tutorial-quiz .tutorial-answers {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 14px;
+}
+.tutorial-quiz .tutorial-answer {
+  min-height: 60px;
+  width: 100%;
+  padding: 14px 20px;
+  border: 2px solid #7185a5;
+  border-radius: 12px;
+  background: #344763;
+  color: #fff5dd;
+  font-size: 1.1rem;
+  text-align: left;
+  touch-action: manipulation;
+}
+.tutorial-quiz .tutorial-answer:hover:not(:disabled) { background: #425b7d; }
+.tutorial-quiz .tutorial-answer:focus-visible { outline: 3px solid #ffd16d; outline-offset: 3px; }
+.tutorial-quiz .tutorial-answer.is-correct { border-color: #92d39f; background: #294d3b; }
+.tutorial-quiz .tutorial-answer.is-wrong { border-color: #f1b59d; }
+@media (min-width: 760px) and (orientation: landscape) {
+  .overlay.tutorial-quiz .panel {
+    width: min(860px, 100%);
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    column-gap: 24px;
+    align-content: start;
+  }
+  .tutorial-quiz .panel > * { grid-column: 2; }
+  .tutorial-quiz .panel > .panel-head { grid-column: 1 / -1; }
+  .tutorial-quiz .panel > .byte-stage { grid-column: 1; grid-row: 2 / span 6; align-self: start; }
+  .tutorial-quiz .byte-stage { grid-template-columns: 1fr; }
+  .tutorial-quiz .byte-picture { width: 170px; justify-self: center; }
+  .tutorial-quiz .byte-bubble::before { left: 40%; top: -10px; transform: rotate(135deg); }
+}
 @media (max-width: 700px) {
   .quests-with-byte {
     grid-template-columns: 1fr;

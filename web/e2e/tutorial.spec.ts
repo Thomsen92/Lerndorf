@@ -80,39 +80,26 @@ for (const viewport of [
       await page.getByRole('button', { name: 'Weiter', exact: true }).click();
     }
 
-    // quiz: five questions, the first one answered wrong once
+    // Three direct-tap questions, including a wrong answer and retry.
     await page.locator('.tutorial-quiz h2').waitFor();
-    await page.waitForTimeout(300);
+    await expect(page.locator('.tutorial-quiz input, .tutorial-quiz select, #check')).toHaveCount(0);
     await shot('04-quiz-1');
-    await page.locator('input[value="mouse"]').check();
-    await page.locator('#check').click();
-    await expect(page.getByText('Leider falsch')).toBeVisible();
+    await page.getByRole('button', { name: 'mouse', exact: true }).click();
+    await expect(page.getByText('Leider falsch', { exact: false })).toBeVisible();
     await shot('05-quiz-1-wrong-hint');
-    await page.locator('input[value="house"]').check();
-    await page.locator('#check').click();
-    await page.getByRole('button', { name: 'Weiter' }).click();
-    await page.locator('#gap').fill('is');
-    await shot('06-quiz-2-gap');
-    await page.locator('#check').click();
-    await page.getByRole('button', { name: 'Weiter' }).click();
-    await page.locator('input[value="red"]').check();
-    await shot('07-quiz-3');
-    await page.locator('#check').click();
-    await page.getByRole('button', { name: 'Weiter' }).click();
-    await page.locator('select[data-left="dog"]').selectOption('Hund');
-    await page.locator('select[data-left="cat"]').selectOption('Katze');
-    await page.locator('select[data-left="bird"]').selectOption('Vogel');
-    await shot('08-quiz-4-match');
-    await page.locator('#check').click();
-    await page.getByRole('button', { name: 'Weiter' }).click();
+    await page.getByRole('button', { name: 'house', exact: true }).click();
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Frage 2 von 3' })).toBeVisible();
+    await shot('06-quiz-2-buttons');
+    await page.getByRole('button', { name: 'is', exact: true }).click();
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Frage 3 von 3' })).toBeVisible();
     await page.locator('[data-listen]').waitFor();
-    await page.waitForTimeout(1600);
-    await shot('09-quiz-5-listening');
-    await page.locator('input[value="your new neighbour"]').check();
-    await page.locator('#check').click();
-    await expect(page.getByText('Super, alles richtig')).toBeVisible();
+    await shot('07-quiz-3-listening');
+    await page.getByRole('button', { name: 'your new neighbour', exact: true }).click();
+    await expect(page.getByText('Super, alles richtig', { exact: false })).toBeVisible();
     await shot('10-quiz-done');
-    await page.getByRole('button', { name: 'Weiter' }).click();
+    await page.getByRole('button', { name: 'Weiter', exact: true }).click();
 
     // buy and place the house
     await page.getByRole('button', { name: 'Haus kaufen' }).waitFor();
@@ -149,7 +136,7 @@ for (const viewport of [
 test('resumed placement confirms the XP badge and one chest payment before quests', async ({ page }) => {
   test.setTimeout(90_000);
   await page.setViewportSize({ width: 1024, height: 768 });
-  await page.goto('/dev/tutorial.html?step=place&answered=5&char=girl');
+  await page.goto('/dev/tutorial.html?step=place&answered=3&char=girl');
   await page.locator('.build-bar--guided [data-item]').click();
   await page.getByRole('button', { name: 'Haus hinstellen' }).click();
   await page.getByRole('heading', { name: 'Level 2!', exact: true }).waitFor({ timeout: 30_000 });

@@ -15,7 +15,7 @@ export const LINES = {
   ruin: "Oh no, your house is a ruin! Let's fix it.",
   quests: 'Every day there are Daily Quests. They are short English tasks.',
   coins: 'Right answers give you coins. You can buy things for your house.',
-  quiz: 'Answer five easy questions. Then you get coins for a new house.',
+  quiz: 'Answer three easy questions. Then you get coins for a new house.',
   buy: 'Well done! Now buy the new house.',
   place: 'Put your new house here.',
   final: "Now let's do your Daily Quests!",

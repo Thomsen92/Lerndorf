@@ -1,6 +1,6 @@
 // First-login tutorial screenshot harness. Development page only, not part of the app build.
 // `e2e/tutorial.spec.ts` opens it through the Vite dev server. It mounts the real pupil village
-// with a fake Supabase client that plays the tutorial RPCs of migration 0019 (same rules, no
+// with a fake Supabase client that plays the tutorial RPCs through migration 0021 (same rules, no
 // server). URL params: step, answered, char, wait (ms of fake latency), fail (rpc names, once).
 import { mountVillage } from '../src/ui/villageView';
 
@@ -17,29 +17,9 @@ const QUESTIONS = [
     hint: 'You live in it.',
     sol: 'house',
   },
-  { nr: 2, type: 'gap', prompt: 'My name ___ Tom.', data: {}, hint: "Use a form of 'be'.", sol: 'is' },
+  { nr: 2, type: 'choice', prompt: 'My name ___ Tom.', data: { options: ['am', 'is', 'are'] }, hint: "Use a form of 'be'.", sol: 'is' },
   {
     nr: 3,
-    type: 'choice',
-    prompt: 'Which word is a colour?',
-    data: { options: ['red', 'run', 'rain'] },
-    hint: 'Think of a tomato.',
-    sol: 'red',
-  },
-  {
-    nr: 4,
-    type: 'match',
-    prompt: 'Match the animals.',
-    data: { left: ['dog', 'cat', 'bird'], right: ['Vogel', 'Hund', 'Katze'] },
-    hint: 'Think of animals.',
-    sol: JSON.stringify([
-      ['dog', 'Hund'],
-      ['cat', 'Katze'],
-      ['bird', 'Vogel'],
-    ]),
-  },
-  {
-    nr: 5,
     type: 'listening',
     prompt: 'Listen. Who is talking?',
     data: {
@@ -102,7 +82,7 @@ async function rpc(fn: string, args: Record<string, unknown> = {}) {
       return ok(state());
     case 'tutorial_question': {
       const x = QUESTIONS[s.answered];
-      return ok({ nr: x.nr, total: 5, type: x.type, prompt: x.prompt, data: x.data });
+      return ok({ nr: x.nr, total: 3, type: x.type, prompt: x.prompt, data: x.data });
     }
     case 'tutorial_answer': {
       const x = QUESTIONS[(args.p_nr as number) - 1];
@@ -111,11 +91,11 @@ async function rpc(fn: string, args: Record<string, unknown> = {}) {
       if (!right)
         return ok({ correct: false, hint: x.hint, answered: s.answered, done: false, coins: s.coins });
       s.answered += 1;
-      if (s.answered === 5) {
+      if (s.answered === 3) {
         s.step = 'buy';
         s.coins += 50;
       }
-      return ok({ correct: true, hint: null, answered: s.answered, done: s.answered === 5, coins: s.coins });
+      return ok({ correct: true, hint: null, answered: s.answered, done: s.answered === 3, coins: s.coins });
     }
     case 'tutorial_buy_house':
       s.coins -= 50;

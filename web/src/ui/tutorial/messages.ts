@@ -16,7 +16,7 @@ export const SAD_TEXT = 'Oh nein, mein Haus ist eine Ruine!';
 export const FINAL_TEXT = 'Jetzt wird gelernt und Dailys gemacht!';
 
 /** Before the quiz: what happens next. */
-export const QUIZ_INTRO = 'Beantworte fünf leichte Fragen. Dann bekommst du Münzen für ein neues Haus.';
+export const QUIZ_INTRO = 'Drei kurze Fragen. Tippe auf die richtige Antwort. Danach bekommst du Münzen für dein Haus.';
 
 /** Reward of the tutorial quiz in coins (server: tutorial_reward()). Only used for the text. */
 export const REWARD = 50;

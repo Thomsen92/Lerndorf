@@ -1,14 +1,12 @@
 /**
- * Tutorial quiz: the five fixed questions one at a time, in a non-modal panel (the account menu
+ * Tutorial quiz: three tap-to-answer questions in a non-modal panel (the account menu
  * stays reachable). Wrong answers show the English hint and may be repeated; the solution is never
  * sent to the client. The server decides which question is current (answered + 1).
  */
 import type { Result } from '../../api/build';
-import type { QuestType } from '../../api/quests';
 import type { TutorialAnswerResult, TutorialQuestion } from '../../api/tutorial';
 import { loadVoices, speakEnglish } from '../../quests/speech';
-import { answerMode, buildAnswer, type AnswerState } from '../../tasks/answer';
-import { answerForm, bindAnswerForm, emptyState, type AnswerFormSpec } from '../answerForms';
+import { stringList } from '../../tasks/answer';
 import { NETWORK_ERROR, NEXT, QUIZ_DONE, QUIZ_INTRO, RETRY } from './messages';
 import { createCompanion } from '../../mascot/mascotStage';
 import type { Sound } from '../sound';
@@ -22,12 +20,12 @@ export interface QuizOptions {
   sound?: Pick<Sound, 'enabled'>;
   reducedMotion?: () => boolean;
   api: QuizApi;
-  /** coins after the fifth correct answer (reward booked by the server) */
+  /** Coins after the third correct answer (reward booked by the server). */
   onCoins: (coins: number) => void;
 }
 
 export interface QuizHandle {
-  /** resolves when all five questions are answered correctly */
+  /** Resolves when all three questions are answered correctly. */
   done: Promise<void>;
   close(): void;
 }
@@ -39,11 +37,6 @@ async function safe<T>(call: () => Promise<Result<T>>): Promise<Result<T>> {
     console.error('tutorial request failed', err);
     return { ok: false, message: NETWORK_ERROR };
   }
-}
-
-function formSpec(q: TutorialQuestion): AnswerFormSpec {
-  const data = (q.data && typeof q.data === 'object' ? q.data : {}) as Record<string, unknown>;
-  return { type: answerMode(q.type as QuestType, data), data };
 }
 
 let counter = 0;
@@ -116,8 +109,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
   };
 
   const render = (q: TutorialQuestion): void => {
-    const spec = formSpec(q);
-    const state: AnswerState = emptyState(spec);
+    const data = (q.data && typeof q.data === 'object' ? q.data : {}) as Record<string, unknown>;
     heading(`Frage ${q.nr} von ${q.total}`);
     if (q.nr === 1) panel.append(el('p', 'quest-rule', QUIZ_INTRO));
     const prompt = el('p', 'tutorial-prompt', q.prompt);
@@ -126,7 +118,6 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
     byte.lookAt(prompt);
 
     if (q.type === 'listening') {
-      const data = spec.data;
       const speak = typeof data.speak === 'string' ? data.speak : '';
       const fallback = el('p', 'quest-fallback');
       fallback.hidden = true;
@@ -148,39 +139,23 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
       play();
     }
 
-    const formBox = el('div', 'quest-form');
-    formBox.innerHTML = answerForm(spec, state);
-    const bindForm = (): void =>
-      bindAnswerForm(formBox, state, () => {
-        formBox.innerHTML = answerForm(spec, state);
-        bindForm();
-      });
-    bindForm();
+    const formBox = el('div', 'quest-form tutorial-answers');
+    formBox.setAttribute('role', 'group');
+    formBox.setAttribute('aria-label', 'Antwort antippen');
     const feedback = el('p', 'status quest-feedback');
     feedback.setAttribute('role', 'status');
     let pending = false;
-    const check = button('Prüfen', true, () => void submit());
-    check.id = 'check';
-    panel.append(formBox, check, feedback);
-    formBox.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && (e.target as HTMLElement).tagName === 'INPUT') {
-        e.preventDefault();
-        void submit();
-      }
-    });
-    (formBox.querySelector<HTMLElement>('input, select') ?? check).focus();
-
-    const submit = async (): Promise<void> => {
+    panel.append(formBox, feedback);
+    const choices: HTMLButtonElement[] = [];
+    const lock = (on: boolean): void => { choices.forEach(b => { b.disabled = on; }); };
+    const submit = async (answer: string, selected: HTMLButtonElement): Promise<void> => {
       if (pending) return;
-      const answer = buildAnswer(state);
-      if (answer === null) {
-        feedback.textContent = 'Bitte zuerst alles ausfüllen.';
-        return;
-      }
       pending = true;
+      choices.forEach(b => b.classList.remove('is-wrong', 'is-correct'));
       synth?.cancel();
       byte.thinking();
-      check.disabled = true;
+      lock(true);
+      formBox.setAttribute('aria-busy', 'true');
       feedback.textContent = 'Wird geprüft …';
       const res = await safe(() => opts.api.answer(q.nr, answer));
       pending = false;
@@ -188,14 +163,19 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
         if (res.ok && res.value.done) opts.onCoins(res.value.coins);
         return;
       }
-      check.disabled = false;
+      formBox.removeAttribute('aria-busy');
       if (!res.ok) {
+        lock(false);
         feedback.textContent = res.message;
+        selected.focus();
         return;
       }
       const r = res.value;
       void byte.answer(`tutorial-${q.nr}`, r.correct);
       if (!r.correct) {
+        lock(false);
+        selected.classList.add('is-wrong');
+        selected.focus();
         feedback.textContent = r.hint ? 'Leider falsch. Tipp: ' : 'Leider falsch. Versuch es noch einmal.';
         if (r.hint) {
           const hint = el('span', undefined, r.hint);
@@ -204,11 +184,7 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
         }
         return;
       }
-      // correct: lock the form and go on
-      formBox
-        .querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>('input, select, button')
-        .forEach((c) => (c.disabled = true));
-      check.remove();
+      selected.classList.add('is-correct');
       if (r.done) {
         opts.onCoins(r.coins);
         feedback.textContent = QUIZ_DONE;
@@ -222,6 +198,14 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
       panel.append(next);
       next.focus();
     };
+    for (const option of stringList(data, 'options')) {
+      const choice = button(option, false, () => void submit(option, choice));
+      choice.className = 'tutorial-answer';
+      choice.lang = 'en';
+      choices.push(choice);
+      formBox.append(choice);
+    }
+    choices[0]?.focus();
   };
 
   void load();

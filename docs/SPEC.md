@@ -325,7 +325,7 @@ Entwurf und Entscheidungen: `docs/superpowers/specs/2026-10-21-first-login-tutor
 **Zustand** je Schüler in `tutorial_progress` (`step`, `answered`, `reward_paid`, `house_bought`, `completed_at`; RLS: nur die eigene Zeile lesbar). Ablauf der Schritte:
 
 ```
-intro --tutorial_continue--> quiz --5x tutorial_answer richtig--> buy --tutorial_buy_house--> place --tutorial_place_house--> done
+intro --tutorial_continue--> quiz --3x tutorial_answer richtig--> buy --tutorial_buy_house--> place --tutorial_place_house--> done
 ```
 
 | Funktion | Wirkung |
@@ -333,8 +333,8 @@ intro --tutorial_continue--> quiz --5x tutorial_answer richtig--> buy --tutorial
 | `tutorial_state()` | `{needed, step, plot_index, character, answered}`; wer schon ein Haus im Haus-Sockel hat, bekommt `done` |
 | `tutorial_start()` | vergibt atomar das niedrigste freie Grundstück der Klasse (Advisory-Lock), legt die Fortschrittszeile an; Wiederholung ändert nichts |
 | `tutorial_continue('intro')` | `intro` → `quiz` (braucht ein Grundstück) |
-| `tutorial_question()` | die aktuelle Frage (Nr. = `answered + 1`), nie Lösung oder Tipp |
-| `tutorial_answer(nr, antwort)` | falsch: Tipp, keine Strafe, beliebig oft; fünfte richtige Antwort: einmalig 50 Münzen (`coin_ledger.reason = 'tutorial'`, Unique-Index) → `buy` |
+| `tutorial_question()` | drei Fragen (Wortschatz, Grammatik, Hören) mit je drei großen Antwortknöpfen; Antippen prüft sofort, ohne Schreiben, Dropdown oder zusätzlichen Bestätigen-Knopf; die aktuelle Frage (Nr. = `answered + 1`), nie Lösung oder Tipp |
+| `tutorial_answer(nr, antwort)` | falsch: Tipp, keine Strafe, beliebig oft; dritte richtige Antwort: einmalig 50 Münzen (`coin_ledger.reason = 'tutorial'`, Unique-Index) → `buy` |
 | `tutorial_buy_house()` | Kauf des Fachwerkhauses zum Katalogpreis (50), auch bei geschlossenem Shop → `place`; doppelter Aufruf bucht nicht noch einmal |
 | `tutorial_place_house()` | setzt das Haus in den Sockel `house` (Drehung 0), auch bei geschlossenem Baumodus; braucht ein Grundstück → `done` |
 | `tutorial_finish()` | Abschlussaufruf des Clients, wiederholbar, nur bei `done` |
