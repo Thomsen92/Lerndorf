@@ -1,0 +1,125 @@
+{
+  "characters": [
+    {
+      "kind": "boy",
+      "baseBytes": 1928460,
+      "baseTriangles": 11717,
+      "allPartsAndBaseBytes": 2617868,
+      "clips": [
+        "cry",
+        "greet_03",
+        "walk",
+        "froehliches springen hopsen",
+        "gravious sassy catwalk of a  model",
+        "swagger"
+      ],
+      "parts": [
+        {
+          "id": "avatar_boy_feathered_helmet",
+          "triangles": 4499,
+          "bytes": 229520
+        },
+        {
+          "id": "avatar_boy_gucci_sunglasses",
+          "triangles": 2599,
+          "bytes": 162716
+        },
+        {
+          "id": "avatar_boy_gold_chain",
+          "triangles": 2999,
+          "bytes": 139196
+        },
+        {
+          "id": "avatar_boy_halberd",
+          "triangles": 3000,
+          "bytes": 157976
+        }
+      ]
+    },
+    {
+      "kind": "girl",
+      "baseBytes": 1978908,
+      "baseTriangles": 10690,
+      "allPartsAndBaseBytes": 3350764,
+      "clips": [
+        "dance_04",
+        "swagger",
+        "walk",
+        "gravious sassy catwalk of a  model",
+        "sexy dance"
+      ],
+      "parts": [
+        {
+          "id": "avatar_girl_cloud_beat",
+          "triangles": 1308,
+          "bytes": 30356
+        },
+        {
+          "id": "avatar_girl_pixel_cat",
+          "triangles": 424,
+          "bytes": 10128
+        },
+        {
+          "id": "avatar_girl_daisy_bucket",
+          "triangles": 1564,
+          "bytes": 48992
+        },
+        {
+          "id": "avatar_girl_heart_pop",
+          "triangles": 928,
+          "bytes": 23516
+        },
+        {
+          "id": "avatar_girl_shooting_stars",
+          "triangles": 352,
+          "bytes": 18232
+        },
+        {
+          "id": "avatar_girl_starpack",
+          "triangles": 1592,
+          "bytes": 49516
+        },
+        {
+          "id": "avatar_girl_crescent",
+          "triangles": 1152,
+          "bytes": 25532
+        },
+        {
+          "id": "avatar_girl_candy_orbit",
+          "triangles": 804,
+          "bytes": 20636
+        },
+        {
+          "id": "avatar_girl_bloom",
+          "triangles": 384,
+          "bytes": 9188
+        },
+        {
+          "id": "avatar_girl_soft_bow",
+          "triangles": 592,
+          "bytes": 13748
+        },
+        {
+          "id": "avatar_girl_slim_jeans",
+          "triangles": 6546,
+          "bytes": 942968
+        },
+        {
+          "id": "avatar_girl_pleated_skirt",
+          "triangles": 4640,
+          "bytes": 179044
+        }
+      ]
+    }
+  ],
+  "room": [
+    {
+      "name": "wardrobe",
+      "bytes": 1481380
+    },
+    {
+      "name": "rug",
+      "bytes": 2276968
+    }
+  ]
+}

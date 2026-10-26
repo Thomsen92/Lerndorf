@@ -1,6 +1,6 @@
 # Avatar-Kleiderschrank – Umsetzungsplan für Lerndorf
 
-> **Ausführung:** Ein Agent, sequenziell mit `executing-plans`; keine Subagents. Jeden Abschnitt erst nach dessen Prüfungen abschließen. Dieser Plan ist noch nicht ausgeführt.
+> **Ausführung:** Ein Agent, sequenziell mit `executing-plans`; keine Subagents. Jeden Abschnitt erst nach dessen Prüfungen abschließen. Software lokal umgesetzt. Prüfstand und bewusste Abweichungen: [Umsetzungsstand](../../AVATAR_KLEIDERSCHRANK.md). Hardware-Abnahme und Live-Migration/Veröffentlichung bleiben offen.
 
 **Ziel:** Über das Hausmenü eine eigene Zimmer-Szene öffnen, gekaufte Kleidung und Accessoires direkt an der drehbaren Figur anprobieren und den bestätigten Look im ganzen Lerndorf zeigen.
 
@@ -25,7 +25,7 @@
 | Neu | Verantwortung |
 | --- | --- |
 | `content/avatar/wardrobe.json` | Ein geprüftes Importmanifest: kanonische IDs, Runtime-IDs, Figur, Slot, Konflikte, Quelle, Thumbnail, geplanter Preis |
-| `blender/scripts/prepare_wardrobe.py` | Reproduzierbarer, nicht destruktiver Zusammenbau der modularen Bases mit den bisherigen Animationsclips |
+| `web/scripts/prepare-wardrobe.mjs` | Reproduzierbarer direkter GLB-Zusammenbau der modularen Bases mit den bisherigen Animationsclips |
 | `web/scripts/audit-wardrobe.mjs` | Export-/Katalog-/Dateipfadprüfung einschließlich Clips, Farbkanälen und Revisionen |
 | `web/public/assets/characters/wardrobe/{boy,girl}/` | Ausgewählte neue Exporte, lokale Kataloge, Zubehör und PNGs; keine alten ZIPs oder Blend-Dateien ausliefern |
 | `web/src/avatars/look.ts` | Persistenztypen, reine Normalisierung/Validierung, Slot-/Konflikt- und Farbregeln |
@@ -135,7 +135,7 @@ interface AvatarCustomizer {
 **Dateien:** `render/wardrobeRoom.ts`, `wardrobeStage.ts`, entsprechende Tests und `dev/wardrobe.*`.
 
 - [ ] Die neue Testseite zunächst mit realer Figur, Fake-Besitz und dem Adapter aus A2 aufbauen. Beide Figuren über `?character=boy|girl` erreichbar machen; keine Schüleranmeldung oder echten Supabase-Daten verwenden.
-- [ ] Zimmer aus eigener Geometrie bauen. Offene Schranktüren, Fächer und Kleiderbügel müssen als Silhouette erkennbar bleiben. Keine austauschbare einfarbige Fläche als Zimmer-Ersatz.
+- [ ] Vom Nutzer angekündigtes Tripo-Kleiderschrankmodell integrieren; Referenz ist `blender/sources/references/wardrobe-open-reference.png`. Keinen Schrank aus Code-Grundformen als Ersatz bauen. Vor Übernahme des gelieferten Modells Maßstab, Texturen, Bounds und Herkunft prüfen. Generisches Zimmer aus Boden, Wänden, Teppich und Licht darum bauen. Offene Schranktüren, Fächer und Kleiderbügel müssen als Silhouette erkennbar bleiben. Keine austauschbare einfarbige Fläche als Zimmer-Ersatz.
 - [ ] Einmaliges niedrig aufgelöstes Raum-Render-Target und Blur-Cache erstellen; nur bei Größen-/Qualitätswechsel erneuern. Die scharfe Figur mit sanftem Bodenschatten davor rendern. `configurePreviewRenderer` und bestehende Beleuchtungs-/Farbraumregeln wiederverwenden.
 - [ ] `createWardrobeStage(host, {character, look, reducedMotion, quality})` mit `applyLook`, `rotateBy`, `resetView`, `resize` und `dispose` bereitstellen. Raum/Kamera bleiben statisch; Figurendrehung wird um ihre eigene Hochachse geführt.
 - [ ] Pointer Capture, Bewegungsgrenze und `pointercancel` berücksichtigen. `touch-action: none` nur auf der Drehfläche; Inventar-Scrollen bleibt nativ. Auf UI-Klicks kein Rotationssprung. Linke/rechte Pfeiltaste beziehungsweise große Drehknöpfe rufen denselben Pfad auf.

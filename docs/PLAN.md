@@ -428,22 +428,22 @@ Hinweis XP-Abschluss 25.10.2026: Supabase-Trockenlauf sieht ausschließlich 0020
 
 Der Austausch nimmt die folgende Editor-Umsetzung nicht vorweg. Kein Deployment und keine Datenbankänderung.
 
-### Avatar-Kleiderschrank – geplant am 26.10.2026
+### Avatar-Kleiderschrank – lokale Umsetzung 26.10.2026
 
-Grundlage sind die gelesenen Implementationen unter `Prototyp/StandardBoyShop/` und `Prototyp/StandardGirlShop/` sowie der neue Nutzerauftrag: Hausmenü → eigene Zimmer-Szene, offener verschwommener Schrank im Hintergrund, drehbare Figur vorn und direkte Auswahl besessener Gegenstände. Planung erstellt, noch kein Editor-Code und keine Migration ausgeführt.
+Grundlage sind die gelesenen Implementationen unter `Prototyp/StandardBoyShop/` und `Prototyp/StandardGirlShop/` sowie der neue Nutzerauftrag: Hausmenü → eigene Zimmer-Szene, offener verschwommener Schrank im Hintergrund, drehbare Figur vorn und direkte Auswahl besessener Gegenstände. Editor, Runtime, Asset-Paket und Migration sind lokal umgesetzt. Migration 0023 noch nicht live angewendet; kein Deployment.
 
 - [Gestaltung und geprüfter Ist-Zustand](superpowers/specs/2026-10-26-avatar-wardrobe-design.md)
 - [Detaillierter Umsetzungsplan](superpowers/plans/2026-10-26-avatar-wardrobe.md)
 
 | AP | Status | Ergebnis |
 | --- | --- | --- |
-| A1 | [ ] | Modulare Bases und finale Girl-r10-Kandidaten mit bisherigen Animationen zusammenführen und prüfen |
-| A2 | [ ] | Gemeinsame Runtime für Farben, Zubehör, geriggte Kleidung und Konflikte |
-| A3 | [ ] | Besitzprüfung, Paletten, sichere Look-Persistenz und einmalige Avatar-Käufe |
-| A4 | [ ] | Eigene Zimmer-Bühne mit Blur-Hintergrund und drehbarer Figur |
-| A5 | [ ] | Tablet-Oberfläche mit direkter Anprobe und „Fertig“ |
-| A6 | [ ] | Hausmenü, Shop und Inventar verbinden |
-| A7 | [ ] | Gespeicherte Looks in Dorf, Profil und Lehrer-Dorfansicht |
+| A1 | [x] | Modulare Bases und finale Girl-r10-Kandidaten mit bisherigen Animationen zusammenführen und prüfen |
+| A2 | [x] | Gemeinsame Runtime für Farben, Zubehör, geriggte Kleidung und Konflikte |
+| A3 | [x] | Besitzprüfung, Paletten, sichere Look-Persistenz und einmalige Avatar-Käufe |
+| A4 | [x] | Eigene Zimmer-Bühne mit Blur-Hintergrund und drehbarer Figur |
+| A5 | [x] | Tablet-Oberfläche mit direkter Anprobe und „Fertig“ |
+| A6 | [x] | Hausmenü, Shop und Inventar verbinden |
+| A7 | [x] | Gespeicherte Looks in Dorf, Profil und Lehrer-Dorfansicht |
 | A8 | [ ] | End-to-End-, WebGL-, Galerie- und Leistungsprüfung; Dokumentation |
 
-Ausführung auf Wunsch weiterhin sequenziell durch einen Agenten. Technische Schranke vor der sichtbaren Umstellung: Beide modularen Shop-Bases sind animationslos; bisherige Clips müssen erhalten bleiben. Die Boy-Integrationsnotizen beziehen sich teilweise auf den inzwischen ersetzten Jungen. Aktuelle Assetkosten überschreiten das alte Avatar-Polygonbudget; Optimierung und Tablet-Abnahme sind eingeplant.
+Ausführung auf Wunsch weiterhin sequenziell durch einen Agenten. Technische Schranke vor der sichtbaren Umstellung: Beide modularen Shop-Bases sind animationslos; bisherige Clips müssen erhalten bleiben. Die Boy-Integrationsnotizen beziehen sich teilweise auf den inzwischen ersetzten Jungen. Die Animationen sind übernommen; optimierte Texturen, Detailwechsel und eine Rock-Passformkorrektur sind umgesetzt. A8-Softwareprüfungen und Bildkontrolle sind lokal erfolgt (871 Tests, Build und ESLint erfolgreich; neun Kleiderschrank-Browserprüfungen bestanden); Hardware-Abnahme auf dem Schul-Tablet und spätere Veröffentlichung bleiben offen. Details: [Umsetzungsstand](AVATAR_KLEIDERSCHRANK.md).

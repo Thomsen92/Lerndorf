@@ -1,6 +1,6 @@
 # Avatar-Editor: Kleiderschrank im eigenen Haus
 
-Stand: 26.10.2026. Planungsentwurf auf Grundlage des Nutzerauftrags und der beiden lokalen Shop-Implementationen. Noch keine Umsetzung oder Veröffentlichung. Ausführung sequenziell durch einen Agenten.
+Stand: 26.10.2026. Planungsentwurf auf Grundlage des Nutzerauftrags und der beiden lokalen Shop-Implementationen. Software inzwischen lokal umgesetzt; keine Live-Migration oder Veröffentlichung. Aktueller Stand: [Umsetzungsdokument](../../AVATAR_KLEIDERSCHRANK.md). Ausführung sequenziell durch einen Agenten.
 
 ## 1. Ziel und Bedienung
 
@@ -41,7 +41,7 @@ Verglichene Ansätze:
 2. Ein Dialog über dem Dorf wäre kleiner umzusetzen, bietet aber weniger Platz und entspricht dem gewünschten Zimmerwechsel weniger gut.
 3. Ein begehbarer Hausinnenraum mit echter Tiefenunschärfe wäre deutlich aufwendiger. Für das Umziehen sind weder Bewegung im Raum noch laufendes Depth-of-Field nötig.
 
-Wir planen Ansatz 1. Ein eigener Editor-Renderer ist nur während dieser Ansicht aktiv; das Dorf pausiert. Der Raum wird aus wenigen eigenen Low-Poly-Objekten gebaut: Boden, zwei Wände, offener Schrank mit Fächern/Kleiderstange, kleiner Teppich und warmes Licht. Keine neue 3D-Generierung und keine externen Assets nötig. Der Raum wird beim Öffnen und nach Größenwechsel einmal in kleiner Auflösung gerendert und weichgezeichnet. Die Figur wird scharf darüber gerendert. Kein Blur auf DOM-Bedienelementen oder Figur und kein laufender teurer Tiefenunschärfe-Effekt.
+Wir planen Ansatz 1. Ein eigener Editor-Renderer ist nur während dieser Ansicht aktiv; das Dorf pausiert. **Nutzerkorrektur:** Der Kleiderschrank wird nicht aus Code-Grundformen gebaut. Die Lehrkraft erstellt ihn mit Tripo anhand des Referenzbilds `blender/sources/references/wardrobe-open-reference.png` und liefert das Ergebnis zur Integration. Schrank und Teppich sind inzwischen geliefert und in der Spielkopie integriert. Boden, zwei Wände, kleiner Teppich und warmes Licht bilden darum das generische Zimmer. Der Raum wird beim Öffnen und nach Größenwechsel einmal in kleiner Auflösung gerendert und weichgezeichnet. Die Figur wird scharf darüber gerendert. Kein Blur auf DOM-Bedienelementen oder Figur und kein laufender teurer Tiefenunschärfe-Effekt.
 
 ### Tablet-Layout
 

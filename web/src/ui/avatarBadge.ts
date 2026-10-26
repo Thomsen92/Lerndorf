@@ -1,5 +1,6 @@
 import type { CharacterKind } from '../render/character';
 import type { PortraitSource } from '../render/portrait';
+import type { AvatarLook } from '../avatars/look';
 import { avatarPortrait } from './frames';
 import { crestSvg } from './crest';
 export interface BadgeProgress {
@@ -20,6 +21,7 @@ export interface AvatarBadge {
   setCoins?(coins: number): void;
   current?(): BadgeProgress;
   updateCharacter?(kind: CharacterKind | null): void;
+  updateLook?(look: AvatarLook): void;
 }
 export function createAvatarBadge(opts: {
   nickname: string;
@@ -27,6 +29,7 @@ export function createAvatarBadge(opts: {
   onOpen: (b: HTMLButtonElement) => void;
   reducedMotion?: () => boolean;
   portraits?: PortraitSource;
+  look?: AvatarLook;
 }): AvatarBadge {
   const el = document.createElement('button');
   el.type = 'button';
@@ -73,6 +76,7 @@ export function createAvatarBadge(opts: {
           frameId: frame,
           size: 'small',
           portraits: opts.portraits,
+          look: opts.look,
         }),
       );
     }
@@ -102,6 +106,11 @@ export function createAvatarBadge(opts: {
     current: () => ({ ...current }),
     updateCharacter(kind) {
       opts.character = kind;
+      frame = '';
+      update(current);
+    },
+    updateLook(look) {
+      opts.look = look;
       frame = '';
       update(current);
     },

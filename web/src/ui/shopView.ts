@@ -5,6 +5,8 @@
  * The inventory view reuses openItemArea with origin 'inventar'.
  */
 import { KIND_LABEL, KIND_ORDER, type ItemApi, type ItemEntry, type ItemKind } from '../api/items';
+import { partById } from '../avatars/catalog';
+import type { CharacterKind } from '../render/character';
 import type { PreviewFactory } from '../render/itemPreview';
 import { acquireSessionThumbs, type ThumbSource } from '../render/itemThumbs';
 import type { SlotId } from '../world/plotPlan';
@@ -13,6 +15,8 @@ import type { ModalHandle } from './dialog';
 import { itemCard, openItemDetail, setCardThumb, type ItemOrigin } from './itemDetail';
 
 export interface ItemAreaOptions {
+  character?: CharacterKind;
+  onWardrobe?: (itemId?: string) => void;
   api: ItemApi;
   getCoins: () => number;
   onCoins: (c: number) => void;
@@ -97,7 +101,13 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
   }
 
   const visible = (): ItemEntry[] =>
-    (book ?? []).filter((e) => (origin === 'shop' ? !e.starter : e.owned > 0));
+    (book ?? []).filter((e) =>
+      origin === 'shop'
+        ? !e.starter &&
+          e.shopVisible !== false &&
+          (e.kind !== 'avatar' || !opts.character || partById(e.id)?.character === opts.character)
+        : e.owned > 0,
+    );
   const kinds = (): ItemKind[] =>
     origin === 'shop' ? [...KIND_ORDER] : KIND_ORDER.filter((k) => visible().some((e) => e.kind === k));
 
@@ -201,6 +211,8 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
       onBuild: opts.onBuild,
       onShowSlot: opts.onShowSlot,
       onOpenInventory: opts.onOpenInventory,
+      character: opts.character,
+      onWardrobe: opts.onWardrobe,
       onChanged: () => {
         if (!closed) void load(false);
       },
@@ -247,7 +259,6 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
     },
   };
 }
-
 
 /** The tutorial house (first-login tutorial, spec §4.7). */
 export const TUTORIAL_HOUSE: ItemEntry = {

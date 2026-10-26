@@ -4,19 +4,24 @@ import type { AvatarBadge } from './avatarBadge';
  */
 export type NavButton = 'aufgaben' | 'haus';
 /** all areas; bauen, shop and inventar live under 'haus' */
-export type NavArea = NavButton | 'dorf' | 'bauen' | 'shop' | 'inventar' | 'profil';
+export type NavArea = NavButton | 'dorf' | 'bauen' | 'shop' | 'inventar' | 'profil' | 'kleiderschrank';
 
 export const NAV_BUTTONS: readonly NavButton[] = ['aufgaben', 'haus'];
 
 const LABELS: Record<NavButton, { icon: string; label: string }> = {
-  aufgaben: { icon: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h4"/>', label: 'Aufgaben' },
+  aufgaben: {
+    icon: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 9h6M9 13h6M9 17h4"/>',
+    label: 'Aufgaben',
+  },
   haus: { icon: '<path d="m3 11 9-8 9 8M5 10v11h14V10M10 21v-7h4v7"/>', label: 'Mein Haus' },
 };
 
 /** Nav button that is marked for an area: bauen/shop/inventar → 'haus'. */
 export function navButtonFor(area: NavArea): NavButton | null {
   if (area === 'profil' || area === 'dorf') return null;
-  return area === 'bauen' || area === 'shop' || area === 'inventar' ? 'haus' : area;
+  return area === 'bauen' || area === 'shop' || area === 'inventar' || area === 'kleiderschrank'
+    ? 'haus'
+    : area;
 }
 
 export interface GameNav {
@@ -105,7 +110,10 @@ export function createGameNav(opts: {
       badge.textContent = open === 'done' ? '✓' : String(open);
       badge.setAttribute('aria-hidden', 'true');
       b.append(badge);
-      b.setAttribute('aria-label', open === 'done' ? 'Aufgaben, Tagesziel geschafft' : `Aufgaben, ${open} Quests offen`);
+      b.setAttribute(
+        'aria-label',
+        open === 'done' ? 'Aufgaben, Tagesziel geschafft' : `Aufgaben, ${open} Quests offen`,
+      );
     },
     setActive(area) {
       const active = navButtonFor(area);

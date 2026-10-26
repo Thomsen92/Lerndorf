@@ -120,8 +120,8 @@ describe('area controller', () => {
     await leave('dorf');
   });
 
-  it('HOUSE_AREAS has exactly the four house areas', () => {
-    expect([...HOUSE_AREAS].sort()).toEqual(['bauen', 'haus', 'inventar', 'shop']);
+  it('HOUSE_AREAS has all five house areas', () => {
+    expect([...HOUSE_AREAS].sort()).toEqual(['bauen', 'haus', 'inventar', 'kleiderschrank', 'shop']);
   });
 });
 

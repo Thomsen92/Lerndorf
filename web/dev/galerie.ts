@@ -7,6 +7,8 @@ import { setBoardNote } from '../src/render/plaza';
 import { buildVillage } from '../src/render/village';
 import { createMarketByte } from '../src/mascot/marketByte';
 import { Crowd } from '../src/render/crowd';
+import { loadCharacter } from '../src/render/character';
+import { avatarCatalog } from '../src/avatars/catalog';
 import { setupScene } from '../src/render/scene';
 import { grassReady } from '../src/render/grass';
 import { kenneyReady } from '../src/render/kenney';
@@ -19,7 +21,7 @@ const map = params.get('map') ?? 'tal';
 const viewName = params.get('view') ?? 'overview';
 document.title = `Galerie ${map} ${seed} ${viewName}`;
 const PLOTS = 34;
-const RESIDENTS = 24;
+const RESIDENTS = params.has('wardrobe') ? 32 : 24;
 const NAMES = [
   'anna',
   'ben',
@@ -80,7 +82,7 @@ const members = Array.from({ length: RESIDENTS }, (_, i) => {
   });
   return {
     plotIndex: (i * 7) % PLOTS, // spread over the village
-    nickname: NAMES[i % NAMES.length],
+    nickname: NAMES[i % NAMES.length] + (i >= NAMES.length ? String(i) : ''),
     level: params.get('xp') === '1' ? [7, 15, 20, 30][i % 4] : undefined,
     titleLabel:
       params.get('xp') === '1'
@@ -216,6 +218,13 @@ declare global {
       step(seconds: number): void;
       drawCalls(): { total: number; world: number };
       byteCost(reaction: 'idle' | 'celebrate'): { calls: number; triangles: number };
+      appearanceCost(): {
+        residents: number;
+        calls: number;
+        triangles: number;
+        geometries: number;
+        textures: number;
+      };
       ready: boolean;
     };
   }
@@ -226,6 +235,18 @@ window.galerie = {
   step,
   drawCalls,
   byteCost,
+  appearanceCost() {
+    crowd.updateLabels(camera);
+    renderer.info.reset();
+    renderer.render(scene, camera);
+    return {
+      residents: crowd.villagers.length,
+      calls: renderer.info.render.calls,
+      triangles: renderer.info.render.triangles,
+      geometries: renderer.info.memory.geometries,
+      textures: renderer.info.memory.textures,
+    };
+  },
   ready: false,
 };
 
@@ -238,8 +259,30 @@ void Promise.all([
   rig.skyReady,
   grassReady(),
   kenneyReady().then(() => new Promise((r) => setTimeout(r, 0))),
-]).then(([sky]) => {
+  Promise.all([loadCharacter('boy'), loadCharacter('girl')]),
+]).then(async ([sky]) => {
+  if (params.has('wardrobe'))
+    await Promise.all(
+      crowd.villagers.map(async (v, i) => {
+        const allowed = avatarCatalog.filter((p) => p.character === v.character);
+        const items =
+          v.character === 'boy'
+            ? allowed.map((p) => p.id)
+            : [
+                'avatar_girl_daisy_bucket',
+                'avatar_girl_heart_pop',
+                'avatar_girl_starpack',
+                'avatar_girl_candy_orbit',
+                'avatar_girl_bloom',
+                i % 4 === 1 ? 'avatar_girl_slim_jeans' : 'avatar_girl_pleated_skirt',
+              ];
+        v.look = { items, colors: { hair: i % 3 === 0 ? '#5b3a29' : '#2b2118' } };
+        await v.style?.applyLook(v.look);
+      }),
+    );
   if (sky) (village.userData.setSky as ((t: THREE.Texture) => void) | undefined)?.(sky);
+  renderer.render(scene, camera);
+  crowd.updateLabels(camera);
   renderer.render(scene, camera);
   window.galerie.ready = true;
 });

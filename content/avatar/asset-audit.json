@@ -1,0 +1,31 @@
+[
+  {
+    "kind": "boy",
+    "restMatrixError": 0.000014014671181672433,
+    "inverseBindError": 0.000014066696166992188,
+    "bones": 65,
+    "clips": [
+      "cry",
+      "greet_03",
+      "walk",
+      "froehliches springen hopsen",
+      "gravious sassy catwalk of a  model",
+      "swagger"
+    ],
+    "baseBytes": 2259928
+  },
+  {
+    "kind": "girl",
+    "restMatrixError": 0.000017542118230906567,
+    "inverseBindError": 0.000017523765563964844,
+    "bones": 65,
+    "clips": [
+      "dance_04",
+      "swagger",
+      "walk",
+      "gravious sassy catwalk of a  model",
+      "sexy dance"
+    ],
+    "baseBytes": 2401732
+  }
+]

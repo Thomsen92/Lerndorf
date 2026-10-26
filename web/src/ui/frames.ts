@@ -1,5 +1,6 @@
 import { characterAssetUrl, type CharacterKind } from '../render/character';
 import type { PortraitSource } from '../render/portrait';
+import type { AvatarLook } from '../avatars/look';
 import { sessionPortraitSource } from '../render/portrait';
 export type Ornament = 'grain' | 'rivets' | 'spikes' | 'crown' | 'gems' | 'shimmer';
 export interface FrameStyle {
@@ -60,6 +61,7 @@ export function avatarPortrait(opts: {
   frameId: string;
   size: 'small' | 'large';
   portraits?: PortraitSource;
+  look?: AvatarLook;
 }): HTMLElement {
   const el = document.createElement('span');
   el.className = `avatar-portrait avatar-portrait--${opts.size}`;
@@ -68,7 +70,7 @@ export function avatarPortrait(opts: {
   const kind = opts.character ?? 'boy';
   img.src = characterAssetUrl(kind, 'png');
   el.append(img, frameSvg(opts.frameId, opts.size === 'large' ? 160 : 64));
-  void (opts.portraits ?? sessionPortraitSource)(kind)
+  void (opts.portraits ?? sessionPortraitSource)(kind, opts.look)
     .then((url) => {
       if (url) img.src = url;
     })

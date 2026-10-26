@@ -15,6 +15,7 @@ export interface ItemEntry {
   nameDe: string;
   price: number;
   starter: boolean;
+  shopVisible?: boolean;
   /** Starter items: always 1. */
   owned: number;
   /** Slots that show this item (starters count where they are the fallback). */
@@ -53,6 +54,7 @@ export function buildItemBook(
       nameDe: c.nameDe,
       price: c.price,
       starter: c.starter,
+      shopVisible: c.shopVisible ?? true,
       owned,
       placedIn,
       free: Math.max(0, owned - placedIn.length),
@@ -71,7 +73,8 @@ export function purchaseState(
   coins: number,
   shopOpen: boolean,
 ): { canBuy: boolean; reason: string | null } {
-  if (ONCE.has(e.kind) && e.owned > 0) return { canBuy: false, reason: 'Hast du schon.' };
+  if ((ONCE.has(e.kind) || e.kind === 'avatar') && e.owned > 0)
+    return { canBuy: false, reason: 'Hast du schon.' };
   if (!shopOpen) return { canBuy: false, reason: 'Der Shop ist gerade geschlossen.' };
   if (coins < e.price) return { canBuy: false, reason: 'Dafür reichen die Münzen nicht.' };
   return { canBuy: true, reason: null };

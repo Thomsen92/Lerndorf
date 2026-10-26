@@ -9,6 +9,8 @@ import { THUMB_PLACEHOLDER, type ThumbSource } from '../render/itemThumbs';
 import { slotById, type SlotId, type SlotKind } from '../world/plotPlan';
 import { openModal, type ModalHandle } from './dialog';
 import { esc } from './esc';
+import { partById, partUrl } from '../avatars/catalog';
+import type { CharacterKind } from '../render/character';
 
 export type ItemOrigin = 'shop' | 'inventar';
 
@@ -40,7 +42,9 @@ export function itemCard(
           const s = purchaseState(e, ctx.coins, ctx.shopOpen);
           return s.reason ? `<span class="item-reason">${esc(s.reason)}</span>` : '';
         })()}`
-      : `<span class="item-count">Besitz: ${e.owned} · aufgestellt: ${e.placedIn.length}</span>`;
+      : e.kind === 'avatar'
+        ? `<span class="item-count">In deinem Inventar</span>`
+        : `<span class="item-count">Besitz: ${e.owned} · aufgestellt: ${e.placedIn.length}</span>`;
   btn.innerHTML = `<span class="item-thumb" aria-hidden="true">${THUMB_PLACEHOLDER[e.kind]}</span><span class="item-name">${esc(e.nameDe)}</span><span class="item-kind">${esc(
     KIND_LABEL[e.kind],
   )}</span>${info}`;
@@ -55,6 +59,8 @@ export function itemCard(
 }
 
 export interface DetailOptions {
+  character?: CharacterKind;
+  onWardrobe?: (itemId?: string) => void;
   entry: ItemEntry;
   origin: ItemOrigin;
   opener: HTMLElement;
@@ -132,6 +138,16 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
   }
 
   function renderPreview(): void {
+    const avatarPart = partById(entry.id);
+    if (avatarPart) {
+      previewBox.replaceChildren();
+      const img = document.createElement('img');
+      img.src = partUrl(avatarPart, true);
+      img.alt = entry.nameDe;
+      img.style.cssText = 'width:100%;height:260px;object-fit:contain';
+      previewBox.append(img);
+      return;
+    }
     preview?.dispose();
     preview = null;
     previewBox.replaceChildren();
@@ -199,6 +215,19 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       return;
     }
     if (mode === 'bought') {
+      if (entry.kind === 'avatar' && partById(entry.id) && opts.onWardrobe) {
+        actions.append(
+          button(
+            'Zum Kleiderschrank',
+            () => {
+              modal.close();
+              opts.onWardrobe!(entry.id);
+            },
+            'primary',
+          ),
+        );
+        return;
+      }
       actions.append(
         button('Zum Inventar', () => {
           modal.close();
@@ -238,6 +267,28 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       return;
     }
     // inventory
+    if (entry.kind === 'avatar') {
+      const part = partById(entry.id);
+      if (part && opts.onWardrobe && (!opts.character || part.character === opts.character))
+        actions.append(
+          button(
+            'Anziehen',
+            () => {
+              modal.close();
+              opts.onWardrobe!(entry.id);
+            },
+            'primary',
+          ),
+        );
+      else
+        actions.append(
+          note(
+            part
+              ? 'Für deine andere Figur.'
+              : 'Für diesen Gegenstand ist noch kein tragbares Modell verfügbar.',
+          ),
+        );
+    }
     if (hasSlot) {
       const canBuild = opts.buildOpen && entry.free > 0;
       actions.append(

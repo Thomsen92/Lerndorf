@@ -51,6 +51,8 @@ vi.mock('../../src/render/village', async () => {
 const crowdCalls: string[] = [];
 vi.mock('../../src/render/crowd', () => ({
   Crowd: class {
+    dispose(): void {}
+    setLook(): void {}
     setCharacter(): void {}
     placeOwnInFrontOfHouse(): void {
       crowdCalls.push('place');

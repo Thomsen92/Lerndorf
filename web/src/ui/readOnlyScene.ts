@@ -53,6 +53,7 @@ export function createReadOnlyScene(
       nickname: m.nickname,
       own: m.id === view.pupilId,
       character: m.character,
+      look: m.wardrobe?.[m.character ?? 'boy'],
       level: m.level,
     })),
   );
@@ -134,6 +135,7 @@ export function createReadOnlyScene(
       disposed = true;
       gl.setAnimationLoop(null);
       controls.dispose();
+      crowd.dispose();
       byte.dispose();
       setBoardNote(village, null);
       gl.dispose();

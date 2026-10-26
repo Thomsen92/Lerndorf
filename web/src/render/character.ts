@@ -77,7 +77,9 @@ const pending = new Map<CharacterKind, Promise<CharacterAsset | null>>();
 
 /** Keep the model and its static selection image on the same asset revision. */
 export function characterAssetUrl(kind: CharacterKind, format: 'glb' | 'png'): string {
-  return `${import.meta.env.BASE_URL}assets/characters/${kind}.${format}${kind === 'boy' ? '?v=20261026' : ''}`;
+  return format === 'glb'
+    ? `${import.meta.env.BASE_URL}assets/characters/wardrobe/${kind}/character.glb?v=20261026-1`
+    : `${import.meta.env.BASE_URL}assets/characters/${kind}.png?v=20261026-1`;
 }
 
 /** Loads a model once; resolves null if loading fails (the placeholder stays then). */
@@ -95,9 +97,14 @@ export function loadCharacter(kind: CharacterKind): Promise<CharacterAsset | nul
       const catwalk = find(names.catwalk);
       const dances = names.dances.map(find).filter((c): c is THREE.AnimationClip => c !== undefined);
       if (!walk || !catwalk || dances.length === 0) {
-        console.warn(`character ${kind}: missing clip`, gltf.animations.map((a) => a.name));
+        console.warn(
+          `character ${kind}: missing clip`,
+          gltf.animations.map((a) => a.name),
+        );
         return null;
       }
+      const short = gltf.scene.getObjectByName('tripo_part_0_short');
+      if (short) short.visible = false;
       gltf.scene.updateMatrixWorld(true);
       const size = new THREE.Box3().setFromObject(gltf.scene).getSize(new THREE.Vector3());
       return {
@@ -112,6 +119,10 @@ export function loadCharacter(kind: CharacterKind): Promise<CharacterAsset | nul
     .catch((err: unknown) => {
       console.warn(`character ${kind}: load failed`, err);
       return null;
+    })
+    .then((asset) => {
+      if (!asset) pending.delete(kind);
+      return asset;
     });
   pending.set(kind, p);
   return p;

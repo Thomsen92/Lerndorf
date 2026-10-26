@@ -148,3 +148,10 @@ Die Platzhalter-Figuren des Prototyps sind besser als Kugelkopf-Figuren und dien
 4. Erst wenn alle Blickwinkel mindestens so gut wie das Soll aussehen, gilt das AP als fertig. Die Lehrkraft entscheidet bei L.11.
 
 Leistung bleibt dabei Pflicht (SPEC §10.11): Die Schönheit kommt aus Farben, Formen, Instancing und Lichtkegeln, nicht aus teuren Lichtern oder Shadern.
+
+
+## Kleiderschrank-Szene (26.10.2026)
+
+Der vom Nutzer gelieferte offene Holzschrank und runde Teppich bilden das warme Zimmer. Der Raum wird einmal gerendert und weichgezeichnet; die eigene drehbare Figur bleibt scharf. Comic Neue, ruhige helle Flächen, große Auswahlkarten und mindestens 48 px große Bedienziele. Kein Blur auf der Figur oder UI. Die Gesamtansicht ersetzt beim Umziehen das pausierte Dorf.
+
+Die gelieferten modularen Figuren überschreiten das frühere 3.000-Dreiecke-Ziel. Das Ziel ist damit nicht erfüllt: tatsächliche Assetkosten stehen in content/avatar/delivery-audit.json. Ausgelieferte Texturen maximal 1024². Ferne Figuren zeigen ab 45 m die Grundausstattung; unter 38 m werden Outfitdetails wieder sichtbar. Im Zimmer/Porträt immer volle Details. Der 32-Figuren-Software-WebGL-Test ergab 365/327/484 Draw Calls in Übersicht/Grundstück/Markt nach Optimierung. Die Abnahme mit mindestens 30 fps auf dem ältesten Schul-Tablet bleibt offen. [Umsetzungsstand](AVATAR_KLEIDERSCHRANK.md).

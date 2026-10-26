@@ -1,4 +1,6 @@
 import { nameTag, type TagInfo } from './village';
+import { AvatarCustomizer } from '../avatars/customizer';
+import { emptyLook, type AvatarLook } from '../avatars/look';
 /**
  * Villagers in the 3D scene: placeholder figures that walk, sit, wait and greet each other.
  * Behaviour comes from avatars/behaviour.ts; this file only moves and shows them.
@@ -32,6 +34,9 @@ const GREET_RANGE = 3.2;
 const GREET_COOLDOWN = 12; // seconds before the same pair greets again
 
 export interface Villager {
+  look?: AvatarLook;
+  style?: AvatarCustomizer;
+  detailed?: boolean;
   nickname: string;
   own: boolean;
   group: THREE.Group;
@@ -64,6 +69,7 @@ const EMOTE_LOOPS = 2;
 const FADE = 0.25;
 
 interface Input {
+  look?: AvatarLook;
   level?: number;
   nickname: string;
   /** The pupil's own figure gets the marker and the highlighted name sign. */
@@ -206,6 +212,7 @@ function bubble(text: string): THREE.Sprite {
 }
 
 export class Crowd {
+  private disposed = false;
   readonly villagers: Villager[] = [];
   private readonly lastGreet = new Map<string, number>();
   private clock = 0;
@@ -236,6 +243,7 @@ export class Crowd {
         bubbleTimer: 0,
         rng,
         fig: null,
+        look: input.look ?? emptyLook(),
         character: input.character ?? DEFAULT_CHARACTER,
         pose: null,
         emote: null,
@@ -251,7 +259,7 @@ export class Crowd {
   private loadFigure(v: Villager): void {
     const kind = v.character;
     void loadCharacter(kind).then((asset) => {
-      if (asset && v.character === kind) this.attachModel(v, asset);
+      if (asset && v.character === kind && !this.disposed) this.attachModel(v, asset);
     });
   }
 
@@ -261,10 +269,17 @@ export class Crowd {
       if (mesh.isMesh && mesh.material instanceof THREE.MeshStandardMaterial) mesh.visible = false;
     }
     if (v.fig) {
+      v.style?.dispose();
       v.fig.mixer.stopAllAction();
+      v.fig.mixer.uncacheRoot(v.fig.root);
+      v.fig.root.traverse((o) => {
+        if ((o as THREE.SkinnedMesh).isSkinnedMesh) (o as THREE.SkinnedMesh).skeleton.dispose();
+      });
       v.group.remove(v.fig.root);
     }
     v.fig = instantiate(asset);
+    v.style = new AvatarCustomizer(v.fig.root, v.character);
+    void v.style.applyLook(v.look ?? emptyLook()).catch(() => undefined);
     v.group.add(v.fig.root);
     // spread the walk phase so the figures do not step in sync
     v.fig.mixer.setTime(v.rng() * 2);
@@ -291,6 +306,27 @@ export class Crowd {
     if (!v || (v.character === kind && v.fig)) return;
     v.character = kind;
     this.loadFigure(v);
+  }
+  setLook(nickname: string, look: AvatarLook): void {
+    const v = this.villagers.find((v) => v.nickname === nickname);
+    if (!v) return;
+    v.look = look;
+    void v.style?.applyLook(look).catch(() => undefined);
+  }
+  dispose(): void {
+    this.disposed = true;
+    for (const v of this.villagers) {
+      v.style?.dispose();
+      if (v.fig) {
+        v.fig.mixer.stopAllAction();
+        v.fig.mixer.uncacheRoot(v.fig.root);
+        v.fig.root.traverse((o) => {
+          if ((o as THREE.SkinnedMesh).isSkinnedMesh) (o as THREE.SkinnedMesh).skeleton.dispose();
+        });
+        v.group.remove(v.fig.root);
+        v.fig = null;
+      }
+    }
   }
 
   /** Single tap: catwalk, double tap: a dance, each two loops. Without the model the figure hops. */
@@ -435,6 +471,10 @@ export class Crowd {
       const sign = v.group.userData.sign as THREE.Sprite | undefined;
       if (!sign) continue;
       v.group.getWorldPosition(p);
+      const distance = p.distanceTo(cam.position);
+      const detailed = distance < (v.detailed === false ? 38 : 45);
+      v.detailed = detailed;
+      v.style?.setDetail(detailed);
       sign.visible = v.nameTimer > 0 || p.distanceTo(cam.position) < 28;
     }
   }

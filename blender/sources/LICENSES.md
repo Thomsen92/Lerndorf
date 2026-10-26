@@ -40,3 +40,15 @@ Die interaktiven 3D-Truhen (`web/src/render/chestPreview.ts`) und ihre SVG-Ersat
 ## Software – QR-Zugangskarten
 
 - qrcode-generator 1.4.4, Kazuhiko Arase, MIT. Quelle: https://github.com/kazuhikoarase/qrcode-generator. Nur im Lehrer-Bundle für gedruckte Zugangskarten; Lizenz: `web/node_modules/qrcode-generator/LICENSE`.
+
+
+## Avatar-Kleiderschrank (26.10.2026)
+
+| Inhalt | Herkunft und Verarbeitung | Rechte-/Quellenstand |
+| --- | --- | --- |
+| Modulare Figuren, vier Boy- und zwölf Girl-Artikel | Gelieferte Pakete Prototyp/StandardBoyShop und StandardGirlShop; Girl-r10-Base/Unterteile. Ziel web/public/assets/characters/wardrobe/. Animationsdaten aus den bisherigen Spielfiguren übernommen; Originalpakete unverändert. Farbshader und Bindungslogik aus den gelieferten Customizern in TypeScript integriert. | Wie bisher eigene Erstellung der Lehrkraft mit Tripo; Tarif-/Lizenznachweis weiterhin nicht neu bestätigt. |
+| Girl-r10-Denimtexturen | Vom Nutzer gelieferte Vorder-/Rückseitenfotos, laut refinement/texture-provenance.json an UV-Projektion angepasst; normale/raue Texturkanäle abgeleitet. Nur ausgelieferte Kopien in der Auflösung reduziert. | Ursprüngliche Herkunftsnotiz im gelieferten Paket erhalten. |
+| Rock-Anpassung | Eigene Exportkorrektur nur in der Spielkopie: stärkere Beinanbindung, bis zu 18 % Tiefenfreiheit am unteren Saum, korrigierte Normalen/Bounds; Bund und Rig erhalten. | Abgeleitetes Modell, Quellenstand wie Girl-Paket. |
+| Offener Kleiderschrank | Nutzerdatei C:/Users/Thomas/Downloads/wooden wardrobe 3d model.glb; Referenz mit integriertem Imagegen erzeugt, Modell vom Nutzer mit Tripo erstellt. Texturen der Spielkopie reduziert; Geometrie unverändert. | Vom Nutzer bereitgestellt; Tripo-Lizenzstatus wie oben. Ziel assets/wardrobe/wardrobe.glb. |
+| Runder Teppich | Nutzerdatei C:/Users/Thomas/Downloads/round+decorative+rug+3d+model.glb; Referenz mit integriertem Imagegen erzeugt, Modell vom Nutzer mit Tripo erstellt. Texturen der Spielkopie reduziert; Geometrie unverändert. | Vom Nutzer bereitgestellt; Tripo-Lizenzstatus wie oben. Ziel assets/wardrobe/rug.glb. |
+| Zimmerwände, Boden, Licht, UI und Blur | Eigene Geometrie und Code; kein fremdes Raum-Asset. Referenzbilder und Prompts liegen unter blender/sources/references/. | Eigene Erstellung. |

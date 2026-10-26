@@ -36,6 +36,9 @@ import {
 import { createTapDetector } from './tapDetector';
 import { createGameNav, type GameNav, type NavArea } from './gameNav';
 import { openHouseMenu } from './houseMenu';
+import { openWardrobe } from './wardrobeView';
+import { supabaseWardrobeApi } from '../api/wardrobe';
+import { emptyLook, readWardrobe } from '../avatars/look';
 import { openShop } from './shopView';
 import { openInventory } from './inventoryView';
 import { openDailyQuests } from './dailyQuestsView';
@@ -166,8 +169,10 @@ export async function mountVillage(
   document.addEventListener('keydown', onEscape);
 
   let removeWindowPointer: (() => void) | null = null;
+  let disposeCrowd = () => {};
   const stop = (): void => {
     tutorialAbort.abort();
+    disposeCrowd();
     // close the current area (the build preview reverts via exit) and every open modal, so no `inert` is left behind
     void areas?.select('dorf');
     buildMode?.dispose();
@@ -337,16 +342,17 @@ export async function mountVillage(
     }));
   const village = buildVillage(layout, labels, ownPlot);
   scene.add(village);
-  const classNotice = loadClassNotice(supabase, profile.classId).then(n => {
+  const classNotice = loadClassNotice(supabase, profile.classId).then((n) => {
     if (running) setBoardNote(village, n?.text ?? null);
     return n;
   });
   const showClassNotice = async (): Promise<void> => {
     const n = await classNotice;
     if (!n || !running) return;
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
       const card = openNoticeCard(n, { onDone: resolve });
-      if (card) modals.track(card); else resolve();
+      if (card) modals.track(card);
+      else resolve();
     });
   };
   marketByte = createMarketByte({
@@ -378,12 +384,14 @@ export async function mountVillage(
       nickname: m.nickname,
       own: m.id === profile.id,
       character: m.character,
+      look: m.wardrobe?.[m.character ?? 'boy'],
       level: m.level,
       titleLabel: m.titleLabel,
     })),
   );
 
   // quality: applied now, and again when Auto has measured
+  disposeCrowd = () => crowd.dispose();
   const applyQuality = (): void => {
     const level = effectiveLevel(choice, autoResult);
     const s = settingsFor(level);
@@ -449,7 +457,16 @@ export async function mountVillage(
       flight = { from, to: houseView(home), t: 0 };
       if (reducedMotion()) finishFlight();
     }
-    paused = area === 'shop' || area === 'inventar' || area === 'aufgaben' || area === 'profil';
+    paused =
+      area === 'shop' ||
+      area === 'inventar' ||
+      area === 'aufgaben' ||
+      area === 'profil' ||
+      area === 'kleiderschrank';
+    if (nav) {
+      nav.el.inert = area === 'kleiderschrank';
+      nav.el.style.visibility = area === 'kleiderschrank' ? 'hidden' : '';
+    }
     byte.setCovered(paused);
     if (paused) finishFlight(); // the camera is in place before rendering stops
     applyControls(area);
@@ -567,6 +584,7 @@ export async function mountVillage(
 
   // figure choice: part of the tutorial on the first login, later from the settings
   let myCharacter = profile.character;
+  let myWardrobe = profile.wardrobe ?? readWardrobe(null);
   const pickCharacter = (required: boolean, opener: HTMLElement | null): void => {
     modals.track(
       openCharacterPicker({
@@ -578,7 +596,9 @@ export async function mountVillage(
           if (!res.ok) return res.message;
           myCharacter = kind;
           crowd.setCharacter(profile.nickname, kind);
+          crowd.setLook(profile.nickname, myWardrobe[kind]);
           badge.updateCharacter?.(kind);
+          badge.updateLook?.(myWardrobe[kind]);
           return null;
         },
       }),
@@ -612,6 +632,8 @@ export async function mountVillage(
   };
 
   const categories: Partial<Record<'shop' | 'inventar', ItemKind | null>> = {};
+  let wardrobeItem: string | undefined;
+  let shopFromWardrobe = false;
   const itemOptions = (area: 'shop' | 'inventar') => ({
     api: supabaseItemApi(supabase, profile.id),
     getCoins: () => coinsNow,
@@ -619,12 +641,22 @@ export async function mountVillage(
     shopOpen,
     buildOpen,
     category: categories[area] ?? null,
+    character: myCharacter ?? 'boy',
+    onWardrobe: (itemId?: string) => {
+      wardrobeItem = itemId;
+      void areas?.select('kleiderschrank');
+    },
     onCategory: (k: ItemKind) => {
       categories[area] = k;
     },
     onBuild: (itemId: string) => void areas?.open('bauen', () => enterBuild({ itemId })),
     onShowSlot: (slotId: EnterOptions['slotId']) => void areas?.open('bauen', () => enterBuild({ slotId })),
-    onClose: () => void areas?.select('haus'),
+    onClose: () => {
+      if (area === 'shop' && shopFromWardrobe) {
+        shopFromWardrobe = false;
+        void areas?.select('kleiderschrank');
+      } else void areas?.select('haus');
+    },
   });
 
   const ctl = createAreaController({
@@ -643,6 +675,7 @@ export async function mountVillage(
           api: progressApi,
           nickname: profile.nickname,
           character: myCharacter,
+          look: myWardrobe[myCharacter ?? 'boy'],
           getCoins: () => coinsNow,
           onCoins: (c) => {
             onCoins(c);
@@ -665,6 +698,7 @@ export async function mountVillage(
           onBuild: () => void areas?.select('bauen'),
           onShop: () => void areas?.select('shop'),
           onInventory: () => void areas?.select('inventar'),
+          onWardrobe: () => void areas?.select('kleiderschrank'),
           onSettings: openSettings,
           onBack: () => void areas?.select('dorf'),
         });
@@ -673,6 +707,27 @@ export async function mountVillage(
         openShop({ ...itemOptions('shop'), onOpenInventory: () => void areas?.select('inventar') }),
       inventar: async () => openInventory(itemOptions('inventar')),
       bauen: () => enterBuild(),
+      kleiderschrank: async () => {
+        if (!home || inTutorial) return null;
+        const initialItem = wardrobeItem;
+        wardrobeItem = undefined;
+        return openWardrobe({
+          api: supabaseWardrobeApi(supabase, profile.id),
+          maxPixelRatio: settingsFor(effectiveLevel(choice, autoResult)).maxPixelRatio,
+          initialItem,
+          onClose: () => void areas?.select('haus'),
+          onShop: () => {
+            shopFromWardrobe = true;
+            categories.shop = 'avatar';
+            void areas?.select('shop');
+          },
+          onSaved: (d) => {
+            myWardrobe = d.wardrobe;
+            crowd.setLook(profile.nickname, d.wardrobe[d.character]);
+            badge.updateLook?.(d.wardrobe[d.character]);
+          },
+        });
+      },
     },
     onChange: onAreaChange,
   });
@@ -682,6 +737,7 @@ export async function mountVillage(
   const badge = createAvatarBadge({
     nickname: profile.nickname,
     character: myCharacter,
+    look: myWardrobe[myCharacter ?? 'boy'] ?? emptyLook(),
     onOpen: (b) => {
       if (inTutorial) openSettings(b);
       else void ctl.select('profil');
@@ -729,7 +785,10 @@ export async function mountVillage(
     isActive: () => running,
   });
   worldOnProgress = (delta, from) => progressFlow.onProgress(delta, from);
-  if (!inTutorial) void showClassNotice().then(async () => { if (running) await progressFlow.start(); });
+  if (!inTutorial)
+    void showClassNotice().then(async () => {
+      if (running) await progressFlow.start();
+    });
   // fallback for a pupil without a figure who needs no tutorial; in the tutorial the choice is its first step
   if (myCharacter === null && !inTutorial) pickCharacter(true, null);
 
@@ -853,7 +912,9 @@ export async function mountVillage(
     if (buildMode?.isActive) buildMode.exit();
     fx?.clear();
     setTutorialMode(false);
-    void showClassNotice().then(async () => { if (running && openQuests) await ctl.select('aufgaben'); });
+    void showClassNotice().then(async () => {
+      if (running && openQuests) await ctl.select('aufgaben');
+    });
   };
   if (inTutorial) {
     setTutorialMode(true);

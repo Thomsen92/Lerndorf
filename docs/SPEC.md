@@ -286,13 +286,17 @@ Münzstände anderer Schüler sind für Schüler **nicht** sichtbar. Die alten T
 ## 7. Avatar-Rezept
 
 ```json
-{ "v": 1, "skin": 2, "hair": "hair_05", "hairColor": "#c0502f",
-  "top": "top_hoodie", "topColor": "#4b7bec", "pants": "pants_jeans",
-  "hat": null, "acc": "acc_headphones", "pet": null, "eyes": 1 }
+{ "character": "boy", "wardrobe": {
+  "v": 1, "revision": 1,
+  "boy": { "items": ["avatar_boy_gold_chain"], "colors": {"hair":"#5b3a29"} },
+  "girl": { "items": [], "colors": {} }
+} }
 ```
 - Teile mit `starter = true` sind frei wählbar, alle anderen nur, wenn im Inventar.
-- Speichern über RPC `save_avatar(recipe jsonb)`; Funktion validiert jedes Teil gegen Inventar/Starter und Farben gegen eine feste Palette (Hex-Liste in `settings` oder Code).
-- Grundausstattung (Starter): 3 Frisuren, alle Haarfarben, alle Hauttöne, 3 Oberteile, 2 Hosen.
+- Speichern über `save_avatar_look(p_character, p_look, p_expected_revision)` (Migration 0023, lokal vorbereitet). Prüft Schülerrolle, aktuelle Figur, Besitz, kompatible Slots/Konflikte, feste Paletten und erwartete Revision. Nur der Look dieser Figur wird aktualisiert; bisherige Avatar-Felder und der andere Look bleiben erhalten. `save_avatar` ist für alte Rezepte geschützt; neue Look-Schlüssel sind dort gesperrt.
+- Grundausstattung: vollständig bekleidete Originalfigur und kostenlose feste Farben. Geliefert sind vier Boy-Accessoires sowie zehn Girl-Accessoires und zwei geriggte Girl-Unterteile (Jeans/Rock). Keine zusätzlichen Frisuren/Oberteile ohne zugehöriges Modell anbieten. Kanäle `hair`, `skin`, `shoes`, `bottoms`; Girl zusätzlich `top`. Natürliche Hautpalette in `settings.avatar_skin_palette`, sonst `settings.avatar_palette`.
+- Hausmenü → „Kleiderschrank“ öffnet die eigene Zimmer-Szene mit geliefertem Tripo-Schrank und -Teppich. Hintergrund unscharf, Figur scharf und drehbar, direkte Anprobe ausschließlich besessener kompatibler Teile. „Fertig“ speichert, „Zurück“ schützt ungespeicherte Änderungen. Das Dorf pausiert; nach Speicherung übernehmen Dorf und Porträt den bestätigten Look. Shop-Sperren verhindern neue Käufe, nicht das Umziehen vorhandener Sachen.
+- Neue Avatar-Artikel sind einmalig kaufbar. Bestehender Besitz alter Artikel wird erhalten; nicht modellierte Altartikel sind nicht mehr im Verkauf. Beschreibung und Grenzen: [Kleiderschrank](superpowers/specs/2026-10-26-avatar-wardrobe-design.md).
 
 ## 8. RPC-Funktionen (Postgres, `security definer`, `set search_path = public`)
 
@@ -309,7 +313,8 @@ Münzstände anderer Schüler sind für Schüler **nicht** sichtbar. Die alten T
 | `buy_item(item_id text)` | Schüler | Item aktiv, Shop der Klasse offen, genug Münzen | Buchung `-price`, Inventar +1 | `{coins, qty}` |
 | `place_item(item_id text, x int, z int, rot int)` | Schüler | Bau offen; freie Menge im Inventar (qty − platzierte); Footprint im Raster, nicht im Hausbereich, keine Überlappung | Zeile in `placements` | `placement_id` |
 | `remove_placement(id bigint)` | Schüler | gehört dem Spieler | löschen (Item geht ins Inventar zurück) | ok |
-| `save_avatar(recipe jsonb)` | Schüler | s. §7 | `profiles.avatar` | ok |
+| `save_avatar(recipe jsonb)` | Schüler | Legacy-Rezept, reservierte neue Schlüssel gesperrt | Legacy-Felder; Figur und Look bleiben erhalten | Rezept |
+| `save_avatar_look(p_character, p_look, p_expected_revision)` | Schüler | Rolle, Figur, Besitz, Slots/Konflikte, Palette, Revision | gezielter Look in `profiles.avatar.wardrobe` | Figur und beide Looks mit neuer Revision |
 | `add_stamps(class_id text, week date, player_ids uuid[])` | Lehrkraft | Rolle; pro Spieler und Woche nur ein Stempel (`ref = week`) | Buchung `+stamp_reward` je Spieler | Anzahl gebucht |
 | `adjust_coins(player_id uuid, delta int, note text)` | Lehrkraft | Rolle; Ergebnis ≥ 0 | Buchung `teacher` | neuer Stand |
 | `set_class_flags(class_id, shop_open, build_open)` | Lehrkraft | Rolle | Update | ok |
@@ -492,7 +497,7 @@ Quiz und Daily Quests zeigen ein eigenes 3D-Fenster, während das Dorf pausiert.
 | Erststart-Tutorial | Sir Byte begrüßt am Markt und begleitet die Figur zur Ruine; Quiz mit kleinem 3D-Fenster, Haus kaufen und aufstellen, gemeinsame Abschluss-Szene; Buttons und Fehler Deutsch (§8a, §11a) |
 | Shop | Kategorien Deko / Avatar; Preis, „Kaufen“ (mit eigener Bestätigung, kein `confirm()`); ausgegraut wenn zu teuer |
 | Bauen | Kamera fährt zum eigenen Grundstück; Inventar-Leiste; Teil wählen → Raster erscheint → Feld antippen → Drehen/Entfernen; grün/rot für frei/belegt |
-| Mein Avatar | Vorschau, Kategorien, Farbwähler (feste Palette), gesperrte Teile mit Preis |
+| Kleiderschrank | Eigene Zimmer-Szene über Hausmenü; drehbare Figur, direkte Auswahl besessener Teile, feste Farben und Fertig zum Speichern; Kaufen im Shop |
 | Kontoauszug | letzte 30 Buchungen |
 
 Touch-Ziele mind. 44 px; einfache Sprache; keine Emojis als Bedienelemente.

@@ -3,6 +3,7 @@
  * time; results are cached as PNG data URLs, so there is never a WebGL context per card.
  */
 import * as THREE from 'three';
+import { partById, partUrl } from '../avatars/catalog';
 import type { ItemEntry, ItemKind } from '../api/items';
 import type { SlotKind } from '../world/plotPlan';
 import {
@@ -38,7 +39,11 @@ export function createThumbSource(
   const cache = new Map<string, Promise<string | null>>();
   let tail: Promise<unknown> = Promise.resolve();
   return (e) => {
-    if (e.kind === 'avatar' || e.fits.length === 0) return Promise.resolve(null);
+    if (e.kind === 'avatar') {
+      const part = partById(e.id);
+      return Promise.resolve(part ? partUrl(part, true) : null);
+    }
+    if (e.fits.length === 0) return Promise.resolve(null);
     const kind = e.kind;
     const hit = cache.get(e.id);
     if (hit) return hit;

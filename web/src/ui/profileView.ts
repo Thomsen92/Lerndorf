@@ -6,11 +6,13 @@ import type { AreaHandle } from './areas';
 import type { Sound } from './sound';
 import { createChestControl, type ChestControl } from './chestControl';
 import './profile.css';
+import type { AvatarLook } from '../avatars/look';
 let serial = 0;
 export function openProfile(opts: {
   api: ProgressApi;
   nickname: string;
   character: CharacterKind | null;
+  look?: AvatarLook;
   getCoins: () => number;
   onCoins: (c: number) => void;
   onFrame: (id: string) => void;
@@ -86,7 +88,9 @@ export function openProfile(opts: {
     const portrait = button('', () => show('collection', 'frame'), 'profile-portrait-button');
     portrait.setAttribute('aria-label', 'Rahmen ändern');
     portrait.title = 'Rahmen ändern';
-    portrait.append(avatarPortrait({ character: opts.character, frameId: p.frameId, size: 'large' }));
+    portrait.append(
+      avatarPortrait({ character: opts.character, look: opts.look, frameId: p.frameId, size: 'large' }),
+    );
     const edit = text(portrait, 'span', '✎', 'profile-edit');
     edit.setAttribute('aria-hidden', 'true');
     const identity = document.createElement('div');

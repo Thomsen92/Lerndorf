@@ -342,3 +342,12 @@ Nach der Prüfung durch die Lehrkraft in dieser Reihenfolge vorgehen:
 - „Als Schüler ansehen“ prüfen: kein Ändern oder Lösen möglich.
 
 Lokale Prüf-Bilder: `web/test-results/teacher/`, Dorf-Galerie: `web/test-results/layout-teacher/`. Diese Bilder und Testdaten werden nicht veröffentlicht.
+
+
+## Kleiderschrank (lokale Umsetzung 26.10.2026)
+
+Im Hausmenü öffnet „Kleiderschrank“ das Ankleidezimmer. Die Figur wird mit Finger oder Maus gedreht. Einmal auf eine Karte tippen probiert ein gekauftes Teil an; „Fertig“ speichert den Look. Bei Problemen mit dem Speichern bleibt die Auswahl erhalten. „Original“ stellt Grundkleidung oder Originalfarbe wieder her.
+
+Kaufen erfolgt weiter im Haus-Shop. Danach gibt es „Zum Kleiderschrank“, im Inventar „Anziehen“. Ein geschlossener Shop sperrt neue Käufe; bereits gekaufte Dinge bleiben anziehbar. Jede Figur behält einen eigenen Look.
+
+Aktuell lokal vorbereitet: Die neue Migration 0023 und die Veröffentlichung sind noch nicht live ausgeführt. Eine Vorschau mit Testbesitz läuft unter http://localhost:5175/dev/wardrobe.html (Mädchen: ?character=girl). Weitere Details und Prüfstand: [Avatar-Kleiderschrank](AVATAR_KLEIDERSCHRANK.md).

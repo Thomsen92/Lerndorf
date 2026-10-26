@@ -8,7 +8,13 @@ export interface AreaHandle {
 }
 
 /** Areas in which the camera stays on the own house. */
-export const HOUSE_AREAS: ReadonlySet<NavArea> = new Set<NavArea>(['haus', 'bauen', 'shop', 'inventar']);
+export const HOUSE_AREAS: ReadonlySet<NavArea> = new Set<NavArea>([
+  'haus',
+  'bauen',
+  'shop',
+  'inventar',
+  'kleiderschrank',
+]);
 
 export interface AreaController {
   readonly current: NavArea;
@@ -18,7 +24,7 @@ export interface AreaController {
 }
 
 export function createAreaController(opts: {
-  openers: Record<Exclude<NavArea, 'dorf'>, () => Promise<AreaHandle | null>>;
+  openers: Partial<Record<Exclude<NavArea, 'dorf'>, () => Promise<AreaHandle | null>>>;
   onChange: (area: NavArea, previous: NavArea) => void;
 }): AreaController {
   let current: NavArea = 'dorf';
@@ -52,7 +58,10 @@ export function createAreaController(opts: {
         ticket++; // also cancels a different area that is still opening
         return Promise.resolve();
       }
-      return open(area, area === 'dorf' ? () => Promise.resolve(null) : opts.openers[area]);
+      return open(
+        area,
+        area === 'dorf' ? () => Promise.resolve(null) : (opts.openers[area] ?? (() => Promise.resolve(null))),
+      );
     },
     open,
   };

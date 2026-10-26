@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { instantiate, loadCharacter, type CharacterKind } from './character';
 import { configurePreviewRenderer } from './itemPreview';
+import { AvatarCustomizer } from '../avatars/customizer';
+import { emptyLook, lookKey, type AvatarLook } from '../avatars/look';
+import { ASSET_REVISION } from '../avatars/catalog';
 export const PORTRAIT_SIZE = 512;
 export const PORTRAIT_YAW = (30 * Math.PI) / 180;
 export const PORTRAIT_PITCH = (8 * Math.PI) / 180;
@@ -17,14 +20,22 @@ export function portraitCamera(
     fov: 30,
   };
 }
-export type PortraitSource = (kind: CharacterKind) => Promise<string | null>;
+export type PortraitSource = (kind: CharacterKind, look?: AvatarLook) => Promise<string | null>;
+/** Include head-mounted items without letting back equipment shrink the face. */
+export function portraitAppearanceBounds(root: THREE.Object3D): THREE.Box3 {
+  const bounds = portraitHeadBounds(root);
+  root.traverse((o) => {
+    if ((o as THREE.Bone).isBone && /head$/i.test(o.name)) bounds.union(new THREE.Box3().setFromObject(o));
+  });
+  return bounds;
+}
 /** The head bone sits at the jaw; frame the actual skinned head geometry. */
 export function portraitHeadBounds(root: THREE.Object3D): THREE.Box3 {
   const bounds = new THREE.Box3();
   const vertex = new THREE.Vector3();
   root.traverse((object) => {
     const mesh = object as THREE.SkinnedMesh;
-    if (!mesh.isSkinnedMesh) return;
+    if (!mesh.isSkinnedMesh || !mesh.visible) return;
     const indices = mesh.geometry.getAttribute('skinIndex');
     const weights = mesh.geometry.getAttribute('skinWeight');
     if (!indices || !weights) return;
@@ -44,36 +55,39 @@ export function portraitHeadBounds(root: THREE.Object3D): THREE.Box3 {
   return bounds;
 }
 /** Session image cache, with no permanent additional WebGL context. */
-export const sessionPortraitSource: PortraitSource = createPortraitSource(async (kind) => {
+export const sessionPortraitSource: PortraitSource = createPortraitSource(async (kind, look) => {
   if (typeof WebGLRenderingContext === 'undefined') throw Error('WebGL unavailable');
   const renderer = createWebGLPortraitRender();
   if (!renderer) throw Error('WebGL unavailable');
   try {
-    return await renderer.render(kind);
+    return await renderer.render(kind, look);
   } finally {
     renderer.dispose();
   }
 });
-export function createPortraitSource(render: (kind: CharacterKind) => Promise<string>): PortraitSource {
-  const cache = new Map<CharacterKind, Promise<string | null>>();
+export function createPortraitSource(
+  render: (kind: CharacterKind, look?: AvatarLook) => Promise<string>,
+): PortraitSource {
+  const cache = new Map<string, Promise<string | null>>();
   let queue: Promise<unknown> = Promise.resolve();
-  return (kind) => {
-    let result = cache.get(kind);
+  return (kind, look) => {
+    const key = `${kind}:${ASSET_REVISION}:${look ? lookKey(look) : ''}`;
+    let result = cache.get(key);
     if (result) return result;
     result = queue
-      .then(() => render(kind))
+      .then(() => (look ? render(kind, look) : render(kind)))
       .catch(() => {
-        cache.delete(kind);
+        cache.delete(key);
         return null;
       });
-    cache.set(kind, result);
+    cache.set(key, result);
     queue = result;
     return result;
   };
 }
 
 export function createWebGLPortraitRender(): {
-  render: (kind: CharacterKind) => Promise<string>;
+  render: (kind: CharacterKind, look?: AvatarLook) => Promise<string>;
   dispose(): void;
 } | null {
   let renderer: THREE.WebGLRenderer;
@@ -99,11 +113,13 @@ export function createWebGLPortraitRender(): {
     scene.add(light);
   }
   return {
-    async render(kind) {
+    async render(kind, look = emptyLook()) {
       if (disposed) throw Error('Portrait renderer disposed');
       const asset = await loadCharacter(kind);
       if (!asset) throw Error('Character unavailable');
       const clone = instantiate(asset);
+      const style = new AvatarCustomizer(clone.root, kind);
+      await style.applyLook(look);
       clone.walk.play();
       clone.mixer.update(0);
       clone.root.rotation.y = PORTRAIT_YAW;
@@ -114,11 +130,12 @@ export function createWebGLPortraitRender(): {
         clone.root.traverse((o) => {
           if (!bone && /head$/i.test(o.name)) bone = o;
         });
-        const bounds = portraitHeadBounds(clone.root);
+        const bounds = portraitAppearanceBounds(clone.root);
         const head = bounds.isEmpty()
           ? (bone?.getWorldPosition(new THREE.Vector3()) ?? new THREE.Vector3(0, 1.45, 0))
           : bounds.getCenter(new THREE.Vector3());
-        const height = bounds.isEmpty() ? 0.3 : bounds.getSize(new THREE.Vector3()).y;
+        const size = bounds.getSize(new THREE.Vector3());
+        const height = bounds.isEmpty() ? 0.3 : Math.max(size.y, size.x);
         const neck = head.clone().add(new THREE.Vector3(0, -height * 0.55, 0));
         const f = portraitCamera(head, neck, height),
           camera = new THREE.PerspectiveCamera(f.fov, 1, 0.01, 20);
@@ -127,8 +144,12 @@ export function createWebGLPortraitRender(): {
         renderer.render(scene, camera);
         return renderer.domElement.toDataURL('image/png');
       } finally {
+        style.dispose();
         clone.mixer.stopAllAction();
         clone.mixer.uncacheRoot(clone.root);
+        clone.root.traverse((o) => {
+          if ((o as THREE.SkinnedMesh).isSkinnedMesh) (o as THREE.SkinnedMesh).skeleton.dispose();
+        });
         scene.remove(clone.root); /* Skeleton clone shares cached geometry/materials; do not dispose those. */
       }
     },

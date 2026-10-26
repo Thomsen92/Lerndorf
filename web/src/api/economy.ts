@@ -10,6 +10,7 @@ export interface CatalogItem {
   nameDe: string;
   price: number;
   starter: boolean;
+  shopVisible?: boolean;
 }
 
 export type Outcome<T> = { ok: true; value: T } | { ok: false; message: string };
@@ -30,7 +31,7 @@ function explain(message: string): string {
 export async function loadCatalog(supabase: SupabaseClient): Promise<Outcome<CatalogItem[]>> {
   const { data, error } = await supabase
     .from('items')
-    .select('id, kind, slot, name_de, price, starter')
+    .select('id, kind, slot, name_de, price, starter, shop_visible')
     .eq('active', true)
     .order('price');
   if (error) return fail('Der Shop konnte nicht geladen werden.');
@@ -43,6 +44,7 @@ export async function loadCatalog(supabase: SupabaseClient): Promise<Outcome<Cat
       nameDe: r.name_de,
       price: r.price,
       starter: r.starter,
+      shopVisible: r.shop_visible ?? true,
     })),
   };
 }

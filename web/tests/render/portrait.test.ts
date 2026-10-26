@@ -1,6 +1,35 @@
 import { expect, it } from 'vitest';
 import * as THREE from 'three';
-import { portraitCamera, createPortraitSource, portraitHeadBounds } from '../../src/render/portrait';
+import {
+  portraitCamera,
+  createPortraitSource,
+  portraitHeadBounds,
+  portraitAppearanceBounds,
+} from '../../src/render/portrait';
+it('includes a head accessory but ignores long back equipment when framing portraits', () => {
+  const root = new THREE.Group(),
+    head = new THREE.Bone(),
+    back = new THREE.Bone();
+  head.name = 'mixamorigHead';
+  back.name = 'mixamorigSpine2';
+  root.add(head, back);
+  const hat = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.2), new THREE.MeshBasicMaterial());
+  hat.position.y = 1.8;
+  head.add(hat);
+  const weapon = new THREE.Mesh(new THREE.BoxGeometry(0.1, 5, 0.1), new THREE.MeshBasicMaterial());
+  back.add(weapon);
+  root.updateMatrixWorld(true);
+  const b = portraitAppearanceBounds(root);
+  expect(b.max.y).toBeCloseTo(2.05);
+  expect(b.min.y).toBeCloseTo(1.55);
+});
+it('separates portraits by appearance', async () => {
+  let calls = 0;
+  const source = createPortraitSource(async () => String(++calls));
+  expect(await source('boy', { items: [], colors: {} })).toBe('1');
+  expect(await source('boy', { items: [], colors: { hair: '#5b3a29' } })).toBe('2');
+  expect(await source('boy', { items: [], colors: {} })).toBe('1');
+});
 it('frames the head geometry rather than the jaw bone or the legs', () => {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute(

@@ -5,6 +5,7 @@ export interface HouseMenuOptions {
   onBuild: () => void;
   onShop: () => void;
   onInventory: () => void;
+  onWardrobe?: () => void;
   onSettings: (button: HTMLButtonElement) => void;
   onBack: () => void;
 }
@@ -31,6 +32,7 @@ export function openHouseMenu(opts: HouseMenuOptions): AreaHandle {
     return b;
   };
   const build = make('Bauen', () => opts.onBuild());
+  if (opts.onWardrobe) make('Kleiderschrank', opts.onWardrobe);
   make('Shop', () => opts.onShop());
   make('Inventar', () => opts.onInventory());
   make('Einstellungen', (b) => opts.onSettings(b));
