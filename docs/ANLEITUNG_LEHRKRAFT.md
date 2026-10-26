@@ -161,7 +161,7 @@ Wer sich zum ersten Mal anmeldet, bekommt automatisch ein kurzes Tutorial (etwa 
 1. Sie wählen ihre **Figur** (Junge oder Mädchen).
 2. Die Kamera fliegt über das Dorf zum eigenen Grundstück. Dort steht die Figur vor einer **Ruine** und sagt traurig: „Oh nein, mein Haus ist eine Ruine!“
 3. Zwei kurze Nachrichten erklären **Daily Quests** und **Münzen**. Jede bleibt, bis man auf „Weiter“ tippt.
-4. **Fünf ganz leichte Fragen** (Wörter, Lücke, Zuordnen, Hören). Falsch ist nicht schlimm: Es gibt einen kurzen englischen Tipp und man darf es noch einmal versuchen. Nach der fünften richtigen Antwort gibt es **50 Münzen**, einmalig.
+4. **Drei leichte Fragen** (Wörter, Grammatik, Hören), mit großen Antwortknöpfen. Einmal antippen prüft die Antwort, ohne Schreiben oder Dropdown. Falsch ist nicht schlimm: Es gibt einen kurzen englischen Tipp und man darf es noch einmal versuchen. Nach der dritten richtigen Antwort gibt es **50 Münzen**, einmalig.
 5. Mit den Münzen **kaufen** sie das Fachwerkhaus (50 Münzen) und **stellen** es selbst auf den Platz der Ruine. Das geht auch, wenn Shop und Bauen für die Klasse ausgeschaltet sind.
 6. Die Figur **tanzt**, sagt „Jetzt wird gelernt und Dailys gemacht!“, und die Daily Quests öffnen sich.
 
@@ -175,40 +175,9 @@ Bricht jemand ab oder meldet sich ab, geht es beim nächsten Mal am letzten abge
 
 Ihr eigenes Lehrkonto sieht das Tutorial nie.
 
-### Die Datenbank-Änderung (Migration 0019) einspielen
+### Datenbankstand des Tutorials
 
-**Wichtig vorher lesen.** Das Tutorial liegt zurzeit nur auf dem Zweig `feature/first-login-tutorial`, **nicht** auf `main`. Die Datenbank-Änderung `0019_first_login_tutorial.sql` ist noch **nirgends eingespielt**. Die Test-Vorschau des Zweigs benutzt dieselbe Datenbank wie das echte Dorf. Um den Zweig zu testen, muss 0019 also **in die echte Datenbank**.
-
-**Was das bedeutet (ehrlich):** Vom Einspielen bis zur Übernahme auf `main` trifft das alte, echte Dorf auf die neue Datenbank. In dieser Zeit ist die alte Grundstückswahl gesperrt, und das Fachwerkhaus kostet 50 Münzen statt nichts. Das ist nur unproblematisch, solange es **noch keine echten Schülerkonten** gibt. **In dieser Zeit bitte keine echten Schülerkonten anlegen.**
-
-Weitere Folgen von 0019:
-- Das Fachwerkhaus ist kein kostenloses Starterhaus mehr (kostet 50 Münzen).
-- Migration und neuer Code müssen am Ende **zusammen** live gehen.
-- Bitte außerhalb der Unterrichtszeit umstellen.
-
-**Reihenfolge:** 1. Migration 0019 einspielen. 2. Die Vorschau des Zweigs testen. 3. Erst danach den Zweig auf `main` übernehmen.
-
-**Achtung beim Einspielen:** Die Migration darf **nicht** über ein Werkzeug eingespielt werden, das selbst einen Zeitstempel als Versionsnummer einträgt (zum Beispiel `apply_migration` der Supabase-Verbindung). Der Eintrag in der Migrations-Liste muss genau die Version `0019` und den Namen `0019_first_login_tutorial` haben, sonst hält der Ablauf **migrate** die Migration später für „noch offen“ und wird rot.
-
-**Ablauf (Claude Code übernimmt die Technik, oder Sie von Hand):**
-1. Supabase-Dashboard → Ihr Projekt → links **SQL Editor** → **New query**.
-2. Zuerst nachsehen, wie die bisherigen Einträge aussehen, und diese Schreibweise übernehmen:
-   `select version, name from supabase_migrations.schema_migrations order by version;`
-   (Erwartet, aber nicht geprüft: Version zum Beispiel `0018`, Name zum Beispiel `0018_character_choice`. Passt das Muster nicht zu dem unten genannten Eintrag, bitte erst Claude Code fragen.)
-3. Neue Abfrage: Den Inhalt der Datei `supabase/migrations/0019_first_login_tutorial.sql` (auf GitHub, Zweig `feature/first-login-tutorial`, **Raw**) in **einem Stück** zwischen diese beiden Zeilen setzen und mit **Run** ausführen:
-   ```
-   begin;
-   -- hier der gesamte Inhalt von 0019_first_login_tutorial.sql
-   insert into supabase_migrations.schema_migrations (version, name) values ('0019', '0019_first_login_tutorial');
-   commit;
-   ```
-   So entsteht der Eintrag nur, wenn die Migration vollständig gelungen ist. Bei einer roten Fehlermeldung: nichts weiter tun, Meldung an Claude Code schicken.
-4. Die Vorschau-Adresse des Zweigs finden: Cloudflare-Dashboard → **Workers & Pages** → Projekt `lerndorf` → **Deployments** → Eintrag mit dem Zweig `feature/first-login-tutorial` → die Adresse darunter (`https://…lerndorf.pages.dev`).
-5. Dort wie unter „Selbst ausprobieren“ mit einem Testkonto das Tutorial durchspielen.
-
-**Solange 0019 live, aber noch nicht auf `main` ist:** Jeder andere Push auf `main`, der etwas unter `supabase/**` ändert, lässt den Ablauf **migrate** fehlschlagen, bis der Zweig übernommen ist (die Datenbank kennt dann eine Migration, die `main` noch nicht hat). In dieser Zeit also keine anderen Datenbank-Änderungen auf `main` schicken.
-
-**Wenn der Test gut war:** Claude Code bitten, den Zweig auf `main` zu übernehmen. Danach auf GitHub unter **Actions** prüfen, dass **migrate** und **tests** (Datei `deploy.yml`) grün sind (siehe „Daily Quests einspielen“, Schritt 3). Bei rot: Ablaufname und Fehlermeldung an Claude Code schicken.
+Migrationen 0019, 0020 und 0021 sind bereits online (am 26.10.2026 geprüft). Das Drei-Fragen-Tutorial ist damit auch serverseitig eingerichtet. Für den neuen Lehrerbereich fehlt noch 0022; siehe unten „Lehrerbereich bereitstellen“. Die lokale Tutorial-Vorschau verwendet Testdaten und benötigt dafür keine Live-Änderung.
 
 ---
 
@@ -260,7 +229,7 @@ Im Lehrer-Bereich gibt es den Abschnitt **Daily Quests**:
 
 Mit einem Lehrkonto kann man im Dorf keine Quests lösen; dort steht dann „Nur Schülerkonten können Quests lösen.“ Zum Ansehen ist die Vorschau im Lehrer-Bereich da.
 
-Der Abschnitt **Aufgaben-Statistik** zeigt nur noch die alten Wochenaufgaben von früher.
+Die alte Aufgaben-Statistik wird nicht mehr angezeigt. Die Schülerseite zeigt jetzt den aktuellen Spielstand und die Aktivität.
 
 ## Sir Byte begleitet die Schüler
 
@@ -276,21 +245,15 @@ Lokale Testansichten ohne Schülerkonto: `web/dev/byte.html` (Quests), `web/dev/
 
 ## XP, Level und Profil benutzen
 
-Schüler tippen oben rechts auf ihr Figurenbild. Im Profil sehen sie den Fortschritt bis zum nächsten Level, Münzen, ihre Serie, heutige Quests und Truhen. „Sammlung“ führt auf eine eigene Seite mit den Reitern „Titel“ und „Rahmen“: Dort sind freigeschaltete und noch gesperrte Einträge zu sehen. Antippen des Figurenbilds oder Titels im Profil führt direkt zur passenden Auswahl. Die drei Hauptknöpfe bleiben unverändert. Während des Tutorials öffnet das Figurenbild weiterhin die Einstellungen.
+Schüler tippen oben rechts auf ihr Figurenbild. Im Profil sehen sie den Fortschritt bis zum nächsten Level, Münzen, ihre Serie, heutige Quests und Truhen. „Sammlung“ führt auf eine eigene Seite mit den Reitern „Titel“ und „Rahmen“: Dort sind freigeschaltete und noch gesperrte Einträge zu sehen. Antippen des Figurenbilds oder Titels im Profil führt direkt zur passenden Auswahl. Aufgaben und Mein Haus stehen als zwei Symbole neben dem Figurenbild. Während des Tutorials öffnet das Figurenbild weiterhin die Einstellungen.
 
 Richtige Quests bringen auch nach dem dritten Versuch noch XP. Ein vollständiges Tagesziel bringt zusätzliche XP. Stempel geben automatisch 100 XP; dafür muss die Lehrkraft nichts zusätzlich buchen. In der Klassenübersicht stehen Level, XP und Serie. Die Liste bleibt nach Spitzname sortiert.
 
 Zum Öffnen tippen Schüler direkt auf die 3D-Truhe. Mit der Maus wackelt sie und ihre Umrisse leuchten. Der Deckel öffnet sich erst nach der Bestätigung des Servers. Bei einem Netzfehler kann der Schüler dieselbe Truhe erneut antippen; sie bucht ihre Münzen höchstens einmal. Das funktioniert ebenso in der Level-Feier, ohne zweiten Dialog. Die Münzen stehen im Kontoauszug als „Truhe“. Titel und Rahmen sind in der Sammlung erst ab dem angegebenen Level wählbar. XP werden nie abgezogen. Die Rechenregeln werden Schülern nicht als Tabelle angezeigt.
 
-### Datenbank-Änderung 0020 einspielen
+### Datenbank-Änderungen vorbereiten
 
-Die neue Oberfläche braucht die Datei `supabase/migrations/0020_xp_levels.sql`. Die Migrationen 0001–0019 sind am 25.10.2026 online geprüft und bereits vorhanden. Migration 0020 berechnet aus früher gelösten Daily Quests, Stempeln und abgeschlossenen Tutorials einmalig XP nach und vergibt dabei höchstens drei Truhen. Bestehende Münzen und Gegenstände bleiben erhalten.
-
-1. Zuerst die fertige Änderung samt Prüfung ansehen. Noch nicht allein die neue Oberfläche veröffentlichen.
-2. Im Lerndorf-Projekt die Supabase-CLI anmelden und mit dem vorhandenen Projekt verknüpfen, falls die Sitzung abgelaufen ist.
-3. Mit `npx supabase db push --linked --dry-run` prüfen: Als neue Datei darf nur `0020_xp_levels.sql` erscheinen.
-4. Mit `npx supabase db push --linked` die geprüfte Änderung anwenden. Anschließend mit `npx supabase migration list --linked` kontrollieren: 0020 muss lokal und online stehen. Alternativ übernimmt der vorhandene GitHub-Workflow „migrate“ das Einspielen, wenn die Änderung auf `main` veröffentlicht wird.
-5. Danach den passenden Website-Stand veröffentlichen und ein Schülerkonto prüfen: Profil öffnen, Quest lösen, gegebenenfalls eine Truhe öffnen. Mit einem neuen Testkonto zusätzlich das Tutorial bis zur Level-2-Feier durchlaufen.
+0020 berechnet aus früher gelösten Daily Quests, Stempeln und abgeschlossenen Tutorials einmalig XP nach und vergibt dabei höchstens drei Truhen. 0021 verkürzt das Tutorial auf drei Fragen; 0022 ergänzt den Lehrerbereich. Bestehende Münzen und Gegenstände bleiben erhalten. Die geprüfte Reihenfolge und die Veröffentlichung stehen unten unter „Lehrerbereich bereitstellen“.
 
 ### Abnahme auf dem Schul-Tablet
 
@@ -303,3 +266,79 @@ Die neue Oberfläche braucht die Datei `supabase/migrations/0020_xp_levels.sql`.
 - Das Dorf läuft auf dem ältesten Tablet weiterhin flüssig (Ziel mindestens 30 Bilder pro Sekunde).
 
 Entwicklungsbilder: `web/test-results/xp-gallery/`; Tutorial: `web/test-results/tutorial/`; Dorf-Galerie: `web/test-results/layout-xp/`. Diese Prüfdateien bleiben lokal und werden nicht veröffentlicht.
+
+## Lehrerbereich benutzen
+
+Die neue lokale Vorschau ist unter `http://localhost:5175/dev/teacher.html` erreichbar. Sie verwendet ausschließlich erfundene Testdaten: Hier lassen sich die neuen Abläufe ausprobieren, ohne Konten oder Münzen der echten Klasse zu verändern. Nach der Veröffentlichung benutzen Sie wie bisher `/lehrer/`.
+
+### Die sechs Arbeitsseiten
+
+Oben wählen Sie **Klasse 8a** oder **Klasse 8b**. Die Adresse merkt sich die Klasse und die aktuelle Seite, auch beim Neuladen und bei der Zurück-Taste. Auf Tablets öffnet **Menü** die Seitenauswahl.
+
+- **Übersicht:** Anzahl der Schüler, offenes Tutorial, Inaktivität, gebuchte Wochenstempel und Quest-Abdeckung. „Schüler anzeigen“ öffnet die passende gefilterte Liste.
+- **Schüler:** Spitznamen suchen oder nach offenem Tutorial und Inaktivität filtern. „Details“ zeigt Haus, Gegenstände, Wochenquests und die letzten 50 Münzbuchungen. Level, XP und Serie stehen klein beim Spitznamen. Es gibt keine Rangliste.
+- **Münzen & Stempel:** kleine Belohnungen, Korrekturen und Wochenplan-Stempel.
+- **Daily Quests:** Abdeckung, Importfehler und Vorschau mit Lösungen wie bisher.
+- **Konten:** einzeln oder als Liste anlegen, Karten drucken, Passwort zurücksetzen und Konto löschen.
+- **Dorf & Regeln:** Shop/Bauen öffnen oder sperren, Vorlage und Seed ändern, Spielregeln und verkaufte Gegenstände festlegen. Das Neufestlegen des Dorfs braucht weiterhin eine Bestätigung.
+
+### Schnell Münzen buchen – auch am Tablet
+
+1. **Münzen & Stempel** öffnen.
+2. Wenn gewünscht oben einen **Grund** wählen, zum Beispiel Mitarbeit. Der Grund bleibt ausgewählt, bis Sie ihn wechseln.
+3. In der Zeile des Schülers **+5**, **+10**, **+20** oder **+100** antippen. **−5** und **−10** ziehen Münzen ab; die Knöpfe sind bei zu wenig Münzen ausgeschaltet.
+4. Die bestätigte Buchung erscheint mit Betrag und Grund. Für zehn Sekunden lässt sie sich mit **Rückgängig** ausgleichen. Die ursprüngliche Buchung und die Gegenbuchung stehen beide im Kontoauszug.
+
+**Mehrere Schüler:** die Namen markieren oder „alle“ wählen, dann in der Leiste „Für … markierte“ den Betrag antippen. Es wird für alle oder für niemanden gebucht. Während einer Anfrage sind die betroffenen Knöpfe gesperrt.
+
+Hat ein Schüler die Münzen inzwischen ausgegeben, kann „Rückgängig“ scheitern. Dann bleibt die ursprüngliche Buchung stehen und die Seite zeigt den Grund. Bei einer Mehrfachbuchung wird niemals nur ein Teil zurückgenommen.
+
+Für andere Beträge gibt es **Freie Korrektur** mit Pflichtnotiz. Unter **Stempel buchen** wählen Sie den Montag der Woche, markieren die abgegebenen Wochenpläne und buchen wie bisher. Bereits gestempelte Schüler sind ausgegraut; pro Woche gibt es keinen doppelten Stempel.
+
+### Tafelmodus für die Klasse
+
+Auf der **Übersicht** auf **Tafelmodus** klicken. Er zeigt nur Quests der ganzen Klasse, Klassen-Serie, Anzahl der Wochenstempel und die Dorfnachricht. Namen, individuelle Münzen, XP und Inaktivität bleiben verborgen. **Vollbild** nutzt den ganzen Bildschirm, **Zurück** oder Escape führt zur Übersicht. Die Werte werden jede Minute nachgeladen.
+
+### Nachricht ins Dorf schicken
+
+Auf der **Übersicht** unter **Nachricht ins Dorf** bis zu 140 Zeichen schreiben. Standardmäßig bleibt sie sieben Tage gültig; das Datum ist änderbar. **Veröffentlichen** speichert, **Entfernen** löscht die Nachricht. Schüler sehen einen Zettel an der Markttafel und einmal eine Karte mit **OK**. Während des Tutorials wartet die Karte bis zum Ende. Sir Byte liest die Nachricht nicht vor.
+
+### QR-Zugangskärtchen
+
+Direkt nach dem Anlegen oder Passwort-Zurücksetzen auf **Karten drucken** klicken. Jedes Kärtchen zeigt Spitzname, Passwort und QR-Code. Beim Scannen meldet sich der Schüler direkt an. Die Zugangsdaten verschwinden sofort aus der Adresse. Bei einem falschen oder alten Passwort bleibt die normale Anmeldung mit vorausgefülltem Spitznamen stehen.
+
+Die Passwörter bleiben nur für diese Sitzung im Speicher. Nach Abmelden/Schließen stehen die Karten nicht mehr zur Verfügung. Nach einem Passwortwechsel enthält die Karte nur das neue Passwort. **Bei Verlust: Passwort zurücksetzen und eine neue Karte drucken.** Bitte die Druckkarten genauso wie bisher sicher verteilen.
+
+### Als Schüler ansehen
+
+Auf **Schüler** neben einem Namen **Als Schüler ansehen** öffnen. Ein neuer Tab zeigt dessen Dorf und markiertes Haus. Oben steht „Ansicht von … – nur ansehen“. Die Kamera und die Bewohner funktionieren; Shop, Bauen, Inventar, Profil und Tutorial bleiben ausgeschaltet. **Aufgaben** zeigt nur den Aufgabenstand, keine Eingabe und keine Lösungen. **Zurück zum Lehrerbereich** führt zur Schülerliste.
+
+### Lehrerbereich bereitstellen
+
+Der neue Lehrerbereich ist noch nicht veröffentlicht. Die Live-Datenbank wurde in diesem Arbeitsschritt nur gelesen. Am 26.10.2026 wurde folgender Stand bestätigt:
+
+1. `0020_xp_levels.sql`: Fortschritt, Level und Profil – bereits online.
+2. `0021_tutorial_tap_questions.sql`: drei Tutorialfragen – bereits online.
+3. `0022_teacher_overhaul.sql`: neuer Lehrerbereich, Nachrichten und Leseansichten – **noch ausstehend**.
+
+Nach der Prüfung durch die Lehrkraft in dieser Reihenfolge vorgehen:
+
+1. Im Projektordner die bestehende Supabase-Verknüpfung `ygopamapzhlwrpjzjunq` prüfen: `npx supabase migration list --linked`.
+2. Vorschau: `npx supabase db push --linked --dry-run`. Als ausstehende Datei wird nur 0022 erwartet. Bei weiteren oder abweichenden Dateien erst den Unterschied klären.
+3. Außerhalb der Unterrichtszeit `npx supabase db push --linked` ausführen. Die CLI wendet Migration 0022 auf den bereits vorhandenen Vorgängern an. Alternativ übernimmt der vorhandene GitHub-Ablauf „migrate“ dies bei einer abgestimmten Veröffentlichung.
+4. Mit `npx supabase migration list --linked` kontrollieren, dass 0022 nun ebenfalls lokal und online steht.
+5. Den passenden Website-Stand veröffentlichen. Danach mit einem Testkonto Anmeldung, drei Tutorialfragen, Profil und Nachricht prüfen; im Lehrerbereich eine kleine Buchung samt Rückgängig testen.
+
+**Keine einzelne neue Oberfläche vor den Datenbankänderungen veröffentlichen.** Auch nach einem erfolgreichen lokalen Test fehlen die Live-Funktionen bis zu dieser Umstellung.
+
+### Abnahme Lehrerbereich (L.14)
+
+- Alle sechs Seiten und Klassenwechsel öffnen; Neuladen behält die Seite.
+- Schülerdetails, Aktivität und Kontoauszug mit einem Testkonto prüfen.
+- Am Tablet im Hoch- und Querformat eine Einzel-/Mehrfachbuchung und Rückgängig testen.
+- Tafelmodus am Beamer ansehen: ausschließlich Klassenwerte.
+- Dorfnachricht veröffentlichen, als Schüler einmal bestätigen, anschließend erneut anmelden.
+- QR-Karte nach Anlegen und Passwortwechsel auf dem Schulgerät scannen.
+- „Als Schüler ansehen“ prüfen: kein Ändern oder Lösen möglich.
+
+Lokale Prüf-Bilder: `web/test-results/teacher/`, Dorf-Galerie: `web/test-results/layout-teacher/`. Diese Bilder und Testdaten werden nicht veröffentlicht.

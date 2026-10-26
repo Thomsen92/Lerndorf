@@ -1,6 +1,6 @@
 # Lehrerbereich – Überarbeitung (Fassung 2)
 
-**Stand:** 25.10.2026 (Fassung 1 vom 21.10.2026 in der Git-Geschichte) · **Status:** Umfang vom Auftraggeber am 25.10.2026 bestätigt (§2); Details „Entscheidung Claude“. Umsetzungsplan: `docs/superpowers/plans/2026-10-25-teacher-overhaul.md`.
+**Stand:** 26.10.2026 · **Status:** Umgesetzt laut Plan 2026-10-25; Migration (L.13) und Abnahme (L.14) stehen aus. Umfang vom Auftraggeber am 25.10.2026 bestätigt (§2). Umsetzungsplan: `docs/superpowers/plans/2026-10-25-teacher-overhaul.md`.
 
 ## 1. Ziel
 

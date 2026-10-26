@@ -111,6 +111,30 @@ Ziel: Schüler kaufen Deko und gestalten ihr Grundstück; Mitschüler sehen es.
 | [ ] 4.5 | CC | Platzierungen aller Klassenmitglieder im Dorf rendern (Instancing je Item-Typ) | `render/placements.ts` | 32 Grundstücke à 10 Teile < Leistungsbudget |
 | [ ] 4.6 | LK | **Abnahme Stufe 4** | Notiz hier | Kriterien SPEC §18 |
 
+
+## Zwischenpaket L – Lehrerbereich
+
+Plan: [Lehrerbereich-Überarbeitung](superpowers/plans/2026-10-25-teacher-overhaul.md), Fassung 2. Umsetzung am 26.10.2026 direkt auf main, ein Agent. Keine Veröffentlichung oder Änderung der Live-Datenbank.
+
+| AP | Wer | Inhalt | Ergebnis |
+| --- | --- | --- | --- |
+| [x] L.1 | CC | Schüler-, Detail- und atomare Mehrfachbuchungs-RPCs | SQL- und Berechtigungstests |
+| [x] L.2 | CC | Klassenwerte, Dorfnachricht und Lehrer-Lesefunktionen | SQL-Tests, RLS |
+| [x] L.3 | CC | Sechs Seiten, Klassenwahl und Hash-Router | Bestehende Konten-/Dorf-Funktionen übernommen |
+| [x] L.4 | CC | Aktivität und API-Abbildung | Berlin-Tagesgrenzen und Zeitumstellung geprüft |
+| [x] L.5 | CC | Schülerliste mit Suche, Filtern, Details und Kontoauszug | Keine Zugangsdaten in der Liste |
+| [x] L.6 | CC | Schnell-/Mehrfachbuchungen, Gründe, Rückgängig, Stempel | Doppelklickschutz und vollständiges Scheitern von Rückbuchungen geprüft |
+| [x] L.7 | CC | Übersicht und Nachrichteneditor | Datenfehler bleiben auf ihren Teil beschränkt |
+| [x] L.8 | CC | Tafelmodus | Nur Klassenwerte, keine individuellen Angaben |
+| [x] L.9 | CC | Nachricht als Tafelzettel und einmalige Karte | Text sicher dargestellt, Speicherfehler abgefangen |
+| [x] L.10 | CC | QR-Karten und Anmeldung per Fragment | Keine externen QR-Dienste, Fragment sofort gelöscht |
+| [x] L.11 | CC | Als Schüler ansehen | Eigener Leseweg ohne Schüler-Schreibfunktionen |
+| [x] L.12 | CC | Tests, Screenshots und Anleitung | Lokale Vorschau: /dev/teacher.html |
+| [ ] L.13 | LK | Migration 0022 einspielen | Anleitung; 0001–0021 am 26.10.2026 online bestätigt |
+| [ ] L.14 | LK | **Abnahme Lehrerbereich** | Münzseite am Tablet, Tafelmodus am Beamer, QR-Karten und Leseansicht |
+
+Screenshots und lokale Testausgaben: `web/test-results/teacher/`, Dorf-Galerie `web/test-results/layout-teacher/`. Abschluss: 846 Tests, Build, ESLint und acht Lehrer-Browserprüfungen grün; 36 Dorf-Galeriebilder kontrolliert. Alle Testkonten sind reine Browser-Daten. Datenbankdatei: `0022_teacher_overhaul.sql` (nach XP 0020 und Tablet-Tutorial 0021).
+
 ## Zwischenpaket T – Tablet-UI und Navigation
 
 Spec: `docs/superpowers/specs/2026-10-21-tablet-ui-navigation-design.md`, Plan: `docs/superpowers/plans/2026-10-21-tablet-ui-navigation.md`.
@@ -156,7 +180,7 @@ Spec: `docs/superpowers/specs/2026-10-21-first-login-tutorial-design.md`, Plan: 
 
 | AP | Wer | Inhalt | Ergebnis |
 |---|---|---|---|
-| [x] E.1b | CC | Tablet-Tutorial: drei Fragen, große Antwortknöpfe, direkte Prüfung; Migration 0021 | 819 Tests grün; von der Lehrkraft am 26.10.2026 getestet und abgenommen; Live-Migration noch ausstehend |
+| [x] E.1b | CC | Tablet-Tutorial: drei Fragen, große Antwortknöpfe, direkte Prüfung; Migration 0021 | 819 Tests grün; von der Lehrkraft am 26.10.2026 getestet und abgenommen; Migration 0021 online bestätigt |
 | [x] E.1 | CC | Migration `0019_first_login_tutorial.sql` (Tabellen, fünf Fragen, RPCs, automatisches Grundstück, Haus kostet 50) | SQL-Tests grün |
 | [x] E.2 | CC | Ruine im Haus-Sockel, Sprechblasen im Comic-Stil, Kamerapfade, Tanz | Tests grün, Bilder angesehen |
 | [x] E.3 | CC | Ablauf in der Oberfläche (`ui/tutorial/`), Kaufdialog, geführter Baumodus, Einbau ins Dorf; manuelle Grundstückswahl entfernt | Tests grün |
@@ -198,7 +222,7 @@ Spec: `docs/superpowers/specs/2026-10-24-xp-level-design.md`; Plan: `docs/superp
 | [x] X.10 | CC | Level-Wappen und Titel in vorhandenen Namensschildern | Keine zusätzlichen Sprites oder Draw Calls |
 | [x] X.11 | CC | Quests, Bauen, Tutorial, Willkommen-Karte und Lehrerübersicht verbinden | Ungesehene Buchungen bleiben erhalten; Tutorial-Feier vor Quests |
 | [x] X.12 | CC | Browserbilder, Galerie, Gesamtprüfung und Dokumentation | 796 Tests, Build und ESLint grün; Tablet-Bilder, Audio-Prüfung und Tutorial grün; 36 Galeriebilder plus Wappenvergleich |
-| [ ] X.13 | LK | Migration 0020 einspielen (Anleitung „Datenbank-Änderung 0020 einspielen“) | 0001–0019 online bestätigt; 0020 noch nicht eingespielt |
+| [x] X.13 | LK | Migration 0020 einspielen | Am 26.10.2026 über die Supabase-Migrationsliste online bestätigt |
 | [ ] X.14 | LK | **Abnahme XP und Level** auf dem Schul-Tablet (Design §13) | Figurenbild, Fortschritt, Truhen, Titel/Rahmen, Töne, Bildrate |
 
 Die Browser-Vorschau steht unter `web/dev/profile.html`; Bilder unter `web/test-results/xp-gallery/`, Tutorial unter `web/test-results/tutorial/`, Dorf-Galerie unter `web/test-results/layout-xp/`. Vorschauen nutzen Testdaten und gehören nicht zum veröffentlichten Build.
@@ -230,7 +254,7 @@ Auftrag vom 25.10.2026: vorhandenen Sir Byte einbauen, Tutorial und Quests anpas
 | [x] B.6 | CC | Browserbilder, Galerie, Renderbudget und Abschlussprüfung | 814 Tests, Build und ESLint grün; 20 Browserprüfungen, darunter kompletter Erststart in Quer-/Hochformat, Handy-Einstieg, Audio-Unterbrechung, Profilregression; 36 Dorfbilder geprüft |
 | [ ] B.7 | LK | **Abnahme auf dem Schul-Tablet** | Stimme, Lesbarkeit, Tutorial, Tafel-Antippen und Bildrate prüfen |
 
-Sir Byte erfordert keine Migration. Veröffentlichung und XP-Migration 0020 bleiben ausstehend.
+Sir Byte erfordert keine Migration. Stand 26.10.2026: XP-Migration 0020 und Tutorial-Migration 0021 online bestätigt; die Veröffentlichung des neuen Lehrerbereichs und Migration 0022 stehen aus.
 
 Nachbesserung 25.10.2026 nach Hörprobe: Lob rotiert durch acht Texte und zwei passende bestehende Aufnahmen, mit 20 Sekunden Abstand bei der Sprachauswahl und ohne direkt identische Lob-Aufnahmen. Keine zweite gesprochene Lobkette am Tagesende. Die vorhandene Begrüßung `ready.mp3` spielt jetzt auch am Markt im Tutorial, passend zur Blase „Ready when you are.“ und abbrechbar mit „Weiter“. Abgesichert durch Sequenz-, Integrations- und Browserprüfungen für tatsächlichen Audiostart und Unterbrechung. Abschluss: 817 Tests, Build und ESLint sowie fünf gezielte Browserprüfungen inklusive vollständigem Tutorial grün.
 

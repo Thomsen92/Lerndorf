@@ -497,18 +497,37 @@ Quiz und Daily Quests zeigen ein eigenes 3D-Fenster, während das Dorf pausiert.
 
 Touch-Ziele mind. 44 px; einfache Sprache; keine Emojis als Bedienelemente.
 
-## 13. Lehrer-Bereich (`/lehrer`)
+## 13. Lehrer-Bereich (`/lehrer/`)
 
-- **Instanz-Umschalter** (8a / 8b) oben; alle folgenden Ansichten gelten für die gewählte Instanz.
-- Klassen-Übersicht: Spitzname, Münzen, Grundstück, Level, XP und aktuelle Serie; nach Spitzname sortiert. Keine XP-Bearbeitung.
-- Spielregeln der Instanz bearbeiten (Stempel-Belohnung, Tageslimit, Versuche) und Gegenstände je Instanz sperren.
-- **Stempel buchen:** Klasse + Woche (Montag) wählen → Liste mit Häkchen → „Stempel buchen“. Bereits gebuchte Stempel sind markiert. Ziel: eine Klasse < 3 Min.
-- Konten: anlegen (einzeln/Liste), Passwort zurücksetzen, löschen; Druckansicht „Zugangskärtchen“ (Spitzname + Passwort, zum Ausschneiden).
-- Münzen korrigieren mit Notiz.
-- Schalter: Shop offen, Bauen offen (pro Klasse).
-- Dorf-Layout wählen: Kartenvorlage + Seed, mit Vorschaubild.
-- **Daily Quests:** Hinweise (heute oder morgen fehlt ein Paket, „Daily Quests vorhanden bis So 15.11.“, Importfehler je Woche, Ferienwochen) und Vorschau der nächsten 7 Tage mit Tipp und Lösung (§9).
-- Aufgaben-Statistik pro Aufgabe (Anteil richtig) – zeigt die alten Wochenaufgaben.
+Sechs Arbeitsseiten mit Klassenwahl 8a/8b, Abmelden und Adressen wie `#8a/muenzen`. Die Navigation klappt unter 1 024 px hinter „Menü“. Details: [Lehrerbereich, Fassung 2](superpowers/specs/2026-10-21-teacher-ui-design.md).
+
+| Seite | Inhalt |
+| --- | --- |
+| Übersicht | Klassengröße, offenes Tutorial, Inaktivität ab 5 Tagen, Wochenstempel, Quest-Abdeckung; Nachricht ins Dorf (140 Zeichen, standardmäßig 7 Tage); Zugang zum Tafelmodus |
+| Schüler | Alphabetische Liste, Suche und Filter; Münzen, Grundstück/Tutorial, Quests der Woche und letzte Aktivität (Berlin); Level/XP/Serie kompakt beim Spitznamen; seitliche Details mit Besitz, Quests und den letzten 50 Buchungen |
+| Münzen & Stempel | +5/+10/+20/+100/−5/−10, optionale Gründe, Mehrfachbuchung, Rückgängig für 10 Sekunden; freie Korrektur und Wochenstempel; Touch-Ziele mindestens 44 px, auch ab 768 px Breite |
+| Daily Quests | Vorhandene Abdeckung, Importfehler und Vorschau der nächsten 7 Tage mit Lösungen; keine alte Aufgaben-Statistik |
+| Konten | Einzeln/Liste anlegen, Passwort zurücksetzen, geschütztes Löschen; Zugangskärtchen mit lokal erzeugten QR-Codes, nur für in dieser Sitzung angelegte/zurückgesetzte Zugänge |
+| Dorf & Regeln | Shop/Bauen, Vorlage und Seed mit Bestätigung, Spielregeln und verkaufte Gegenstände |
+| Tafelmodus | Nur aggregierte Klassenwerte und Nachricht, jede Minute aktualisiert, Vollbild/Zurück; keine Spitznamen, individuellen Münzstände, XP oder Inaktivität |
+
+Nachrichten stehen als Text auf einem Zettel an der Tafel und einmal als Karte im Dorf. Beim normalen Login kommt die Karte vor der Fortschritts-Willkommenskarte, während des Tutorials erst nach dessen Ende. Gesehen-Merker vertragen gesperrten lokalen Speicher. QR-Zugänge stehen nur im URL-Fragment; dieses wird sofort aus Adresse/Verlauf entfernt. Anmeldung erfolgt ausschließlich über die normale Authentifizierung, ohne externen QR-Dienst.
+
+„Als Schüler ansehen“ öffnet ein eigenes Dorf mit Band und Rückweg zur Lehrkraft. Es nutzt die gewohnte Dorfgeometrie, eigene Hausmarkierung und Bewohner, enthält aber keinen Schüler-Aktionscontroller: kein Profil, Shop, Inventar, Bauen, Tutorial oder Buchungen. Nur „Aufgaben“ öffnet eine reine Leseliste; die vereinfachte Schülernavigation ohne Dorf-Knopf bleibt berücksichtigt.
+
+**Neue Datenbankfunktionen, Migration 0022 (nur Lehrkräfte):**
+
+| RPC | Zweck |
+| --- | --- |
+| `teacher_class_pupils(class_id, week)` | Spielstand und Aktivität, Woche muss Montag sein; keine Auth-Zugangsdaten |
+| `teacher_pupil_detail(player_id)` | Besitz, laufende Woche und letzte 50 Kontoauszug-Zeilen |
+| `adjust_coins_many(player_ids, delta, note)` | Eine Transaktion für alle Schüler oder keinen; sortierte Sperren, Pflichtnotiz, keine doppelten/leeren IDs oder negativen Stände |
+| `class_board(class_id)` | Nur Wochenziel, gelöste Quests, Tageswert, Klassen-Serie, Stempelzahl und Nachricht |
+| `set_class_notice(class_id, text, valid_until)` | Nachricht veröffentlichen oder mit null entfernen; Schüler lesen ausschließlich gültige Nachrichten der eigenen Klasse über RLS |
+| `teacher_village_members(class_id)` | Klassenmitglieder für die Leseansicht ohne Münzen oder private Aktivitätsdaten |
+| `teacher_pupil_quests(player_id)` | Heute/gestern mit gelöst/Versuche, ohne Lösung oder Tipp |
+
+Zukünftige Quest-Versuche erhalten einen Zeitstempel, auch wenn sie falsch sind. Alte ungelöste Versuche ohne Zeitstempel werden bei der Migration nicht als neue Aktivität ausgegeben. Alle Änderungen an Münzen bleiben serverseitig; Rückgängig ist eine Gegenbuchung mit ursprünglicher Notiz und kann bei inzwischen ausgegebenen Münzen vollständig scheitern.
 
 ## 14. Wirtschaft (Standardwerte; je Instanz in `classes` änderbar, Preise in `items`)
 

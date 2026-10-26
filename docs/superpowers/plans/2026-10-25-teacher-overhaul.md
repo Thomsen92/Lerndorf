@@ -1,6 +1,6 @@
 # Lehrerbereich-Überarbeitung Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Rebuild the teacher area (`/lehrer/`) into separate pages with a pupil table (game state + activity + ledger), one-click and multi-pupil coin bookings with reasons and undo (tablet-usable), a class board mode without individual values, a class notice shown in the village, QR codes on the access cards and a read-only "view as pupil" village.
 
@@ -130,11 +130,11 @@
   export function mountShell(root: HTMLElement, supabase: SupabaseClient): { dispose(): void };
   ```
 
-- [ ] **Step 1: Write the failing tests:** `parseRoute('#8b/muenzen')` → 8b/muenzen; `''`/garbage → 8a/uebersicht; round trip with `routeHash`; shell renders the six nav entries in spec order with `aria-current="page"` on the active one, a class switch with both classes, `Abmelden`; changing class keeps the page; `hashchange` mounts the new page and unmounts the old; `tafel` hides nav and header (class `board-mode`); below 1 024 px the nav is behind `Menü` (`aria-expanded`); status region `role="status"` per page.
-- [ ] **Step 2: Run** — FAIL.
-- [ ] **Step 3: Implement** the shell and router; move the existing section code from `teacherView.ts` **unchanged in behaviour** into `pages/accounts.ts` (create single/list, cards print stays as is for now, reset, delete), `pages/village.ts` (switches, template + seed, rules, sold items), `pages/quests.ts` (wraps `renderQuestPanel`). Stamps and free correction move in Task 6; until then keep them on a temporary `muenzen` page with the old markup. Delete the old stats section and its wiring (the `task_stats` RPC and `loadTaskStats` stay). `teacherView.ts` keeps login and calls `mountShell` after sign-in.
-- [ ] **Step 4: Run** — PASS; `npm test`, build green; open `/lehrer/` in the dev server and click every page once (no console errors).
-- [ ] **Step 5: Commit** `git add web/src/teacher web/tests/teacher/router.test.ts web/tests/teacher/shell.test.ts && git commit -m "feat(teacher): page shell with navigation and router"`
+- [x] **Step 1: Write the failing tests:** `parseRoute('#8b/muenzen')` → 8b/muenzen; `''`/garbage → 8a/uebersicht; round trip with `routeHash`; shell renders the six nav entries in spec order with `aria-current="page"` on the active one, a class switch with both classes, `Abmelden`; changing class keeps the page; `hashchange` mounts the new page and unmounts the old; `tafel` hides nav and header (class `board-mode`); below 1 024 px the nav is behind `Menü` (`aria-expanded`); status region `role="status"` per page.
+- [x] **Step 2: Run** — FAIL.
+- [x] **Step 3: Implement** the shell and router; move the existing section code from `teacherView.ts` **unchanged in behaviour** into `pages/accounts.ts` (create single/list, cards print stays as is for now, reset, delete), `pages/village.ts` (switches, template + seed, rules, sold items), `pages/quests.ts` (wraps `renderQuestPanel`). Stamps and free correction move in Task 6; until then keep them on a temporary `muenzen` page with the old markup. Delete the old stats section and its wiring (the `task_stats` RPC and `loadTaskStats` stay). `teacherView.ts` keeps login and calls `mountShell` after sign-in.
+- [x] **Step 4: Run** — PASS; `npm test`, build green; open `/lehrer/` in the dev server and click every page once (no console errors).
+- [x] **Step 5: Commit** `git add web/src/teacher web/tests/teacher/router.test.ts web/tests/teacher/shell.test.ts && git commit -m "feat(teacher): page shell with navigation and router"`
 
 ---
 
@@ -165,9 +165,9 @@
   export function setClassNotice(s: SupabaseClient, classId: ClassId, text: string | null, validUntil: string | null): Promise<Result<true>>;
   ```
 
-- [ ] **Step 1: Write the failing tests:** `activeLabel` across midnight in Berlin (23:30 yesterday vs 00:10 today → `gestern`), DST change on 25.10.2026, `null` → `noch nie`; `inactiveHint` 4 days → null, 6 days → `seit 6 Tagen nicht aktiv`, holiday → null; `plotLabel` for every step; `questsLabel` normal and holiday; api functions map snake_case and errors with a stub client.
-- [ ] **Step 2: Run** — FAIL. **Step 3: Implement.** **Step 4: Run** — PASS.
-- [ ] **Step 5: Commit** `git add web/src/teacher/activity.ts web/src/teacher/api.ts web/tests/teacher/activity.test.ts && git commit -m "feat(teacher): activity labels and new api calls"`
+- [x] **Step 1: Write the failing tests:** `activeLabel` across midnight in Berlin (23:30 yesterday vs 00:10 today → `gestern`), DST change on 25.10.2026, `null` → `noch nie`; `inactiveHint` 4 days → null, 6 days → `seit 6 Tagen nicht aktiv`, holiday → null; `plotLabel` for every step; `questsLabel` normal and holiday; api functions map snake_case and errors with a stub client.
+- [x] **Step 2: Run** — FAIL. **Step 3: Implement.** **Step 4: Run** — PASS.
+- [x] **Step 5: Commit** `git add web/src/teacher/activity.ts web/src/teacher/api.ts web/tests/teacher/activity.test.ts && git commit -m "feat(teacher): activity labels and new api calls"`
 
 ---
 
@@ -181,9 +181,9 @@
 **Interfaces:**
 - Consumes: Task 4. Produces: page `schueler`; route `#8a/schueler/<id>` opens the detail; button `Als Schüler ansehen` opens `/?ansehen=<id>` in a new tab (Task 11).
 
-- [ ] **Step 1: Write the failing tests:** table with semantic `th` headers in spec order, rows sorted by nickname (locale `de`), search filters live (case-insensitive), filter `Tutorial offen` shows only rows with a step, `Nicht aktiv` only rows with a hint; hint text visible in the row (not colour only); `Details` sets the route and shows the side panel with slots, unplaced items, tutorial step, week table, ledger (date `TT.MM. HH:MM`, delta with sign, reason label: `teacher` → `Lehrkraft`, `quest` → `Quest`, `stamp` → `Stempel`, `purchase` → `Kauf`, `tutorial` → `Tutorial`, `refund` → `Erstattung`, `chest` → `Truhe`); a failing detail part shows its own error while the others render; no element contains `@lerndorf.local` or a password field.
-- [ ] **Step 2: Run** — FAIL. **Step 3: Implement.** **Step 4: Run** — PASS.
-- [ ] **Step 5: Commit** `git add web/src/teacher/pages/pupils.ts web/src/teacher/teacher.css web/tests/teacher/pupils.test.ts && git commit -m "feat(teacher): pupils page with activity, details and ledger"`
+- [x] **Step 1: Write the failing tests:** table with semantic `th` headers in spec order, rows sorted by nickname (locale `de`), search filters live (case-insensitive), filter `Tutorial offen` shows only rows with a step, `Nicht aktiv` only rows with a hint; hint text visible in the row (not colour only); `Details` sets the route and shows the side panel with slots, unplaced items, tutorial step, week table, ledger (date `TT.MM. HH:MM`, delta with sign, reason label: `teacher` → `Lehrkraft`, `quest` → `Quest`, `stamp` → `Stempel`, `purchase` → `Kauf`, `tutorial` → `Tutorial`, `refund` → `Erstattung`, `chest` → `Truhe`); a failing detail part shows its own error while the others render; no element contains `@lerndorf.local` or a password field.
+- [x] **Step 2: Run** — FAIL. **Step 3: Implement.** **Step 4: Run** — PASS.
+- [x] **Step 5: Commit** `git add web/src/teacher/pages/pupils.ts web/src/teacher/teacher.css web/tests/teacher/pupils.test.ts && git commit -m "feat(teacher): pupils page with activity, details and ledger"`
 
 ---
 
@@ -204,7 +204,7 @@
   export function bookingNote(delta: number, reason: string | null): string;   // "Schnellbuchung +10 · Mitarbeit", "Schnellbuchung −5"
   ```
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
   - each row: six buttons with exact labels and aria names; `−10` disabled when coins < 10.
   - click `+20` → `adjustCoins(id, 20, 'Schnellbuchung +20')`; with reason `Mitarbeit` selected → note `Schnellbuchung +20 · Mitarbeit`; row coins update only after success; failure → row unchanged, status error.
   - double click `+20` → one call (Review Focus 1); the row's buttons are disabled while pending.
@@ -212,9 +212,9 @@
   - multi: checkboxes + `alle`; bar `Für 3 markierte:` with four buttons; click `+10` → one `adjustCoinsMany` with the three ids; status `+10 Münzen für 3 Schüler`; undo calls `adjustCoinsMany(ids, -10, 'Rückgängig: …')`; bar hidden with 0 marked.
   - free correction (amount + required note) and stamps (Monday picker, booked greyed) behave as before (port the old tests/behaviour).
   - layout at 800 px width (set `window.innerWidth` + class check): rows switch to the stacked layout class `coins--narrow`; all buttons have class `btn-touch` (≥ 44 px in CSS).
-- [ ] **Step 2: Run** — FAIL. **Step 3: Implement** (move stamps and free correction from the temporary page here; CSS grid that wraps the six buttons into two rows of three below 1 024 px, 8 px gaps).
-- [ ] **Step 4: Run** — PASS; manual check in the dev server at 820 × 1180 and 1180 × 820.
-- [ ] **Step 5: Commit** `git add web/src/teacher/pages/coins.ts web/src/teacher/rules.ts web/src/teacher/teacher.css web/tests/teacher/coins.test.ts && git commit -m "feat(teacher): quick and multi bookings with reasons and undo"`
+- [x] **Step 2: Run** — FAIL. **Step 3: Implement** (move stamps and free correction from the temporary page here; CSS grid that wraps the six buttons into two rows of three below 1 024 px, 8 px gaps).
+- [x] **Step 4: Run** — PASS; manual check in the dev server at 820 × 1180 and 1180 × 820.
+- [x] **Step 5: Commit** `git add web/src/teacher/pages/coins.ts web/src/teacher/rules.ts web/src/teacher/teacher.css web/tests/teacher/coins.test.ts && git commit -m "feat(teacher): quick and multi bookings with reasons and undo"`
 
 ---
 
@@ -224,9 +224,9 @@
 - Create: `web/src/teacher/pages/overview.ts`
 - Test: `web/tests/teacher/overview.test.ts` (happy-dom)
 
-- [ ] **Step 1: Write the failing tests:** tiles `Schüler`, `Tutorial noch nicht fertig` (link to `#8a/schueler?filter=tutorial` → pupils page applies the filter), `Nicht aktiv seit 5 Tagen oder mehr` (link with `filter=inaktiv`), `Stempel diese Woche` (`x von y`), Daily-Quests line from `quest_status()` (`vorhanden bis So 08.11.` or the warning); a failing source shows `nicht verfügbar` only in its tile; notice editor: counter `<n>/140`, `Veröffentlichen` disabled when empty or > 140, date default today + 7, `Entfernen` only with an active notice, calls `setClassNotice`; button `Tafelmodus` routes to `tafel`.
-- [ ] **Step 2: Run** — FAIL. **Step 3: Implement** (extend `parseRoute` with an optional `filter` query in the hash; test it in `router.test.ts`). **Step 4: Run** — PASS.
-- [ ] **Step 5: Commit** `git add web/src/teacher/pages/overview.ts web/src/teacher/router.ts web/tests/teacher/overview.test.ts web/tests/teacher/router.test.ts && git commit -m "feat(teacher): overview with class figures and village notice"`
+- [x] **Step 1: Write the failing tests:** tiles `Schüler`, `Tutorial noch nicht fertig` (link to `#8a/schueler?filter=tutorial` → pupils page applies the filter), `Nicht aktiv seit 5 Tagen oder mehr` (link with `filter=inaktiv`), `Stempel diese Woche` (`x von y`), Daily-Quests line from `quest_status()` (`vorhanden bis So 08.11.` or the warning); a failing source shows `nicht verfügbar` only in its tile; notice editor: counter `<n>/140`, `Veröffentlichen` disabled when empty or > 140, date default today + 7, `Entfernen` only with an active notice, calls `setClassNotice`; button `Tafelmodus` routes to `tafel`.
+- [x] **Step 2: Run** — FAIL. **Step 3: Implement** (extend `parseRoute` with an optional `filter` query in the hash; test it in `router.test.ts`). **Step 4: Run** — PASS.
+- [x] **Step 5: Commit** `git add web/src/teacher/pages/overview.ts web/src/teacher/router.ts web/tests/teacher/overview.test.ts web/tests/teacher/router.test.ts && git commit -m "feat(teacher): overview with class figures and village notice"`
 
 ---
 
@@ -237,9 +237,9 @@
 - Modify: `web/src/teacher/teacher.css`
 - Test: `web/tests/teacher/board.test.ts` (happy-dom, fake timers)
 
-- [ ] **Step 1: Write the failing tests:** renders `8a · Woche ab 26.10.`, `Quests diese Woche` with `312 von 504` and a `progressbar` (`aria-valuenow`), `Heute`, `Klassen-Serie` with `🔥 6`, `Stempel diese Woche: 18`, notice text when present; the DOM contains no nickname of the fake class and no `Münzen` (Review Focus 3); reloads every 60 s; `Escape` and `Zurück` route to `uebersicht`; `Vollbild` calls `requestFullscreen` when available and is hidden otherwise.
-- [ ] **Step 2: Run** — FAIL. **Step 3: Implement** (font sizes in `clamp()` for 1080p beamers; high contrast; reduced motion: no bar animation). **Step 4: Run** — PASS.
-- [ ] **Step 5: Commit** `git add web/src/teacher/pages/board.ts web/src/teacher/teacher.css web/tests/teacher/board.test.ts && git commit -m "feat(teacher): board mode for the whole class"`
+- [x] **Step 1: Write the failing tests:** renders `8a · Woche ab 26.10.`, `Quests diese Woche` with `312 von 504` and a `progressbar` (`aria-valuenow`), `Heute`, `Klassen-Serie` with `🔥 6`, `Stempel diese Woche: 18`, notice text when present; the DOM contains no nickname of the fake class and no `Münzen` (Review Focus 3); reloads every 60 s; `Escape` and `Zurück` route to `uebersicht`; `Vollbild` calls `requestFullscreen` when available and is hidden otherwise.
+- [x] **Step 2: Run** — FAIL. **Step 3: Implement** (font sizes in `clamp()` for 1080p beamers; high contrast; reduced motion: no bar animation). **Step 4: Run** — PASS.
+- [x] **Step 5: Commit** `git add web/src/teacher/pages/board.ts web/src/teacher/teacher.css web/tests/teacher/board.test.ts && git commit -m "feat(teacher): board mode for the whole class"`
 
 ---
 
@@ -261,11 +261,11 @@
   export function setBoardNote(plaza: THREE.Object3D, text: string | null): void;   // one plane with a CanvasTexture on the board front; null removes it
   ```
 
-- [ ] **Step 1: Write the failing tests:** card shows title `Nachricht von deiner Lehrkraft`, the text via `textContent` (`<b>` stays literal), `OK` closes and stores the seen key; second call → `null`; throwing store → card shows and nothing throws; `setBoardNote` adds exactly one mesh named `boardNote` (one draw call), replacing it on a second call, removing it with `null`, and disposes the old texture.
-- [ ] **Step 2: Run** — FAIL.
-- [ ] **Step 3: Implement** and wire in `villageView.ts`: after the village is ready and the tutorial is not running, `loadClassNotice` → `setBoardNote` + `openNoticeCard` (after the welcome card of the XP feature if present; order: notice first). In tutorial: only the board note, the card waits until the tutorial ends.
-- [ ] **Step 4: Run** — PASS; `npm run galerie` (board note visible, readable, not z-fighting).
-- [ ] **Step 5: Commit** `git add web/src/api/notice.ts web/src/ui/noticeCard.ts web/src/render/plaza.ts web/src/ui/villageView.ts web/src/style.css web/tests/ui/noticeCard.test.ts web/tests/render/noticeNote.test.ts && git commit -m "feat(village): class notice on the board and as a one-time card"`
+- [x] **Step 1: Write the failing tests:** card shows title `Nachricht von deiner Lehrkraft`, the text via `textContent` (`<b>` stays literal), `OK` closes and stores the seen key; second call → `null`; throwing store → card shows and nothing throws; `setBoardNote` adds exactly one mesh named `boardNote` (one draw call), replacing it on a second call, removing it with `null`, and disposes the old texture.
+- [x] **Step 2: Run** — FAIL.
+- [x] **Step 3: Implement** and wire in `villageView.ts`: after the village is ready and the tutorial is not running, `loadClassNotice` → `setBoardNote` + `openNoticeCard` (after the welcome card of the XP feature if present; order: notice first). In tutorial: only the board note, the card waits until the tutorial ends.
+- [x] **Step 4: Run** — PASS; `npm run galerie` (board note visible, readable, not z-fighting).
+- [x] **Step 5: Commit** `git add web/src/api/notice.ts web/src/ui/noticeCard.ts web/src/render/plaza.ts web/src/ui/villageView.ts web/src/style.css web/tests/ui/noticeCard.test.ts web/tests/render/noticeNote.test.ts && git commit -m "feat(village): class notice on the board and as a one-time card"`
 
 ---
 
@@ -289,9 +289,9 @@
   export function renderCards(cards: Array<{ nickname: string; password: string; classId: string }>, base: string): HTMLElement; // print layout with QR svg per card + hint
   ```
 
-- [ ] **Step 1: Write the failing tests:** round trip with umlauts and special characters in the password; garbage → `null`; `takeLoginFragment` returns the values, afterwards `location.hash === ''` and `replaceState` was called with a URL without `#` (Review Focus 4); login view: with a fragment it signs in automatically (spy on `signInWithPassword` only); on failure the nickname field is filled, the password field empty, the normal error text shows; cards: one `svg` QR per card, the hint text, the URL inside the QR decodes back (use the library's data model in the test, not an image).
-- [ ] **Step 2: Run** — FAIL. **Step 3: Implement**; `main.ts` calls `takeLoginFragment()` before anything else renders. **Step 4: Run** — PASS.
-- [ ] **Step 5: Commit** `git add web/package.json web/package-lock.json web/src/teacher/cards.ts web/src/teacher/pages/accounts.ts web/src/auth/qrLogin.ts web/src/ui/loginView.ts web/src/main.ts web/tests/teacher/cards.test.ts web/tests/auth/qrLogin.test.ts blender/sources/LICENSES.md && git commit -m "feat(accounts): QR codes on access cards, login by fragment"`
+- [x] **Step 1: Write the failing tests:** round trip with umlauts and special characters in the password; garbage → `null`; `takeLoginFragment` returns the values, afterwards `location.hash === ''` and `replaceState` was called with a URL without `#` (Review Focus 4); login view: with a fragment it signs in automatically (spy on `signInWithPassword` only); on failure the nickname field is filled, the password field empty, the normal error text shows; cards: one `svg` QR per card, the hint text, the URL inside the QR decodes back (use the library's data model in the test, not an image).
+- [x] **Step 2: Run** — FAIL. **Step 3: Implement**; `main.ts` calls `takeLoginFragment()` before anything else renders. **Step 4: Run** — PASS.
+- [x] **Step 5: Commit** `git add web/package.json web/package-lock.json web/src/teacher/cards.ts web/src/teacher/pages/accounts.ts web/src/auth/qrLogin.ts web/src/ui/loginView.ts web/src/main.ts web/tests/teacher/cards.test.ts web/tests/auth/qrLogin.test.ts blender/sources/LICENSES.md && git commit -m "feat(accounts): QR codes on access cards, login by fragment"`
 
 ---
 
@@ -313,9 +313,9 @@
   export function openReadOnlyQuests(s: SupabaseClient, pupilId: string, nickname: string, onClose: () => void): AreaHandle; // teacher_pupil_quests, list only
   ```
 
-- [ ] **Step 1: Write the failing tests:** with `readOnly`: band `Ansicht von Lea – nur ansehen` + `Zurück zum Lehrerbereich` (calls `onExit`); nav shows only `Dorf` and `Aufgaben`; `Aufgaben` opens the read-only list (no answer forms, no `Prüfen`); no tutorial start, no build mode, no shop/profile/avatar badge; taps on the own plot do nothing; across the whole mount no call to `rpc()` other than `teacher_village_members` and `teacher_pupil_quests`, and no `insert/update/delete` (Review Focus 5); `main.ts`: `?ansehen=<id>` with a pupil session → ignored (normal village), with a teacher session → read-only view.
-- [ ] **Step 2: Run** — FAIL. **Step 3: Implement** (profile of the pupil read by the teacher via `profiles`; class and placements as today; camera starts at the pupil's plot). **Step 4: Run** — PASS; `npm run build`.
-- [ ] **Step 5: Commit** `git add web/src/ui/readOnlyQuests.ts web/src/ui/villageView.ts web/src/main.ts web/src/api/village.ts web/src/style.css web/tests/ui/readOnlyVillage.test.ts && git commit -m "feat(teacher): view the village as a pupil, read-only"`
+- [x] **Step 1: Write the failing tests:** with `readOnly`: band `Ansicht von Lea – nur ansehen` + `Zurück zum Lehrerbereich` (calls `onExit`); nav shows only `Dorf` and `Aufgaben`; `Aufgaben` opens the read-only list (no answer forms, no `Prüfen`); no tutorial start, no build mode, no shop/profile/avatar badge; taps on the own plot do nothing; across the whole mount no call to `rpc()` other than `teacher_village_members` and `teacher_pupil_quests`, and no `insert/update/delete` (Review Focus 5); `main.ts`: `?ansehen=<id>` with a pupil session → ignored (normal village), with a teacher session → read-only view.
+- [x] **Step 2: Run** — FAIL. **Step 3: Implement** (profile of the pupil read by the teacher via `profiles`; class and placements as today; camera starts at the pupil's plot). **Step 4: Run** — PASS; `npm run build`.
+- [x] **Step 5: Commit** `git add web/src/ui/readOnlyQuests.ts web/src/ui/villageView.ts web/src/main.ts web/src/api/village.ts web/src/style.css web/tests/ui/readOnlyVillage.test.ts && git commit -m "feat(teacher): view the village as a pupil, read-only"`
 
 ---
 
@@ -325,13 +325,13 @@
 - Create: `web/dev/teacher.html`, `web/dev/teacher.ts`, `web/e2e/teacher.spec.ts`
 - Modify: `web/playwright.config.ts`, `docs/SPEC.md` (§13, §8 RPC table), `docs/ANLEITUNG_LEHRKRAFT.md`, `docs/PLAN.md`, spec status line
 
-- [ ] **Step 1: `dev/teacher.ts`** mounts the shell with a fake Supabase (12 pupils with mixed activity, one in the tutorial, two inactive, a notice, a holiday flag switch via `?holiday=1`).
-- [ ] **Step 2: `e2e/teacher.spec.ts`:** at 1440 × 900 shots of every page, the pupil detail, the undo status, the multi bar; at 820 × 1180 and 1180 × 820 the coins page (assert every quick button ≥ 44 × 44 px and no horizontal scroll); the board page at 1920 × 1080 (assert no nickname text in the page). Fail on page errors.
-- [ ] **Step 3: Run** — green; look at every picture.
-- [ ] **Step 4: Full check** `npm test && npm run build && npx eslint src tests` — green.
-- [ ] **Step 5: Docs:** `docs/SPEC.md` §13 rewritten to the six pages + board (short, link to the spec), RPC table rows for the new functions; `docs/ANLEITUNG_LEHRKRAFT.md` new chapter „Lehrerbereich benutzen“ (pages, quick bookings with reasons and undo, board mode at the interactive whiteboard, notice, QR cards, view as pupil) in plain German, step by step; `docs/PLAN.md` block `## Zwischenpaket L – Lehrerbereich` with L.1–L.12 `[x]`, `[ ] L.13 | LK | Migration einspielen (Anleitung) |`, `[ ] L.14 | LK | **Abnahme Lehrerbereich** (Spec §14), Münzseite am Tablet, Tafelmodus am Beamer |`; spec status line `Umgesetzt laut Plan 2026-10-25; Migration (L.13) und Abnahme (L.14) stehen aus.`
-- [ ] **Step 6: Commit** `git add web/dev/teacher.html web/dev/teacher.ts web/e2e/teacher.spec.ts web/playwright.config.ts docs/SPEC.md docs/ANLEITUNG_LEHRKRAFT.md docs/PLAN.md docs/superpowers/specs/2026-10-21-teacher-ui-design.md && git commit -m "test(e2e): teacher area screenshots; guide and docs"`
-- [ ] **Step 7: Report to the teacher in German:** what is new per page, how to apply the migration (step by step, after the previous ones), that QR codes only appear on cards printed right after creating or resetting, where the screenshots are, and the checklist for L.14.
+- [x] **Step 1: `dev/teacher.ts`** mounts the shell with a fake Supabase (12 pupils with mixed activity, one in the tutorial, two inactive, a notice, a holiday flag switch via `?holiday=1`).
+- [x] **Step 2: `e2e/teacher.spec.ts`:** at 1440 × 900 shots of every page, the pupil detail, the undo status, the multi bar; at 820 × 1180 and 1180 × 820 the coins page (assert every quick button ≥ 44 × 44 px and no horizontal scroll); the board page at 1920 × 1080 (assert no nickname text in the page). Fail on page errors.
+- [x] **Step 3: Run** — green; look at every picture.
+- [x] **Step 4: Full check** `npm test && npm run build && npx eslint src tests` — green.
+- [x] **Step 5: Docs:** `docs/SPEC.md` §13 rewritten to the six pages + board (short, link to the spec), RPC table rows for the new functions; `docs/ANLEITUNG_LEHRKRAFT.md` new chapter „Lehrerbereich benutzen“ (pages, quick bookings with reasons and undo, board mode at the interactive whiteboard, notice, QR cards, view as pupil) in plain German, step by step; `docs/PLAN.md` block `## Zwischenpaket L – Lehrerbereich` with L.1–L.12 `[x]`, `[ ] L.13 | LK | Migration einspielen (Anleitung) |`, `[ ] L.14 | LK | **Abnahme Lehrerbereich** (Spec §14), Münzseite am Tablet, Tafelmodus am Beamer |`; spec status line `Umgesetzt laut Plan 2026-10-25; Migration (L.13) und Abnahme (L.14) stehen aus.`
+- [x] **Step 6: Commit** `git add web/dev/teacher.html web/dev/teacher.ts web/e2e/teacher.spec.ts web/playwright.config.ts docs/SPEC.md docs/ANLEITUNG_LEHRKRAFT.md docs/PLAN.md docs/superpowers/specs/2026-10-21-teacher-ui-design.md && git commit -m "test(e2e): teacher area screenshots; guide and docs"`
+- [x] **Step 7: Report to the teacher in German:** what is new per page, how to apply the migration (step by step, after the previous ones), that QR codes only appear on cards printed right after creating or resetting, where the screenshots are, and the checklist for L.14.
 
 ---
 
@@ -340,3 +340,14 @@
 - Spec §2 items: 1 activity → Tasks 1, 4, 5; 3 multi → Tasks 1, 6; 4 reasons → Task 6; 5 undo → Task 6; 6 board → Tasks 2, 8; 7 notice → Tasks 2, 7, 9; 8 QR → Task 10; 9 view as pupil → Tasks 2, 11; 10 ledger → Tasks 1, 5; 11 tablet coins → Task 6, 12; Fassung-1 items (nav, pupil state, quick amounts, auto note, disabled deduction, free correction, stamps, no secrets) → Tasks 3, 5, 6; old statistics removed → Task 3.
 - §4 pages + URL state → Task 3; §5 overview → Task 7; §6 table, activity definitions, details → Tasks 1, 4, 5; §7 → Task 6; §8 → Task 3; §9 → Tasks 2, 8; §10 → Tasks 2, 7, 9; §11 → Task 10; §12 → Tasks 2, 11; §13 RPCs → Tasks 1, 2; §14 acceptance → Task 12 + L.14.
 - Names defined once: `teacher_class_pupils`, `teacher_pupil_detail`, `adjust_coins_many`, `class_board`, `class_notices`, `set_class_notice`, `teacher_village_members`, `teacher_pupil_quests`, `PageId`, `TeacherContext`, `TeacherPage`, `PupilRow`, `activeLabel`, `inactiveHint`, `bookingNote`, `QUICK_AMOUNTS`, `MULTI_AMOUNTS`, `REASONS`, `ClassNotice`, `setBoardNote`, `takeLoginFragment`, `renderCards`, `ReadOnlyView`.
+
+## Umsetzung und Abweichungen – 26.10.2026
+
+- Alle zwölf Implementierungsschritte abgeschlossen, direkt und ohne Subagents. Datenbankdatei: 0022_teacher_overhaul.sql, nach XP 0020 und Tablet-Tutorial 0021. Keine Änderung an der Live-Datenbank, kein Push und keine Veröffentlichung; L.13/L.14 bleiben im Hauptplan offen.
+- Die neuere, bereits abgenommene Schülernavigation ohne Dorf-Schaltfläche gilt auch für die Leseansicht: Aufgaben und der ausdrückliche Rückweg zur Lehrkraft reichen aus. Die Leseansicht besitzt einen eigenen Renderer ohne Supabase-Schreibzugriff.
+- Level/XP/Serie stehen kompakt beim Spitznamen, damit die Tabelle neben geöffneten Details lesbar bleibt. Der bisherige Daily-Quest-Bereich ist unverändert übernommen.
+- Dorfnachricht vor der normalen Fortschritts-Willkommenskarte; während des Tutorials wartet die Karte bis zum Abschluss. Der Zettel bleibt bereits sichtbar.
+- Die vorhandene Bibliothek qrcode-generator 1.4.4 ist ausschließlich im Lehrer-Bundle. Zugangskarten werden beim Abmelden geleert; verspätete Konto-Antworten können sie nicht erneut füllen.
+- Browserprüfungen: Desktopseiten/Details, Tablet-Buchungen 820×1180 und 1180×820, 1920×1080-Tafel, aktuelle QR-Karte nach Passwortwechsel, Nur-ansehen-Dorf/Quests und Nachrichtenzettel. Acht Durchläufe grün; alle 36 Dorf-Galeriebilder angesehen. Hardware-Abnahme auf Schul-Tablet und Beamer steht aus.
+
+Abschlussprüfung: 846 Tests (112 Dateien), Build und ESLint grün. Supabase `migration list --linked` bestätigt 0001–0021 online; `db push --linked --dry-run` nennt ausschließlich 0022. Es wurde keine Migration angewendet.
