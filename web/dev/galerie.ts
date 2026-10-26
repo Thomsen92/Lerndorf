@@ -3,6 +3,7 @@
 // judged from pictures. `scripts/galerie.ts` drives it with Playwright.
 import * as THREE from 'three';
 import { bridgeHeight, buildLayout } from '../src/world/layout';
+import { setBoardNote } from '../src/render/plaza';
 import { buildVillage } from '../src/render/village';
 import { createMarketByte } from '../src/mascot/marketByte';
 import { Crowd } from '../src/render/crowd';
@@ -92,6 +93,7 @@ const members = Array.from({ length: RESIDENTS }, (_, i) => {
 if (params.get('ruin') === '1')
   members.find((m) => m.plotIndex === 0)!.slots.house = { itemId: 'ruin', rot: 0 };
 const village = buildVillage(layout, members, null);
+if (params.has('notice')) setBoardNote(village, 'Bring your English folder on Monday. Let’s learn together!');
 scene.add(village);
 const byte = createMarketByte({ scene, layout, sound: { enabled: false }, openQuests: () => undefined });
 if (params.get('byte') === '0') byte.root.visible = false;
