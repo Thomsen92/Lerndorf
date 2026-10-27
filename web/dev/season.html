@@ -16,6 +16,7 @@
       import * as THREE from 'three';
       import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
       import { loadGlbItem } from '../src/render/glbItems';
+      import { passScene } from '../src/render/passScenes';
 
       const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -25,9 +26,9 @@
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x14101c);
       const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 200);
-      camera.position.set(9, 7, 13);
+      camera.position.set(10, 8, 16);
       const controls = new OrbitControls(camera, renderer.domElement);
-      controls.target.set(0, 1, 0);
+      controls.target.set(0, 1.2, 2.5);
       controls.enableDamping = true;
       controls.autoRotate = true;
       controls.autoRotateSpeed = 0.25;
@@ -69,6 +70,24 @@
         sizes.push({ id: ids[i], size: size.toArray().map((n) => +n.toFixed(2)), minY: +box.min.y.toFixed(2) });
       }
       window.__sizes = sizes;
+
+      // Pass scenes (A3): composed Kenney scenes on their own pedestals.
+      const scenes = ['scene_pumpkin_bed', 'scene_graveyard_gate', 'scene_vampire_coffin'];
+      const sceneSpots = [[-3, 5], [0.5, 5.5], [4, 5]];
+      const sceneGroups = [];
+      for (let i = 0; i < scenes.length; i++) {
+        const model = passScene(scenes[i]);
+        model.position.set(sceneSpots[i][0], 0, sceneSpots[i][1]);
+        scene.add(model);
+        sceneGroups.push(model);
+      }
+      setTimeout(() => {
+        window.__sceneSizes = sceneGroups.map((g, i) => {
+          const b = new THREE.Box3().setFromObject(g);
+          const s = b.getSize(new THREE.Vector3());
+          return { id: scenes[i], size: s.toArray().map((n) => +n.toFixed(2)), minY: +b.min.y.toFixed(2) };
+        });
+      }, 2000);
       window.__ready = true;
 
       renderer.setAnimationLoop(() => {
