@@ -71,6 +71,10 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_house_3: { file: 'shop/house-3.glb', kind: 'house', fill: true },
   shop_home_1: { file: 'shop/home-1.glb', kind: 'house', fill: true },
   shop_home_2: { file: 'shop/home-2.glb', kind: 'house', fill: true },
+  // Landmarks and village church (0048).
+  shop_burj_khalifa: { file: 'shop/burj-khalifa.glb', kind: 'house', fill: true },
+  shop_empire_state: { file: 'shop/empire-state.glb', kind: 'house', fill: true },
+  shop_church: { file: 'shop/church.glb', kind: 'house', fill: true },
   shop_president_car: { file: 'shop/president-car.glb', kind: 'car' },
   shop_trump: { file: 'shop/trump-statue.glb', kind: 'deco' },
   // Both cars are modelled along X; a quarter turn puts the length on Z like all cars (plan §6.2).

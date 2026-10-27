@@ -477,6 +477,33 @@
             "triangles": 2357,
             "bytes": 42716,
             "dims": "6,26 × 5,88 × 6,18 m"
+        },
+        {
+            "file": "burj-khalifa.glb",
+            "name": "Burj Khalifa",
+            "kind": "house",
+            "price": 5000,
+            "triangles": 39109,
+            "bytes": 373736,
+            "dims": "20,49 × 104,04 × 17,85 Einheiten"
+        },
+        {
+            "file": "empire-state.glb",
+            "name": "Empire State Building",
+            "kind": "house",
+            "price": 4000,
+            "triangles": 12881,
+            "bytes": 135796,
+            "dims": "624,80 × 1453,24 × 319,33 Einheiten"
+        },
+        {
+            "file": "church.glb",
+            "name": "Village Church",
+            "kind": "house",
+            "price": 1200,
+            "triangles": 12208,
+            "bytes": 1191928,
+            "dims": "16,13 × 13,54 × 16,13 m"
         }
     ],
     "pending": [
