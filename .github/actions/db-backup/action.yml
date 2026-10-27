@@ -1,0 +1,94 @@
+# Encrypted backup of one Supabase database (plan 2026-10-27-beta-betrieb, B1).
+# Used by backup.yml (nightly), release.yml (before every release) and restore.yml (before a restore).
+# The repository is public: nothing unencrypted is uploaded and the logs show counts only.
+name: db-backup
+description: Dump roles, schema, data and migration history, check them, encrypt and upload.
+
+inputs:
+  db-url:
+    description: Session pooler connection string of the database (secret).
+    required: true
+  passphrase:
+    description: BACKUP_PASSPHRASE (secret).
+    required: true
+  name:
+    description: Artifact name, e.g. backup-2026-10-28.
+    required: true
+  retention-days:
+    description: How long GitHub keeps the artifact (public repos allow up to 90).
+    default: '30'
+
+runs:
+  using: composite
+  steps:
+    - uses: supabase/setup-cli@v1
+      with:
+        version: 2.120.0
+
+    - name: Dump the database
+      shell: bash
+      env:
+        DB_URL: ${{ inputs.db-url }}
+      run: |
+        set -euo pipefail
+        dir="$RUNNER_TEMP/db-backup"
+        rm -rf "$dir" && mkdir -p "$dir" && cd "$dir"
+        # The Supabase guide "Backup and restore using the CLI": roles, schema, data (incl. auth.users),
+        # and the migration history separately.
+        supabase db dump --db-url "$DB_URL" -f roles.sql --role-only
+        supabase db dump --db-url "$DB_URL" -f schema.sql
+        supabase db dump --db-url "$DB_URL" -f data.sql --use-copy --data-only \
+          -x "storage.buckets_vectors" -x "storage.vector_indexes"
+        supabase db dump --db-url "$DB_URL" -f history_schema.sql --schema supabase_migrations
+        supabase db dump --db-url "$DB_URL" -f history_data.sql --use-copy --data-only --schema supabase_migrations
+
+    - name: Compare the backup with the live database
+      shell: bash
+      env:
+        DB_URL: ${{ inputs.db-url }}
+      run: |
+        set -euo pipefail
+        dir="$RUNNER_TEMP/db-backup"
+        command -v psql >/dev/null || sudo apt-get install -y -qq postgresql-client >/dev/null
+        tables="auth.users public.profiles public.classes public.inventory public.placements public.coin_ledger public.xp_ledger"
+        echo "{" > "$dir/live.json"
+        first=1
+        for t in $tables; do
+          n=$(psql "$DB_URL" -Atqc "select count(*) from $t" 2>/dev/null || echo "")
+          [ -z "$n" ] && continue
+          [ $first -eq 1 ] || echo "," >> "$dir/live.json"
+          printf '"%s": %s' "$t" "$n" >> "$dir/live.json"
+          first=0
+        done
+        echo "}" >> "$dir/live.json"
+        {
+          echo "### Sicherung \`${{ inputs.name }}\`"
+          python3 "$GITHUB_ACTION_PATH/../../scripts/db_tools.py" summary "$dir/data.sql" "$dir/live.json"
+          last=$(grep -Eo "^[0-9]{4}" "$dir/history_data.sql" | sort | tail -1 || true)
+          echo
+          echo "Letzte Migration in der Sicherung: ${last:-unbekannt}"
+        } >> "$GITHUB_STEP_SUMMARY"
+        python3 "$GITHUB_ACTION_PATH/../../scripts/db_tools.py" check "$dir/data.sql" "$dir/live.json"
+
+    - name: Encrypt
+      shell: bash
+      env:
+        PASSPHRASE: ${{ inputs.passphrase }}
+      run: |
+        set -euo pipefail
+        dir="$RUNNER_TEMP/db-backup"
+        [ -n "$PASSPHRASE" ] || { echo "::error::BACKUP_PASSPHRASE fehlt"; exit 1; }
+        cd "$dir"
+        tar -czf backup.tar.gz roles.sql schema.sql data.sql history_schema.sql history_data.sql
+        printf '%s' "$PASSPHRASE" | gpg --batch --yes --quiet --pinentry-mode loopback --passphrase-fd 0 \
+          --symmetric --cipher-algo AES256 -o "${{ inputs.name }}.tar.gz.gpg" backup.tar.gz
+        # Only the encrypted file stays on the runner.
+        rm -f backup.tar.gz roles.sql schema.sql data.sql history_schema.sql history_data.sql live.json
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.name }}
+        path: ${{ runner.temp }}/db-backup/${{ inputs.name }}.tar.gz.gpg
+        retention-days: ${{ inputs.retention-days }}
+        if-no-files-found: error
+        compression-level: 0

@@ -592,10 +592,16 @@ Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3
 
 ## 17. Deploy und Betrieb
 
-- `deploy.yml`: bei Push auf `main` nur Tests. Cloudflare Pages baut und veröffentlicht die Seite selbst (Git-Integration, Root `web`, Build `npm ci && npm run build`, Ausgabe `dist`, Variablen `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` im Cloudflare-Projekt).
-- Supabase-Migrationen über Supabase CLI (`supabase db push`), lokal mit `supabase start` testbar.
-- Secrets (von der Lehrkraft einzutragen, Anleitung in `docs/ANLEITUNG_LEHRKRAFT.md`): `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`.
-- Die Lehrkraft muss anlegen: GitHub-Repo `Lerndorf`, Supabase-Projekt (Region `eu-west-1`, Irland – so von der Lehrkraft gewählt). Schritte dafür als einfache Anleitung mit Screenshots-Beschreibung.
+Stand 27.10.2026, Plan `docs/superpowers/plans/2026-10-27-beta-betrieb.md` (Stufe 1).
+
+- **Ein Push auf `main` ändert nichts live.** `deploy.yml` („tests“) prüft bei jedem Push auf `main` Typen, Lint und alle Tests, auch den Migrations-Wächter. `migrate.yml` gibt es nicht mehr.
+- **Live geht es nur über `release.yml`** (von Hand gestartet): Tests und Übersicht → Freigabe durch die Lehrkraft (GitHub-Umgebung `production`, Pflicht-Prüfer) → Sperre Mo–Fr 07:30–15:30 (abschaltbar) → verschlüsselte Sicherung (90 Tage) → `supabase db push` und Edge Function `admin-accounts` → `supabase/migrations.lock` fortschreiben → Branch `production` auf den freigegebenen Commit vorspulen. Cloudflare (Worker mit statischen Dateien, Workers Builds, `web/wrangler.jsonc`) baut die Live-Seite aus dem Branch `production`.
+- **Sicherung:** `backup.yml` jede Nacht 01:30 UTC über die Aktion `.github/actions/db-backup`: `supabase db dump` (Rollen, Schema, Daten inkl. `auth.users`, Migrationsstand) → Abgleich der Zeilenzahlen mit der Live-Datenbank → `tar` + `gpg` AES-256 mit `BACKUP_PASSPHRASE` → Artefakt (30 Tage). Das Repository ist öffentlich: Unverschlüsselt wird nichts hochgeladen, die Logs zeigen nur Zahlen.
+- **Wiederherstellen:** `restore.yml` (von Hand, mit Bestätigungswort). Das Ziel `test` spielt die Migrationen von `main` und danach die Sicherung ins Test-Projekt (Probe und Testdaten). Das Ziel `live` braucht die Freigabe und sichert vorher den aktuellen Stand. Geleert und geladen werden genau die Tabellen der Sicherung; Storage und beide Migrationsverläufe bleiben.
+- **Migrations-Wächter** (`web/scripts/check-migrations.ts`, Test `tests/sql/migration-guard.test.ts`): Live eingespielte Migrationen sind über SHA-256 in `supabase/migrations.lock` eingefroren. Neue dürfen nichts wegnehmen (kein `drop table/column/schema`, kein `truncate`, kein `delete` ohne `where`, keine Typänderung, keine Umbenennung, keine gelöschte Funktion ohne Neuanlage), außer mit einer Zeile `-- destructive-ok: <Grund>`. Die Nummern laufen lückenlos.
+- Quests (`import-content.yml`) gehen weiterhin direkt live (Plan B-E5). `keepalive.yml` hält das Projekt wach.
+- Secrets (Anleitung in `docs/ANLEITUNG_LEHRKRAFT.md`): `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_DB_URL` (Session-Pooler), `BACKUP_PASSPHRASE`; Umgebung `test`: `TEST_SUPABASE_URL`, `TEST_SUPABASE_ANON_KEY`, `TEST_SUPABASE_SERVICE_ROLE_KEY`, `TEST_SUPABASE_DB_PASSWORD`, `TEST_SUPABASE_DB_URL`.
+- Projekte: Supabase `Lerndorf` (live) und `Lerndorf-Test`, beide im Free-Plan, Region `eu-west-1`.
 
 ## 18. Tests und Abnahme
 

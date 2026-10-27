@@ -1,10 +1,10 @@
-# Push to main: runs the tests. The site itself is built and deployed by Cloudflare Pages (Git integration, SPEC §17).
+# Push to main: runs the tests, including the migration guard. Live goes only through release.yml
+# (Cloudflare builds the live site from the branch "production", SPEC §17).
 name: tests
 
 on:
   push:
     branches: [main]
-    paths-ignore: ['supabase/**']
   workflow_dispatch:
 
 permissions:

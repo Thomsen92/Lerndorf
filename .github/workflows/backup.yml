@@ -1,0 +1,30 @@
+# Nightly encrypted backup of the live database (plan 2026-10-27-beta-betrieb, B1).
+# 01:30 UTC = 02:30 in winter, 03:30 in summer (Berlin). Can also be started by hand.
+name: backup
+
+on:
+  schedule:
+    - cron: '30 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-backup-live
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Name of today's backup
+        id: name
+        run: echo "name=backup-$(TZ=Europe/Berlin date +%Y-%m-%d)-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+      - uses: ./.github/actions/db-backup
+        with:
+          db-url: ${{ secrets.SUPABASE_DB_URL }}
+          passphrase: ${{ secrets.BACKUP_PASSPHRASE }}
+          name: ${{ steps.name.outputs.name }}
+          retention-days: '30'

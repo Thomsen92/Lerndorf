@@ -76,10 +76,13 @@ Den Namen genau so schreiben, Groß- und Kleinschreibung zählen.
 
 ### 7. Ersten Lauf starten
 
-Im Repository auf **Actions** gehen. Dort sieht man drei Abläufe:
+Im Repository auf **Actions** gehen. Dort stehen diese Abläufe (Stand 27.10.2026):
 
-- **migrate**: richtet die Datenbank ein. Läuft automatisch bei jeder Änderung.
-- **deploy**: baut die Seite und veröffentlicht sie. Läuft automatisch bei jeder Änderung am Code.
+- **tests**: prüft jede Änderung auf `main`. Ändert nichts an der Live-Seite.
+- **release**: bringt Änderungen live – nur wenn du ihn startest und freigibst (Teil 3).
+- **backup**: sichert die Datenbank jede Nacht verschlüsselt.
+- **restore**: spielt eine Sicherung zurück (Notfall, Teil 3).
+- **import-content**: spielt Quests ein.
 - **keepalive**: hält das Supabase-Projekt wach. Läuft alle drei Tage.
 
 Falls ein Ablauf rot wird, schick den Namen des Ablaufs und die Fehlermeldung an Claude Code. Die Meldung nicht selbst umformulieren.
@@ -154,6 +157,55 @@ Vorsicht: Das Löschen entfernt Konto, Haus und alle Münzen unwiderruflich. Sch
 
 ---
 
+## Teil 3: Sicherer Betrieb mit echten Schülern
+
+Seit 27.10.2026 geht nichts mehr automatisch live. Jede Nacht entsteht eine verschlüsselte Sicherung, und live geht es nur, wenn du **release** startest und freigibst.
+
+### Einmal einrichten (etwa 10 Minuten)
+
+Schon erledigt hast du: das Test-Projekt, `BACKUP_PASSPHRASE`, `SUPABASE_DB_URL`, die Umgebungen `production` (mit dir als Prüfer) und `test` (mit fünf Secrets).
+
+Jetzt fehlen noch drei Schritte, **in dieser Reihenfolge**:
+
+1. **Erster Release.** GitHub → **Actions** → links **release** → rechts **Run workflow** → Branch `main` lassen → grüner Knopf **Run workflow**. Nach ein paar Minuten steht gelb „Waiting for review“. Den Lauf anklicken → **Review deployments** → Haken bei `production` → **Approve and deploy**. Der Ablauf macht eine Sicherung, spielt die Datenbank ein und legt den Branch `production` an. Wird er rot, die Meldung an Claude schicken.
+2. **Cloudflare umstellen.** https://dash.cloudflare.com → **Workers & Pages** → **lerndorf** → **Settings** → **Builds** → Reiter **Production** → **Production branch**: `production` auswählen und speichern. Ab jetzt baut Cloudflare die Live-Seite nur noch aus diesem Branch.
+3. **Branch schützen.** GitHub → **Settings** → **Rules** → **Rulesets** → **New ruleset** → **New branch ruleset**. Name `production`, Enforcement **Active**, bei **Target branches** → **Add target** → **Include by pattern** → `production`. Angehakt lassen: **Restrict deletions** und **Block force pushes**. Alles andere aus. **Create**.
+
+### So geht ein Update live
+
+1. Am besten abends oder am Wochenende (Mo–Fr 07:30–15:30 lehnt der Ablauf ab).
+2. **Actions** → **release** → **Run workflow** → **Run workflow**.
+3. Den Lauf anklicken. Unter „Was live geht“ steht, welche Datenbank-Änderungen dabei sind. Steht hinter einer Migration `destructive-ok`, erst bei Claude nachfragen.
+4. **Review deployments** → `production` anhaken → **Approve and deploy**.
+5. Wird alles grün, ist das Update in ein bis zwei Minuten live. Die Sicherung von vorher liegt 90 Tage unter dem Lauf bei **Artifacts**.
+
+### Sicherungen
+
+- Jede Nacht läuft **backup**. Ist ein Lauf rot, schickt dir GitHub eine E-Mail; dann die Meldung an Claude weitergeben.
+- Unter jedem Lauf steht eine Tabelle mit Zeilenzahlen (Konten, Klassen, Inventar …). Namen stehen dort nie.
+- Die Datei unter **Artifacts** ist verschlüsselt und lässt sich nur mit `BACKUP_PASSPHRASE` öffnen. **Dieses Passwort nie verlieren** – im Passwort-Manager und auf Papier in der Schule aufbewahren.
+- Einmal im Monat eine Sicherung herunterladen (Lauf öffnen → **Artifacts** → Name anklicken) und auf deinem Rechner ablegen. GitHub löscht nächtliche Sicherungen nach 30 Tagen.
+
+### Notfälle
+
+**N1 · Die Seite ist kaputt, die Daten sind in Ordnung.**
+Cloudflare → **lerndorf** → **Deployments** → bei der vorigen Version **⋯** → **Rollback**. Die Seite ist sofort wieder die alte.
+
+**N2 · Ein Update hat Daten beschädigt.**
+1. Den Klassen sagen, dass alles seit der Sicherung verloren geht (meist nur der Abend).
+2. Den Lauf mit der passenden Sicherung öffnen (meist der letzte **release**-Lauf). Seine Nummer steht in der Adresszeile nach `/runs/`, den Namen siehst du unter **Artifacts** (z. B. `pre-release-…`).
+3. **Actions** → **restore** → **Run workflow**: Wohin `live`, Nummer und Name eintragen, `WIEDERHERSTELLEN` eintippen → **Run workflow** → freigeben.
+4. Der Ablauf sichert vorher den jetzigen Stand und zeigt danach eine Tabelle. Jede Zeile muss gleich sein.
+
+**N3 · Das Live-Projekt ist weg.**
+Die letzte Sicherung mit **restore** nach `test` spielen und dann Claude bitten, Cloudflare und die Secrets auf das Test-Projekt umzustellen.
+
+### Probe (einmal, und gern vor jedem großen Update)
+
+**Actions** → **restore** → **Run workflow**: Wohin `test`, Nummer und Name der letzten nächtlichen Sicherung, `WIEDERHERSTELLEN`. Danach steht im Test-Projekt eine Kopie der echten Daten, und die Tabelle zeigt, dass die Sicherung vollständig ist.
+
+---
+
 ## Erststart-Tutorial
 
 ### Was Schüler beim ersten Anmelden erleben
@@ -203,9 +255,9 @@ Beim ersten Mal muss die Reihenfolge stimmen. Sonst versucht GitHub, Quests in e
 
 1. **Datenbank zuerst.** Claude Code lädt die neue Version des Lerndorfs auf GitHub hoch (Zweig `main`). Darin sind die Datenbank-Änderungen (Migrationen `0015` bis `0017`), aber noch **keine** Quest-Datei.
 2. Auf GitHub im Repository **Lerndorf** oben auf **Actions** klicken.
-3. In der Liste den neuesten Lauf **migrate** suchen. Warten, bis er einen **grünen Haken** hat (meist 1–2 Minuten). Ist er rot: den Namen des Ablaufs und die Fehlermeldung an Claude Code schicken und **nicht** weitermachen.
+3. Die Datenbank-Änderung mit **release** live bringen (Teil 3, „So geht ein Update live“). Warten, bis der Lauf einen **grünen Haken** hat. Ist er rot: den Namen des Ablaufs und die Fehlermeldung an Claude Code schicken und **nicht** weitermachen.
    - Es läuft auch **import-content**, weil die Beschreibung `FORMAT.md` im Ordner `content/` neu ist. Er ist grün, weil noch keine Quest-Datei da ist.
-   - Bis **migrate** grün ist, kann bei Schülern „Die Quests konnten nicht geladen werden.“ stehen. Laden Sie deshalb außerhalb der Unterrichtszeit hoch.
+   - Bis **release** grün ist, kann bei Schülern „Die Quests konnten nicht geladen werden.“ stehen. Laden Sie deshalb außerhalb der Unterrichtszeit hoch.
    - Bis die erste Quest-Datei eingespielt ist, sehen die Schüler „Heute gibt es keine neuen Quests.“ Das ist normal.
 4. **Erst jetzt die Quests.** Die erste Wochendatei (zum Beispiel `2026-11-09.json`) und, falls nötig, Ferien-Dateien in den Ordner `content/daily-quests/` legen und auf GitHub hochladen (Commit auf `main`). Das kann auch Claude Code für Sie tun.
 5. Wieder auf **Actions** gehen und warten, bis der neue Lauf **import-content** grün ist.
@@ -327,7 +379,7 @@ Nach der Prüfung durch die Lehrkraft in dieser Reihenfolge vorgehen:
 
 1. Im Projektordner die bestehende Supabase-Verknüpfung `ygopamapzhlwrpjzjunq` prüfen: `npx supabase migration list --linked`.
 2. Vorschau: `npx supabase db push --linked --dry-run`. Als ausstehende Datei wird nur 0022 erwartet. Bei weiteren oder abweichenden Dateien erst den Unterschied klären.
-3. Außerhalb der Unterrichtszeit `npx supabase db push --linked` ausführen. Die CLI wendet Migration 0022 auf den bereits vorhandenen Vorgängern an. Alternativ übernimmt der vorhandene GitHub-Ablauf „migrate“ dies bei einer abgestimmten Veröffentlichung.
+3. Außerhalb der Unterrichtszeit `npx supabase db push --linked` ausführen. Die CLI wendet Migration 0022 auf den bereits vorhandenen Vorgängern an. Seit 27.10.2026 übernimmt das der Ablauf **release** mit Sicherung und Freigabe (Teil 3).
 4. Mit `npx supabase migration list --linked` kontrollieren, dass 0022 nun ebenfalls lokal und online steht.
 5. Den passenden Website-Stand veröffentlichen. Danach mit einem Testkonto Anmeldung, drei Tutorialfragen, Profil und Nachricht prüfen; im Lehrerbereich eine kleine Buchung samt Rückgängig testen.
 

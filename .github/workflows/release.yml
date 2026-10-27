@@ -1,0 +1,139 @@
+# Release to the live game (plan 2026-10-27-beta-betrieb, B3). Started by hand in GitHub Actions.
+#
+#   1. tests and the migration guard on main, plus a summary of what goes live
+#   2. waits for the approval of the teacher (environment "production", required reviewer)
+#   3. school-hours check, encrypted backup of the live database (kept 90 days)
+#   4. supabase db push + edge function, then freezes the migrations in supabase/migrations.lock
+#   5. fast-forwards the branch "production"; Cloudflare builds the live site from it
+#
+# Pushes to main never change the live database: migrate.yml is gone, only this workflow does.
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      during_school:
+        description: 'Trotzdem jetzt veröffentlichen, auch Mo–Fr 07:30–15:30'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npx eslint src tests
+      - run: npm test
+      - name: What goes live
+        run: |
+          {
+            echo "## Was live geht"
+            echo
+            echo "**Neue Datenbank-Migrationen** (noch nicht eingefroren):"
+            echo
+            node scripts/check-migrations.ts | sed 's/^neu: /- /' || true
+            echo
+            if git rev-parse --verify -q origin/production >/dev/null; then
+              echo "**Änderungen seit dem letzten Release:**"
+              echo
+              git log --no-merges --format='- %s' origin/production..HEAD | head -60
+            else
+              echo "Erster Release: der Branch \`production\` entsteht jetzt."
+            fi
+            echo
+            echo "Zeilen mit \`destructive-ok\` stehen oben hinter der Migration. Steht dort etwas, vor dem Freigeben nachfragen."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  release:
+    needs: check
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: No release during school hours
+        if: ${{ !inputs.during_school }}
+        run: |
+          day=$(TZ=Europe/Berlin date +%u)
+          now=$((10#$(TZ=Europe/Berlin date +%H%M)))
+          if [ "$day" -le 5 ] && [ "$now" -ge 730 ] && [ "$now" -lt 1530 ]; then
+            echo "::error::Mo–Fr zwischen 07:30 und 15:30 wird nicht veröffentlicht. Später erneut starten oder 'Trotzdem jetzt' anhaken."
+            exit 1
+          fi
+
+      - uses: ./.github/actions/db-backup
+        with:
+          db-url: ${{ secrets.SUPABASE_DB_URL }}
+          passphrase: ${{ secrets.BACKUP_PASSPHRASE }}
+          name: pre-release-${{ github.sha }}-${{ github.run_id }}
+          retention-days: '90'
+
+      - name: Migrations and edge function to the live database
+        working-directory: supabase
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        run: |
+          set -euo pipefail
+          REF=$(echo "$SUPABASE_URL" | sed -E 's#https://([^.]+)\.supabase\.co.*#\1#')
+          supabase link --project-ref "$REF" --password "$SUPABASE_DB_PASSWORD"
+          supabase db push --password "$SUPABASE_DB_PASSWORD"
+          supabase functions deploy admin-accounts --project-ref "$REF"
+
+      - name: Freeze the released migrations
+        run: |
+          set -euo pipefail
+          node web/scripts/check-migrations.ts --update-lock
+          if git diff --quiet -- supabase/migrations.lock; then
+            echo "Keine neuen Migrationen."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore(release): freeze migrations released in run ${{ github.run_id }}" -- supabase/migrations.lock
+            git push origin HEAD:refs/heads/main || echo "::warning::main hat sich bewegt; bitte 'npm run migrations:lock' lokal ausführen und committen."
+          fi
+
+      - name: Publish the site (branch production)
+        env:
+          # the commit that was tested and approved, not the lock commit made above
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if git rev-parse --verify -q origin/production >/dev/null; then
+            git merge-base --is-ancestor origin/production "$SHA" || {
+              echo "::error::production ist nicht Vorgänger von main – bitte melden, nichts erzwingen."
+              exit 1
+            }
+          fi
+          git push origin "$SHA:refs/heads/production"
+          {
+            echo "## Veröffentlicht"
+            echo "Datenbank aktualisiert, \`production\` steht auf \`${SHA:0:7}\`."
+            echo "Cloudflare baut die Seite jetzt neu (ein bis zwei Minuten)."
+          } >> "$GITHUB_STEP_SUMMARY"

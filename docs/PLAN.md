@@ -284,6 +284,19 @@ Messung in derselben Szene auf allen drei Karten, Qualität „Niedrig“: Sir B
 
 ---
 
+## Zwischenpaket O – Sicherer Betrieb für die offene Beta
+
+Plan: [Beta-Betrieb](superpowers/plans/2026-10-27-beta-betrieb.md). Stufe 1 umgesetzt am 27.10.2026 auf `feature/beta-betrieb`.
+
+| AP | Status | Notiz |
+| --- | --- | --- |
+| B1 | [x] | `backup.yml` jede Nacht + Aktion `.github/actions/db-backup`: Rollen, Schema, Daten inkl. `auth.users`, Migrationsstand; Abgleich der Zeilenzahlen mit live; AES-256 mit `BACKUP_PASSPHRASE`; Artefakt 30 Tage. Abweichung: statt Rückspiel-Probe in einen Container ein Zahlenabgleich; die echte Probe ist `restore.yml` nach `test` (B4) |
+| B2 | [x] | Migrations-Wächter `web/scripts/check-migrations.ts` + 9 Tests; `supabase/migrations.lock` friert 0001–0027 ein; die Season-Migrationen 0028–0033 bestehen ihn |
+| B3 | [x] | `release.yml` (Tests, Übersicht, Freigabe `production`, Unterrichtszeit-Sperre, Sicherung 90 Tage, `db push`, Edge Function, Lock fortschreiben, Branch `production`); `migrate.yml` entfernt; `tests` läuft bei jedem Push auf `main` |
+| B4 | [x] | `restore.yml` (Ziel `test` oder `live`, Bestätigungswort, vorher Sicherung); Notfall-Anleitung N1–N3 und Probe in `ANLEITUNG_LEHRKRAFT.md` Teil 3 |
+| B5 | [ ] | Lehrkraft: erster Release, Cloudflare auf `production`, Ruleset für `production` (Anleitung Teil 3) |
+| B6 | [ ] | Erster echter Lauf von `backup` und Probe `restore` → `test` |
+
 ## Was die Lehrkraft insgesamt tun muss
 
 1. **Einmalig (Stufe 1, ca. 60 Min.):** GitHub-Repo anlegen, Supabase-Projekt anlegen, Secrets eintragen, Pages aktivieren – nach Anleitung.

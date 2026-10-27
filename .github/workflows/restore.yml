@@ -1,0 +1,133 @@
+# Restore a backup (plan 2026-10-27-beta-betrieb, B4). Started by hand, never automatically.
+#
+#   target "test": copies a live backup into the test project. The test project first gets the
+#                  migrations of main, then exactly the backed-up tables are emptied and loaded.
+#                  This is the drill for an emergency and the way to fill the test environment.
+#   target "live": puts a backup back into the live database (emergency N2). Needs the approval of
+#                  the teacher and makes a backup of the current state first. Everything pupils did
+#                  after that backup is lost.
+#
+# The migration history is not restored: the database keeps its current schema version.
+name: restore
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Wohin? test = Test-Projekt (Probe), live = echte Datenbank (Notfall)'
+        type: choice
+        options: [test, live]
+        default: test
+      run_id:
+        description: 'Nummer des Laufs, der die Sicherung gemacht hat (steht in der Adresse des Laufs)'
+        required: true
+      artifact:
+        description: 'Name der Sicherung, z. B. backup-2026-10-28-123456789'
+        required: true
+      confirm:
+        description: 'Zur Sicherheit WIEDERHERSTELLEN eintippen'
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: restore
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target == 'live' && 'production' || 'test' }}
+    env:
+      TARGET_DB_URL: ${{ inputs.target == 'live' && secrets.SUPABASE_DB_URL || secrets.TEST_SUPABASE_DB_URL }}
+    steps:
+      - name: Confirmation
+        run: |
+          [ "${{ inputs.confirm }}" = "WIEDERHERSTELLEN" ] || { echo "::error::Bestätigung fehlt: WIEDERHERSTELLEN eintippen."; exit 1; }
+          [ -n "$TARGET_DB_URL" ] || { echo "::error::Verbindung für '${{ inputs.target }}' fehlt (Secret)."; exit 1; }
+
+      - uses: actions/checkout@v4
+
+      - name: Backup of the current live state first
+        if: inputs.target == 'live'
+        uses: ./.github/actions/db-backup
+        with:
+          db-url: ${{ secrets.SUPABASE_DB_URL }}
+          passphrase: ${{ secrets.BACKUP_PASSPHRASE }}
+          name: pre-restore-${{ github.run_id }}
+          retention-days: '90'
+
+      - uses: supabase/setup-cli@v1
+        if: inputs.target == 'test'
+        with:
+          version: 2.120.0
+
+      - name: Test project gets the migrations of main
+        if: inputs.target == 'test'
+        working-directory: supabase
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+          TEST_SUPABASE_DB_PASSWORD: ${{ secrets.TEST_SUPABASE_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          REF=$(echo "$TEST_SUPABASE_URL" | sed -E 's#https://([^.]+)\.supabase\.co.*#\1#')
+          [ "$REF" != "ygopamapzhlwrpjzjunq" ] || { echo "::error::TEST_SUPABASE_URL zeigt auf das Live-Projekt."; exit 1; }
+          supabase link --project-ref "$REF" --password "$TEST_SUPABASE_DB_PASSWORD"
+          supabase db push --password "$TEST_SUPABASE_DB_PASSWORD"
+          supabase functions deploy admin-accounts --project-ref "$REF"
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact }}
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ runner.temp }}/restore
+
+      - name: Decrypt
+        env:
+          PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/restore"
+          printf '%s' "$PASSPHRASE" | gpg --batch --yes --quiet --pinentry-mode loopback --passphrase-fd 0 \
+            -o backup.tar.gz -d "${{ inputs.artifact }}.tar.gz.gpg"
+          tar -xzf backup.tar.gz data.sql
+          rm -f backup.tar.gz
+
+      - name: Empty the backed-up tables and load the backup (one transaction)
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/restore"
+          command -v psql >/dev/null || sudo apt-get install -y -qq postgresql-client >/dev/null
+          python3 "$GITHUB_WORKSPACE/.github/scripts/db_tools.py" truncate-sql data.sql > head.sql
+          # Only the data of the app and the accounts; storage and the migration histories stay.
+          python3 "$GITHUB_WORKSPACE/.github/scripts/db_tools.py" load-sql data.sql load.sql
+          psql "$TARGET_DB_URL" --quiet --single-transaction --variable ON_ERROR_STOP=1 \
+            --file head.sql --file load.sql > /dev/null
+
+      - name: Compare row counts
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/restore"
+          python3 "$GITHUB_WORKSPACE/.github/scripts/db_tools.py" counts data.sql > dump.json
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, os, subprocess, sys
+          dump = json.load(open('dump.json'))
+          bad = 0
+          print('## Wiederhergestellt nach `${{ inputs.target }}`\n')
+          print('| Tabelle | Sicherung | jetzt |\n|---|---:|---:|')
+          for table, n in sorted(dump.items()):
+              if table.split('.')[0] in ('storage', 'supabase_migrations') or table == 'auth.schema_migrations':
+                  continue
+              schema, name = table.split('.', 1)
+              now = subprocess.run(['psql', os.environ['TARGET_DB_URL'], '-Atqc',
+                                    f'select count(*) from "{schema}"."{name}"'],
+                                   capture_output=True, text=True).stdout.strip()
+              mark = '' if now == str(n) else ' ⚠️'
+              bad += mark != ''
+              print(f'| `{table}` | {n} | {now}{mark} |')
+          sys.exit(1 if bad else 0)
+          PY
