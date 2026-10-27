@@ -34,3 +34,18 @@ Thumbs.db
 # Kenney source packs and videos stay outside the repository (blender/sources/LICENSES.md)
 Kenny/
 Video/
+
+# Local asset library: large sources, not in the repo. The game uses the
+# optimised copies under web/public/assets/ (see docs/superpowers/specs).
+# Anchored to the root: on Windows (core.ignorecase) "Assets/" would also hide web/public/assets/.
+/Assets/
+
+# Local package caches and temporary build output
+.npm-cache/
+web/.npm-cache/
+web/.tmp-build/
+/test-results/
+
+# Approved reference prototype and its asset copies stay local.
+# Already tracked files in Prototyp/ remain tracked.
+/Prototyp/
