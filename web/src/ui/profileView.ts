@@ -290,7 +290,18 @@ export function openProfile(opts: {
         : rewards.filter((r) => r.kind === 'frame');
     for (const reward of items) {
       const selected = category === 'title' ? p.titleId === (reward?.id ?? null) : p.frameId === reward?.id;
-      const locked = !!reward && reward.level > p.level;
+      const locked = !!reward && (reward.season ? !reward.owned : reward.level > p.level);
+      const note = reward?.season
+        ? locked
+          ? msg`, ${tr('Season I')}`
+          : selected
+            ? tr(', gewählt')
+            : tr(', wählen')
+        : locked
+          ? msg`, ab Level ${reward!.level}`
+          : selected
+            ? tr(', gewählt')
+            : tr(', wählen');
       const card = document.createElement('div');
       card.className = `collection-card${locked ? ' collection-card--locked' : ''}${selected ? ' collection-card--selected' : ''}`;
       const error = document.createElement('p');
@@ -302,7 +313,7 @@ export function openProfile(opts: {
       b.dataset.reward = reward?.id ?? 'none';
       b.setAttribute(
         'aria-label',
-        `${reward?.label ?? tr('Kein Titel')}${locked ? msg`, ab Level ${reward!.level}` : selected ? tr(', gewählt') : tr(', wählen')}`,
+        `${reward?.label ?? tr('Kein Titel')}${note}`,
       );
       b.setAttribute('aria-pressed', String(selected));
       b.disabled = locked || busy;
@@ -314,7 +325,13 @@ export function openProfile(opts: {
       text(
         b,
         'span',
-        locked ? msg`🔒 Level ${reward!.level}` : selected ? tr('✓ Gewählt') : tr('Wählen'),
+        locked
+          ? reward?.season
+            ? msg`🔒 ${tr('Season I')}`
+            : msg`🔒 Level ${reward!.level}`
+          : selected
+            ? tr('✓ Gewählt')
+            : tr('Wählen'),
         'collection-card-state',
       );
       card.append(b, error);

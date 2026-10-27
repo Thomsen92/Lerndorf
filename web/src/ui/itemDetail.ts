@@ -10,6 +10,7 @@ import { THUMB_PLACEHOLDER, type ThumbSource } from '../render/itemThumbs';
 import { slotById, type SlotId, type SlotKind } from '../world/plotPlan';
 import { openModal, type ModalHandle } from './dialog';
 import { esc } from './esc';
+import type { SeasonApi } from '../api/season';
 import { partById, partUrl, canWear } from '../avatars/catalog';
 import type { CharacterKind } from '../render/character';
 
@@ -76,6 +77,8 @@ export interface DetailOptions {
   onChanged: () => void;
   createPreview?: PreviewFactory;
   reducedMotion?: boolean;
+  /** Season items can be sold here (RPC sell_item). */
+  season?: SeasonApi;
 }
 
 type Mode = 'detail' | 'confirm' | 'bought';
@@ -136,6 +139,23 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
   function setStatus(text: string, error = false): void {
     status.textContent = text;
     status.className = error ? 'status error' : 'status';
+  }
+
+  async function doSell(): Promise<void> {
+    if (!opts.season || busy) return;
+    busy = true;
+    for (const b of actions.querySelectorAll('button')) b.disabled = true;
+    try {
+      const res = await opts.season.sell(entry.id, 1);
+      opts.onCoins(opts.getCoins() + res.coins);
+      setStatus(msg`Verkauft für ${res.coins} Münzen.`);
+      opts.onChanged();
+      modal.close();
+    } catch {
+      setStatus(tr('Verkaufen fehlgeschlagen.'), true);
+      busy = false;
+      renderActions();
+    }
   }
 
   function renderPreview(): void {
@@ -305,6 +325,9 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       );
       if (!opts.buildOpen) actions.append(note(tr('Das Bauen ist gerade geschlossen.')));
       else if (entry.free === 0) actions.append(note(tr('Alles ist schon aufgestellt.')));
+    }
+    if (opts.season && entry.seasonItem && entry.free > 0) {
+      actions.append(button(tr('Verkaufen'), () => void doSell()));
     }
     for (const id of entry.placedIn) {
       const slot = slotById(id);

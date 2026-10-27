@@ -25,6 +25,8 @@ export interface ItemEntry {
   free: number;
   /** Slot ids that accept the kind; empty for avatar items. */
   fits: SlotId[];
+  /** Season items can be sold from the inventory. */
+  seasonItem?: boolean;
 }
 
 export const KIND_ORDER: readonly ItemKind[] = ['house', 'garage', 'car', 'deco', 'avatar'];
@@ -60,6 +62,7 @@ export function buildItemBook(
       placedIn,
       free: Math.max(0, owned - placedIn.length),
       fits,
+      seasonItem: Boolean(c.season),
     };
   });
 }

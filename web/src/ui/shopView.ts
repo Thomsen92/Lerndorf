@@ -234,6 +234,7 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
       onOpenInventory: opts.onOpenInventory,
       character: opts.character,
       onWardrobe: opts.onWardrobe,
+      season: opts.season,
       onChanged: () => {
         if (!closed) void load(false);
       },

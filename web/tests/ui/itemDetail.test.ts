@@ -4,6 +4,7 @@ import type { ItemApi, ItemEntry } from '../../src/api/items';
 import type { PreviewFactory } from '../../src/render/itemPreview';
 import { itemCard, openItemDetail, type DetailOptions } from '../../src/ui/itemDetail';
 import type { ModalHandle } from '../../src/ui/dialog';
+import type { SeasonApi } from '../../src/api/season';
 
 const deco: ItemEntry = {
   id: 'deco_cat',
@@ -232,5 +233,19 @@ describe('itemCard thumbnail', () => {
     await flush();
     expect(card.querySelector('span.item-thumb')?.textContent).toBe('👕');
     expect(itemCard(deco, 'inventar', ctx).querySelector('span.item-thumb')).not.toBeNull();
+  });
+});
+
+describe('season selling', () => {
+  it('sells one free copy for coins', async () => {
+    const sell = vi.fn().mockResolvedValue({ coins: 40 });
+    const season = { sell } as unknown as SeasonApi;
+    const { calls } = open({ origin: 'inventar', entry: { ...deco, seasonItem: true }, season });
+    await flush();
+    btn('Verkaufen')?.click();
+    await flush();
+    expect(sell).toHaveBeenCalledWith('deco_cat', 1);
+    expect(calls.onCoins).toHaveBeenCalledWith(190);
+    expect(calls.onChanged).toHaveBeenCalled();
   });
 });
