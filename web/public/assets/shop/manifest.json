@@ -387,6 +387,15 @@
             "triangles": 304,
             "bytes": 14748,
             "dims": "2,48 × 1,67 × 6,36 m"
+        },
+        {
+            "file": "fast-food-sign.glb",
+            "name": "Fast Food Sign",
+            "kind": "deco",
+            "price": 60,
+            "triangles": 60996,
+            "bytes": 331652,
+            "dims": "265,9 × 497,6 × 118,5 Einheiten"
         }
     ],
     "pending": [
