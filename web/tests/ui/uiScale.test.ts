@@ -13,6 +13,13 @@ it('defaults to medium and remembers the choice', () => {
   expect(document.documentElement.dataset.ui).toBe('s');
 });
 
+it('offers a mini size for desktop screens', () => {
+  localStorage.clear();
+  setUiScale('xs');
+  expect(readUiScale()).toBe('xs');
+  expect(document.documentElement.dataset.ui).toBe('xs');
+});
+
 it('falls back to medium when storage throws', () => {
   const broken = {
     getItem: () => {

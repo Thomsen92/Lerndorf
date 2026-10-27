@@ -1355,10 +1355,13 @@ table.ledger td {
   animation: none;
 }
 
-/* Interface size: small, medium (default, a little smaller than before) or large.
-   Zoom scales the layout, so centred panels stay centred. */
+/* Interface size: mini (desktop screens), small, medium (default, a little smaller than before) or
+   large. Zoom scales the layout, so centred panels stay centred. */
 :root {
   --ui: 0.9;
+}
+:root[data-ui='xs'] {
+  --ui: 0.7;
 }
 :root[data-ui='s'] {
   --ui: 0.8;
@@ -1371,6 +1374,7 @@ table.ledger td {
 }
 .game-nav,
 .overlay .panel,
+.house-menu,
 .tutorial-card {
   zoom: var(--ui);
 }

@@ -1,4 +1,4 @@
-export type UiScale = 's' | 'm' | 'l';
+export type UiScale = 'xs' | 's' | 'm' | 'l';
 export const UI_SCALE_KEY = 'lerndorf.uiScale';
 
 type Store = Pick<Storage, 'getItem' | 'setItem'>;
@@ -11,11 +11,11 @@ function defaultStore(): Store | null {
   }
 }
 
-/** Small, medium (default, a little smaller than the old layout) or large interface. */
+/** Mini (for desktop screens), small, medium (default, a little smaller than the old layout) or large interface. */
 export function readUiScale(from: Store | null = defaultStore()): UiScale {
   try {
     const saved = from?.getItem(UI_SCALE_KEY);
-    if (saved === 's' || saved === 'm' || saved === 'l') return saved;
+    if (saved === 'xs' || saved === 's' || saved === 'm' || saved === 'l') return saved;
   } catch {
     /* Shared tablets may block storage. */
   }

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interface size – check</title>
+  </head>
+  <body style="margin: 0; height: 100vh; background: #4f7a43">
+    <script type="module">
+      // Dev check for the interface sizes (Mini, Klein, Mittel, Groß): house menu and settings.
+      // ?ui=xs|s|m|l picks the size, ?settings opens the settings dialog.
+      import '../src/style.css';
+      import { setLocale } from '../src/i18n.ts';
+      import { applyUiScale } from '../src/ui/uiScale.ts';
+      import { openHouseMenu } from '../src/ui/houseMenu.ts';
+      import { openAccountMenu } from '../src/ui/accountMenu.ts';
+      const params = new URLSearchParams(location.search);
+      setLocale('en');
+      applyUiScale(params.get('ui') ?? 'm');
+      const noop = () => {};
+      openHouseMenu({ onBuild: noop, onShop: noop, onInventory: noop, onSettings: noop, onBack: noop });
+      if (params.has('settings')) {
+        openAccountMenu({
+          opener: document.body,
+          nickname: 'testa',
+          coins: 8121,
+          quality: 'auto',
+          onQuality: noop,
+          onLogout: noop,
+        });
+      }
+      window.__ready = true;
+    </script>
+  </body>
+</html>

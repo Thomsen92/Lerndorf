@@ -65,6 +65,7 @@ export function openAccountMenu(opts: {
     for (const [value, b] of sizeButtons) b.setAttribute('aria-pressed', String(value === scale));
   };
   for (const [value, label] of [
+    ['xs', tr('Mini')],
     ['s', tr('Klein')],
     ['m', tr('Mittel')],
     ['l', tr('Groß')],

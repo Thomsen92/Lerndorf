@@ -393,6 +393,7 @@ export const EN: Record<string, string> = {
   Sprache: 'Language',
   Neuigkeiten: 'News',
   'Größe der Oberfläche': 'Interface size',
+  Mini: 'Mini',
   Klein: 'Small',
   Mittel: 'Medium',
   Groß: 'Large',
