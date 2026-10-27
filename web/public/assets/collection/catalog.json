@@ -1,0 +1,2065 @@
+{
+  "schemaVersion": 2,
+  "season": "Season I – Halloween",
+  "name": "The Midnight Collection",
+  "license": "Own artwork and geometry, CC0 1.0",
+  "cards": [
+    {
+      "id": "lantern-verbs",
+      "number": 1,
+      "name": "Lantern of Verbs",
+      "rarity": "rare",
+      "kind": "grammar",
+      "model": "cards/lantern-verbs.glb",
+      "motifModel": "motifs/lantern-verbs.glb",
+      "thumbnail": "cards/lantern-verbs-thumb.png",
+      "front": "cards/lantern-verbs-front.svg",
+      "back": "cards/lantern-verbs-back.svg",
+      "topic": "Irregular verbs",
+      "key": "LIGHT · LIT · LIT",
+      "example": "The lantern lit the path.",
+      "notes": [
+        "Present: I light the lantern.",
+        "Past: I lit the lantern.",
+        "Perfect: I have lit the lantern."
+      ],
+      "tip": "Three forms. One little light.",
+      "color": "#95b6d2",
+      "icon": "lantern",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 14,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "pumpkin-comparisons",
+      "number": 2,
+      "name": "Pumpkin Comparisons",
+      "rarity": "normal",
+      "kind": "grammar",
+      "model": "cards/pumpkin-comparisons.glb",
+      "motifModel": "motifs/pumpkin-comparisons.glb",
+      "thumbnail": "cards/pumpkin-comparisons-thumb.png",
+      "front": "cards/pumpkin-comparisons-front.svg",
+      "back": "cards/pumpkin-comparisons-back.svg",
+      "topic": "Comparatives",
+      "key": "DARK · DARKER · DARKEST",
+      "example": "This pumpkin is bigger.",
+      "notes": [
+        "dark → darker → darkest",
+        "big → bigger → biggest",
+        "This is the biggest pumpkin."
+      ],
+      "tip": "Double the final consonant: big → bigger.",
+      "color": "#c7b891",
+      "icon": "pumpkin",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 1,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "ghost-questions",
+      "number": 3,
+      "name": "Ghost of Questions",
+      "rarity": "rare",
+      "kind": "grammar",
+      "model": "cards/ghost-questions.glb",
+      "motifModel": "motifs/ghost-questions.glb",
+      "thumbnail": "cards/ghost-questions-thumb.png",
+      "front": "cards/ghost-questions-front.svg",
+      "back": "cards/ghost-questions-back.svg",
+      "topic": "Past simple questions",
+      "key": "DID YOU HEAR THAT?",
+      "example": "Did the ghost open the door?",
+      "notes": [
+        "Did + person + base verb",
+        "Did the ghost open the door?",
+        "Yes, it did. / No, it didn't."
+      ],
+      "tip": "After did, use the base verb.",
+      "color": "#95b6d2",
+      "icon": "ghost",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 14,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "witch-recipe",
+      "number": 4,
+      "name": "The Witch’s Recipe",
+      "rarity": "epic",
+      "kind": "grammar",
+      "model": "cards/witch-recipe.glb",
+      "motifModel": "motifs/witch-recipe.glb",
+      "thumbnail": "cards/witch-recipe-thumb.png",
+      "front": "cards/witch-recipe-front.svg",
+      "back": "cards/witch-recipe-back.svg",
+      "topic": "Quantifiers",
+      "key": "A FEW · A LITTLE",
+      "example": "A few pumpkins. A little magic.",
+      "notes": [
+        "A few pumpkins: things we can count.",
+        "A little magic: something uncountable.",
+        "There are a few pumpkins in the pot."
+      ],
+      "tip": "Count the pumpkins. Feel the magic.",
+      "color": "#b198c9",
+      "icon": "cauldron",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "haunted-prepositions",
+      "number": 5,
+      "name": "Haunted Prepositions",
+      "rarity": "normal",
+      "kind": "grammar",
+      "model": "cards/haunted-prepositions.glb",
+      "motifModel": "motifs/haunted-prepositions.glb",
+      "thumbnail": "cards/haunted-prepositions-thumb.png",
+      "front": "cards/haunted-prepositions-front.svg",
+      "back": "cards/haunted-prepositions-back.svg",
+      "topic": "Prepositions of place",
+      "key": "BEHIND · BETWEEN · ABOVE",
+      "example": "The bat is above the gate.",
+      "notes": [
+        "The cat is between the pumpkins.",
+        "The ghost is behind the tree.",
+        "The bat is above the gate."
+      ],
+      "tip": "Tiny words tell us where things are.",
+      "color": "#c7b891",
+      "icon": "gate",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 2,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "blood-moon-story",
+      "number": 6,
+      "name": "Blood Moon Story",
+      "rarity": "epic",
+      "kind": "grammar",
+      "model": "cards/blood-moon-story.glb",
+      "motifModel": "motifs/blood-moon-story.glb",
+      "thumbnail": "cards/blood-moon-story-thumb.png",
+      "front": "cards/blood-moon-story-front.svg",
+      "back": "cards/blood-moon-story-back.svg",
+      "topic": "Past continuous",
+      "key": "WAS / WERE + -ING",
+      "example": "I was reading when the moon turned red.",
+      "notes": [
+        "I was reading.",
+        "They were walking.",
+        "An action was in progress in the past."
+      ],
+      "tip": "Set the scene. Then tell the story.",
+      "color": "#b198c9",
+      "icon": "moon",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "night-light",
+      "number": 7,
+      "name": "The Star",
+      "rarity": "normal",
+      "kind": "rhyme",
+      "model": "cards/night-light.glb",
+      "motifModel": "motifs/night-light.glb",
+      "thumbnail": "cards/night-light-thumb.png",
+      "front": "cards/night-light-front.svg",
+      "back": "cards/night-light-back.svg",
+      "topic": "Classic verse",
+      "key": "STAR · ARE",
+      "example": "TWINKLE, twinkle, little star,",
+      "notes": [
+        "TWINKLE, twinkle, little star,",
+        "How I wonder what you are !",
+        "Star and are share the same ending sound."
+      ],
+      "tip": "Read a real nursery poem aloud.",
+      "color": "#c7b891",
+      "icon": "star",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 3,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "source": {
+        "type": "original-excerpt",
+        "author": "Jane Taylor",
+        "work": "The Star",
+        "location": "Opening couplet",
+        "url": "https://www.poetryfoundation.org/poems/45316/the-star-56d224c697fbe",
+        "publisher": "Poetry Foundation",
+        "excerptLines": [
+          "TWINKLE, twinkle, little star,",
+          "How I wonder what you are !"
+        ],
+        "verifiedOn": "2026-10-27",
+        "rights": "Public-domain original text; source transcription credited",
+        "authorNote": "The linked transcription credits Ann and Jane Taylor jointly. The Morgan Library attributes this poem to Jane Taylor.",
+        "additionalUrl": "https://www.themorgan.org/music-manuscripts-and-printed-music/85839"
+      }
+    },
+    {
+      "id": "bat-cat",
+      "number": 8,
+      "name": "The Owl and the Pussy-Cat",
+      "rarity": "normal",
+      "kind": "rhyme",
+      "model": "cards/bat-cat.glb",
+      "motifModel": "motifs/bat-cat.glb",
+      "thumbnail": "cards/bat-cat-thumb.png",
+      "front": "cards/bat-cat-front.svg",
+      "back": "cards/bat-cat-back.svg",
+      "topic": "Classic verse",
+      "key": "HAND · SAND",
+      "example": "And hand in hand, on the edge of the sand,",
+      "notes": [
+        "And hand in hand, on the edge of the sand,",
+        "They danced by the light of the moon,",
+        "Hand and sand rhyme inside the same line."
+      ],
+      "tip": "Find the rhyme within the line.",
+      "color": "#c7b891",
+      "icon": "cat",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 3,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "source": {
+        "type": "original-excerpt",
+        "author": "Edward Lear",
+        "work": "The Owl and the Pussy-Cat",
+        "location": "Stanza III, two lines",
+        "url": "https://www.poetryfoundation.org/poems/43188/the-owl-and-the-pussy-cat",
+        "publisher": "Poetry Foundation",
+        "excerptLines": [
+          "And hand in hand, on the edge of the sand,",
+          "They danced by the light of the moon,"
+        ],
+        "verifiedOn": "2026-10-27",
+        "rights": "Public-domain original text; source transcription credited"
+      }
+    },
+    {
+      "id": "moon-spoon",
+      "number": 9,
+      "name": "The Moon",
+      "rarity": "normal",
+      "kind": "rhyme",
+      "model": "cards/moon-spoon.glb",
+      "motifModel": "motifs/moon-spoon.glb",
+      "thumbnail": "cards/moon-spoon-thumb.png",
+      "front": "cards/moon-spoon-front.svg",
+      "back": "cards/moon-spoon-back.svg",
+      "topic": "Classic verse",
+      "key": "HALL · WALL",
+      "example": "The moon has a face like the clock in the hall;",
+      "notes": [
+        "The moon has a face like the clock in the hall;",
+        "She shines on thieves on the garden wall,",
+        "Hall and wall rhyme. The moon is described as a person."
+      ],
+      "tip": "Notice how a poem gives the moon a face.",
+      "color": "#c7b891",
+      "icon": "moon",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 4,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "source": {
+        "type": "original-excerpt",
+        "author": "Robert Louis Stevenson",
+        "work": "The Moon",
+        "location": "A Child’s Garden of Verses, opening couplet",
+        "url": "https://www.gutenberg.org/files/25609/25609-h/25609-h.htm",
+        "publisher": "Project Gutenberg",
+        "excerptLines": [
+          "The moon has a face like the clock in the hall;",
+          "She shines on thieves on the garden wall,"
+        ],
+        "verifiedOn": "2026-10-27",
+        "rights": "Public-domain original text; source transcription credited"
+      }
+    },
+    {
+      "id": "book-look",
+      "number": 10,
+      "name": "The Tyger",
+      "rarity": "normal",
+      "kind": "rhyme",
+      "model": "cards/book-look.glb",
+      "motifModel": "motifs/book-look.glb",
+      "thumbnail": "cards/book-look-thumb.png",
+      "front": "cards/book-look-front.svg",
+      "back": "cards/book-look-back.svg",
+      "topic": "Classic verse",
+      "key": "BRIGHT · NIGHT",
+      "example": "Tyger Tyger, burning bright,",
+      "notes": [
+        "Tyger Tyger, burning bright,",
+        "In the forests of the night;",
+        "Bright and night rhyme. Tyger is an older spelling of tiger."
+      ],
+      "tip": "Listen for the repeated b in burning bright.",
+      "color": "#c7b891",
+      "icon": "cat",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 5,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "source": {
+        "type": "original-excerpt",
+        "author": "William Blake",
+        "work": "The Tyger",
+        "location": "Opening couplet",
+        "url": "https://www.poetryfoundation.org/poems/43687/the-tyger",
+        "publisher": "Poetry Foundation",
+        "excerptLines": [
+          "Tyger Tyger, burning bright,",
+          "In the forests of the night;"
+        ],
+        "verifiedOn": "2026-10-27",
+        "rights": "Public-domain original text; source transcription credited"
+      }
+    },
+    {
+      "id": "adjective-key",
+      "number": 11,
+      "name": "Key of Adjectives",
+      "rarity": "normal",
+      "kind": "vocabulary",
+      "model": "cards/adjective-key.glb",
+      "motifModel": "motifs/adjective-key.glb",
+      "thumbnail": "cards/adjective-key-thumb.png",
+      "front": "cards/adjective-key-front.svg",
+      "back": "cards/adjective-key-back.svg",
+      "topic": "Describing words",
+      "key": "BRAVE · BRIGHT · STRANGE",
+      "example": "A brave cat enters a strange house.",
+      "notes": [
+        "Adjectives describe nouns.",
+        "A bright lantern. A strange noise.",
+        "The brave cat opens the gate."
+      ],
+      "tip": "Find three adjectives in your next story.",
+      "color": "#c7b891",
+      "icon": "key",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 5,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "past-footsteps",
+      "number": 12,
+      "name": "Footsteps in the Past",
+      "rarity": "normal",
+      "kind": "grammar",
+      "model": "cards/past-footsteps.glb",
+      "motifModel": "motifs/past-footsteps.glb",
+      "thumbnail": "cards/past-footsteps-thumb.png",
+      "front": "cards/past-footsteps-front.svg",
+      "back": "cards/past-footsteps-back.svg",
+      "topic": "Regular verbs",
+      "key": "WALK · WALKED · WALKED",
+      "example": "The keeper walked home.",
+      "notes": [
+        "Present: I walk past the gate.",
+        "Past: I walked past the gate.",
+        "Perfect: I have walked past the gate."
+      ],
+      "tip": "Regular verbs often end in -ed.",
+      "color": "#c7b891",
+      "icon": "boot",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 6,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "talking-pumpkin",
+      "number": 13,
+      "name": "The Talking Pumpkin",
+      "rarity": "normal",
+      "kind": "grammar",
+      "model": "cards/talking-pumpkin.glb",
+      "motifModel": "motifs/talking-pumpkin.glb",
+      "thumbnail": "cards/talking-pumpkin-thumb.png",
+      "front": "cards/talking-pumpkin-front.svg",
+      "back": "cards/talking-pumpkin-back.svg",
+      "topic": "Ability with can",
+      "key": "CAN · CANNOT · CAN’T",
+      "example": "This pumpkin can tell a story.",
+      "notes": [
+        "Can + base verb describes ability.",
+        "The pumpkin can speak English.",
+        "It cannot fly, but it can sing."
+      ],
+      "tip": "Use can without to.",
+      "color": "#c7b891",
+      "icon": "speech",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 7,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "time-for-tea",
+      "number": 14,
+      "name": "Time for Tea",
+      "rarity": "normal",
+      "kind": "grammar",
+      "model": "cards/time-for-tea.glb",
+      "motifModel": "motifs/time-for-tea.glb",
+      "thumbnail": "cards/time-for-tea-thumb.png",
+      "front": "cards/time-for-tea-front.svg",
+      "back": "cards/time-for-tea-back.svg",
+      "topic": "Time expressions",
+      "key": "AT NIGHT · IN OCTOBER",
+      "example": "We meet on Monday at night.",
+      "notes": [
+        "At night. In October. On Monday.",
+        "Use on with days.",
+        "We read in the evening."
+      ],
+      "tip": "Small time words make a big difference.",
+      "color": "#c7b891",
+      "icon": "cup",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 7,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "better-late",
+      "number": 15,
+      "name": "Better Late Than Never",
+      "rarity": "rare",
+      "kind": "proverb",
+      "model": "cards/better-late.glb",
+      "motifModel": "motifs/better-late.glb",
+      "thumbnail": "cards/better-late-thumb.png",
+      "front": "cards/better-late-front.svg",
+      "back": "cards/better-late-back.svg",
+      "topic": "Proverb",
+      "key": "BETTER LATE THAN NEVER",
+      "example": "The ghost arrived late, but arrived.",
+      "notes": [
+        "Doing something late can be better than not doing it.",
+        "The ghost was late for reading club.",
+        "It joined in instead of giving up."
+      ],
+      "tip": "A traditional proverb about making an effort.",
+      "color": "#95b6d2",
+      "icon": "clock",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 15,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "two-heads",
+      "number": 16,
+      "name": "Two Heads Are Better",
+      "rarity": "rare",
+      "kind": "proverb",
+      "model": "cards/two-heads.glb",
+      "motifModel": "motifs/two-heads.glb",
+      "thumbnail": "cards/two-heads-thumb.png",
+      "front": "cards/two-heads-front.svg",
+      "back": "cards/two-heads-back.svg",
+      "topic": "Proverb",
+      "key": "TWO HEADS ARE BETTER THAN ONE",
+      "example": "Two friends solve the puzzle together.",
+      "notes": [
+        "Working together can help us find better ideas.",
+        "One ghost reads. One checks the words.",
+        "Together they understand the story."
+      ],
+      "tip": "A traditional proverb about teamwork.",
+      "color": "#95b6d2",
+      "icon": "two-heads",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 16,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "practice-perfect",
+      "number": 17,
+      "name": "Practice Makes Perfect",
+      "rarity": "rare",
+      "kind": "proverb",
+      "model": "cards/practice-perfect.glb",
+      "motifModel": "motifs/practice-perfect.glb",
+      "thumbnail": "cards/practice-perfect-thumb.png",
+      "front": "cards/practice-perfect-front.svg",
+      "back": "cards/practice-perfect-back.svg",
+      "topic": "Proverb",
+      "key": "PRACTICE MAKES PERFECT",
+      "example": "The witch practises a little each day.",
+      "notes": [
+        "Practice helps us improve a skill.",
+        "The witch reads five new words each day.",
+        "A mistake is a chance to practise again."
+      ],
+      "tip": "A traditional proverb about steady practice.",
+      "color": "#95b6d2",
+      "icon": "target",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 16,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "friend-in-need",
+      "number": 18,
+      "name": "A Friend in Need",
+      "rarity": "rare",
+      "kind": "proverb",
+      "model": "cards/friend-in-need.glb",
+      "motifModel": "motifs/friend-in-need.glb",
+      "thumbnail": "cards/friend-in-need-thumb.png",
+      "front": "cards/friend-in-need-front.svg",
+      "back": "cards/friend-in-need-back.svg",
+      "topic": "Proverb",
+      "key": "A FRIEND IN NEED IS A FRIEND INDEED",
+      "example": "A friend brings a lantern to help.",
+      "notes": [
+        "A true friend helps when things are difficult.",
+        "The path was dark, so a friend brought a light.",
+        "Indeed means really or truly."
+      ],
+      "tip": "A traditional proverb about friendship.",
+      "color": "#95b6d2",
+      "icon": "heart",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 17,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "hidden-key",
+      "number": 19,
+      "name": "The Hidden Key",
+      "rarity": "rare",
+      "kind": "grammar",
+      "model": "cards/hidden-key.glb",
+      "motifModel": "motifs/hidden-key.glb",
+      "thumbnail": "cards/hidden-key-thumb.png",
+      "front": "cards/hidden-key-front.svg",
+      "back": "cards/hidden-key-back.svg",
+      "topic": "Prepositions of place",
+      "key": "UNDER · NEXT TO · INSIDE",
+      "example": "The key is under the old book.",
+      "notes": [
+        "The key is under the book.",
+        "The lock is next to the gate.",
+        "A note is inside the box."
+      ],
+      "tip": "Describe a hiding place in English.",
+      "color": "#95b6d2",
+      "icon": "lock",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 18,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "slow-steady",
+      "number": 20,
+      "name": "Slow and Steady",
+      "rarity": "rare",
+      "kind": "proverb",
+      "model": "cards/slow-steady.glb",
+      "motifModel": "motifs/slow-steady.glb",
+      "thumbnail": "cards/slow-steady-thumb.png",
+      "front": "cards/slow-steady-front.svg",
+      "back": "cards/slow-steady-back.svg",
+      "topic": "Proverb",
+      "key": "SLOW AND STEADY WINS THE RACE",
+      "example": "A little progress every day adds up.",
+      "notes": [
+        "Calm, regular effort can bring success.",
+        "The tortoise learns one new word a day.",
+        "It keeps going, even when learning is slow."
+      ],
+      "tip": "A traditional proverb about patience.",
+      "color": "#95b6d2",
+      "icon": "tortoise",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 18,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "rain-train",
+      "number": 21,
+      "name": "Who Has Seen the Wind?",
+      "rarity": "rare",
+      "kind": "rhyme",
+      "model": "cards/rain-train.glb",
+      "motifModel": "motifs/rain-train.glb",
+      "thumbnail": "cards/rain-train-thumb.png",
+      "front": "cards/rain-train-front.svg",
+      "back": "cards/rain-train-back.svg",
+      "topic": "Classic verse",
+      "key": "YOU · THROUGH",
+      "example": "Who has seen the wind?",
+      "notes": [
+        "Who has seen the wind?",
+        "Neither I nor you:",
+        "But when the leaves hang trembling,",
+        "The wind is passing through.",
+        "You and through rhyme, although their spellings differ."
+      ],
+      "tip": "Read the stanza and listen for you / through.",
+      "color": "#95b6d2",
+      "icon": "umbrella",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 19,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "source": {
+        "type": "original-excerpt",
+        "author": "Christina Rossetti",
+        "work": "Who Has Seen the Wind?",
+        "location": "First stanza",
+        "url": "https://www.poetryfoundation.org/poems/43197/who-has-seen-the-wind",
+        "publisher": "Poetry Foundation",
+        "excerptLines": [
+          "Who has seen the wind?",
+          "Neither I nor you:",
+          "But when the leaves hang trembling,",
+          "The wind is passing through."
+        ],
+        "verifiedOn": "2026-10-27",
+        "rights": "Public-domain original text; source transcription credited"
+      }
+    },
+    {
+      "id": "quiet-mouse",
+      "number": 22,
+      "name": "Quiet as a Mouse",
+      "rarity": "rare",
+      "kind": "simile",
+      "model": "cards/quiet-mouse.glb",
+      "motifModel": "motifs/quiet-mouse.glb",
+      "thumbnail": "cards/quiet-mouse-thumb.png",
+      "front": "cards/quiet-mouse-front.svg",
+      "back": "cards/quiet-mouse-back.svg",
+      "topic": "Simile",
+      "key": "AS QUIET AS A MOUSE",
+      "example": "The reader is as quiet as a mouse.",
+      "notes": [
+        "A simile compares two things.",
+        "As quiet as a mouse means very quiet.",
+        "The mouse listens beside the book."
+      ],
+      "tip": "Use as + adjective + as to compare.",
+      "color": "#95b6d2",
+      "icon": "mouse",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 20,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "silver-lining",
+      "number": 23,
+      "name": "The Silver Lining",
+      "rarity": "epic",
+      "kind": "proverb",
+      "model": "cards/silver-lining.glb",
+      "motifModel": "motifs/silver-lining.glb",
+      "thumbnail": "cards/silver-lining-thumb.png",
+      "front": "cards/silver-lining-front.svg",
+      "back": "cards/silver-lining-back.svg",
+      "topic": "Proverb",
+      "key": "EVERY CLOUD HAS A SILVER LINING",
+      "example": "Even a difficult day can hold something good.",
+      "notes": [
+        "A difficult situation may have a good side.",
+        "The rain kept us inside.",
+        "We found a new story to read together."
+      ],
+      "tip": "A traditional proverb about finding hope.",
+      "color": "#b198c9",
+      "icon": "cloud",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "book-cover",
+      "number": 24,
+      "name": "Beyond the Cover",
+      "rarity": "epic",
+      "kind": "proverb",
+      "model": "cards/book-cover.glb",
+      "motifModel": "motifs/book-cover.glb",
+      "thumbnail": "cards/book-cover-thumb.png",
+      "front": "cards/book-cover-front.svg",
+      "back": "cards/book-cover-back.svg",
+      "topic": "Proverb",
+      "key": "DON’T JUDGE A BOOK BY ITS COVER",
+      "example": "An old cover can hide a wonderful story.",
+      "notes": [
+        "Appearance does not tell us everything.",
+        "The book looked old and dusty.",
+        "Inside was a funny, exciting story."
+      ],
+      "tip": "A traditional proverb about looking deeper.",
+      "color": "#b198c9",
+      "icon": "closed-book",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "actions-words",
+      "number": 25,
+      "name": "Actions Speak Louder",
+      "rarity": "epic",
+      "kind": "proverb",
+      "model": "cards/actions-words.glb",
+      "motifModel": "motifs/actions-words.glb",
+      "thumbnail": "cards/actions-words-thumb.png",
+      "front": "cards/actions-words-front.svg",
+      "back": "cards/actions-words-back.svg",
+      "topic": "Proverb",
+      "key": "ACTIONS SPEAK LOUDER THAN WORDS",
+      "example": "The keeper helps instead of just promising.",
+      "notes": [
+        "What we do can matter more than what we say.",
+        "The keeper said he would help.",
+        "Then he carried the books home."
+      ],
+      "tip": "A traditional proverb about keeping promises.",
+      "color": "#b198c9",
+      "icon": "megaphone",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "birds-feather",
+      "number": 26,
+      "name": "Birds of a Feather",
+      "rarity": "epic",
+      "kind": "proverb",
+      "model": "cards/birds-feather.glb",
+      "motifModel": "motifs/birds-feather.glb",
+      "thumbnail": "cards/birds-feather-thumb.png",
+      "front": "cards/birds-feather-front.svg",
+      "back": "cards/birds-feather-back.svg",
+      "topic": "Proverb",
+      "key": "BIRDS OF A FEATHER FLOCK TOGETHER",
+      "example": "Friends often share interests.",
+      "notes": [
+        "People with similar interests often spend time together.",
+        "The night readers all enjoy ghost stories.",
+        "They meet at the library every Friday."
+      ],
+      "tip": "A traditional proverb about shared interests.",
+      "color": "#b198c9",
+      "icon": "feather",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "sleepy-skeletons",
+      "number": 27,
+      "name": "Peter Piper’s Practice",
+      "rarity": "epic",
+      "kind": "tongue-twister",
+      "model": "cards/sleepy-skeletons.glb",
+      "motifModel": "motifs/sleepy-skeletons.glb",
+      "thumbnail": "cards/sleepy-skeletons-thumb.png",
+      "front": "cards/sleepy-skeletons-front.svg",
+      "back": "cards/sleepy-skeletons-back.svg",
+      "topic": "Traditional tongue twister",
+      "key": "PETER · PIPER · PEPPERS",
+      "example": "Peter Piper picked a peck of pickled peppers,",
+      "notes": [
+        "Peter Piper picked a peck of pickled peppers,",
+        "Repeat the p sound slowly. A peck is an old measure."
+      ],
+      "tip": "A traditional tongue twister, recited by our skeleton.",
+      "color": "#b198c9",
+      "icon": "skull",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      },
+      "source": {
+        "type": "original-excerpt",
+        "author": "Traditional",
+        "work": "Peter Piper",
+        "location": "First line",
+        "url": "https://etc.usf.edu/lit2go/74/nursery-rhymes-and-traditional-poems/5326/peter-piper/",
+        "publisher": "University of South Florida · Lit2Go",
+        "excerptLines": [
+          "Peter Piper picked a peck of pickled peppers,"
+        ],
+        "verifiedOn": "2026-10-27",
+        "rights": "Public-domain original text; source transcription credited"
+      }
+    },
+    {
+      "id": "echo-verse",
+      "number": 28,
+      "name": "The Witches’ Chant",
+      "rarity": "epic",
+      "kind": "rhyme",
+      "model": "cards/echo-verse.glb",
+      "motifModel": "motifs/echo-verse.glb",
+      "thumbnail": "cards/echo-verse-thumb.png",
+      "front": "cards/echo-verse-front.svg",
+      "back": "cards/echo-verse-back.svg",
+      "topic": "Classic verse",
+      "key": "TROUBLE · BUBBLE",
+      "example": "Double, double toil and trouble;",
+      "notes": [
+        "Double, double toil and trouble;",
+        "Fire burn, and cauldron bubble.",
+        "Trouble and bubble rhyme. Toil means hard work."
+      ],
+      "tip": "Say the witches’ chant with a steady beat.",
+      "color": "#b198c9",
+      "icon": "cauldron",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      },
+      "source": {
+        "type": "original-excerpt",
+        "author": "William Shakespeare",
+        "work": "Macbeth",
+        "location": "Act 4, scene 1, lines 10–11",
+        "url": "https://www.folger.edu/explore/shakespeares-works/macbeth/read/",
+        "publisher": "Folger Shakespeare Library",
+        "excerptLines": [
+          "Double, double toil and trouble;",
+          "Fire burn, and cauldron bubble."
+        ],
+        "verifiedOn": "2026-10-27",
+        "rights": "Public-domain original text; source transcription credited"
+      }
+    },
+    {
+      "id": "fortune-brave",
+      "number": 29,
+      "name": "Fortune Favours the Brave",
+      "rarity": "epic",
+      "kind": "proverb",
+      "model": "cards/fortune-brave.glb",
+      "motifModel": "motifs/fortune-brave.glb",
+      "thumbnail": "cards/fortune-brave-thumb.png",
+      "front": "cards/fortune-brave-front.svg",
+      "back": "cards/fortune-brave-back.svg",
+      "topic": "Proverb",
+      "key": "FORTUNE FAVOURS THE BRAVE",
+      "example": "The learner tries a new story.",
+      "notes": [
+        "Trying something difficult can lead to good things.",
+        "The learner felt shy but read the first line.",
+        "One brave step made the next step easier."
+      ],
+      "tip": "A traditional proverb about trying.",
+      "color": "#b198c9",
+      "icon": "shield",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "knowledge-power",
+      "number": 30,
+      "name": "Knowledge Is Power",
+      "rarity": "epic",
+      "kind": "proverb",
+      "model": "cards/knowledge-power.glb",
+      "motifModel": "motifs/knowledge-power.glb",
+      "thumbnail": "cards/knowledge-power-thumb.png",
+      "front": "cards/knowledge-power-front.svg",
+      "back": "cards/knowledge-power-back.svg",
+      "topic": "Proverb",
+      "key": "KNOWLEDGE IS POWER",
+      "example": "New words open new doors.",
+      "notes": [
+        "Learning helps us understand and do more.",
+        "The reader learnt the meaning of a sign.",
+        "Now the hidden door makes sense."
+      ],
+      "tip": "A traditional proverb about the value of learning.",
+      "color": "#b198c9",
+      "icon": "orb-book",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "empire-state-postcard",
+      "number": 39,
+      "name": "Empire State after Dark",
+      "rarity": "rare",
+      "kind": "vocabulary",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/empire-state-postcard.glb",
+      "motifModel": "prints/empire-state-postcard.glb",
+      "thumbnail": "prints/empire-state-thumb.png",
+      "front": "prints/empire-state-front.png",
+      "back": "prints/empire-state-back.svg",
+      "topic": "Empire State Building",
+      "key": "TALL · TALLER · TALLEST",
+      "example": "A frightfully tall hello from New York!",
+      "notes": [
+        "The supplied photograph becomes a Halloween postcard.",
+        "Compare heights using taller than.",
+        "The back is a little postcard to the night readers."
+      ],
+      "tip": "A photographic print on a real, thin 3D postcard.",
+      "color": "#95b6d2",
+      "icon": "print",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 20,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "Empire State Building",
+        "note": "Halloween transformation of supplied photo; new postcard text."
+      }
+    },
+    {
+      "id": "manhattan-postcard",
+      "number": 40,
+      "name": "Manhattan after Dark",
+      "rarity": "epic",
+      "kind": "vocabulary",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/manhattan-postcard.glb",
+      "motifModel": "prints/manhattan-postcard.glb",
+      "thumbnail": "prints/manhattan-thumb.png",
+      "front": "prints/manhattan-front.png",
+      "back": "prints/manhattan-back.svg",
+      "topic": "New York · cityscape",
+      "key": "SKYLINE · HARBOUR · MIST",
+      "example": "Wish you were here… if you dare.",
+      "notes": [
+        "A blood moon rises over the supplied Manhattan view.",
+        "The skyline is glowing. The water is reflecting the lights.",
+        "City words: skyline, harbour, pier and mist."
+      ],
+      "tip": "Describe what you can see in the picture.",
+      "color": "#b198c9",
+      "icon": "print",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "New York · cityscape",
+        "note": "Halloween transformation of supplied photo; new postcard text."
+      }
+    },
+    {
+      "id": "midnight-focus-card",
+      "number": 41,
+      "name": "The Midnight Focus",
+      "rarity": "normal",
+      "kind": "grammar",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/midnight-focus-card.glb",
+      "motifModel": "prints/midnight-focus-card.glb",
+      "thumbnail": "prints/focus-thumb.png",
+      "front": "prints/focus-front.svg",
+      "back": "prints/focus-back.svg",
+      "topic": "Relative clauses",
+      "key": "WHO · WHICH",
+      "example": "The witch who lives next door is friendly.",
+      "notes": [
+        "The original Focus box is printed unchanged.",
+        "Halloween examples are added beneath the original box.",
+        "Who refers to people; which refers to things."
+      ],
+      "tip": "Look for the relative clause in each new sentence.",
+      "color": "#c7b891",
+      "icon": "print",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 8,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "Relative clauses",
+        "note": "Original source box unchanged; separate Halloween examples added.",
+        "sourceImage": "prints/reference-focus.png"
+      }
+    },
+    {
+      "id": "two-ways-boo-card",
+      "number": 42,
+      "name": "Two Ways to Say Boo",
+      "rarity": "normal",
+      "kind": "vocabulary",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/two-ways-boo-card.glb",
+      "motifModel": "prints/two-ways-boo-card.glb",
+      "thumbnail": "prints/british-american-thumb.png",
+      "front": "prints/british-american-front.svg",
+      "back": "prints/british-american-back.svg",
+      "topic": "British / American English",
+      "key": "COLOUR · COLOR · BISCUIT · COOKIE",
+      "example": "My favourite colour is orange.",
+      "notes": [
+        "The original British/American table is printed unchanged.",
+        "New Halloween examples appear below it in two columns.",
+        "Our neighbour gives us biscuits. Our neighbor gives us cookies."
+      ],
+      "tip": "Same Halloween, different English.",
+      "color": "#c7b891",
+      "icon": "print",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 9,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "British / American English",
+        "note": "Original source box unchanged; separate Halloween examples added.",
+        "sourceImage": "prints/reference-british-american.png"
+      }
+    },
+    {
+      "id": "become-go-grow-card",
+      "number": 43,
+      "name": "Become, Go or Grow?",
+      "rarity": "normal",
+      "kind": "grammar",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/become-go-grow-card.glb",
+      "motifModel": "prints/become-go-grow-card.glb",
+      "thumbnail": "prints/become-go-grow-thumb.png",
+      "front": "prints/become-go-grow-front.svg",
+      "back": "prints/become-go-grow-back.svg",
+      "topic": "German werden",
+      "key": "BECOME · GO · GROW",
+      "example": "The pumpkin became a lantern.",
+      "notes": [
+        "The original German werden table is printed unchanged.",
+        "Become can introduce a noun: became a lantern.",
+        "Go bad and grow darker describe changes of state."
+      ],
+      "tip": "Choose the English verb that fits the meaning.",
+      "color": "#c7b891",
+      "icon": "print",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 9,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "German werden",
+        "note": "Original image printed unchanged; separate Halloween learning prompts added.",
+        "sourceImage": "prints/reference-become-go-grow.png"
+      }
+    },
+    {
+      "id": "spooky-sounds-card",
+      "number": 44,
+      "name": "Spooky Sounds",
+      "rarity": "normal",
+      "kind": "vocabulary",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/spooky-sounds-card.glb",
+      "motifModel": "prints/spooky-sounds-card.glb",
+      "thumbnail": "prints/spooky-sounds-thumb.png",
+      "front": "prints/spooky-sounds-front.svg",
+      "back": "prints/spooky-sounds-back.svg",
+      "topic": "Spelling and pronunciation",
+      "key": "EE · IGH · OUS · TION",
+      "example": "A creepy night celebration.",
+      "notes": [
+        "The original spelling and pronunciation table is unchanged.",
+        "The Halloween words extend the four spelling patterns.",
+        "The original phonetic symbols stay in their source image."
+      ],
+      "tip": "Read the word groups aloud and compare the sounds.",
+      "color": "#c7b891",
+      "icon": "print",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 10,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "Spelling and pronunciation",
+        "note": "Original image printed unchanged; separate Halloween learning prompts added.",
+        "sourceImage": "prints/reference-spooky-sounds.png"
+      }
+    },
+    {
+      "id": "midnight-map-card",
+      "number": 45,
+      "name": "The Midnight Map",
+      "rarity": "rare",
+      "kind": "vocabulary",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/midnight-map-card.glb",
+      "motifModel": "prints/midnight-map-card.glb",
+      "thumbnail": "prints/midnight-map-thumb.png",
+      "front": "prints/midnight-map-front.svg",
+      "back": "prints/midnight-map-back.svg",
+      "topic": "North America · directions",
+      "key": "NORTH · SOUTH · EAST · WEST",
+      "example": "Canada is north of the USA.",
+      "notes": [
+        "The supplied map and vocabulary panel are printed unchanged.",
+        "Country labels, borders and the map itself are preserved.",
+        "Only the extra ghost-trail sentence is an invented story."
+      ],
+      "tip": "Use the source map to practise directions.",
+      "color": "#95b6d2",
+      "icon": "print",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 25,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "North America · directions",
+        "note": "Original image printed unchanged; separate Halloween learning prompts added.",
+        "sourceImage": "prints/reference-midnight-map.png"
+      }
+    },
+    {
+      "id": "midnight-bird-card",
+      "number": 46,
+      "name": "The Midnight Bird",
+      "rarity": "rare",
+      "kind": "poem",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/midnight-bird-card.glb",
+      "motifModel": "prints/midnight-bird-card.glb",
+      "thumbnail": "prints/midnight-bird-thumb.png",
+      "front": "prints/midnight-bird-front.svg",
+      "back": "prints/midnight-bird-back.svg",
+      "topic": "A poem from the supplied textbook",
+      "key": "FLOOR · DOOR · WORD · ABSURD",
+      "example": "Read the original bird poem aloud.",
+      "notes": [
+        "The supplied original poem and picture are printed unchanged.",
+        "The author is not named in the supplied extract.",
+        "The added reading prompts are not extra lines of the poem."
+      ],
+      "tip": "Read the original aloud and find its rhyming pairs.",
+      "color": "#95b6d2",
+      "icon": "print",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 30,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "A poem from the supplied textbook",
+        "note": "Original image printed unchanged; separate Halloween learning prompts added.",
+        "sourceImage": "prints/reference-midnight-bird.png",
+        "author": "Not named in supplied extract"
+      }
+    },
+    {
+      "id": "haunted-definitions-card",
+      "number": 47,
+      "name": "Haunted Definitions",
+      "rarity": "rare",
+      "kind": "grammar",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/haunted-definitions-card.glb",
+      "motifModel": "prints/haunted-definitions-card.glb",
+      "thumbnail": "prints/haunted-definitions-thumb.png",
+      "front": "prints/haunted-definitions-front.svg",
+      "back": "prints/haunted-definitions-back.svg",
+      "topic": "Defining with who and which",
+      "key": "A PERSON WHO · A THING WHICH",
+      "example": "Do you know the person who carved this pumpkin?",
+      "notes": [
+        "The supplied picture strip and original exercise are unchanged.",
+        "The new Halloween sentences are extra examples.",
+        "No answers are inserted into the original exercise."
+      ],
+      "tip": "A person who …; a thing which …",
+      "color": "#95b6d2",
+      "icon": "print",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 30,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "Defining with who and which",
+        "note": "Original image printed unchanged; separate Halloween learning prompts added.",
+        "sourceImage": "prints/reference-haunted-definitions.png"
+      }
+    },
+    {
+      "id": "spooky-as-as-card",
+      "number": 48,
+      "name": "As Spooky as …",
+      "rarity": "normal",
+      "kind": "grammar",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/spooky-as-as-card.glb",
+      "motifModel": "prints/spooky-as-as-card.glb",
+      "thumbnail": "prints/spooky-as-as-thumb.png",
+      "front": "prints/spooky-as-as-front.svg",
+      "back": "prints/spooky-as-as-back.svg",
+      "topic": "Comparisons with as … as",
+      "key": "AS … AS · NOT AS … AS",
+      "example": "My pumpkin is as big as yours.",
+      "notes": [
+        "The original as … as Focus box is printed unchanged.",
+        "The added sentences compare pumpkins, lights and houses.",
+        "The adjective stays in its base form between as and as."
+      ],
+      "tip": "Use as … as for equality; not as … as for a difference.",
+      "color": "#c7b891",
+      "icon": "print",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 11,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "Comparisons with as … as",
+        "note": "Original image printed unchanged; separate Halloween learning prompts added.",
+        "sourceImage": "prints/reference-spooky-as-as.png"
+      }
+    },
+    {
+      "id": "towers-after-dark-card",
+      "number": 49,
+      "name": "Towers after Dark",
+      "rarity": "epic",
+      "kind": "grammar",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/towers-after-dark-card.glb",
+      "motifModel": "prints/towers-after-dark-card.glb",
+      "thumbnail": "prints/towers-after-dark-thumb.png",
+      "front": "prints/towers-after-dark-front.svg",
+      "back": "prints/towers-after-dark-back.svg",
+      "topic": "Comparatives · superlatives",
+      "key": "TALL · TALLER · THE TALLEST",
+      "example": "Which tower is the tallest in the diagram?",
+      "notes": [
+        "The original text and height diagram are printed unchanged.",
+        "The comparison refers to the supplied diagram and its values.",
+        "The pumpkin tower is a fictional extra example."
+      ],
+      "tip": "Compare the heights shown in the original diagram.",
+      "color": "#b198c9",
+      "icon": "print",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "Comparatives · superlatives",
+        "note": "Original image printed unchanged; separate Halloween learning prompts added.",
+        "sourceImage": "prints/reference-towers-after-dark.png"
+      }
+    },
+    {
+      "id": "highlight-halloween-card",
+      "number": 50,
+      "name": "Highlight 8 · Halloween Edition",
+      "rarity": "legendary",
+      "kind": "vocabulary",
+      "format": "printed-surface",
+      "series": "textbook-prints",
+      "model": "prints/highlight-halloween-card.glb",
+      "motifModel": "prints/highlight-halloween-card.glb",
+      "thumbnail": "prints/highlight-halloween-thumb.png",
+      "front": "textbook/highlight-halloween-cover.png",
+      "back": "textbook/highlight-halloween-back.png",
+      "topic": "The Season I almanac cover",
+      "key": "HIGHLIGHT 8 · HALLOWEEN",
+      "example": "A legendary cover for a season of stories.",
+      "notes": [
+        "The Highlight 8 Halloween cover is also a collectible card.",
+        "The front is the almanac cover; the back carries the driving-you-batty meme.",
+        "This is the only Legendary card in Season I."
+      ],
+      "tip": "The almanac cover and the collectible share their artwork.",
+      "color": "#dbb166",
+      "icon": "print",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      },
+      "reference": {
+        "type": "user-supplied-textbook-adaptation",
+        "work": "Highlight 8 · Mittelschule Bayern · R",
+        "publisher": "Cornelsen",
+        "page": "Front cover and meme back",
+        "note": "Existing edited book artwork reused for the almanac cover and collectible card."
+      },
+      "assetRoles": [
+        "almanac-cover",
+        "collectible-card"
+      ]
+    },
+    {
+      "id": "bloody-friday-card",
+      "number": 51,
+      "name": "Bloody Friday",
+      "rarity": "epic",
+      "kind": "humour",
+      "format": "printed-surface",
+      "series": "classroom-curses",
+      "model": "prints/curses/bloody-friday-card.glb",
+      "motifModel": "prints/curses/bloody-friday-card.glb",
+      "thumbnail": "prints/curses/bloody-friday-card-thumb.png",
+      "front": "prints/curses/bloody-friday-card-front.svg",
+      "back": "prints/curses/bloody-friday-card-back.svg",
+      "topic": "The weekend has been postponed",
+      "key": "FRIDAY · DETENTION · PATIENCE",
+      "example": "School has finished. This card, regrettably, has not. Put the kettle on; Friday is now a limited edition.",
+      "notes": [
+        "School has finished. This card, regrettably, has not. Put the kettle on; Friday is now a limited edition.",
+        "Move your imaginary weekend one dramatic step away.",
+        "Gain +2 Patience and a suspiciously cold cup of tea.",
+        "I’m a detention card with a weekend-shaped identity crisis."
+      ],
+      "tip": "Imaginary card effects · British humour",
+      "color": "#b198c9",
+      "icon": "print",
+      "description": "School has finished. This card, regrettably, has not. Put the kettle on; Friday is now a limited edition.",
+      "effects": [
+        "Move your imaginary weekend one dramatic step away.",
+        "Gain +2 Patience and a suspiciously cold cup of tea."
+      ],
+      "flavour": "I’m a detention card with a weekend-shaped identity crisis.",
+      "satire": true,
+      "effectMode": "flavour-only",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "school-rules-card",
+      "number": 52,
+      "name": "Hausordnung abschreiben",
+      "rarity": "normal",
+      "kind": "humour",
+      "format": "printed-surface",
+      "series": "classroom-curses",
+      "model": "prints/curses/school-rules-card.glb",
+      "motifModel": "prints/curses/school-rules-card.glb",
+      "thumbnail": "prints/curses/school-rules-card-thumb.png",
+      "front": "prints/curses/school-rules-card-front.svg",
+      "back": "prints/curses/school-rules-card-back.svg",
+      "topic": "A thrilling stationery sequel",
+      "key": "COPY · RULES · HANDWRITING",
+      "example": "A thrilling sequel in which the school rules are copied out by hand. Every sentence has somehow survived the first reading.",
+      "notes": [
+        "A thrilling sequel in which the school rules are copied out by hand. Every sentence has somehow survived the first reading.",
+        "Copy one imaginary paragraph.",
+        "Gain +3 Handwriting; lose one pen to the void.",
+        "My replay value is mostly stationery."
+      ],
+      "tip": "Imaginary card effects · British humour",
+      "color": "#c7b891",
+      "icon": "print",
+      "description": "A thrilling sequel in which the school rules are copied out by hand. Every sentence has somehow survived the first reading.",
+      "effects": [
+        "Copy one imaginary paragraph.",
+        "Gain +3 Handwriting; lose one pen to the void."
+      ],
+      "flavour": "My replay value is mostly stationery.",
+      "satire": true,
+      "effectMode": "flavour-only",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 11,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "official-reprimand-card",
+      "number": 53,
+      "name": "Verweis",
+      "rarity": "rare",
+      "kind": "humour",
+      "format": "printed-surface",
+      "series": "classroom-curses",
+      "model": "prints/curses/official-reprimand-card.glb",
+      "motifModel": "prints/curses/official-reprimand-card.glb",
+      "thumbnail": "prints/curses/official-reprimand-card-thumb.png",
+      "front": "prints/curses/official-reprimand-card-front.svg",
+      "back": "prints/curses/official-reprimand-card-back.svg",
+      "topic": "Official displeasure on parchment",
+      "key": "OFFICIAL · ENVELOPE · STAMP",
+      "example": "Official displeasure, now available in premium parchment. The envelope would like a quiet word.",
+      "notes": [
+        "Official displeasure, now available in premium parchment. The envelope would like a quiet word.",
+        "Place one Very Serious Stamp.",
+        "All nearby imaginary paperwork becomes 10% more official.",
+        "I’m a rectangle that has learned to sound disappointed."
+      ],
+      "tip": "Imaginary card effects · British humour",
+      "color": "#95b6d2",
+      "icon": "print",
+      "description": "Official displeasure, now available in premium parchment. The envelope would like a quiet word.",
+      "effects": [
+        "Place one Very Serious Stamp.",
+        "All nearby imaginary paperwork becomes 10% more official."
+      ],
+      "flavour": "I’m a rectangle that has learned to sound disappointed.",
+      "satire": true,
+      "effectMode": "flavour-only",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 35,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "vaping-reprimand-card",
+      "number": 54,
+      "name": "Verschärfter Verweis für Vapen",
+      "rarity": "epic",
+      "kind": "humour",
+      "format": "printed-surface",
+      "series": "classroom-curses",
+      "model": "prints/curses/vaping-reprimand-card.glb",
+      "motifModel": "prints/curses/vaping-reprimand-card.glb",
+      "thumbnail": "prints/curses/vaping-reprimand-card-thumb.png",
+      "front": "prints/curses/vaping-reprimand-card-front.svg",
+      "back": "prints/curses/vaping-reprimand-card-back.svg",
+      "topic": "The paperwork has escalated",
+      "key": "FOG · FRESH AIR · JUDGEMENT",
+      "example": "The sequel arrived in a cloud of remarkably poor judgement. Even the Halloween fog machine has raised an eyebrow.",
+      "notes": [
+        "The sequel arrived in a cloud of remarkably poor judgement. Even the Halloween fog machine has raised an eyebrow.",
+        "Clear the imaginary fog.",
+        "Gain +2 Fresh Air; summon one Extremely Formal Envelope.",
+        "I’ve been upgraded. This is rarely good news for a piece of paper."
+      ],
+      "tip": "Imaginary card effects · British humour",
+      "color": "#b198c9",
+      "icon": "print",
+      "description": "The sequel arrived in a cloud of remarkably poor judgement. Even the Halloween fog machine has raised an eyebrow.",
+      "effects": [
+        "Clear the imaginary fog.",
+        "Gain +2 Fresh Air; summon one Extremely Formal Envelope."
+      ],
+      "flavour": "I’ve been upgraded. This is rarely good news for a piece of paper.",
+      "satire": true,
+      "effectMode": "flavour-only",
+      "acquisition": {
+        "source": "season-chest",
+        "additionalToCoins": false,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "forgotten-homework-card",
+      "number": 55,
+      "name": "Strich! Hausaufgabe vergessen",
+      "rarity": "normal",
+      "kind": "humour",
+      "format": "printed-surface",
+      "series": "classroom-curses",
+      "model": "prints/curses/forgotten-homework-card.glb",
+      "motifModel": "prints/curses/forgotten-homework-card.glb",
+      "thumbnail": "prints/curses/forgotten-homework-card-thumb.png",
+      "front": "prints/curses/forgotten-homework-card-front.svg",
+      "back": "prints/curses/forgotten-homework-card-back.svg",
+      "topic": "One small line. So much lore.",
+      "key": "HOMEWORK · TALLY · EXCUSE",
+      "example": "One tiny line. An astonishing amount of lore. The homework is, of course, in the other bag.",
+      "notes": [
+        "One tiny line. An astonishing amount of lore. The homework is, of course, in the other bag.",
+        "Add one imaginary tally.",
+        "Draw an Excuse; if it says “the other bag”, draw another.",
+        "I contain fewer pixels than the explanation I’m about to receive."
+      ],
+      "tip": "Imaginary card effects · British humour",
+      "color": "#c7b891",
+      "icon": "print",
+      "description": "One tiny line. An astonishing amount of lore. The homework is, of course, in the other bag.",
+      "effects": [
+        "Add one imaginary tally.",
+        "Draw an Excuse; if it says “the other bag”, draw another."
+      ],
+      "flavour": "I contain fewer pixels than the explanation I’m about to receive.",
+      "satire": true,
+      "effectMode": "flavour-only",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 12,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "cool-box-card",
+      "number": 56,
+      "name": "Kerim ab in die Kühlbox",
+      "rarity": "rare",
+      "kind": "humour",
+      "format": "printed-surface",
+      "series": "classroom-curses",
+      "model": "prints/curses/cool-box-card.glb",
+      "motifModel": "prints/curses/cool-box-card.glb",
+      "thumbnail": "prints/curses/cool-box-card-thumb.png",
+      "front": "prints/curses/cool-box-card-front.svg",
+      "back": "prints/curses/cool-box-card-back.svg",
+      "topic": "A very dramatic cooling-off break",
+      "key": "CALM · COMPOSURE · INTERMISSION",
+      "example": "A brief cooling-off intermission, presented with the production values of an arctic expedition.",
+      "notes": [
+        "A brief cooling-off intermission, presented with the production values of an arctic expedition.",
+        "Pause the imaginary drama for one turn.",
+        "Gain +2 Composure and a dignified penguin.",
+        "I’ve turned a short break into an entire character arc."
+      ],
+      "tip": "Imaginary card effects · British humour",
+      "color": "#95b6d2",
+      "icon": "print",
+      "description": "A brief cooling-off intermission, presented with the production values of an arctic expedition.",
+      "effects": [
+        "Pause the imaginary drama for one turn.",
+        "Gain +2 Composure and a dignified penguin."
+      ],
+      "flavour": "I’ve turned a short break into an entire character arc.",
+      "satire": true,
+      "effectMode": "flavour-only",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 40,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "cuess-digga-card",
+      "number": 57,
+      "name": "Cüss digga das Schwer",
+      "rarity": "rare",
+      "kind": "humour",
+      "format": "printed-surface",
+      "series": "classroom-curses",
+      "model": "prints/curses/cuess-digga-card.glb",
+      "motifModel": "prints/curses/cuess-digga-card.glb",
+      "thumbnail": "prints/curses/cuess-digga-card-thumb.png",
+      "front": "prints/curses/cuess-digga-card-front.svg",
+      "back": "prints/curses/cuess-digga-card-back.svg",
+      "topic": "An academically rigorous sigh",
+      "key": "DIFFICULT · DRAMATIC · SIGH",
+      "example": "An academically rigorous assessment consisting of four words and a long, theatrical exhale.",
+      "notes": [
+        "An academically rigorous assessment consisting of four words and a long, theatrical exhale.",
+        "All imaginary tasks become “a bit much” for one turn.",
+        "Gain +2 Dramatic Sighs and one raised eyebrow.",
+        "I’m self-aware enough to suspect I’m being pronounced wrong."
+      ],
+      "tip": "Imaginary card effects · British humour",
+      "color": "#95b6d2",
+      "icon": "print",
+      "description": "An academically rigorous assessment consisting of four words and a long, theatrical exhale.",
+      "effects": [
+        "All imaginary tasks become “a bit much” for one turn.",
+        "Gain +2 Dramatic Sighs and one raised eyebrow."
+      ],
+      "flavour": "I’m self-aware enough to suspect I’m being pronounced wrong.",
+      "satire": true,
+      "effectMode": "flavour-only",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 40,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    },
+    {
+      "id": "toilet-question-card",
+      "number": 58,
+      "name": "Can I go of the toilet",
+      "rarity": "normal",
+      "kind": "humour",
+      "format": "printed-surface",
+      "series": "classroom-curses",
+      "model": "prints/curses/toilet-question-card.glb",
+      "motifModel": "prints/curses/toilet-question-card.glb",
+      "thumbnail": "prints/curses/toilet-question-card-thumb.png",
+      "front": "prints/curses/toilet-question-card-front.svg",
+      "back": "prints/curses/toilet-question-card-back.svg",
+      "topic": "A minor prepositional incident",
+      "key": "OF → TO · PLEASE",
+      "example": "A perfectly reasonable request has suffered a minor prepositional incident. British plumbing remains cautiously optimistic.",
+      "notes": [
+        "A perfectly reasonable request has suffered a minor prepositional incident. British plumbing remains cautiously optimistic.",
+        "Swap “of” for “to”.",
+        "Unlock: “Can I go to the toilet, please?”",
+        "I’m the grammar card. Naturally, I need correcting."
+      ],
+      "tip": "Imaginary card effects · British humour",
+      "color": "#c7b891",
+      "icon": "print",
+      "description": "A perfectly reasonable request has suffered a minor prepositional incident. British plumbing remains cautiously optimistic.",
+      "effects": [
+        "Swap “of” for “to”.",
+        "Unlock: “Can I go to the toilet, please?”"
+      ],
+      "flavour": "I’m the grammar card. Naturally, I need correcting.",
+      "satire": true,
+      "effectMode": "flavour-only",
+      "acquisition": {
+        "source": "learnpass",
+        "tier": 13,
+        "additionalToCoins": true,
+        "uniquePerPlayer": true
+      }
+    }
+  ],
+  "archivedCards": [
+    {
+      "id": "sofia-moon-witch",
+      "number": 31,
+      "name": "Sofia, the Moon Witch",
+      "status": "benched",
+      "rarity": "normal"
+    },
+    {
+      "id": "mason-aurora-ghost",
+      "number": 32,
+      "name": "Mason, the Aurora Ghost",
+      "status": "benched",
+      "rarity": "rare"
+    },
+    {
+      "id": "bella-vampire-reader",
+      "number": 33,
+      "name": "Bella, the Vampire Reader",
+      "status": "benched",
+      "rarity": "rare"
+    },
+    {
+      "id": "ryan-maple-werewolf",
+      "number": 34,
+      "name": "Ryan, the Maple Werewolf",
+      "status": "benched",
+      "rarity": "epic"
+    },
+    {
+      "id": "selena-moon-musician",
+      "number": 35,
+      "name": "Selena, the Moon Musician",
+      "status": "benched",
+      "rarity": "normal"
+    },
+    {
+      "id": "liberty-after-dark",
+      "number": 36,
+      "name": "Lady Liberty after Dark",
+      "status": "benched",
+      "rarity": "legendary"
+    },
+    {
+      "id": "werehound-twins",
+      "number": 37,
+      "name": "The Werehound Twins",
+      "status": "benched",
+      "rarity": "rare"
+    },
+    {
+      "id": "ghost-level-gamer",
+      "number": 38,
+      "name": "The Ghost-Level Gamer",
+      "status": "benched",
+      "rarity": "normal"
+    }
+  ],
+  "rarityOrder": [
+    "normal",
+    "rare",
+    "epic",
+    "legendary"
+  ],
+  "almanacCover": {
+    "cardId": "highlight-halloween-card",
+    "front": "textbook/highlight-halloween-cover.png",
+    "back": "textbook/highlight-halloween-back.png",
+    "bookModel": "textbook/highlight-halloween-book.glb",
+    "role": "shared-season-almanac-cover",
+    "requiresCardOwnership": false
+  },
+  "bookStudy": {
+    "id": "highlight-halloween-book",
+    "name": "Highlight 8 · Halloween cover study",
+    "model": "textbook/highlight-halloween-book.glb",
+    "cover": "textbook/highlight-halloween-cover.png",
+    "backCover": "textbook/highlight-halloween-back.png",
+    "status": "user-review",
+    "almanacCoverCardId": "highlight-halloween-card"
+  },
+  "rarityPolicy": {
+    "legendaryExclusiveCardId": "highlight-halloween-card"
+  },
+  "acquisitionPolicy": {
+    "version": "r11",
+    "duplicates": false,
+    "ownershipLimit": 1,
+    "learnpass": {
+      "rarities": [
+        "normal",
+        "rare"
+      ],
+      "coinTiers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        25,
+        30,
+        35,
+        40
+      ],
+      "additionalToCoins": true,
+      "order": "normal-first-then-rare-by-number",
+      "allocation": "equal-progress-one-or-two-per-coin-tier"
+    },
+    "chest": {
+      "rarities": [
+        "epic",
+        "legendary"
+      ],
+      "cardIds": [
+        "witch-recipe",
+        "blood-moon-story",
+        "silver-lining",
+        "book-cover",
+        "actions-words",
+        "birds-feather",
+        "sleepy-skeletons",
+        "echo-verse",
+        "fortune-brave",
+        "knowledge-power",
+        "manhattan-postcard",
+        "towers-after-dark-card",
+        "highlight-halloween-card",
+        "bloody-friday-card",
+        "vaping-reprimand-card"
+      ],
+      "excludeOwnedBeforeDraw": true,
+      "exhausted": "no-card-bonus-original-village-item-unchanged",
+      "cardHitRate": null,
+      "rarityWeights": null
+    },
+    "implementationStatus": "prototype-metadata-and-plan-only"
+  },
+  "passCardRewards": [
+    {
+      "tier": 1,
+      "cardIds": [
+        "pumpkin-comparisons"
+      ]
+    },
+    {
+      "tier": 2,
+      "cardIds": [
+        "haunted-prepositions"
+      ]
+    },
+    {
+      "tier": 3,
+      "cardIds": [
+        "night-light",
+        "bat-cat"
+      ]
+    },
+    {
+      "tier": 4,
+      "cardIds": [
+        "moon-spoon"
+      ]
+    },
+    {
+      "tier": 5,
+      "cardIds": [
+        "book-look",
+        "adjective-key"
+      ]
+    },
+    {
+      "tier": 6,
+      "cardIds": [
+        "past-footsteps"
+      ]
+    },
+    {
+      "tier": 7,
+      "cardIds": [
+        "talking-pumpkin",
+        "time-for-tea"
+      ]
+    },
+    {
+      "tier": 8,
+      "cardIds": [
+        "midnight-focus-card"
+      ]
+    },
+    {
+      "tier": 9,
+      "cardIds": [
+        "two-ways-boo-card",
+        "become-go-grow-card"
+      ]
+    },
+    {
+      "tier": 10,
+      "cardIds": [
+        "spooky-sounds-card"
+      ]
+    },
+    {
+      "tier": 11,
+      "cardIds": [
+        "spooky-as-as-card",
+        "school-rules-card"
+      ]
+    },
+    {
+      "tier": 12,
+      "cardIds": [
+        "forgotten-homework-card"
+      ]
+    },
+    {
+      "tier": 13,
+      "cardIds": [
+        "toilet-question-card"
+      ]
+    },
+    {
+      "tier": 14,
+      "cardIds": [
+        "lantern-verbs",
+        "ghost-questions"
+      ]
+    },
+    {
+      "tier": 15,
+      "cardIds": [
+        "better-late"
+      ]
+    },
+    {
+      "tier": 16,
+      "cardIds": [
+        "two-heads",
+        "practice-perfect"
+      ]
+    },
+    {
+      "tier": 17,
+      "cardIds": [
+        "friend-in-need"
+      ]
+    },
+    {
+      "tier": 18,
+      "cardIds": [
+        "hidden-key",
+        "slow-steady"
+      ]
+    },
+    {
+      "tier": 19,
+      "cardIds": [
+        "rain-train"
+      ]
+    },
+    {
+      "tier": 20,
+      "cardIds": [
+        "quiet-mouse",
+        "empire-state-postcard"
+      ]
+    },
+    {
+      "tier": 25,
+      "cardIds": [
+        "midnight-map-card"
+      ]
+    },
+    {
+      "tier": 30,
+      "cardIds": [
+        "midnight-bird-card",
+        "haunted-definitions-card"
+      ]
+    },
+    {
+      "tier": 35,
+      "cardIds": [
+        "official-reprimand-card"
+      ]
+    },
+    {
+      "tier": 40,
+      "cardIds": [
+        "cool-box-card",
+        "cuess-digga-card"
+      ]
+    }
+  ],
+  "contentVersion": "e42d4c79c8503240f8d189d668684c8b2d80776d9230433452adab9b89c71664"
+}

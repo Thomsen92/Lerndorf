@@ -1,0 +1,1216 @@
+{
+  "source": "Prototyp/marktplatz/assets/collection",
+  "contentVersion": "e42d4c79c8503240f8d189d668684c8b2d80776d9230433452adab9b89c71664",
+  "files": [
+    {
+      "path": "cards/actions-words-back.svg",
+      "sha256": "ec95e9d16095bbe462eb2846152a929e548ddb7a03699edcf8c20bdd4dd1711e",
+      "bytes": 2886
+    },
+    {
+      "path": "cards/actions-words-front.svg",
+      "sha256": "c61af8dec0c4c0890a780fa2f8dc993331a5e4eb96446a22baf6d000b4cfce2a",
+      "bytes": 3385
+    },
+    {
+      "path": "cards/actions-words-thumb.png",
+      "sha256": "2b0b5261f54a11a39fb2b4e16de47cde515cde21b0f1d99eb865ff7cdce6aab0",
+      "bytes": 24709
+    },
+    {
+      "path": "cards/actions-words.glb",
+      "sha256": "98ac78194a2eeb6e402804f13442da8d299bd025a69dfddbab0a2c9093c10ef3",
+      "bytes": 826560
+    },
+    {
+      "path": "cards/adjective-key-back.svg",
+      "sha256": "40dbac0d4450d219c21053dbe03320103aa66d894acf29a1bb9ce1d27078c893",
+      "bytes": 2826
+    },
+    {
+      "path": "cards/adjective-key-front.svg",
+      "sha256": "8c90a85cbd34d34ecf33b65ab78ced2c073e87da92902f42e39c0e520ab08197",
+      "bytes": 3343
+    },
+    {
+      "path": "cards/adjective-key-thumb.png",
+      "sha256": "3004a74dd05156c71132fbd4b0fda3d2fc1515903899fe538d051b2204f00c44",
+      "bytes": 23764
+    },
+    {
+      "path": "cards/adjective-key.glb",
+      "sha256": "9d7d9d0383a91ec8b52b2d04fc48b557a2da80c9a2c276eb72c07359216a84bc",
+      "bytes": 818980
+    },
+    {
+      "path": "cards/bat-cat-back.svg",
+      "sha256": "6a9e9db35ef15dfbca7af868c95059df13a6e5962ccd79c6de399fa9a2b48690",
+      "bytes": 3059
+    },
+    {
+      "path": "cards/bat-cat-front.svg",
+      "sha256": "02ea174f3b37cf94980068c6509f92f8e64d6ad01d7656f46b07ee4b5eb90cd1",
+      "bytes": 3620
+    },
+    {
+      "path": "cards/bat-cat-thumb.png",
+      "sha256": "06203f6e9a464108d3c3621f348c01ad0b2f9a968984603dd2c8606e01133e6c",
+      "bytes": 24062
+    },
+    {
+      "path": "cards/bat-cat.glb",
+      "sha256": "69470265489ea0d36c62a5daab830b4b9a74b25f59fcdc32197847a49b33a37a",
+      "bytes": 848524
+    },
+    {
+      "path": "cards/better-late-back.svg",
+      "sha256": "e29185c9f2ae45318578a3bf2248c04e05d1aa2dcc0bbc97be707e69f38b4cd0",
+      "bytes": 2941
+    },
+    {
+      "path": "cards/better-late-front.svg",
+      "sha256": "9d5d359cef1cdd74e2f916a711c787bc37769e68a99c97f3b3413f5e6c29ec97",
+      "bytes": 3376
+    },
+    {
+      "path": "cards/better-late-thumb.png",
+      "sha256": "62b71ae8fc2f28204ca2dab9428c25517e065946e888fb1bd819489f5fc30a50",
+      "bytes": 24642
+    },
+    {
+      "path": "cards/better-late.glb",
+      "sha256": "b06754fcfe574f9741b48470c0f09e1fdcbba8daaaa2fe1363c0942ad59d91b7",
+      "bytes": 873892
+    },
+    {
+      "path": "cards/birds-feather-back.svg",
+      "sha256": "6b90569fa96201ba741a75a91ec8fb5626d22d6761bb46a014a606d82dd4970d",
+      "bytes": 3014
+    },
+    {
+      "path": "cards/birds-feather-front.svg",
+      "sha256": "b64ba697908fcbb6241d077b4dd2105753754515097e5f4fb06d133ea6ebeb1a",
+      "bytes": 3381
+    },
+    {
+      "path": "cards/birds-feather-thumb.png",
+      "sha256": "71ccb931faee2b9237aa57b348ade87af74decf96e736ae894c1ffb2cec9fb7c",
+      "bytes": 24985
+    },
+    {
+      "path": "cards/birds-feather.glb",
+      "sha256": "e0c838acb7bea856e9930bc7d8f5b5868aca0b15223624854d9b3880209bb330",
+      "bytes": 826592
+    },
+    {
+      "path": "cards/blood-moon-story-back.svg",
+      "sha256": "1761e5f31138c3b82aa5733feaf76a6305446f1cf33f144c70cbed5a57790c7e",
+      "bytes": 2924
+    },
+    {
+      "path": "cards/blood-moon-story-front.svg",
+      "sha256": "19494cd9060aa308cb0f54d1fb801e944d206fdc7c107a5afabfe4fd96d163a8",
+      "bytes": 3458
+    },
+    {
+      "path": "cards/blood-moon-story-thumb.png",
+      "sha256": "14013edc099348547f420cc6fb7f7efc08bab8985aead20adda5c35322d8afdd",
+      "bytes": 25398
+    },
+    {
+      "path": "cards/blood-moon-story.glb",
+      "sha256": "5e0c386489a169b82ef54d034dd30cb171e12f10e645c1a6d3fc8625de12bdfb",
+      "bytes": 826560
+    },
+    {
+      "path": "cards/book-cover-back.svg",
+      "sha256": "86f78c27377dd58ccd19b8e60fdb48b8a83120b9f9bbe6248f44775c80fa5129",
+      "bytes": 2890
+    },
+    {
+      "path": "cards/book-cover-front.svg",
+      "sha256": "d75fcb7b940fef5792bf7eccac8c2bb810eb0da085bc82dc5922a7333ccadfb8",
+      "bytes": 3391
+    },
+    {
+      "path": "cards/book-cover-thumb.png",
+      "sha256": "607982f4a0273800f7cadcb726b7549f5a4b8ac9bde6f7d5ff8298d5bee51c39",
+      "bytes": 23020
+    },
+    {
+      "path": "cards/book-cover.glb",
+      "sha256": "c2fefc5a189ac2d042100d007fb7ef6a861501f9547f030dd224bba26f0084be",
+      "bytes": 840460
+    },
+    {
+      "path": "cards/book-look-back.svg",
+      "sha256": "afe9af507dddb470531e78964920cfe5b1f5d1c8e954a1b886bb309931c1f6c5",
+      "bytes": 3078
+    },
+    {
+      "path": "cards/book-look-front.svg",
+      "sha256": "66846e54a897479e74417bf989bd19fae2148827a5907079b809274e2e03e593",
+      "bytes": 3535
+    },
+    {
+      "path": "cards/book-look-thumb.png",
+      "sha256": "815ca2f2cf3fef6556e27f874058f75fc0390a2a0e1714487818d544813e89a0",
+      "bytes": 23134
+    },
+    {
+      "path": "cards/book-look.glb",
+      "sha256": "f4148e5c15955131396540562385f3790f9c12c6331f25741444e76128ebffb5",
+      "bytes": 839064
+    },
+    {
+      "path": "cards/echo-verse-back.svg",
+      "sha256": "839881c3c3262870b658af7675129de4a0b44c8e8178502e35679b105a0cc25a",
+      "bytes": 3099
+    },
+    {
+      "path": "cards/echo-verse-front.svg",
+      "sha256": "15500862c600dfee70014eef8a7156e5a1b6ffb5787edeb8a2a5214fd5821d24",
+      "bytes": 3638
+    },
+    {
+      "path": "cards/echo-verse-thumb.png",
+      "sha256": "e402399ed0b74f7e606f96f82c29a64af83651425854cead021e73a1d0dadca9",
+      "bytes": 24296
+    },
+    {
+      "path": "cards/echo-verse.glb",
+      "sha256": "225e10734bb845740a40181bca517d13aa7321ce58ce46be545781b5092feb5e",
+      "bytes": 850380
+    },
+    {
+      "path": "cards/fortune-brave-back.svg",
+      "sha256": "41380159b564f024f2b34df3166a3c02eb50b52b4b9f525bf56eb7f24adf2ae3",
+      "bytes": 3009
+    },
+    {
+      "path": "cards/fortune-brave-front.svg",
+      "sha256": "31fe485c6961c5113b5e3d586ac01829d5636978185d32bc4cac3d8a684d7d9f",
+      "bytes": 3407
+    },
+    {
+      "path": "cards/fortune-brave-thumb.png",
+      "sha256": "c7664e9d70c4c9a7cf8177b73733c5824cc0a6147dc3c7981b722e2a5864b7d4",
+      "bytes": 25366
+    },
+    {
+      "path": "cards/fortune-brave.glb",
+      "sha256": "58359777413af51ba170e093162a89677232cfeb44d72c77b98be830b3ec7389",
+      "bytes": 834768
+    },
+    {
+      "path": "cards/friend-in-need-back.svg",
+      "sha256": "96b163e36d5466e57fd15562b21b7a8f2ab7d2ff4fc19af0519f1b2d33047bc0",
+      "bytes": 2898
+    },
+    {
+      "path": "cards/friend-in-need-front.svg",
+      "sha256": "4ff4df6a814a31a6a6c416191fc4fa1ac8674c93a28c45eb0aa84c29cfccf7da",
+      "bytes": 3351
+    },
+    {
+      "path": "cards/friend-in-need-thumb.png",
+      "sha256": "3792081a991374734a58a2382e14619c0feeea8613cf6356afe5a0e0e4ec701d",
+      "bytes": 24073
+    },
+    {
+      "path": "cards/friend-in-need.glb",
+      "sha256": "deb99f62b6bb39ecc38ef3740e1f540b67de3853ad66f20803948d1b818ba9a6",
+      "bytes": 807504
+    },
+    {
+      "path": "cards/ghost-questions-back.svg",
+      "sha256": "47f3a5d4861f23f582ad574449a21f70728f7d1a1ae2948cff1516930b97586b",
+      "bytes": 2862
+    },
+    {
+      "path": "cards/ghost-questions-front.svg",
+      "sha256": "1b6e1afb38a59f9696507576c104801d65dfcc193e4290cfdced375c05ce4c86",
+      "bytes": 3387
+    },
+    {
+      "path": "cards/ghost-questions-thumb.png",
+      "sha256": "6a2b5ec5909c96d591cbb264d85ee37e8b21854f83c0a05f65b6ad26845982a7",
+      "bytes": 23823
+    },
+    {
+      "path": "cards/ghost-questions.glb",
+      "sha256": "fec142380230778526df6a2f263a76b571c685b4dca0908d5e06cb57b3183947",
+      "bytes": 826004
+    },
+    {
+      "path": "cards/haunted-prepositions-back.svg",
+      "sha256": "bca99576e2f90b7aef867e4a49441cd4e55bb90893473eea4373ea55e901d7d7",
+      "bytes": 2910
+    },
+    {
+      "path": "cards/haunted-prepositions-front.svg",
+      "sha256": "576015e668e5c805a0f9e26b2a363d439ef3cf49d1d11e68344b490fef89f51c",
+      "bytes": 3430
+    },
+    {
+      "path": "cards/haunted-prepositions-thumb.png",
+      "sha256": "109e313bbcb3532a6ae4b3445158fd4ff217fb493815ce5ec7928e148e3e187b",
+      "bytes": 23225
+    },
+    {
+      "path": "cards/haunted-prepositions.glb",
+      "sha256": "8443cf048ee01a4e3a5da4798aca16eb19068527f8aada2990d808bbee04ce7d",
+      "bytes": 829136
+    },
+    {
+      "path": "cards/hidden-key-back.svg",
+      "sha256": "d61de9b2d0eb9afe63da498ec78942eb7cc98cbc66175360618fa5120ce0c889",
+      "bytes": 2838
+    },
+    {
+      "path": "cards/hidden-key-front.svg",
+      "sha256": "4697bd0c18086e9da611223482d0e0ad345b7e3385c457a07ab0007981254d66",
+      "bytes": 3368
+    },
+    {
+      "path": "cards/hidden-key-thumb.png",
+      "sha256": "b3f57d51982ea1e2ca3746aad3465fa40511d30c63d113cb15d6dcf51be26cee",
+      "bytes": 22784
+    },
+    {
+      "path": "cards/hidden-key.glb",
+      "sha256": "8b86fc37517be7164b70fd2bd5869ce0e5a0c65735ebcffd7b4e51a2e43ea7b5",
+      "bytes": 827868
+    },
+    {
+      "path": "cards/knowledge-power-back.svg",
+      "sha256": "963009a0d7b37a6f760e142c989c190e42a4ebb86789b550a664c97dec2972b1",
+      "bytes": 3004
+    },
+    {
+      "path": "cards/knowledge-power-front.svg",
+      "sha256": "1b118658afd2f7ecd9abda57d38417f7f544eb3fe0e388b520f9199f15fde04f",
+      "bytes": 3369
+    },
+    {
+      "path": "cards/knowledge-power-thumb.png",
+      "sha256": "fc5baa7d2302de70da721d8619350e2147cdcda5022fabd0219c64c58dae6592",
+      "bytes": 24506
+    },
+    {
+      "path": "cards/knowledge-power.glb",
+      "sha256": "584000638766b9d8c518604cdfc508c1eeae09266e40eb78eed0c29663ef5b72",
+      "bytes": 842488
+    },
+    {
+      "path": "cards/lantern-verbs-back.svg",
+      "sha256": "d9f945160adcd72c99cc869f218975595eaa08b7cf0804b450eaa5a0ddf9e95a",
+      "bytes": 2893
+    },
+    {
+      "path": "cards/lantern-verbs-front.svg",
+      "sha256": "dce0e1a786ab458c0f0779080171ba5ce9b48cc0f84b867d59dbb3387e96e56e",
+      "bytes": 3405
+    },
+    {
+      "path": "cards/lantern-verbs-thumb.png",
+      "sha256": "8f5c37d3db60f6a2a186fc8edaa3f8031c15a82864334dba75dfa2b4cffb18b7",
+      "bytes": 22678
+    },
+    {
+      "path": "cards/lantern-verbs.glb",
+      "sha256": "db9b9b7745edfe5ece752d0e155f33849f382a4e0286fd7d7cfcb4b3603a166a",
+      "bytes": 821140
+    },
+    {
+      "path": "cards/moon-spoon-back.svg",
+      "sha256": "a72b8f09e4cd090718a4288ea492ee9f61f4b385dcc4f7870487c04e9b806f02",
+      "bytes": 3199
+    },
+    {
+      "path": "cards/moon-spoon-front.svg",
+      "sha256": "e6a64ec859b97952c3ee60e1f27b33ef8d98610d8e68b3160d19998be4837615",
+      "bytes": 3659
+    },
+    {
+      "path": "cards/moon-spoon-thumb.png",
+      "sha256": "1784d605e7d4217c8cd5f206a263683ffc70a37962e0a3d80506f29bea68c0a0",
+      "bytes": 24754
+    },
+    {
+      "path": "cards/moon-spoon.glb",
+      "sha256": "8e81d453e73a37e1e0c1aacebe90dfbe4beef486cec557ad3416430548c95d52",
+      "bytes": 835224
+    },
+    {
+      "path": "cards/night-light-back.svg",
+      "sha256": "6504474e874501f354e1d2e4a5e9a980e81a85748ea27fd3492f5a97825029e6",
+      "bytes": 2984
+    },
+    {
+      "path": "cards/night-light-front.svg",
+      "sha256": "17e181ad4c80e5dbce313f5a4c0b3070dd1c06994cdd07d28f69fca674f1ee2d",
+      "bytes": 3476
+    },
+    {
+      "path": "cards/night-light-thumb.png",
+      "sha256": "7741af94b1ee401c2a68c11f21327141e25a2537de617c1e504f72dc7a351764",
+      "bytes": 23096
+    },
+    {
+      "path": "cards/night-light.glb",
+      "sha256": "34d7c2822bc7578e2b976d0478856c8126d13b0eadd2fd2e60c7c135bbc41e54",
+      "bytes": 804636
+    },
+    {
+      "path": "cards/past-footsteps-back.svg",
+      "sha256": "feb0964978db8c51693a2af0c1cb7d7095e75f651e508e300e780370360f4351",
+      "bytes": 2824
+    },
+    {
+      "path": "cards/past-footsteps-front.svg",
+      "sha256": "2ad718beba551ecef6814fab2d0227a0e0f737b82a246205ecee07d0aec86585",
+      "bytes": 3297
+    },
+    {
+      "path": "cards/past-footsteps-thumb.png",
+      "sha256": "253db040891eaf5db3b371ee96544b1324cc69c4372ed6a61e30f2c8330b48d9",
+      "bytes": 23012
+    },
+    {
+      "path": "cards/past-footsteps.glb",
+      "sha256": "96838fb32b0f4152da1f0464a7137c230cf8073906e2daf843fead81da035856",
+      "bytes": 820584
+    },
+    {
+      "path": "cards/practice-perfect-back.svg",
+      "sha256": "e9e5f877b449e1a26e58f70a0735aca1e6f206dce20c1e8efd8af84f899b8382",
+      "bytes": 2966
+    },
+    {
+      "path": "cards/practice-perfect-front.svg",
+      "sha256": "48b7543d0c5a407552f58d49a67d67667ae882cb6f29107999f7fde7f4dc4888",
+      "bytes": 3383
+    },
+    {
+      "path": "cards/practice-perfect-thumb.png",
+      "sha256": "8ca957ba4afef6fef270845e65d851cc70a1e90f6f3e2e1bb3ce8a12374fad8a",
+      "bytes": 24995
+    },
+    {
+      "path": "cards/practice-perfect.glb",
+      "sha256": "e4eff9cfa4bcaa86c5f4771bca448eebe1a50a386b032d8f46721a4a418315c5",
+      "bytes": 870664
+    },
+    {
+      "path": "cards/pumpkin-comparisons-back.svg",
+      "sha256": "1d290bdd1b2ac80ce5c654b1d114dc2a11f77ec0e6d6eecd65b179662c6855b5",
+      "bytes": 2937
+    },
+    {
+      "path": "cards/pumpkin-comparisons-front.svg",
+      "sha256": "924710a3a513e84d78fd1b56183c6a7abe93a8abf649d5ebe311324c5670b787",
+      "bytes": 3413
+    },
+    {
+      "path": "cards/pumpkin-comparisons-thumb.png",
+      "sha256": "62b2ad1396e5995491771d98b9d66059b18ecd42925c3840fe1f18b34b702a8e",
+      "bytes": 23982
+    },
+    {
+      "path": "cards/pumpkin-comparisons.glb",
+      "sha256": "af5f8c9e4461779402d776b5aa8d6e8cd96e8ecdd7c509ee0d09c954129e4f13",
+      "bytes": 826696
+    },
+    {
+      "path": "cards/quiet-mouse-back.svg",
+      "sha256": "467309d95fff88fac22993e7ad45526161770671c9fe93e6e2452ec32a200f3c",
+      "bytes": 2990
+    },
+    {
+      "path": "cards/quiet-mouse-front.svg",
+      "sha256": "f8e86f08eee9dd0f33074de5adf60d4e5179115fe44547ca963a10b5cc421241",
+      "bytes": 3482
+    },
+    {
+      "path": "cards/quiet-mouse-thumb.png",
+      "sha256": "d62fa5023a29db767f93eaa144991c59447017ac2ec5914217049201b09f1d6a",
+      "bytes": 23363
+    },
+    {
+      "path": "cards/quiet-mouse.glb",
+      "sha256": "1c4357b2676d1b7b1685c2ab0991e785979274102195e3c31e281f1030c28ae4",
+      "bytes": 843204
+    },
+    {
+      "path": "cards/rain-train-back.svg",
+      "sha256": "7ffd2d0ba2353ce21555ce415dc5f9dd6d5a98ab8ca97793c28000aa4aa487e9",
+      "bytes": 3198
+    },
+    {
+      "path": "cards/rain-train-front.svg",
+      "sha256": "a3e4ece216ec650f2319ddbe2623c1ccb7ffe23a846e0a32409885f1223cc542",
+      "bytes": 3490
+    },
+    {
+      "path": "cards/rain-train-thumb.png",
+      "sha256": "574aa27ccd8d1b498292d8b8ff1088dab2e691bc9f526a7185302a0a23d2b619",
+      "bytes": 23906
+    },
+    {
+      "path": "cards/rain-train.glb",
+      "sha256": "bf85afde64f0cc59fa22ad7cf358561dc96dd0926d032e427bf9b1d195c9bb2d",
+      "bytes": 856832
+    },
+    {
+      "path": "cards/silver-lining-back.svg",
+      "sha256": "e6ca4e1d74e0b64a2681e821aa55d44749571240dba68b7174d18ff05b2172fb",
+      "bytes": 2929
+    },
+    {
+      "path": "cards/silver-lining-front.svg",
+      "sha256": "e7f03d3ca2203384fdad189294fb6d6e18d17f2e3b87c56d840ba1d1baa1e7aa",
+      "bytes": 3404
+    },
+    {
+      "path": "cards/silver-lining-thumb.png",
+      "sha256": "46ab8b0f17dd6e434eed06fec04cd4ff0f1b51343367efc691fab4fb2a9f2fcb",
+      "bytes": 23622
+    },
+    {
+      "path": "cards/silver-lining.glb",
+      "sha256": "db7bf20b4b919887cc152907eb5e1edbe006519f28e915f1f29900797aecee85",
+      "bytes": 824412
+    },
+    {
+      "path": "cards/sleepy-skeletons-back.svg",
+      "sha256": "99b227cadaaa5d1ae90417faa112dac15216e15732dc533f5107790ceaaae5af",
+      "bytes": 3083
+    },
+    {
+      "path": "cards/sleepy-skeletons-front.svg",
+      "sha256": "f30a518e52f7b87413ccab2e509d562d2651e53a4e202b8f1994cf3409911072",
+      "bytes": 3666
+    },
+    {
+      "path": "cards/sleepy-skeletons-thumb.png",
+      "sha256": "9e43c4a90f9d251ece4f7a5089e2a11c12c8c896b001ecda72ca0a6a6d799446",
+      "bytes": 24790
+    },
+    {
+      "path": "cards/sleepy-skeletons.glb",
+      "sha256": "ab4e34754c32bc2ea49bf7b3f620bee8a343b22c426137573063eee350160efd",
+      "bytes": 863432
+    },
+    {
+      "path": "cards/slow-steady-back.svg",
+      "sha256": "7ce180876d762b5f3406b6ee4fa23df2537eafb32e998fed24d8618e97bad4cb",
+      "bytes": 3012
+    },
+    {
+      "path": "cards/slow-steady-front.svg",
+      "sha256": "4157419fe1e15dcacb83249e535e030776c4ca080842fb0fd631454457592494",
+      "bytes": 3464
+    },
+    {
+      "path": "cards/slow-steady-thumb.png",
+      "sha256": "a5b4a9d212d8d84b31c5df3c52217a3acd79bd3f619da40febeaf443c1fae37d",
+      "bytes": 24524
+    },
+    {
+      "path": "cards/slow-steady.glb",
+      "sha256": "1cdfc9532aceacb524707fda83e53ff80873c51dbd0b666ec6330cbe01a743ef",
+      "bytes": 873436
+    },
+    {
+      "path": "cards/talking-pumpkin-back.svg",
+      "sha256": "7d74a10724e2b75c4c5ab5d4b6d1c6e8a6dd3e5041d467b6df2b8865f10366d9",
+      "bytes": 2817
+    },
+    {
+      "path": "cards/talking-pumpkin-front.svg",
+      "sha256": "5734a1d13c2d158057db8ad822396b635d404d174317b5647e2c3ea070077fd6",
+      "bytes": 3343
+    },
+    {
+      "path": "cards/talking-pumpkin-thumb.png",
+      "sha256": "3ee3c6fe3787b44153c1ab01a19e2f4cd8c8787b44455b95a128cbe393fe2619",
+      "bytes": 22347
+    },
+    {
+      "path": "cards/talking-pumpkin.glb",
+      "sha256": "fabb9e69b99d196347d1046c53bc35ece950f93e2fc8b935939f81c2c6192f7e",
+      "bytes": 807532
+    },
+    {
+      "path": "cards/time-for-tea-back.svg",
+      "sha256": "ac152013e9da647f31840a44b20a87c7cf8abd772cf4542308fdbc5f1a4b5c92",
+      "bytes": 2893
+    },
+    {
+      "path": "cards/time-for-tea-front.svg",
+      "sha256": "ff2862ad1280a9c16d7439e269876b1c99c05773d7fc2d48b60762e1622d16ba",
+      "bytes": 3387
+    },
+    {
+      "path": "cards/time-for-tea-thumb.png",
+      "sha256": "674518c577dbe7d5fc3417eb14a40e77dff9267c03072f222479950c67443300",
+      "bytes": 23045
+    },
+    {
+      "path": "cards/time-for-tea.glb",
+      "sha256": "628532a21dd9276ae080b92aa66fd758b5120eaf2f495f54398ffdab21ff8c2e",
+      "bytes": 831864
+    },
+    {
+      "path": "cards/two-heads-back.svg",
+      "sha256": "0bd5b86c21544c894b44737a6f826a60748321a71f20ea996ba327650c7db553",
+      "bytes": 2977
+    },
+    {
+      "path": "cards/two-heads-front.svg",
+      "sha256": "45f8a49963b4ca84f84d85d997b960b0fd3acccf197ea1eb9ca8040aa5778214",
+      "bytes": 3462
+    },
+    {
+      "path": "cards/two-heads-thumb.png",
+      "sha256": "ffdd0a86d284403ff5c105b38d16df4702d7a12dbecb05e756b8b1859a9f2be6",
+      "bytes": 24162
+    },
+    {
+      "path": "cards/two-heads.glb",
+      "sha256": "6655865102f05958d205adaf6403673a90836788bebe87eefa62cf503be90e6b",
+      "bytes": 859040
+    },
+    {
+      "path": "cards/witch-recipe-back.svg",
+      "sha256": "2d0ced0700541f794124a1b99c36d1879178a87945973695edd87e5f70d6c411",
+      "bytes": 2980
+    },
+    {
+      "path": "cards/witch-recipe-front.svg",
+      "sha256": "29c281c2375169ac3e9851ddb3007e4bb07951925f59123fea2cc9d1c3478508",
+      "bytes": 3432
+    },
+    {
+      "path": "cards/witch-recipe-thumb.png",
+      "sha256": "4aaaf1df99ffdee325e933ba95dc22c7daddb7c6a806f2bb7b283e88a24070d9",
+      "bytes": 23824
+    },
+    {
+      "path": "cards/witch-recipe.glb",
+      "sha256": "7ed89b39264cfb7d0398c8e86dad45d92e141ac0cbddef17f105fa368262ade0",
+      "bytes": 840920
+    },
+    {
+      "path": "LICENSES.md",
+      "sha256": "fae69179a804e9cdf13e18c3be83bebde83b544d5a426ae117205aadec9c5dbe",
+      "bytes": 8148
+    },
+    {
+      "path": "LITERARY_SOURCES.md",
+      "sha256": "c5aca5e071ec01802382e2e7738e83ddac844c688ccaf5f76cf3616ebdacb13a",
+      "bytes": 2532
+    },
+    {
+      "path": "motifs/actions-words.glb",
+      "sha256": "650aa2b9fb75a072d34f9fe0f342d2eb538652f1f85bb01c71b456a60f3ce176",
+      "bytes": 18496
+    },
+    {
+      "path": "motifs/adjective-key.glb",
+      "sha256": "093d8c1ad579fe249fdd5b53d5a3ad86f3ce4675aa89f41ef924b0ab8f40593f",
+      "bytes": 23728
+    },
+    {
+      "path": "motifs/bat-cat.glb",
+      "sha256": "66e582a542360256ec4abd6b2567c72f77bcc0139c2730dd9c7e1a4311812bce",
+      "bytes": 44340
+    },
+    {
+      "path": "motifs/better-late.glb",
+      "sha256": "f923284e1f143c76beb566bdf65ce18fe3034389e46b36d228f12292420165fc",
+      "bytes": 65044
+    },
+    {
+      "path": "motifs/birds-feather.glb",
+      "sha256": "ca4dc4248fc66a562d4bdccf034456a98254febcaa1b44a9306088c468813526",
+      "bytes": 14852
+    },
+    {
+      "path": "motifs/blood-moon-story.glb",
+      "sha256": "1b79909119a0ebb085cce73731b3d6370af8b0b7dac45d99d8212652b8f099f2",
+      "bytes": 14660
+    },
+    {
+      "path": "motifs/book-cover.glb",
+      "sha256": "d386054886ccf1cbf70fc0ec041b98cfd90c084f9044ea62f9693370838dfc71",
+      "bytes": 48220
+    },
+    {
+      "path": "motifs/book-look.glb",
+      "sha256": "e0b0b2a3c3ddcae729392110f08c243aaf4e2b41efc9b95e4a929fe4d32af2cb",
+      "bytes": 44344
+    },
+    {
+      "path": "motifs/echo-verse.glb",
+      "sha256": "80854e6de81ac33130685c1c03fbd8cf00c8a08b7b824bb28f6d3336e347e6ae",
+      "bytes": 40668
+    },
+    {
+      "path": "motifs/fortune-brave.glb",
+      "sha256": "d7470aeebc1f5c85617c6406b6e7fb0676caafe598a16b49a260894a8f2e3f59",
+      "bytes": 13136
+    },
+    {
+      "path": "motifs/friend-in-need.glb",
+      "sha256": "4dcd7872717595ea606a10b78e0b858b873d501bfbe7f10bd81ce012a9556182",
+      "bytes": 5760
+    },
+    {
+      "path": "motifs/ghost-questions.glb",
+      "sha256": "db502082944752e2dea539ef0467d45885df4abbabddf1aecbb0daa5c756d1fb",
+      "bytes": 30832
+    },
+    {
+      "path": "motifs/haunted-prepositions.glb",
+      "sha256": "4a772c6e22ef0826e745c6ab07bbf5bf4451b2465875c6ccb73f3f919d0161d3",
+      "bytes": 42312
+    },
+    {
+      "path": "motifs/hidden-key.glb",
+      "sha256": "dd27062233fe2897c63cc463ac3331f695dca92c0a6d40a217f849269ba56566",
+      "bytes": 44108
+    },
+    {
+      "path": "motifs/knowledge-power.glb",
+      "sha256": "a2c919daa2e31750d3b62824ea08f300fc0f67a2130eddaa56c61406178fcea3",
+      "bytes": 31796
+    },
+    {
+      "path": "motifs/lantern-verbs.glb",
+      "sha256": "d68e65791b34a949f98ce6e3a1abbc1ab875ee44ab020c5123a06916b8a697d9",
+      "bytes": 37040
+    },
+    {
+      "path": "motifs/moon-spoon.glb",
+      "sha256": "3faba8754b451c9d150d40305ef779cb2d78b7174e4bba45785fd0cb1b753abd",
+      "bytes": 14640
+    },
+    {
+      "path": "motifs/night-light.glb",
+      "sha256": "309e8c5d8638e6910c7c8088274d3c3107a12275a04fbdd967f12c2bbe80dec4",
+      "bytes": 12192
+    },
+    {
+      "path": "motifs/past-footsteps.glb",
+      "sha256": "c442a174327889df6ea9ff2dfb96d2737ea48ad74200c3c51b68db2c2e5c0fe6",
+      "bytes": 33592
+    },
+    {
+      "path": "motifs/practice-perfect.glb",
+      "sha256": "5f6a5918ea0d2289de826f3ab0c2171f49756144bb05aca02b91f3df7b3a9f5e",
+      "bytes": 57800
+    },
+    {
+      "path": "motifs/pumpkin-comparisons.glb",
+      "sha256": "8ff6d65574b66ba903cf91faa3fb18956ab679499341b9987dc83fdb1293c7e5",
+      "bytes": 31848
+    },
+    {
+      "path": "motifs/quiet-mouse.glb",
+      "sha256": "bc2232ec0e27b92700d4fa8ba89d05d47a4163a9d5f0252bffeab28e6893a132",
+      "bytes": 45052
+    },
+    {
+      "path": "motifs/rain-train.glb",
+      "sha256": "0b3840500b76687719482bf4cc7b76e8b445a526073da87d9602dc01aaff4a9b",
+      "bytes": 42200
+    },
+    {
+      "path": "motifs/silver-lining.glb",
+      "sha256": "fc8682679b530a5dffaeb69bf4a345c0d8b4adc6e3bed9e94755d0cbb25211de",
+      "bytes": 28648
+    },
+    {
+      "path": "motifs/sleepy-skeletons.glb",
+      "sha256": "2b6b15111582a6832cd336227048d68ec3b3e0a43cb2d865301ce01300858ff6",
+      "bytes": 58344
+    },
+    {
+      "path": "motifs/slow-steady.glb",
+      "sha256": "bbadbe0f224ab3ffad2be84d661f4ff141dfe0679b325cccdb934721004ca305",
+      "bytes": 65284
+    },
+    {
+      "path": "motifs/talking-pumpkin.glb",
+      "sha256": "fa84168792ec356672889b23131975815b62f5f508226f4ce84f1a1c79678b2e",
+      "bytes": 27972
+    },
+    {
+      "path": "motifs/time-for-tea.glb",
+      "sha256": "9ce4d665fa0c254a8b39a1ac798a420616423ef32e33323f451d0277df7f3885",
+      "bytes": 46892
+    },
+    {
+      "path": "motifs/two-heads.glb",
+      "sha256": "3cd041711c92b114b9a8e95d76bd819282307af2bf270b89def18608ff810517",
+      "bytes": 57116
+    },
+    {
+      "path": "motifs/witch-recipe.glb",
+      "sha256": "d4815e52f12aacaf386a29e6d2a25319dd1fe474cb08991c2f638d9c03051d14",
+      "bytes": 40676
+    },
+    {
+      "path": "prints/become-go-grow-back.svg",
+      "sha256": "3accfc30c4b8aea3305b80eaa4e8510e84f8a89f1510d5b8af0eaebcdb3926fa",
+      "bytes": 1385
+    },
+    {
+      "path": "prints/become-go-grow-card.glb",
+      "sha256": "4a74bb7453f123bad98f74b816b094a33b76f30cedc75d35956f3f623fd95a4f",
+      "bytes": 205144
+    },
+    {
+      "path": "prints/become-go-grow-front.svg",
+      "sha256": "f193d1c508a68edc461ec42dec5cec5a1e06656fac49b96999aec7bbe1a506c8",
+      "bytes": 55886
+    },
+    {
+      "path": "prints/become-go-grow-thumb.png",
+      "sha256": "369d346698ea98d51b3d5bfff5daea76285087a8c6dba0c53db28bf0f8d4ad46",
+      "bytes": 8797
+    },
+    {
+      "path": "prints/british-american-back.svg",
+      "sha256": "3ea7f6ea425868b098f22a1d88df7601431faecb956b4dc9c683aa20e40af481",
+      "bytes": 1445
+    },
+    {
+      "path": "prints/british-american-front.svg",
+      "sha256": "442ca622389eced11f367f904ac41dc0ce9ff15ba705bd99fdc51259feb1bf4e",
+      "bytes": 43142
+    },
+    {
+      "path": "prints/british-american-thumb.png",
+      "sha256": "68817dabd0b6d45ebe7ed9cdc433aad6344ea19cbb080366b77f0a6f10e7e3e8",
+      "bytes": 9108
+    },
+    {
+      "path": "prints/curses/bloody-friday-card-back.svg",
+      "sha256": "d493f86f2cf4010adb10e03c85d278a91712b71ac7766d6802ec01b06c8b5517",
+      "bytes": 3188
+    },
+    {
+      "path": "prints/curses/bloody-friday-card-front.svg",
+      "sha256": "91dab6d60948e6ab3f1de19cbfb995f3426334dd0817cfad9cc52378611f24e2",
+      "bytes": 2887941
+    },
+    {
+      "path": "prints/curses/bloody-friday-card-thumb.png",
+      "sha256": "cdff472eb51b6dd0b9603d34429c50530c829ed1b5079874f6385669be3d416d",
+      "bytes": 49276
+    },
+    {
+      "path": "prints/curses/bloody-friday-card.glb",
+      "sha256": "ae892ac95cbc66797d62ecd393e23909bf6514eb859c58566292cd6ccaf757fe",
+      "bytes": 1472056
+    },
+    {
+      "path": "prints/curses/cool-box-card-back.svg",
+      "sha256": "c5f8692664c70a9e1733b40ef6e7a6fa256acbb271b56a01b8f80e0c2287fde4",
+      "bytes": 3195
+    },
+    {
+      "path": "prints/curses/cool-box-card-front.svg",
+      "sha256": "18f5446df7d5266e647341ad98729c6c77f98c7dff01fc367c3adc1331c95086",
+      "bytes": 2667380
+    },
+    {
+      "path": "prints/curses/cool-box-card-thumb.png",
+      "sha256": "4824964e13a2c9790cc00f0b8a1be158178c8dab0e2c24702dd0dc7cb64df268",
+      "bytes": 49883
+    },
+    {
+      "path": "prints/curses/cool-box-card.glb",
+      "sha256": "41b419a3f203f9e8f4cdf8d17e4eae1b64cd169b28eb4d1ca3631c71c1e1c420",
+      "bytes": 1449876
+    },
+    {
+      "path": "prints/curses/cuess-digga-card-back.svg",
+      "sha256": "c2ea8cadb1d38b6dbe00b24d2bafd2d58820ae503af2867518a1cf2ccbdc0d09",
+      "bytes": 3200
+    },
+    {
+      "path": "prints/curses/cuess-digga-card-front.svg",
+      "sha256": "92ad6d49379d01f5b1fa30e1b728d4c889ae0312f153941bcd447a642962da32",
+      "bytes": 2899655
+    },
+    {
+      "path": "prints/curses/cuess-digga-card-thumb.png",
+      "sha256": "4c4324f90e104068f9e55d9d2d15fab312a6b8adecd65eb9100728126b2fcbf9",
+      "bytes": 49800
+    },
+    {
+      "path": "prints/curses/cuess-digga-card.glb",
+      "sha256": "ae34292cdbf4ddac8d2cdaf91b499d3a9020bd5d9d157157622c9e6093fc450f",
+      "bytes": 1462460
+    },
+    {
+      "path": "prints/curses/forgotten-homework-card-back.svg",
+      "sha256": "9579911d10fe05943c4b6829d88274f730e6b36a54f95558f9ab2e11b12193df",
+      "bytes": 3210
+    },
+    {
+      "path": "prints/curses/forgotten-homework-card-front.svg",
+      "sha256": "070a598433789caaf8478b85761601cc8896033fc5d31b146f739873df2e9b7e",
+      "bytes": 2733914
+    },
+    {
+      "path": "prints/curses/forgotten-homework-card-thumb.png",
+      "sha256": "c45af3540c78f9cb970ca118dd6562470405d672fad03fca21460fb6fb869862",
+      "bytes": 49864
+    },
+    {
+      "path": "prints/curses/forgotten-homework-card.glb",
+      "sha256": "e710aec683e863cf8d5d9ec174b540198bad40925e94c7f3942e7d1581ed15bf",
+      "bytes": 1456788
+    },
+    {
+      "path": "prints/curses/official-reprimand-card-back.svg",
+      "sha256": "3ca9f20a57b4f4e1cab007d1d1f880cc95e545963bef26e4bf0b991578571d19",
+      "bytes": 3178
+    },
+    {
+      "path": "prints/curses/official-reprimand-card-front.svg",
+      "sha256": "0a379808d1d623e70a1338a3add292d83c0ef0bbdcfea42b06cb8aaa897042f1",
+      "bytes": 2889261
+    },
+    {
+      "path": "prints/curses/official-reprimand-card-thumb.png",
+      "sha256": "6cd064bfb3ddbd3852169c0a4d2f6e560358eb6633209e7a54b7ae829fdcb117",
+      "bytes": 48077
+    },
+    {
+      "path": "prints/curses/official-reprimand-card.glb",
+      "sha256": "57c715f0f854449e8989481f242efa5e699b0580f15f32e7562f404ed3eec114",
+      "bytes": 1437604
+    },
+    {
+      "path": "prints/curses/school-rules-card-back.svg",
+      "sha256": "9caaa3a1c1fba9b37db979b345330fd0aa61aeae6c6dacabb209235cdd60786f",
+      "bytes": 3144
+    },
+    {
+      "path": "prints/curses/school-rules-card-front.svg",
+      "sha256": "02095da62e9007bcf21423e0fccea95c939569c5b63cdf5ad46ac095fb065e12",
+      "bytes": 2684855
+    },
+    {
+      "path": "prints/curses/school-rules-card-thumb.png",
+      "sha256": "7fbc96f4054d8498eec578f457d0450fb519726908572756c4e38eca412bce59",
+      "bytes": 48805
+    },
+    {
+      "path": "prints/curses/school-rules-card.glb",
+      "sha256": "c326bc0cac45ff2b9800f5eeef8e700d7b64679dbef23093f5e601b6e0cfa78c",
+      "bytes": 1425960
+    },
+    {
+      "path": "prints/curses/toilet-question-card-back.svg",
+      "sha256": "a044f279bb21d268273bb17187c7bb099193c795a84fd797345c45ad20b957ce",
+      "bytes": 3189
+    },
+    {
+      "path": "prints/curses/toilet-question-card-front.svg",
+      "sha256": "bded813611b7a089e3097d474c9f52d57eba0e4880026dd9e937a6922df7d309",
+      "bytes": 2710135
+    },
+    {
+      "path": "prints/curses/toilet-question-card-thumb.png",
+      "sha256": "58e6c2010e18a710c315280029b2920ce3638aeefa19db64c0193dbeb3c3a7d4",
+      "bytes": 47748
+    },
+    {
+      "path": "prints/curses/toilet-question-card.glb",
+      "sha256": "609fe9cbec8aa920d90e895d9fbda300afc1e04e015df2baed14f7e47d89dc8c",
+      "bytes": 1419424
+    },
+    {
+      "path": "prints/curses/vaping-reprimand-card-back.svg",
+      "sha256": "38266449f09f7afa3e6cc616426d15d5a0a13194fd7d446636676ce235d3c274",
+      "bytes": 3214
+    },
+    {
+      "path": "prints/curses/vaping-reprimand-card-front.svg",
+      "sha256": "55b856723550e7bfcbca4ffc3b3415f86c959b1760db359ada87c17c35875f31",
+      "bytes": 2960261
+    },
+    {
+      "path": "prints/curses/vaping-reprimand-card-thumb.png",
+      "sha256": "60a04c7370738ee86ffb24792def172632a9f8737dd8a9d921ab102377ac5639",
+      "bytes": 50200
+    },
+    {
+      "path": "prints/curses/vaping-reprimand-card.glb",
+      "sha256": "0b6856373fce5a785d3786bab3a888c3b5e6ce79236b3b82fcd2dd64ddce1354",
+      "bytes": 1474772
+    },
+    {
+      "path": "prints/empire-state-back.svg",
+      "sha256": "329b601293c2bd6cb6e89510be0df08878c7c23698fdad9fc3410f79bbc61d66",
+      "bytes": 1864
+    },
+    {
+      "path": "prints/empire-state-front.png",
+      "sha256": "0dd72cb141fa624c03602b7c4dccce774e884afec8f9ae6c0afac7305044774b",
+      "bytes": 2621983
+    },
+    {
+      "path": "prints/empire-state-postcard.glb",
+      "sha256": "2b88b18a1cfefc3d79e51ab5a232f154f34f81fbf9555834bdd5a3ab667f9007",
+      "bytes": 1639300
+    },
+    {
+      "path": "prints/empire-state-thumb.png",
+      "sha256": "e9a8f09a52dd9c83dfa9833f9ca4b5134595506f67f4466ed0f60866a74095c2",
+      "bytes": 68857
+    },
+    {
+      "path": "prints/focus-back.svg",
+      "sha256": "bb99d9d6614150e159eb594409f45e788714029ccd3dfd5d8eb1152e9352a233",
+      "bytes": 1443
+    },
+    {
+      "path": "prints/focus-front.svg",
+      "sha256": "ebb4d89c0b851bb158ad1be43519ff51362f28a3503f489f6e1c91c58728cefa",
+      "bytes": 86279
+    },
+    {
+      "path": "prints/focus-thumb.png",
+      "sha256": "8527755ffc498e102a4e2ccb68dff086ffa7ad05d082a1b3d9dd0f773ecdd3ff",
+      "bytes": 11281
+    },
+    {
+      "path": "prints/haunted-definitions-back.svg",
+      "sha256": "9d020eb203f950887d531f608ae343c61504719b9a45cf8fa63be2ed197711c7",
+      "bytes": 1420
+    },
+    {
+      "path": "prints/haunted-definitions-card.glb",
+      "sha256": "00bc69fb51baad709993d1cff6f00548db6074bdd6c01c8cca08d0474f11b357",
+      "bytes": 449256
+    },
+    {
+      "path": "prints/haunted-definitions-front.svg",
+      "sha256": "c1296327b1a89631317110893e4c0c49f459c7dbd66a0bc6ff6482f05dd63813",
+      "bytes": 213281
+    },
+    {
+      "path": "prints/haunted-definitions-thumb.png",
+      "sha256": "fa4c4fe0455c6482af614ca3075649cbfbdaf9b3ac11120312df999059aecc24",
+      "bytes": 14902
+    },
+    {
+      "path": "prints/highlight-halloween-card.glb",
+      "sha256": "5372bb12d0e7f4fa11e9ba66ec544f523d96e4d520838677750a3aef4e7e2160",
+      "bytes": 2526668
+    },
+    {
+      "path": "prints/highlight-halloween-thumb.png",
+      "sha256": "6f34e33760b530c83ff771f990a255e4ec9db88632c498ad8cd2cf424742be02",
+      "bytes": 50475
+    },
+    {
+      "path": "prints/manhattan-back.svg",
+      "sha256": "8521e564d56be310efe45da8827e01d94177dfddc6702fc597bc36b5068be3f6",
+      "bytes": 1736
+    },
+    {
+      "path": "prints/manhattan-front.png",
+      "sha256": "64dc7e5659f3ab25c00b15015d193624287cd9ba94cf7735a1694551739bbb73",
+      "bytes": 2812749
+    },
+    {
+      "path": "prints/manhattan-postcard.glb",
+      "sha256": "622482959d0df77570dd08bf285cf4897e9f1e10fdbe57638fdc0a5b9bff0ae3",
+      "bytes": 1359552
+    },
+    {
+      "path": "prints/manhattan-thumb.png",
+      "sha256": "621c1c4ae51305a611c0adc2da90575ab86aadc220c3d0ef5e8f441f556c72e2",
+      "bytes": 26045
+    },
+    {
+      "path": "prints/midnight-bird-back.svg",
+      "sha256": "0e6a86de3a212cca5a8f8a085b502df5bf86e5c27c3fec745f7e471fb2f1e803",
+      "bytes": 1434
+    },
+    {
+      "path": "prints/midnight-bird-card.glb",
+      "sha256": "e2e5aefc282c68efcb28010bdb26541cd3927b4a5b445b240ad01bdb6bc09d10",
+      "bytes": 364484
+    },
+    {
+      "path": "prints/midnight-bird-front.svg",
+      "sha256": "6d0310836dd95e683b0684a3ea554920eb6cecedd82755f452dbfa7bb6a117fe",
+      "bytes": 166621
+    },
+    {
+      "path": "prints/midnight-bird-thumb.png",
+      "sha256": "5ab72848fe9b4e3dbe2219df523203e48bf8977cf9aa57ffdb8cef3ffb26297e",
+      "bytes": 12495
+    },
+    {
+      "path": "prints/midnight-focus-card.glb",
+      "sha256": "1582a2d18d44fdc7e51028efe648137f7d665537d1ac32c407698e6b61050645",
+      "bytes": 274712
+    },
+    {
+      "path": "prints/midnight-map-back.svg",
+      "sha256": "99e89a445af3495f71fb02809b044f89786e5598c49e209042a2fd36acea343d",
+      "bytes": 1389
+    },
+    {
+      "path": "prints/midnight-map-card.glb",
+      "sha256": "7d91c26b353b39392e7a3b7f6e5634716f16764b215f830591d9435b9058a11b",
+      "bytes": 1143284
+    },
+    {
+      "path": "prints/midnight-map-front.svg",
+      "sha256": "00cddb7799f34250eb956328ac66747cadfbe21e2a14acbb8b1a58e208b36b74",
+      "bytes": 1300530
+    },
+    {
+      "path": "prints/midnight-map-thumb.png",
+      "sha256": "9445f0a1ea0f01ac611b894a86f23368752bf36bcbff840ac808d6850d8f2349",
+      "bytes": 43133
+    },
+    {
+      "path": "prints/reference-become-go-grow.png",
+      "sha256": "d9fd93b6c83df2619abd718a0853dd16453d10d3ad99a345453e59f8d08e6407",
+      "bytes": 41071
+    },
+    {
+      "path": "prints/reference-british-american.png",
+      "sha256": "6f9355cd289972e40ed633fc6a1d6e41e694533468c4ade136de1a055222610d",
+      "bytes": 31202
+    },
+    {
+      "path": "prints/reference-focus.png",
+      "sha256": "3482c6d8a0aefa885dfa63a6d64ff11c6a9d2005502b164438921566b63653e5",
+      "bytes": 63869
+    },
+    {
+      "path": "prints/reference-haunted-definitions.png",
+      "sha256": "1e9217f57479044e28836c1b046916cf7f200d8953f2339991b420ec923475b1",
+      "bytes": 159112
+    },
+    {
+      "path": "prints/reference-midnight-bird.png",
+      "sha256": "008336a4a089001dcd9bc085c34f934869ac8ccde3aef192742268b832f6289a",
+      "bytes": 124111
+    },
+    {
+      "path": "prints/reference-midnight-map.png",
+      "sha256": "dceaa961c672caf9fc7c93c204097ed49995fb24a3a6853a3ff51945ffc0088f",
+      "bytes": 974570
+    },
+    {
+      "path": "prints/reference-spooky-as-as.png",
+      "sha256": "16ea31126028d909951ae96546a0728e57ed8a7dbf1937acb9b523566fe1e835",
+      "bytes": 48500
+    },
+    {
+      "path": "prints/reference-spooky-sounds.png",
+      "sha256": "f2ff9fe93227da63b40f24e54b7bb2a0506fbd7fef4c0efa82564d3d2b16aca2",
+      "bytes": 29643
+    },
+    {
+      "path": "prints/reference-towers-after-dark.png",
+      "sha256": "18df55f80584897f6b5af0e3efdc094d7a49d991ef2477133a2cf8a1f14d0d33",
+      "bytes": 95054
+    },
+    {
+      "path": "prints/spooky-as-as-back.svg",
+      "sha256": "c45d465c0281fe7dcb3d95a0992d4f4d4f1ca0e24b037bad8340f15909e025ab",
+      "bytes": 1402
+    },
+    {
+      "path": "prints/spooky-as-as-card.glb",
+      "sha256": "c159bfffc549de17b2b615a3dd76a8ccecb8c79dd4256fbb37bcb432434462bc",
+      "bytes": 291056
+    },
+    {
+      "path": "prints/spooky-as-as-front.svg",
+      "sha256": "e7de7910a90aa317c547ca21d77c9c741d6b78a20868f1a1ac757046f6faec90",
+      "bytes": 65763
+    },
+    {
+      "path": "prints/spooky-as-as-thumb.png",
+      "sha256": "cdbd3d25dba9c31a871e297d593a0a7941b17b61916f38172467f6f73f70cb81",
+      "bytes": 10823
+    },
+    {
+      "path": "prints/spooky-sounds-back.svg",
+      "sha256": "7b235393c130c28eaaea4fd3eeab572a4c86f989ed95e426e8a35316b1aee99a",
+      "bytes": 1411
+    },
+    {
+      "path": "prints/spooky-sounds-card.glb",
+      "sha256": "76d766840d0e4e6c046162f96a35c5210372d02d863681a9724af0742bada55a",
+      "bytes": 170024
+    },
+    {
+      "path": "prints/spooky-sounds-front.svg",
+      "sha256": "29bb876b88f2aa1d8a05f5b452a3c847095f84384dcdc61bf79833bde4c69c7f",
+      "bytes": 40605
+    },
+    {
+      "path": "prints/spooky-sounds-thumb.png",
+      "sha256": "fee41995e9e4e4159a8c9cf8ee47d19ecb6d40719c626e1d929c65895e83ab80",
+      "bytes": 7267
+    },
+    {
+      "path": "prints/towers-after-dark-back.svg",
+      "sha256": "c7346d3a3bb23c4bdd19a2e5659349db8231b42e954ffbac429aeede3c05b4e2",
+      "bytes": 1393
+    },
+    {
+      "path": "prints/towers-after-dark-card.glb",
+      "sha256": "373747de1d797ee11447b6969126be040f2dc7396c2be7ad4863a113d6b2c0ad",
+      "bytes": 316176
+    },
+    {
+      "path": "prints/towers-after-dark-front.svg",
+      "sha256": "60bc044e31537723a6bcdb34feb56f55ac2ec4cec5b889514cfc9f4dd9eed645",
+      "bytes": 127880
+    },
+    {
+      "path": "prints/towers-after-dark-thumb.png",
+      "sha256": "d982f5fd3b56a0c7120f92d4c2ead7c6bac2483fbe545d79a3a47bbc8b26ea55",
+      "bytes": 13022
+    },
+    {
+      "path": "prints/two-ways-boo-card.glb",
+      "sha256": "e7e04f2ad9d44d1b3db7f16dd74a4a47a8e8f92931860751080001de0f4977a4",
+      "bytes": 191160
+    },
+    {
+      "path": "textbook/highlight-halloween-back.png",
+      "sha256": "42d70116f705331f050cc1631f38fc6a8010846395cc1d0cf11c8cf2f8c449d7",
+      "bytes": 1707332
+    },
+    {
+      "path": "textbook/highlight-halloween-book.glb",
+      "sha256": "abdaa5cb7e47e40c7252f85d403395ebaf99b98362465c2d5f5ea340f15ea189",
+      "bytes": 1995284
+    },
+    {
+      "path": "textbook/highlight-halloween-cover.png",
+      "sha256": "aa03675cf03add7a8a86ce5e938caeb0283e0c62cdd8681d46529d07ada16e6a",
+      "bytes": 1693233
+    }
+  ]
+}

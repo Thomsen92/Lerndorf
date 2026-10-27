@@ -13,6 +13,7 @@
     "test:e2e": "playwright test",
     "preview": "vite preview",
     "galerie": "node scripts/galerie.ts",
+    "import:collection": "node scripts/import-halloween-prototype.ts",
     "migrations:check": "node scripts/check-migrations.ts",
     "migrations:lock": "node scripts/check-migrations.ts --update-lock"
   },
