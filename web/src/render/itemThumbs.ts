@@ -13,6 +13,7 @@ import {
   PREVIEW_STILL_YAW,
 } from './itemPreview';
 import { plotAsset, tintFor } from './plotAssets';
+import { isGlbItem, loadGlbItem } from './glbItems';
 
 /** Data URL (PNG) of the item, or null for items without a model (avatar) or on failure. */
 export type ThumbItem = Pick<ItemEntry, 'id' | 'kind' | 'fits'>;
@@ -64,7 +65,7 @@ export function createThumbSource(
 
 /** One lazily created offscreen renderer (256x192, alpha); null when WebGL is unavailable. */
 export function createWebGLThumbRender(): {
-  render: (kind: SlotKind, itemId: string) => string;
+  render: (kind: SlotKind, itemId: string) => Promise<string>;
   dispose(): void;
 } | null {
   let renderer: THREE.WebGLRenderer;
@@ -83,8 +84,9 @@ export function createWebGLThumbRender(): {
   camera.aspect = THUMB_W / THUMB_H;
   camera.updateProjectionMatrix();
   return {
-    render(kind, itemId) {
-      const model = plotAsset(kind, itemId, tintFor(0));
+    async render(kind, itemId) {
+      const glb = isGlbItem(itemId);
+      const model = glb ? await loadGlbItem(itemId) : plotAsset(kind, itemId, tintFor(0));
       try {
         model.rotation.y = PREVIEW_STILL_YAW;
         scene.add(model);
@@ -96,10 +98,12 @@ export function createWebGLThumbRender(): {
         return url;
       } finally {
         scene.remove(model);
-        model.traverse((o) => {
-          // materials are shared and cached by plotAssets (the village uses them too): never dispose them
-          if (o instanceof THREE.Mesh) o.geometry.dispose();
-        });
+        if (!glb) {
+          model.traverse((o) => {
+            // materials are shared and cached by plotAssets (the village uses them too): never dispose them
+            if (o instanceof THREE.Mesh) o.geometry.dispose();
+          });
+        }
       }
     },
     dispose() {

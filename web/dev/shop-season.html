@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shop – non-season articles (U4b)</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #120d18; }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import { setLocale } from '../src/i18n.ts';
+      import '../src/style.css';
+      import { buildItemBook } from '../src/api/items.ts';
+      import { openShop } from '../src/ui/shopView.ts';
+      setLocale('en');
+
+      const catalogue = [
+        { id: 'shop_cabin', kind: 'house', slot: null, nameDe: 'Blockhütte', price: 500, starter: false, shopVisible: true },
+        { id: 'shop_beatall', kind: 'car', slot: null, nameDe: 'Beatall', price: 600, starter: false, shopVisible: true },
+        { id: 'shop_toyoyo', kind: 'car', slot: null, nameDe: 'Toyoyo', price: 700, starter: false, shopVisible: true },
+        { id: 'shop_president_car', kind: 'car', slot: null, nameDe: 'Präsidentenwagen', price: 2000, starter: false, shopVisible: true },
+        { id: 'shop_trump', kind: 'deco', slot: null, nameDe: 'Trump-Statue', price: 2000, starter: false, shopVisible: true },
+        { id: 'shop_white_house', kind: 'house', slot: null, nameDe: 'Weißes Haus', price: 5000, starter: false, shopVisible: true },
+      ];
+      const book = buildItemBook(catalogue, {}, {});
+      const api = {
+        async loadBook() { return { ok: true, value: book }; },
+        async buy() { return { ok: true, value: { coins: 9000, qty: 1 } }; },
+      };
+      openShop({
+        api,
+        character: 'boy',
+        getCoins: () => 10000,
+        onCoins: () => {},
+        shopOpen: true,
+        buildOpen: false,
+        category: null,
+        onCategory: () => {},
+        onBuild: () => {},
+        onShowSlot: () => {},
+        onOpenInventory: () => {},
+        onClose: () => {},
+      });
+      window.__ready = true;
+    </script>
+  </body>
+</html>

@@ -69,7 +69,7 @@ describe('acquireSessionThumbs', () => {
   afterEach(() => resetSessionThumbs());
   const fake = () => {
     const dispose = vi.fn();
-    const render = vi.fn((_k: string, id: string) => `data:${id}`);
+    const render = vi.fn(async (_k: string, id: string) => `data:${id}`);
     const factory = vi.fn(() => ({ render, dispose }));
     return { dispose, render, factory };
   };
