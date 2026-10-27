@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LearnPass Entwurf</title>
+    <style>
+      @font-face { font-family: 'Comic Neue'; src: url('/fonts/ComicNeue-Bold.woff2') format('woff2'); font-weight: 700; }
+      @font-face { font-family: 'Comic Neue'; src: url('/fonts/ComicNeue-Regular.woff2') format('woff2'); font-weight: 400; }
+      :root {
+        --body: 'Atkinson Hyperlegible', Verdana, system-ui, sans-serif;
+        --display: 'Comic Neue', 'Comic Sans MS', cursive;
+        --night: #0f0a17; --sky: #1d1030; --card: #221830; --card-hi: #2d2040; --edge: #3d2c52;
+        --moon: #d2462e; --moon-glow: #f07a4c; --pumpkin: #ff8f2b; --gold: #f2b630; --bone: #f6e9d2; --muted: #b6a5c6; --soot: #120912;
+        --common: #9aa3ad; --rare: #4a8ff0; --epic: #a46cf0; --legendary: #f2b630; --focus: #ffd16d;
+        color-scheme: dark;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #07050c; color: var(--bone); font: 16px/1.4 var(--body); }
+      button { font: inherit; color: inherit; cursor: pointer; }
+      button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+      .r-common { --r: var(--common); } .r-rare { --r: var(--rare); } .r-epic { --r: var(--epic); } .r-legendary { --r: var(--legendary); }
+      .thumb { width: 100%; height: 100%; object-fit: contain; display: block; }
+      .thumb:not([src]) { visibility: hidden; }
+
+      /* review chrome */
+      .note { max-width: 1180px; margin: 0 auto; padding: 14px 16px 10px; color: #9c8fb0; font-size: 14px; }
+      .note b { color: var(--bone); }
+      .label { max-width: 1180px; margin: 28px auto 10px; padding: 0 16px; color: #8d80a3; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+
+      /* ===== the LearnPass screen (full-screen overlay in the game) ===== */
+      .lp {
+        position: relative; max-width: 1180px; margin: 0 auto; min-height: 780px; overflow: hidden; border-radius: 26px; isolation: isolate;
+        background:
+          radial-gradient(320px 320px at 86% 4%, #ffb08a 0, var(--moon-glow) 14%, var(--moon) 34%, #7d1f1c 52%, transparent 53%),
+          radial-gradient(640px 420px at 86% 4%, #d2462e55, transparent 70%),
+          linear-gradient(180deg, var(--sky), var(--night) 62%);
+        box-shadow: 0 30px 80px #000c, inset 0 0 0 2px #2a1d3b;
+      }
+      .lp .skyline { position: absolute; left: 0; right: 0; top: 64px; height: 64px; z-index: -1; opacity: .95; }
+      .lp .fog { position: absolute; left: 0; right: 0; top: 470px; height: 120px; z-index: 0; pointer-events: none; background: linear-gradient(180deg, transparent, #2a1f3a66 40%, transparent); filter: blur(8px); }
+
+      .lp-head { display: flex; align-items: center; gap: 14px; padding: 22px 26px 0; }
+      .lp-title { margin: 0; font: 700 40px/0.95 var(--display); text-transform: uppercase; color: var(--bone); -webkit-text-stroke: 2px var(--soot); paint-order: stroke fill; text-shadow: 0 4px 0 var(--soot); }
+      .lp-title small { display: block; font-size: 15px; letter-spacing: .2em; color: var(--pumpkin); -webkit-text-stroke: 0; text-shadow: none; margin-bottom: 4px; }
+      .lp-head .grow { flex: 1; }
+      .chip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: #120b1ccc; border: 1px solid var(--edge); font-weight: 700; backdrop-filter: blur(6px); }
+      .chip .coin { width: 22px; height: 22px; }
+      .icon-btn { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--edge); background: #120b1ccc; font-size: 22px; line-height: 1; }
+
+      .lp-status { display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; margin: 18px 26px 0; padding: 14px 18px; border-radius: 18px; background: #160e22d9; border: 1px solid var(--edge); backdrop-filter: blur(8px); }
+      .tier-badge { width: 64px; height: 70px; display: grid; place-items: center; font: 700 30px var(--display); color: var(--soot); background: linear-gradient(160deg, #ffd37a, var(--pumpkin)); clip-path: polygon(50% 0, 100% 22%, 100% 74%, 50% 100%, 0 74%, 0 22%); }
+      .lp-status h2 { margin: 0 0 6px; font: 700 22px var(--display); }
+      .lp-status h2 span { color: var(--muted); font: 400 15px var(--body); margin-left: 8px; }
+      .xpbar { height: 14px; border-radius: 99px; background: #0b0712; border: 1px solid #3d2c52; overflow: hidden; }
+      .xpbar i { display: block; height: 100%; width: 53%; border-radius: 99px; background: linear-gradient(90deg, var(--pumpkin), var(--gold)); box-shadow: 0 0 12px #ff8f2b88; }
+      .ghost-btn { min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--edge); background: #241832; font-weight: 700; }
+
+      /* track: straight, swipeable, snapping reward cards */
+      .track-wrap { position: relative; margin-top: 18px; }
+      .track-wrap::before, .track-wrap::after { content: ''; position: absolute; top: 0; bottom: 0; width: 40px; z-index: 2; pointer-events: none; }
+      .track-wrap::before { left: 0; background: linear-gradient(90deg, var(--night), transparent); }
+      .track-wrap::after { right: 0; background: linear-gradient(270deg, var(--night), transparent); }
+      .track { position: relative; display: flex; gap: 14px; align-items: flex-end; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding: 36px 40px 4px; scrollbar-width: none; touch-action: pan-x; cursor: grab; }
+      .track::-webkit-scrollbar { display: none; }
+      .track.dragging { cursor: grabbing; scroll-snap-type: none; }
+      .tier { position: relative; flex: 0 0 auto; display: grid; justify-items: center; gap: 10px; scroll-snap-align: center; }
+      .node-box { position: relative; z-index: 1; width: 22px; height: 22px; display: grid; place-items: center; }
+      .card {
+        position: relative; width: 156px; height: 252px; padding: 0; border-radius: 18px; border: 2px solid var(--edge); text-align: center; overflow: hidden;
+        background: linear-gradient(180deg, var(--card-hi), var(--card)); display: grid; grid-template-rows: 30px 118px 1fr 44px; box-shadow: 0 10px 24px #0008;
+        transition: transform .15s ease;
+      }
+      .card:active { transform: scale(.97); }
+      .card .top { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px 0; font: 700 13px var(--body); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+      .card .top svg { width: 16px; height: 16px; }
+      .card .art { position: relative; margin: 4px 10px 0; border-radius: 12px; background: radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--glow, #6b4f8a) 45%, transparent), transparent 70%); display: grid; place-items: center; overflow: hidden; }
+      .card .art > * { max-width: 100%; max-height: 100%; }
+      .card .name { padding: 8px 10px 0; font: 700 15px/1.2 var(--body); }
+      .card .nm { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .card .extra { display: block; margin-top: 3px; font: 400 13px var(--body); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .card .foot { display: grid; place-items: center; margin: 0 8px 8px; border-radius: 10px; font: 700 14px var(--body); color: var(--muted); background: #150d1f; }
+      /* states */
+      .card.locked .art { filter: saturate(.45) brightness(.85); }
+      .card.locked .name { color: #cfc2dc; }
+      .card.claimed { border-color: #3e5a3a; }
+      .card.claimed .foot { color: #a6e05a; }
+      .card.ready { border-color: var(--pumpkin); box-shadow: 0 0 0 4px #ff8f2b33, 0 0 34px #ff8f2b66, 0 10px 24px #0008; }
+      .card.ready .foot { background: linear-gradient(180deg, #ffb24a, var(--pumpkin)); color: var(--soot); font-size: 16px; }
+      .card.mile { width: 196px; height: 284px; grid-template-rows: 30px 146px 1fr 44px; border-color: transparent; background: linear-gradient(180deg, #3a2a14, #231a12) padding-box, linear-gradient(160deg, #ffe39a, var(--gold) 40%, #8a5a12) border-box; }
+      .card.mile .top { color: var(--gold); }
+      .card.final { width: 230px; }
+      .node { width: 14px; height: 14px; border-radius: 50%; background: #2a1f3a; border: 2px solid #4a3a60; }
+      .tier.done .node { background: var(--pumpkin); border-color: #ffd37a; }
+      .tier.here .node { width: 22px; height: 22px; background: var(--gold); box-shadow: 0 0 0 5px #f2b63044; }
+      .rail { position: absolute; bottom: 13px; height: 4px; background: #2a1f3a; border-radius: 4px; z-index: 0; }
+      .rail i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: linear-gradient(90deg, var(--pumpkin), var(--gold)); }
+      .here-pin { position: absolute; top: -28px; left: 50%; z-index: 3; transform: translateX(-50%); pointer-events: none; }
+      .here-pin span { font: 700 12px var(--body); color: var(--soot); background: var(--gold); border-radius: 8px; padding: 1px 8px; text-transform: uppercase; letter-spacing: .08em; }
+
+      /* reward art pieces */
+      .coins-art svg { width: 86px; height: 86px; filter: drop-shadow(0 6px 8px #0009); }
+      .frame-art { position: relative; width: 96px; height: 96px; }
+      .frame-art img { position: absolute; left: 22%; top: 27%; width: 56%; height: 56%; border-radius: 50%; object-fit: cover; object-position: 50% 12%; background: #2b2140; }
+      .frame-art svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+      .title-art { width: 100%; padding: 0 4px; display: grid; place-items: center; }
+      .title-art .title-plaque { min-width: 0; width: 100%; min-height: 64px; font-size: 14px; padding: 12px 16px; }
+      .title-art .title-plaque .title-plaque-label { white-space: normal; overflow: visible; line-height: 1.15; }
+      .pick-art { display: grid; grid-template-columns: 1fr 1fr; width: 100%; height: 100%; }
+
+      /* bottom: chest sources and what's inside */
+      .lp-bottom { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 26px 26px 26px; }
+      .src { display: grid; grid-template-columns: 52px 1fr; grid-template-rows: auto auto; gap: 2px 12px; align-items: center; padding: 12px 14px; border-radius: 16px; background: #160e22e6; border: 1px solid var(--edge); text-align: left; min-height: 96px; }
+      .src .ico { grid-row: 1 / span 3; width: 52px; height: 52px; display: grid; place-items: center; }
+      .src b { font: 700 17px var(--display); }
+      .src small { color: var(--muted); font-size: 13px; }
+      .src .act { justify-self: start; margin-top: 6px; min-height: 44px; padding: 0 14px; white-space: nowrap; font-size: 15px; border-radius: 10px; border: 0; background: var(--pumpkin); color: var(--soot); font-weight: 700; }
+      .src .act.alt { background: #2d2040; color: var(--bone); border: 1px solid var(--edge); }
+      .ring { --p: 66; width: 50px; height: 50px; border-radius: 50%; background: conic-gradient(var(--pumpkin) calc(var(--p) * 1%), #2a1f3a 0); display: grid; place-items: center; }
+      .ring::after { content: '2/3'; width: 38px; height: 38px; border-radius: 50%; background: #160e22; display: grid; place-items: center; font: 700 14px var(--body); }
+      .src.inside { border-color: #6b4f8a; background: linear-gradient(135deg, #2b1c40, #160e22); }
+
+      /* what's inside modal */
+      .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: #05030acc; padding: 16px; }
+      .modal[hidden] { display: none; }
+      .sheet { width: min(860px, 100%); max-height: calc(100vh - 32px); overflow: auto; border-radius: 22px; background: linear-gradient(180deg, #23173a, #140d1f); border: 1px solid var(--edge); padding: 22px 24px; box-shadow: 0 30px 80px #000; }
+      .sheet header { display: flex; align-items: center; gap: 12px; }
+      .sheet h3 { margin: 0; font: 700 28px var(--display); flex: 1; }
+      .sheet p { color: var(--muted); margin: 6px 0 16px; }
+      .band { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: start; padding: 14px 0; border-top: 1px solid #ffffff14; }
+      .band .pct { font: 700 34px var(--display); color: var(--r); line-height: 1; }
+      .band .pct small { display: block; font: 700 14px var(--body); letter-spacing: .12em; text-transform: uppercase; margin-top: 4px; }
+      .band .items { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 8px; }
+      .band .items figure { margin: 0; text-align: center; font-size: 12px; line-height: 1.2; color: var(--muted); overflow-wrap: anywhere; }
+      .band .items .box { aspect-ratio: 1; border-radius: 12px; background: #0f0a17; border: 2px solid color-mix(in srgb, var(--r) 70%, #000); padding: 4px; margin-bottom: 4px; }
+
+      /* other views */
+      .details { max-width: 1180px; margin: 0 auto 48px; padding: 0 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+      .tile { background: linear-gradient(180deg, #1d1430, #120b1c); border: 1px solid var(--edge); border-radius: 20px; padding: 16px; }
+      .tile h4 { margin: 0 0 12px; font: 700 13px var(--body); color: var(--muted); letter-spacing: .12em; text-transform: uppercase; }
+      .pcard { position: relative; overflow: hidden; border-radius: 16px; padding: 14px; background: radial-gradient(130px 130px at 92% 0, var(--moon) 0, #7d1f1c 55%, transparent 56%), #1a1026; border: 1px solid #5a3a60; display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; }
+      .pcard b { font: 700 20px var(--display); text-transform: uppercase; }
+      .pcard .xpbar { grid-column: 1 / -1; height: 10px; }
+      .pcard .go { min-height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: var(--pumpkin); color: var(--soot); font-weight: 700; }
+      .reveal { text-align: center; padding: 16px 10px 12px; border-radius: 16px; background: repeating-conic-gradient(from 0deg at 50% 40%, color-mix(in srgb, var(--r) 30%, transparent) 0 8deg, transparent 8deg 16deg), radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--r) 50%, transparent), #120b1c 65%); border: 2px solid var(--r); }
+      .reveal .pic { width: 160px; height: 160px; margin: 0 auto; }
+      .reveal .badge { display: inline-block; margin-top: 6px; padding: 2px 12px; border-radius: 999px; background: var(--r); color: var(--soot); font: 700 13px var(--body); letter-spacing: .12em; text-transform: uppercase; }
+      .reveal h5 { margin: 8px 0 2px; font: 700 24px var(--display); }
+      .reveal p { margin: 0 0 12px; color: var(--muted); }
+      .reveal button, .pick-confirm { min-height: 48px; padding: 0 22px; border-radius: 12px; border: 0; background: var(--pumpkin); color: var(--soot); font-weight: 700; }
+      .pick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+      .pick button { position: relative; aspect-ratio: 1; padding: 4px; border-radius: 12px; background: #0f0a17; border: 2px solid color-mix(in srgb, var(--r) 75%, #000); }
+      .pick button.own::after { content: 'owned'; position: absolute; left: 4px; bottom: 4px; font-size: 11px; background: #000b; border-radius: 6px; padding: 0 5px; }
+      .pick button[aria-pressed='true'] { border-color: var(--bone); box-shadow: 0 0 0 3px var(--pumpkin); }
+      .pick-note { color: var(--muted); font-size: 14px; margin: 10px 0; }
+
+      .shake { animation: shake .5s ease-in-out 2; }
+      @keyframes shake { 25% { transform: rotate(-5deg) scale(1.04); } 75% { transform: rotate(5deg) scale(1.04); } }
+      .card.ready { animation: glow 1.8s ease-in-out infinite; }
+      @keyframes glow { 50% { box-shadow: 0 0 0 6px #ff8f2b44, 0 0 46px #ff8f2b99, 0 10px 24px #0008; } }
+
+      @media (max-width: 860px) {
+        .lp { border-radius: 0; min-height: 0; }
+        .lp-head { padding: 16px 16px 0; flex-wrap: wrap; } .lp-title { font-size: 30px; }
+        .lp-status { margin: 14px 16px 0; grid-template-columns: auto 1fr; } .lp-status .ghost-btn { grid-column: 1 / -1; }
+        .track { padding-left: 16px; padding-right: 16px; }
+        .lp-bottom { grid-template-columns: 1fr; margin: 20px 16px; }
+        .details { grid-template-columns: 1fr; }
+        .band { grid-template-columns: 1fr; }
+      }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } .track { scroll-behavior: auto; } }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <radialGradient id="g-coin" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff3b8" /><stop offset=".45" stop-color="#ffcf4d" /><stop offset="1" stop-color="#b9780f" /></radialGradient>
+      </defs>
+      <symbol id="i-coin" viewBox="0 0 64 64"><ellipse cx="32" cy="34" rx="26" ry="26" fill="#8a5508" /><circle cx="32" cy="31" r="26" fill="url(#g-coin)" /><circle cx="32" cy="31" r="19" fill="none" stroke="#a8690c" stroke-width="3" opacity=".7" /><path d="M32 19l3.6 7.6 8.3.9-6.2 5.6 1.8 8.2L32 37.2l-7.5 4.1 1.8-8.2-6.2-5.6 8.3-.9z" fill="#a8690c" opacity=".8" /></symbol>
+      <symbol id="i-coins" viewBox="0 0 96 96"><g transform="translate(30 4) scale(.85)"><use href="#i-coin" width="64" height="64" /></g><g transform="translate(4 26) scale(.85)"><use href="#i-coin" width="64" height="64" /></g><g transform="translate(34 34)"><use href="#i-coin" width="64" height="64" /></g></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor" /><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.4" /></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#a6e05a" /><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#120912" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+      <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z" fill="currentColor" /></symbol>
+    </svg>
+
+    <p class="note"><b>LearnPass – Variante A, überarbeitet.</b> Gerade Karten-Spur zum Wischen mit dem Finger, jede Stufe zeigt ihre Belohnung als Bild, Blutmond-Stimmung. Chancen nur noch unter „What's inside?“. Beispieldaten: Stufe 12, 452 XP. Echte Bilder: Season-Modelle, 3D-Truhe, Titel-Schild und Rahmen aus dem Spiel, Kenney-Figuren als Platzhalter für die Pass-Szenen.</p>
+
+    <section class="lp" aria-label="LearnPass">
+      <svg class="skyline" viewBox="0 0 1180 90" preserveAspectRatio="none" aria-hidden="true">
+        <path fill="#0d0814" d="M0 90V62l40-6 22 8 30-22 26 18 44-10 20-30 8 4 10-24 10 24 8-4 18 32 40 6 30-14 22 10 36-6 16-20h10l16 20 44 4 26-12 30 14 40-8 24 10 34-20 18 16 26-6 30 12 24-18 22 4 14-28 6 2 8-18 8 18 6-2 14 30 34 4 28-10 40 12 30-8 26 10 34-14 24 8 30-6 40 10 34-8 26 6V90z" />
+        <g fill="#0d0814"><rect x="300" y="44" width="6" height="22" /><rect x="292" y="50" width="22" height="5" /><rect x="820" y="40" width="6" height="26" /><rect x="812" y="47" width="22" height="5" /></g>
+      </svg>
+      <div class="lp-head">
+        <h1 class="lp-title"><small>Season I</small>Halloween</h1>
+        <span class="grow"></span>
+        <span class="chip">26 days left</span>
+        <span class="chip"><svg class="coin"><use href="#i-coin" /></svg>240</span>
+        <button class="icon-btn" aria-label="Close">✕</button>
+      </div>
+      <div class="lp-status">
+        <div class="tier-badge" aria-hidden="true">12</div>
+        <div><h2>Tier 12 of 40 <span>452 XP · 28 XP to tier 13</span></h2><div class="xpbar"><i></i></div></div>
+        <button class="ghost-btn" data-jump>Jump to tier 12</button>
+      </div>
+      <div class="fog"></div>
+      <div class="track-wrap">
+        <div class="track" data-track tabindex="0" aria-label="LearnPass tiers, swipe left and right"></div>
+        <div class="rail" data-rail><i></i></div>
+      </div>
+      <div class="lp-bottom">
+        <div class="src"><span class="ico" data-art="chest-small"></span><b>1 chest waiting</b><small>From tier 10</small><button class="act">Open in inventory</button></div>
+        <div class="src"><span class="ico"><span class="ring" style="--p: 66"></span></span><b>Chest streak</b><small>2 of 3 days. Solve a quest tomorrow to get a chest.</small></div>
+        <div class="src"><span class="ico"><svg width="46" height="46"><use href="#i-coin" /></svg></span><b>Buy a chest</b><small>50 coins · 1 of 2 left this week</small><button class="act">Buy</button></div>
+        <button class="src inside" data-open-inside><span class="ico" data-art="chest-small-2"></span><b>What's inside?</b><small>Chances and all 28 items</small></button>
+      </div>
+    </section>
+
+    <p class="label">Weitere Ansichten</p>
+    <div class="details">
+      <div class="tile">
+        <h4>Profile card</h4>
+        <div class="pcard"><b>Season I · Halloween</b><span class="chip" style="min-height: 34px">Tier 12</span><div class="xpbar"><i style="width: 30%"></i></div><small style="color: var(--muted)">26 days left · 1 chest waiting</small><button class="go">Open LearnPass</button></div>
+      </div>
+      <div class="tile r-rare">
+        <h4>Opening a chest</h4>
+        <div class="reveal"><div class="pic"><img class="thumb" data-src="season1/kit-witch-cat.glb" data-chest alt="Witch cat" /></div><span class="badge">Rare</span><h5>Witch cat</h5><p>New! It's in your inventory now.</p><button data-replay>Next</button></div>
+      </div>
+      <div class="tile">
+        <h4>Tier 40 · pick one</h4>
+        <div class="pick" data-pick></div>
+        <p class="pick-note">You already own the pumpkin patch. Picking it gives you 100 coins.</p>
+        <button class="pick-confirm">Pick this item</button>
+      </div>
+    </div>
+
+    <div class="modal" data-inside hidden role="dialog" aria-modal="true" aria-labelledby="inside-title">
+      <div class="sheet">
+        <header><h3 id="inside-title">What's inside a season chest?</h3><button class="icon-btn" data-close aria-label="Close">✕</button></header>
+        <p>Each chest holds exactly one item. Pass, streak and shop chests have the same chances.</p>
+        <div data-bands></div>
+      </div>
+    </div>
+
+    <script type="module" src="./learnpass-design.ts"></script>
+  </body>
+</html>
