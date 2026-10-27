@@ -50,6 +50,30 @@ const STATE_LABEL: Record<SeasonRow['state'], string> = {
   closed: 'abgeschlossen',
 };
 
+/** "2026-10-28" → "28.10.2026" (teacher area: German dates). */
+export function germanDate(iso: string): string {
+  const [y, m, d] = iso.slice(0, 10).split('-');
+  return y && m && d ? `${d}.${m}.${y}` : iso;
+}
+
+/** Database errors of the season RPCs in plain German (review W4). */
+export function seasonError(err: unknown, fallback: string): string {
+  const text = err instanceof Error ? err.message : '';
+  const known: Array<[RegExp, string]> = [
+    [/end must be Sunday/, 'Das Ende muss ein Sonntag sein.'],
+    [/end before start/, 'Das Ende muss nach dem Start liegen.'],
+    [/end before today/, 'Das Ende darf nicht vor heute liegen. Zum vorzeitigen Ende gibt es „Jetzt beenden“.'],
+    [/overlap/, 'Die Daten überschneiden sich mit einer anderen Saison.'],
+    [/another season runs/, 'Es läuft schon eine andere Saison.'],
+    [/only planned seasons can start/, 'Nur eine geplante Saison kann gestartet werden.'],
+    [/only running seasons can end/, 'Nur eine laufende Saison kann beendet werden.'],
+    [/season closed/, 'Diese Saison ist abgeschlossen; die Daten sind gesperrt.'],
+    [/season not over/, 'Die Saison läuft noch.'],
+    [/dates missing/, 'Bitte Start und Ende eintragen.'],
+  ];
+  return known.find(([re]) => re.test(text))?.[1] ?? fallback;
+}
+
 async function rpc<T>(ctx: Parameters<TeacherPage['mount']>[1], fn: string, args?: Record<string, unknown>): Promise<T> {
   const { data, error } = await ctx.supabase.rpc(fn, args);
   if (error) throw new Error(error.message);
@@ -81,7 +105,7 @@ export default {
       }
     }
 
-    let data: Overview | null = current ? await overview(current.id) : null;
+    const data: Overview | null = current ? await overview(current.id) : null;
     const changes = current
       ? await rpc<ChangeRow[]>(ctx, 'teacher_season_changes', { p_season: current.id }).catch(() => [])
       : [];
@@ -93,7 +117,13 @@ export default {
           <strong>${esc(s.label)}</strong>
           <span class="season-state">${STATE_LABEL[s.state]}</span>
         </header>
-        <p>${esc(s.starts_on)} – ${esc(s.ends_on)} · ${s.days_left} Tage übrig · ${s.tiers} Stufen · ${s.items} Gegenstände</p>
+        <p>${germanDate(s.starts_on)} – ${germanDate(s.ends_on)} · ${
+          s.state === 'planned'
+            ? `startet am ${germanDate(s.starts_on)}`
+            : s.state === 'running'
+              ? `noch ${s.days_left} Tage`
+              : 'vorbei'
+        } · ${s.tiers} Stufen · ${s.items} Gegenstände</p>
         <div class="season-actions">
           ${s.state === 'planned' ? `<button type="button" class="primary" data-start="${esc(s.id)}">Jetzt starten</button>` : ''}
           ${s.state === 'running' ? `<button type="button" class="danger" data-end="${esc(s.id)}">Jetzt beenden</button>` : ''}
@@ -157,13 +187,14 @@ export default {
 
     root.querySelectorAll<HTMLButtonElement>('[data-start]').forEach((button) => {
       button.onclick = async () => {
+        if (!window.confirm('Saison jetzt starten? Ab heute zählen XP für den LearnPass.')) return;
         button.disabled = true;
         try {
           await rpc(ctx, 'teacher_start_season_now', { p_season: button.dataset.start });
           ctx.status('Saison gestartet.');
           ctx.refresh();
         } catch (err) {
-          ctx.status(err instanceof Error ? err.message : 'Start fehlgeschlagen.', 'error');
+          ctx.status(seasonError(err, 'Start fehlgeschlagen.'), 'error');
           button.disabled = false;
         }
       };
@@ -178,7 +209,7 @@ export default {
           ctx.status('Saison beendet, Stufen wurden gutgeschrieben.');
           ctx.refresh();
         } catch (err) {
-          ctx.status(err instanceof Error ? err.message : 'Beenden fehlgeschlagen.', 'error');
+          ctx.status(seasonError(err, 'Beenden fehlgeschlagen.'), 'error');
           button.disabled = false;
         }
       };
@@ -193,7 +224,7 @@ export default {
           ctx.status('Saison abgeschlossen.');
           ctx.refresh();
         } catch (err) {
-          ctx.status(err instanceof Error ? err.message : 'Abschließen fehlgeschlagen.', 'error');
+          ctx.status(seasonError(err, 'Abschließen fehlgeschlagen.'), 'error');
           button.disabled = false;
         }
       };
@@ -204,16 +235,24 @@ export default {
         event.preventDefault();
         const d = new FormData(form);
         const season = form.dataset.season ?? '';
+        const start = String(d.get('start') ?? '');
+        const end = String(d.get('end') ?? '');
+        if (
+          !window.confirm(
+            `Saison auf ${germanDate(start)} – ${germanDate(end)} setzen? Abgeholte Stufen bleiben, XP vor dem neuen Start zählen nicht mehr.`,
+          )
+        )
+          return;
         try {
           await rpc(ctx, 'teacher_set_season_dates', {
             p_season: season,
-            p_starts_on: String(d.get('start') ?? ''),
-            p_ends_on: String(d.get('end') ?? ''),
+            p_starts_on: start,
+            p_ends_on: end,
           });
           ctx.status('Daten gespeichert.');
           ctx.refresh();
         } catch (err) {
-          ctx.status(err instanceof Error ? err.message : 'Speichern fehlgeschlagen.', 'error');
+          ctx.status(seasonError(err, 'Speichern fehlgeschlagen.'), 'error');
         }
       };
     });

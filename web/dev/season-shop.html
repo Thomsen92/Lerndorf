@@ -7,7 +7,7 @@
     <style>
       html, body { margin: 0; height: 100%; background: #120d18; color: #f6e9d2;
         font: 16px system-ui, sans-serif; }
-      .panel { width: min(640px, 94vw); margin: 40px auto; padding: 18px; border-radius: 18px;
+      .panel { box-sizing: border-box; width: min(640px, 94vw); margin: 40px auto; padding: 18px; border-radius: 18px;
         background: #1b1322; border: 1px solid #3d2c52; }
       h2 { margin: 0 0 14px; font-size: 22px; }
     </style>
@@ -18,31 +18,14 @@
       <div id="host"></div>
     </div>
     <script type="module">
+      import '../src/style.css';
       import { setLocale } from '../src/i18n.ts';
       import { createSeasonShopTile } from '../src/ui/seasonShop.ts';
-      setLocale('en');
-
-      let left = 2;
-      let coins = 240;
-      const api = {
-        async state() {
-          return {
-            season: { id: '2026-11-halloween', label: 'Season I', theme: 'halloween', starts_on: '2026-10-28', ends_on: '2026-12-06', state: 'running', days_left: 26 },
-            xp: 452, tier: 12, tiers: [], next: null,
-            chests: { pass: 1, streak: 0, shop: 0 },
-            shop: { price: 50, left, week_start: '2026-10-26' },
-            streak: { current: 2, best: 4, last_day: '2026-10-26', to_chest: 1 },
-            choice: { open: false, item_id: null },
-          };
-        },
-        async buyChest() {
-          left -= 1;
-          coins -= 50;
-          return { left };
-        },
-      };
+      import { mockSeason } from './seasonMock.ts';
+      setLocale(new URLSearchParams(location.search).get('lang') === 'de' ? 'de' : 'en');
+      const season = mockSeason();
       const host = document.getElementById('host');
-      const tile = createSeasonShopTile({ api, getCoins: () => coins, onCoins: (c) => { coins = c; } });
+      const tile = createSeasonShopTile({ api: season.api, getCoins: season.coins, onCoins: season.setCoins });
       host.append(tile);
       window.__ready = true;
     </script>

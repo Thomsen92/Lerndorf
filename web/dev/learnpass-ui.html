@@ -3,92 +3,34 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>LearnPass – UI harness (U1)</title>
+    <title>LearnPass – UI harness</title>
     <style>
-      html, body { margin: 0; height: 100%; background: #0f0a17; color: #f6e9d2;
-        font: 16px system-ui, sans-serif; }
-      #open { position: fixed; left: 16px; top: 16px; z-index: 5; padding: 10px 16px; border-radius: 10px;
+      html, body { margin: 0; height: 100%; background: #0f0a17; color: #f6e9d2; font: 16px system-ui, sans-serif; }
+      #open { position: fixed; left: 16px; bottom: 16px; z-index: 1; padding: 10px 16px; border-radius: 10px;
         border: 0; background: #ff8f2b; color: #2b1408; font-weight: 800; cursor: pointer; }
     </style>
   </head>
   <body>
     <button id="open" type="button">Open LearnPass</button>
     <script type="module">
-      import { renderLearnPass } from '../src/ui/learnpass/learnpassView.ts';
+      // The game page styles load the local Comic Neue font, like in the village.
+      import '../src/style.css';
+      import { openLearnPass } from '../src/ui/learnpass/openLearnPass.ts';
       import { setLocale } from '../src/i18n.ts';
-      setLocale('en');
-
-      const CHESTS = new Set([5, 10, 15, 20, 25, 30, 35, 40]);
-      const TITLES = { 12: 'title_season_pumpkin_rookie', 22: 'title_season_ghost_hunter', 32: 'title_season_witch_friend', 40: 'title_season_halloween_legend' };
-      const FRAMES = { 8: 'frame_season_pumpkin', 18: 'frame_season_web', 28: 'frame_season_grave', 38: 'frame_season_cauldron' };
-      const SCENES = new Set([21, 23, 24, 26, 27, 29, 31, 33, 34, 36, 37, 39]);
-      const xpOf = (t) => (t <= 10 ? t * 30 : t <= 20 ? 300 + (t - 10) * 60 : t <= 30 ? 900 + (t - 20) * 90 : 1800 + (t - 30) * 120);
-      const tiers = [];
-      for (let t = 1; t <= 40; t++) {
-        tiers.push({
-          tier: t,
-          xp: xpOf(t),
-          coins: (t <= 20 ? 5 : 0) + (CHESTS.has(t) ? 25 : 0),
-          chest: CHESTS.has(t),
-          title_id: TITLES[t] ?? null,
-          frame_id: FRAMES[t] ?? null,
-          item_id: SCENES.has(t) ? `scene_${t}` : null,
-          choice: t === 40,
-          state: t < 12 ? 'claimed' : t === 12 ? 'ready' : t === 13 ? 'next' : 'locked',
-        });
-      }
-      const state = {
-        season: { id: '2026-11-halloween', label: 'Season I – Halloween', theme: 'halloween', starts_on: '2026-10-28', ends_on: '2026-12-06', state: 'running', days_left: 26 },
-        xp: 452,
-        tier: 12,
-        tiers,
-        next: { tier: 13, xp: 480, missing: 28 },
-        chests: { pass: 1, streak: 0, shop: 0 },
-        shop: { price: 50, left: 1, week_start: '2026-10-26' },
-        streak: { current: 2, best: 4, last_day: '2026-10-26', to_chest: 1 },
-        choice: { open: false, item_id: null },
-      };
-      let coins = 240;
-      let view = null;
-
+      import { mockSeason } from './seasonMock.ts';
+      const params = new URLSearchParams(location.search);
+      setLocale(params.get('lang') === 'de' ? 'de' : 'en');
+      const season = mockSeason({ tier: Number(params.get('tier') ?? 12) });
+      let overlay = null;
       function open() {
-        view?.destroy();
-        view = renderLearnPass(
-          state,
-          {
-            onClose: () => view?.destroy(),
-            getCoins: () => coins,
-            onClaim: async (tier) => {
-              const row = state.tiers.find((t) => t.tier === tier);
-              row.state = 'claimed';
-              coins += row.coins;
-              state.chests.pass += row.chest ? 1 : 0;
-              if (tier === 12) {
-                state.tier = 13;
-                state.next = { tier: 14, xp: 540, missing: 88 };
-                state.tiers[13].state = 'next';
-              }
-              view.update(state);
-            },
-            onBuyChest: async () => {
-              coins -= 50;
-              state.shop.left -= 1;
-              state.chests.pass += 1;
-              view.update(state);
-            },
-            onOpenInventory: () => toast('Inventory: season chests'),
-            onOpenInside: () => toast('What’s inside? (U3)'),
-            onPickItem: () => toast('Pick a season item (U1)'),
-          },
-          false,
-        );
-        document.body.append(view.el);
-      }
-      function toast(text) {
-        const el = document.getElementById('toast') ?? document.body.appendChild(Object.assign(document.createElement('div'), { id: 'toast' }));
-        el.textContent = text;
-        el.style.cssText = 'position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#160e22;border:1px solid #3d2c52;padding:10px 16px;border-radius:12px;z-index:80';
-        setTimeout(() => el.remove(), 1800);
+        overlay?.close();
+        overlay = openLearnPass({
+          api: season.api,
+          getCoins: season.coins,
+          onCoins: season.setCoins,
+          reducedMotion: params.has('still'),
+          onOpenInventory: () => {},
+        });
       }
       document.getElementById('open').addEventListener('click', open);
       open();

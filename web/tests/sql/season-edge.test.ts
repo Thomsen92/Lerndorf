@@ -2,6 +2,8 @@
 // shop window and the chest odds. Complements season-rpc.test.ts (smoke) as package S4.
 import { PGlite } from '@electric-sql/pglite';
 import { readFileSync } from 'node:fs';
+import type { SeasonState } from '../../src/api/season';
+import { PIN_SEASON_CLOCK, type Obj } from './seasonClock';
 import { describe, it, expect, beforeAll, beforeEach, afterEach, afterAll } from 'vitest';
 
 const MIGRATIONS = [
@@ -45,6 +47,7 @@ describe('season edge cases', () => {
     db = new PGlite();
     await db.exec(AUTH_STUB);
     for (const file of MIGRATIONS) await db.exec(readFileSync(new URL(file, dir), 'utf8'));
+    await db.exec(PIN_SEASON_CLOCK);
     await db.exec(`grant select, insert, update, delete on all tables in schema public to anon, authenticated;
       grant usage, select on all sequences in schema public to anon, authenticated;
       insert into auth.users values('${A}'),('${T}') on conflict do nothing;
@@ -73,7 +76,7 @@ describe('season edge cases', () => {
     await db.exec("update public.seasons set starts_on = date '2026-11-05', ends_on = date '2026-11-08';");
     await db.exec(`insert into public.xp_ledger(player_id,delta,reason,ref) values('${A}',300,'quest','seed');`);
     await asAnna();
-    const s = (await db.query<{ v: any }>('select public.season_state() v')).rows[0].v;
+    const s = (await db.query<{ v: SeasonState }>('select public.season_state() v')).rows[0].v;
     expect(s.season.state).toBe('upcoming');
     // XP only counts inside the season window (plan E3).
     expect(s.tier).toBe(0);
@@ -85,7 +88,7 @@ describe('season edge cases', () => {
     await db.exec(`insert into public.xp_ledger(player_id,delta,reason,ref,created_at)
       values('${A}',300,'quest','seed','2026-10-20 12:00+02');`);
     await asAnna();
-    const first = (await db.query<{ v: any }>('select public.season_state() v')).rows[0].v;
+    const first = (await db.query<{ v: SeasonState }>('select public.season_state() v')).rows[0].v;
     expect(first.season.state).toBe('ended');
     const claims = (await db.query<{ n: number }>(
       "select count(*)::int n from public.season_claims where player_id = $1 and season = '2026-11-halloween'",
@@ -114,7 +117,7 @@ describe('season edge cases', () => {
     await asAnna();
     await expect(db.query("select public.sell_item('deco_flowerbed_red',1)")).rejects.toThrow(/not sellable/);
     await expect(db.query("select public.sell_item('season_bat',5)")).rejects.toThrow(/not owned/);
-    const r = (await db.query<{ v: any }>("select public.sell_item('season_bat',1) v")).rows[0].v;
+    const r = (await db.query<{ v: Obj }>("select public.sell_item('season_bat',1) v")).rows[0].v;
     expect(r.coins).toBe(15);
   });
 
@@ -127,7 +130,7 @@ describe('season edge cases', () => {
     )).rows[0].id;
     await db.exec(`reset role; insert into public.inventory(player_id,item_id,qty) values('${A}','${item}',1);`);
     await asAnna();
-    const r = (await db.query<{ v: any }>('select public.choose_season_item($1) v', [item])).rows[0].v;
+    const r = (await db.query<{ v: Obj }>('select public.choose_season_item($1) v', [item])).rows[0].v;
     expect(r.duplicate).toBe(true);
     expect(r.coins).toBe(15);
     await expect(db.query('select public.choose_season_item($1)', [item])).rejects.toThrow(/already chosen/);
@@ -160,26 +163,74 @@ describe('season edge cases', () => {
     await expect(db.query('select public.buy_season_chest()')).rejects.toThrow(/season not running/);
   });
 
-  it('rolls the four rarities roughly at 55/30/12/3', async () => {
-    await db.exec(`reset role; update public.profiles set coins = 100000 where id = '${A}';
+  it('rolls the four rarities at 55/30/12/3 within 2 points over 10,000 chests', async () => {
+    await db.exec(`reset role;
       insert into public.season_chests(player_id,season,source,ref)
-      select '${A}','2026-11-halloween','shop','shop-test-' || g from generate_series(1, 400) g;`);
+      select '${A}','2026-11-halloween','shop','shop-test-' || g from generate_series(1, 10000) g;`);
     await asAnna();
-    const ids = (await db.query<{ id: string }>(
-      "select id from public.season_chests where source = 'shop' and player_id = $1",
-      [A],
-    )).rows.map((r) => Number(r.id));
-    for (const id of ids) await db.query('select public.open_season_chest($1)', [id]);
+    // One statement opens all chests: the same RPC per chest, without 10,000 round trips.
+    await db.exec(`select count(public.open_season_chest(id)) from public.season_chests
+      where player_id = '${A}' and source = 'shop';`);
     const counts = (await db.query<{ rarity: string; n: number }>(
       "select rarity, count(*)::int n from public.season_chests where source = 'shop' group by rarity",
     )).rows;
-    const by = Object.fromEntries(counts.map((c) => [c.rarity, c.n]));
-    expect(by.common).toBeGreaterThan(180);
-    expect(by.common).toBeLessThan(270);
-    expect(by.rare).toBeGreaterThan(80);
-    expect(by.rare).toBeLessThan(170);
-    expect(by.epic).toBeGreaterThan(15);
-    expect(by.epic).toBeLessThan(85);
-    expect(by.legendary).toBeLessThan(35);
-  }, 60000);
+    const share = Object.fromEntries(counts.map((c) => [c.rarity, (c.n / 10000) * 100]));
+    expect(Math.abs(share.common - 55)).toBeLessThan(2);
+    expect(Math.abs(share.rare - 30)).toBeLessThan(2);
+    expect(Math.abs(share.epic - 12)).toBeLessThan(2);
+    expect(Math.abs(share.legendary - 3)).toBeLessThan(2);
+  }, 120000);
+
+  it('keeps the running season when a later season is already planned (review W1)', async () => {
+    await db.exec(`reset role;
+      insert into public.seasons(id,label,theme,starts_on,ends_on)
+      values('2027-02-winter','Season II – Winter','winter',date '2027-02-01',date '2027-03-14');
+      insert into public.season_tiers(season,tier,xp) values('2027-02-winter',1,30);`);
+    await asAnna();
+    const s = (await db.query<{ v: SeasonState }>('select public.season_state() v')).rows[0].v;
+    expect(s.season.id).toBe('2026-11-halloween');
+    expect(s.season.state).toBe('running');
+    await db.exec(`reset role; delete from public.seasons where id = '2027-02-winter';`);
+  });
+
+  it('still allows the tier-40 pick after a newer season has started (review W1)', async () => {
+    await db.exec(`insert into public.xp_ledger(player_id,delta,reason,ref) values('${A}',3000,'quest','bulk');`);
+    await asAnna();
+    await db.query('select public.claim_season_tier(40)');
+    await db.exec(`reset role;
+      update public.seasons set starts_on = date '2026-10-01', ends_on = date '2026-10-25'
+        where id = '2026-11-halloween';
+      insert into public.seasons(id,label,theme,starts_on,ends_on)
+      values('2027-02-winter','Season II – Winter','winter',date '2026-10-26',date '2026-11-29');`);
+    await asAnna();
+    const now = (await db.query<{ v: SeasonState }>('select public.season_state() v')).rows[0].v;
+    expect(now.season.id).toBe('2027-02-winter');
+    const r = (await db.query<{ v: Obj }>("select public.choose_season_item('season_bat') v")).rows[0].v;
+    expect(r).toMatchObject({ chosen: 'season_bat', duplicate: false });
+    await db.exec(`reset role; delete from public.seasons where id = '2027-02-winter';`);
+  });
+
+  it('books season coins with the season in the reference (review K3)', async () => {
+    await db.exec(`insert into public.xp_ledger(player_id,delta,reason,ref) values('${A}',30,'quest','one');`);
+    await asAnna();
+    await db.query('select public.claim_season_tier(1)');
+    const ref = (await db.query<{ ref: string }>(
+      "select ref from public.coin_ledger where reason = 'season' and player_id = $1", [A],
+    )).rows[0].ref;
+    expect(ref).toBe('season:2026-11-halloween:tier-1');
+  });
+
+  it('pays for each shop chest exactly once and never for a refused one (review B3)', async () => {
+    await db.exec(`reset role; update public.profiles set coins = 200 where id = '${A}';`);
+    await asAnna();
+    await db.query('select public.buy_season_chest()');
+    await db.query('select public.buy_season_chest()');
+    await expect(db.query('select public.buy_season_chest()')).rejects.toThrow(/weekly limit/);
+    const coins = (await db.query<{ coins: number }>('select coins from public.profiles where id = $1', [A])).rows[0];
+    expect(coins.coins).toBe(100);
+    const refs = (await db.query<{ ref: string }>(
+      "select ref from public.season_chests where player_id = $1 and source = 'shop' order by ref", [A],
+    )).rows.map((r) => r.ref);
+    expect(refs).toEqual(['shop-2026-10-26-1', 'shop-2026-10-26-2']);
+  });
 });

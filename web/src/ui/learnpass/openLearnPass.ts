@@ -1,7 +1,14 @@
-/** Opens the LearnPass page with the real API (U5): claims, shop chest and inventory link. */
+/**
+ * Opens the LearnPass page with the real API (U5): claims, shop chest, inventory link, the chest
+ * pool for "What's inside?" and the tier-40 pick. Holds the session picture renderer while open.
+ */
 import { tr } from '../../i18n';
-import type { SeasonApi } from '../../api/season';
+import type { PoolItem, SeasonApi } from '../../api/season';
+import { itemName } from '../seasonChests';
 import { renderLearnPass, type LearnPassHandle } from './learnpassView';
+import { openInside } from './insideModal';
+import { openSeasonPick } from './seasonPick';
+import { seasonPictures, type PortraitFactory } from './rewardArt';
 
 export interface OpenLearnPassOptions {
   api: SeasonApi;
@@ -9,7 +16,8 @@ export interface OpenLearnPassOptions {
   onCoins: (coins: number) => void;
   reducedMotion: boolean;
   onOpenInventory: () => void;
-  onPickItem?: () => void;
+  /** The player's portrait in a given frame (frame rewards); a default figure otherwise. */
+  portrait?: PortraitFactory;
 }
 
 export interface LearnPassOverlay {
@@ -19,21 +27,29 @@ export interface LearnPassOverlay {
 export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
   let view: LearnPassHandle | null = null;
   let closed = false;
+  let seasonId = '';
+  let poolJob: Promise<PoolItem[]> | null = null;
+  const pictures = seasonPictures();
+  const pool = () => (poolJob ??= opts.api.pool(seasonId));
 
   function close(): void {
+    if (closed) return;
     closed = true;
     view?.destroy();
     view = null;
+    pictures.release();
   }
 
   const actions = {
     onClose: () => close(),
     getCoins: opts.getCoins,
-    async onClaim(tier: number): Promise<void> {
+    itemName: (id: string) => itemName(id),
+    async onClaim(tier: number): Promise<number> {
       const result = await opts.api.claim(tier);
       const coins = result.rewards.coins ?? 0;
       if (coins > 0) opts.onCoins(opts.getCoins() + coins);
       await refresh();
+      return coins;
     },
     async onBuyChest(): Promise<void> {
       await opts.api.buyChest();
@@ -45,10 +61,20 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
       opts.onOpenInventory();
     },
     onOpenInside(): void {
-      // The view opens the pool dialog itself.
+      if (view) openInside(view.el, { pool: pool(), pictures });
     },
     onPickItem(): void {
-      opts.onPickItem?.();
+      if (!view) return;
+      openSeasonPick(view.el, {
+        pool: pool(),
+        owned: opts.api.owned(),
+        pictures,
+        onPick: async (itemId) => {
+          const result = await opts.api.choose(itemId, seasonId || undefined);
+          if (result.coins) opts.onCoins(opts.getCoins() + result.coins);
+          await refresh();
+        },
+      });
     },
   };
 
@@ -56,8 +82,9 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
     if (closed) return;
     const state = await opts.api.state();
     if (closed) return;
+    seasonId = state.season.id;
     if (!view) {
-      view = renderLearnPass(state, actions, opts.reducedMotion);
+      view = renderLearnPass(state, actions, { reducedMotion: opts.reducedMotion, pictures, portrait: opts.portrait });
       document.body.append(view.el);
     } else {
       view.update(state);
@@ -69,13 +96,17 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
     const box = document.createElement('div');
     box.className = 'learnpass-error';
     box.setAttribute('role', 'alert');
-    box.innerHTML = `<p>${tr('Die Season konnte nicht geladen werden.')}</p>`;
+    const p = document.createElement('p');
+    p.textContent = tr('Die Season konnte nicht geladen werden.');
     const ok = document.createElement('button');
     ok.type = 'button';
-    ok.className = 'lp-btn';
+    ok.className = 'lp-act';
     ok.textContent = tr('Schließen');
-    ok.addEventListener('click', () => box.remove());
-    box.append(ok);
+    ok.addEventListener('click', () => {
+      box.remove();
+      close();
+    });
+    box.append(p, ok);
     document.body.append(box);
   }
 

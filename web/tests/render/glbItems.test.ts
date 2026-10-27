@@ -1,9 +1,35 @@
 // A1: the GLB item registry must cover exactly the season and shop manifests, and the loader must
 // normalise models into the MAX_SIZE box of their kind.
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { GLB_ITEMS, normaliseGlb } from '../../src/render/glbItems';
+import { GLB_ITEMS, MIN_DECO_SIZE, glbAsset, loadGlbItem, normaliseGlb } from '../../src/render/glbItems';
+
+// The loader is replaced by a stub that returns one 1 x 0.5 x 0.5 m box, so the cache and the
+// placeholder logic can be tested without files.
+vi.mock('three/addons/loaders/GLTFLoader.js', () => ({
+  GLTFLoader: class {
+    setMeshoptDecoder(): void {}
+    loadAsync(): Promise<{ scene: THREE.Group }> {
+      const scene = new THREE.Group();
+      scene.add(new THREE.Mesh(new THREE.BoxGeometry(1, 0.5, 0.5)));
+      return Promise.resolve({ scene });
+    }
+  },
+}));
+
+function sizeOf(object: THREE.Object3D): THREE.Vector3 {
+  object.updateMatrixWorld(true);
+  return new THREE.Box3().setFromObject(object, true).getSize(new THREE.Vector3());
+}
+
+function boxScene(w: number, h: number, d: number): THREE.Group {
+  const scene = new THREE.Group();
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d));
+  mesh.position.set(3, h / 2 + 1, -2); // off-centre and floating, like the kit-* models
+  scene.add(mesh);
+  return scene;
+}
 import { MAX_SIZE } from '../../src/world/plotPlan';
 
 const season = JSON.parse(
@@ -49,5 +75,45 @@ describe('glb item registry', () => {
     expect(box.min.y).toBeCloseTo(0, 2);
     expect((box.min.x + box.max.x) / 2).toBeCloseTo(0, 2);
     expect((box.min.z + box.max.z) / 2).toBeCloseTo(0, 2);
+  });
+
+  it('never enlarges a model that already fits (review B5)', () => {
+    const size = sizeOf(normaliseGlb(boxScene(1, 1.4, 1), { file: 'x.glb', kind: 'deco' }));
+    expect(size.y).toBeCloseTo(1.4, 2);
+  });
+
+  it('grows tiny decorations to 0.8 m on their longest side', () => {
+    const size = sizeOf(normaliseGlb(boxScene(0.4, 0.2, 0.1), { file: 'x.glb', kind: 'deco' }));
+    expect(Math.max(size.x, size.y, size.z)).toBeCloseTo(MIN_DECO_SIZE, 2);
+  });
+
+  it('turns cars modelled along X before fitting them (review B5)', () => {
+    const size = sizeOf(normaliseGlb(boxScene(4.5, 2.1, 2.1), { file: 'x.glb', kind: 'car', yaw: Math.PI / 2 }));
+    expect(size.z).toBeCloseTo(4.5, 1);
+    expect(size.x).toBeCloseTo(2.1, 1);
+  });
+
+  it('turns Toyoyo and Beatall a quarter so their length lies on Z', () => {
+    expect(GLB_ITEMS.shop_toyoyo.yaw).toBeCloseTo(Math.PI / 2);
+    expect(GLB_ITEMS.shop_beatall.yaw).toBeCloseTo(Math.PI / 2);
+  });
+
+  it('gives every caller its own model, so two plots and a thumbnail never steal it (review B1)', async () => {
+    const a = await loadGlbItem('season_bat');
+    const b = await loadGlbItem('season_bat');
+    expect(a).not.toBe(b);
+    a.rotation.y = 0.6;
+    expect(b.rotation.y).toBe(0);
+
+    const plotA = glbAsset('season_bat', 'deco');
+    const plotB = glbAsset('season_bat', 'deco');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const lodOf = (g: THREE.Group) => g.children.find((c) => c instanceof THREE.LOD) as THREE.LOD;
+    expect(lodOf(plotA).levels[0].object.children.length).toBeGreaterThan(0);
+    expect(lodOf(plotB).levels[0].object.children.length).toBeGreaterThan(0);
+    expect(lodOf(plotA).levels[0].object).not.toBe(lodOf(plotB).levels[0].object);
+    // the placeholder is gone once the model is there
+    expect(plotA.children.filter((c) => c instanceof THREE.Mesh)).toHaveLength(0);
   });
 });

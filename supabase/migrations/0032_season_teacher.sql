@@ -4,7 +4,7 @@
 create or replace function public.teacher_seasons() returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare
-  v_today date := (now() at time zone 'Europe/Berlin')::date;
+  v_today date := public.season_today();
 begin
   perform public.require_teacher();
   return coalesce((
@@ -25,7 +25,7 @@ create or replace function public.teacher_set_season_dates(
 language plpgsql security definer set search_path = public as $$
 declare
   v_season seasons%rowtype;
-  v_today date := (now() at time zone 'Europe/Berlin')::date;
+  v_today date := public.season_today();
 begin
   perform public.require_teacher();
   select * into v_season from seasons where id = p_season for update;
@@ -55,7 +55,7 @@ create or replace function public.teacher_start_season_now(p_season text) return
 language plpgsql security definer set search_path = public as $$
 declare
   v_season seasons%rowtype;
-  v_today date := (now() at time zone 'Europe/Berlin')::date;
+  v_today date := public.season_today();
 begin
   perform public.require_teacher();
   select * into v_season from seasons where id = p_season for update;
@@ -80,7 +80,7 @@ create or replace function public.teacher_end_season_now(p_season text) returns 
 language plpgsql security definer set search_path = public as $$
 declare
   v_season seasons%rowtype;
-  v_today date := (now() at time zone 'Europe/Berlin')::date;
+  v_today date := public.season_today();
 begin
   perform public.require_teacher();
   select * into v_season from seasons where id = p_season for update;
@@ -88,10 +88,11 @@ begin
   if public.season_state_of(v_season, v_today) <> 'running' then
     raise exception 'only running seasons can end' using errcode = 'P0001';
   end if;
-  update seasons set ends_on = v_today - 1 where id = p_season;
+  -- Yesterday is the last day; a season that started today or yesterday keeps one day (review W5).
+  update seasons set ends_on = greatest(v_today - 1, v_season.starts_on) where id = p_season;
   insert into season_changes (season, teacher_id, action, detail)
-  values (p_season, auth.uid(), 'end', jsonb_build_object('ends_on', v_today - 1));
-  perform public.close_season(p_season);
+  values (p_season, auth.uid(), 'end', jsonb_build_object('ends_on', greatest(v_today - 1, v_season.starts_on)));
+  perform public.season_close_now(p_season, auth.uid());
   return public.teacher_seasons();
 end $$;
 
@@ -99,7 +100,7 @@ create or replace function public.teacher_season_overview(p_class text, p_season
 language plpgsql security definer set search_path = public as $$
 declare
   v_season seasons%rowtype;
-  v_today date := (now() at time zone 'Europe/Berlin')::date;
+  v_today date := public.season_today();
 begin
   perform public.require_teacher();
   select * into v_season from seasons where id = p_season;

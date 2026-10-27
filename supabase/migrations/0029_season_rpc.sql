@@ -1,6 +1,12 @@
 -- Season I RPCs (plan §3.2, §3.5). All writes go through these security-definer functions.
 -- Students never write tables directly; internal helpers are not executable by clients.
 
+-- Today in Europe/Berlin. Every season rule reads the date here, so tests can pin the clock.
+create or replace function public.season_today() returns date
+language sql stable as $$
+  select (now() at time zone 'Europe/Berlin')::date
+$$;
+
 -- Sell value by rarity (plan E11: single pieces use the rarity value, no special prices).
 create or replace function public.season_sell_value(p_item public.items) returns int
 language sql immutable as $$
@@ -8,10 +14,19 @@ language sql immutable as $$
     case p_item.rarity when 'rare' then 40 when 'epic' then 100 when 'legendary' then 250 else 15 end)
 $$;
 
--- Latest season row (there is exactly one running at a time, but several may be planned).
-create or replace function public.season_latest() returns public.seasons
+-- The season players see: the running one, else the one that started last, else the next planned
+-- one. A planned Season II must never hide a running or just ended Season I (review W1).
+create or replace function public.season_current() returns public.seasons
 language sql stable security definer set search_path = public as $$
-  select * from seasons order by starts_on desc limit 1
+  select s.* from seasons s
+  cross join (select public.season_today() as today) t
+  order by
+    case when s.closed_at is null and t.today between s.starts_on and s.ends_on then 0
+         when s.starts_on <= t.today then 1
+         else 2 end,
+    case when s.starts_on <= t.today then s.starts_on end desc nulls last,
+    s.starts_on
+  limit 1
 $$;
 
 create or replace function public.season_state_of(p_season public.seasons, p_today date)
@@ -74,7 +89,7 @@ declare
 begin
   if p_tier.coins > 0 then
     insert into coin_ledger (player_id, delta, reason, ref)
-    values (p_uid, p_tier.coins, 'season', 'tier-' || p_tier.tier);
+    values (p_uid, p_tier.coins, 'season', 'season:' || p_tier.season || ':tier-' || p_tier.tier);
     update profiles set coins = coins + p_tier.coins where id = p_uid;
     v_result := v_result || jsonb_build_object('coins', p_tier.coins);
   end if;
@@ -134,7 +149,7 @@ language plpgsql security definer set search_path = public as $$
 declare
   v_uid uuid := auth.uid();
   v_season seasons%rowtype;
-  v_today date := (now() at time zone 'Europe/Berlin')::date;
+  v_today date := public.season_today();
   v_state text;
   v_xp int;
   v_reached int;
@@ -145,8 +160,8 @@ declare
   v_week_start date;
 begin
   if v_uid is null then raise exception 'not logged in' using errcode = '42501'; end if;
-  select * into v_season from seasons order by starts_on desc limit 1;
-  if not found then raise exception 'no season' using errcode = 'P0002'; end if;
+  v_season := public.season_current();
+  if v_season.id is null then raise exception 'no season' using errcode = 'P0002'; end if;
 
   v_state := public.season_state_of(v_season, v_today);
   if v_state in ('ended', 'closed') then
@@ -209,20 +224,18 @@ language plpgsql security definer set search_path = public as $$
 declare
   v_uid uuid := auth.uid();
   v_season seasons%rowtype;
-  v_today date := (now() at time zone 'Europe/Berlin')::date;
+  v_today date := public.season_today();
   v_state text;
   v_row season_tiers%rowtype;
   v_xp int;
 begin
   if v_uid is null then raise exception 'not logged in' using errcode = '42501'; end if;
-  select * into v_season from seasons order by starts_on desc limit 1;
-  if not found then raise exception 'no season' using errcode = 'P0002'; end if;
+  v_season := public.season_current();
+  if v_season.id is null then raise exception 'no season' using errcode = 'P0002'; end if;
   v_state := public.season_state_of(v_season, v_today);
   if v_state = 'upcoming' then raise exception 'season not started' using errcode = 'P0001'; end if;
-  if v_state <> 'running' then
-    perform public.season_finish_player(v_uid, v_season.id);
-    raise exception 'season ended' using errcode = 'P0001';
-  end if;
+  -- After the end season_state credits the reached tiers (E14); a claim only reports it.
+  if v_state <> 'running' then raise exception 'season ended' using errcode = 'P0001'; end if;
   select * into v_row from season_tiers where season = v_season.id and tier = p_tier;
   if not found then raise exception 'unknown tier' using errcode = 'P0002'; end if;
   v_xp := public.season_xp(v_uid, v_season);
@@ -233,11 +246,12 @@ begin
   return jsonb_build_object('tier', p_tier, 'rewards', public.season_book_tier(v_uid, v_row));
 end $$;
 
-create or replace function public.choose_season_item(p_item_id text) returns jsonb
+-- Tier-40 pick (E7). It stays open after the season end, also when a later season exists:
+-- the open claim decides the season, not the calendar (review W1).
+create or replace function public.choose_season_item(p_item_id text, p_season text default null) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare
   v_uid uuid := auth.uid();
-  v_season seasons%rowtype;
   v_claim season_claims%rowtype;
   v_item items%rowtype;
   v_result jsonb;
@@ -245,19 +259,26 @@ declare
   v_placed int;
 begin
   if v_uid is null then raise exception 'not logged in' using errcode = '42501'; end if;
-  select * into v_season from seasons order by starts_on desc limit 1;
   select * into v_claim from season_claims
-    where player_id = v_uid and season = v_season.id and tier = 40 for update;
-  if not found then raise exception 'tier not claimed' using errcode = 'P0001'; end if;
-  if v_claim.choice_item_id is not null then raise exception 'already chosen' using errcode = 'P0001'; end if;
+    where player_id = v_uid and tier = 40 and choice_item_id is null
+      and (p_season is null or season = p_season)
+    order by claimed_at desc limit 1 for update;
+  if not found then
+    if exists (select 1 from season_claims where player_id = v_uid and tier = 40
+               and (p_season is null or season = p_season)) then
+      raise exception 'already chosen' using errcode = 'P0001';
+    end if;
+    raise exception 'tier not claimed' using errcode = 'P0001';
+  end if;
   select * into v_item from items
-    where id = p_item_id and season = v_season.id and lootbox_weight > 0;
+    where id = p_item_id and season = v_claim.season and lootbox_weight > 0;
   if not found then raise exception 'not in pool' using errcode = 'P0002'; end if;
   select coalesce((select qty from inventory where player_id = v_uid and item_id = p_item_id), 0) into v_qty;
   select count(*) into v_placed from placements where player_id = v_uid and item_id = p_item_id;
   if v_qty > 0 or v_placed > 0 then
     insert into coin_ledger (player_id, delta, reason, ref)
-    values (v_uid, public.season_sell_value(v_item), 'season', 'season_choice:' || p_item_id);
+    values (v_uid, public.season_sell_value(v_item), 'season',
+            'season:' || v_claim.season || ':choice:' || p_item_id);
     update profiles set coins = coins + public.season_sell_value(v_item) where id = v_uid;
     v_result := jsonb_build_object('item_id', p_item_id, 'duplicate', true,
                                   'coins', public.season_sell_value(v_item));
@@ -265,7 +286,7 @@ begin
     v_result := public.season_add_item(v_uid, p_item_id);
   end if;
   update season_claims set choice_item_id = p_item_id
-    where player_id = v_uid and season = v_season.id and tier = 40;
+    where player_id = v_uid and season = v_claim.season and tier = 40;
   return v_result || jsonb_build_object('chosen', p_item_id);
 end $$;
 
@@ -274,28 +295,29 @@ language plpgsql security definer set search_path = public as $$
 declare
   v_uid uuid := auth.uid();
   v_season seasons%rowtype;
-  v_today date := (now() at time zone 'Europe/Berlin')::date;
-  v_week_start date := date_trunc('week', (now() at time zone 'Europe/Berlin')::date)::date;
+  v_today date := public.season_today();
+  v_week_start date := date_trunc('week', public.season_today())::date;
   v_count int;
   v_coins int;
 begin
   if v_uid is null then raise exception 'not logged in' using errcode = '42501'; end if;
-  select * into v_season from seasons order by starts_on desc limit 1;
-  if public.season_state_of(v_season, v_today) <> 'running' then
+  v_season := public.season_current();
+  if v_season.id is null or public.season_state_of(v_season, v_today) <> 'running' then
     raise exception 'season not running' using errcode = 'P0001';
   end if;
+  -- Lock the profile before counting: a double tap must not pay twice for one chest (review B3).
+  select coins into v_coins from profiles where id = v_uid for update;
   select count(*) into v_count from season_chests
     where player_id = v_uid and season = v_season.id and source = 'shop'
       and ref like 'shop-' || v_week_start || '-%';
   if v_count >= 2 then raise exception 'weekly limit' using errcode = 'P0001'; end if;
-  select coins into v_coins from profiles where id = v_uid for update;
   if v_coins < 50 then raise exception 'not enough coins' using errcode = 'P0001'; end if;
+  -- No "on conflict do nothing": a clash raises and rolls the payment back.
+  insert into season_chests (player_id, season, source, ref)
+  values (v_uid, v_season.id, 'shop', 'shop-' || v_week_start || '-' || (v_count + 1));
   update profiles set coins = coins - 50 where id = v_uid;
   insert into coin_ledger (player_id, delta, reason, ref)
-  values (v_uid, -50, 'purchase', 'season_shop:' || v_week_start || ':' || (v_count + 1));
-  insert into season_chests (player_id, season, source, ref)
-  values (v_uid, v_season.id, 'shop', 'shop-' || v_week_start || '-' || (v_count + 1))
-  on conflict do nothing;
+  values (v_uid, -50, 'purchase', 'season:' || v_season.id || ':shop-' || v_week_start || '-' || (v_count + 1));
   return jsonb_build_object('ok', true, 'left', 2 - (v_count + 1), 'price', 50);
 end $$;
 
@@ -368,28 +390,35 @@ begin
   return jsonb_build_object('coins', v_total, 'qty', p_qty);
 end $$;
 
+-- Credits all players and marks the season closed (E14). Internal: no date or teacher check.
+create or replace function public.season_close_now(p_season text, p_teacher uuid) returns int
+language plpgsql security definer set search_path = public as $$
+declare
+  v_player uuid;
+  v_n int := 0;
+begin
+  for v_player in select id from profiles where role = 'student' loop
+    v_n := v_n + public.season_finish_player(v_player, p_season);
+  end loop;
+  update seasons set closed_at = now() where id = p_season;
+  insert into season_changes (season, teacher_id, action, detail)
+  values (p_season, p_teacher, 'close', jsonb_build_object('credited', v_n));
+  return v_n;
+end $$;
+
 -- Teacher: close a season after its end, crediting all players (plan E14).
 create or replace function public.close_season(p_season text) returns jsonb
 language plpgsql security definer set search_path = public as $$
 declare
-  v_uid uuid := auth.uid();
   v_season seasons%rowtype;
-  v_today date := (now() at time zone 'Europe/Berlin')::date;
-  v_player uuid;
-  v_n int := 0;
+  v_today date := public.season_today();
 begin
   perform public.require_teacher();
   select * into v_season from seasons where id = p_season for update;
   if not found then raise exception 'season not found' using errcode = 'P0002'; end if;
   if v_season.closed_at is not null then return jsonb_build_object('closed', false, 'players', 0); end if;
   if v_today <= v_season.ends_on then raise exception 'season not over' using errcode = 'P0001'; end if;
-  for v_player in select id from profiles where role = 'student' loop
-    v_n := v_n + public.season_finish_player(v_player, p_season);
-  end loop;
-  update seasons set closed_at = now() where id = p_season;
-  insert into season_changes (season, teacher_id, action, detail)
-  values (p_season, v_uid, 'close', jsonb_build_object('credited', v_n));
-  return jsonb_build_object('closed', true, 'players', v_n);
+  return jsonb_build_object('closed', true, 'players', public.season_close_now(p_season, auth.uid()));
 end $$;
 
 -- Chest streak: one calendar day counts if at least one quest was solved (plan E12).
@@ -438,7 +467,9 @@ create trigger season_quest_streak
 
 -- Grants: students use the five RPCs; close_season is for teachers; helpers stay internal.
 revoke all on function public.season_sell_value(public.items) from public, anon, authenticated;
-revoke all on function public.season_latest() from public, anon, authenticated;
+revoke all on function public.season_today() from public, anon, authenticated;
+revoke all on function public.season_current() from public, anon, authenticated;
+revoke all on function public.season_close_now(text, uuid) from public, anon, authenticated;
 revoke all on function public.season_state_of(public.seasons, date) from public, anon, authenticated;
 revoke all on function public.season_xp(uuid, public.seasons) from public, anon, authenticated;
 revoke all on function public.season_reached_tier(uuid, public.seasons) from public, anon, authenticated;
@@ -450,7 +481,7 @@ revoke all on function public.season_quest_streak_trigger() from public, anon, a
 
 revoke all on function public.season_state() from public, anon;
 revoke all on function public.claim_season_tier(int) from public, anon;
-revoke all on function public.choose_season_item(text) from public, anon;
+revoke all on function public.choose_season_item(text, text) from public, anon;
 revoke all on function public.buy_season_chest() from public, anon;
 revoke all on function public.open_season_chest(bigint) from public, anon;
 revoke all on function public.sell_item(text, int) from public, anon;
@@ -458,7 +489,7 @@ revoke all on function public.close_season(text) from public, anon;
 
 grant execute on function public.season_state() to authenticated;
 grant execute on function public.claim_season_tier(int) to authenticated;
-grant execute on function public.choose_season_item(text) to authenticated;
+grant execute on function public.choose_season_item(text, text) to authenticated;
 grant execute on function public.buy_season_chest() to authenticated;
 grant execute on function public.open_season_chest(bigint) to authenticated;
 grant execute on function public.sell_item(text, int) to authenticated;

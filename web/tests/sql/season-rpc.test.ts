@@ -1,6 +1,8 @@
 // Smoke tests for the Season I RPCs (0029). The full 10-case suite follows in S4.
 import { PGlite } from '@electric-sql/pglite';
 import { readFileSync } from 'node:fs';
+import type { ClaimResult, SeasonState } from '../../src/api/season';
+import { PIN_SEASON_CLOCK, type Obj } from './seasonClock';
 import { describe, it, expect, beforeAll, afterEach, afterAll } from 'vitest';
 
 const MIGRATIONS = [
@@ -65,6 +67,7 @@ describe('season RPCs', () => {
     db = new PGlite();
     await db.exec(AUTH_STUB);
     for (const file of MIGRATIONS) await db.exec(readFileSync(new URL(file, dir), 'utf8'));
+    await db.exec(PIN_SEASON_CLOCK);
     await db.exec(`grant select, insert, update, delete on all tables in schema public to anon, authenticated;
       grant usage, select on all sequences in schema public to anon, authenticated;`);
     // Put the season around "today" so the running state can be tested deterministically.
@@ -85,22 +88,22 @@ describe('season RPCs', () => {
 
   it('reports state, xp and tier', async () => {
     await asAnna();
-    const r = await db.query<{ v: any }>('select public.season_state() v');
+    const r = await db.query<{ v: SeasonState }>('select public.season_state() v');
     const s = r.rows[0].v;
     expect(s.season.state).toBe('running');
     expect(s.xp).toBe(300);
     expect(s.tier).toBe(10);
     expect(s.tiers).toHaveLength(40);
-    expect(s.next.tier).toBe(11);
+    expect(s.next?.tier).toBe(11);
   });
 
   it('claims a tier once with all rewards', async () => {
     await asAnna();
-    const r = await db.query<{ v: any }>('select public.claim_season_tier(5) v');
+    const r = await db.query<{ v: ClaimResult }>('select public.claim_season_tier(5) v');
     expect(r.rows[0].v.rewards.coins).toBe(30);
     expect(r.rows[0].v.rewards.chest).toBe(true);
     await expect(db.query('select public.claim_season_tier(5)')).rejects.toThrow(/already claimed/);
-    const state = (await db.query<{ v: any }>('select public.season_state() v')).rows[0].v;
+    const state = (await db.query<{ v: SeasonState }>('select public.season_state() v')).rows[0].v;
     expect(state.chests.pass).toBe(1);
   });
 
@@ -112,8 +115,8 @@ describe('season RPCs', () => {
   it('sells a chest twice a week and refuses the third', async () => {
     await db.exec(`reset role; update public.profiles set coins = 200 where id = '${A}';`);
     await asAnna();
-    expect((await db.query<{ v: any }>('select public.buy_season_chest() v')).rows[0].v.left).toBe(1);
-    expect((await db.query<{ v: any }>('select public.buy_season_chest() v')).rows[0].v.left).toBe(0);
+    expect((await db.query<{ v: Obj }>('select public.buy_season_chest() v')).rows[0].v.left).toBe(1);
+    expect((await db.query<{ v: Obj }>('select public.buy_season_chest() v')).rows[0].v.left).toBe(0);
     await expect(db.query('select public.buy_season_chest()')).rejects.toThrow(/weekly limit/);
   });
 
@@ -121,9 +124,9 @@ describe('season RPCs', () => {
     await asAnna();
     const id = (await db.query<{ id: string }>("select id from public.season_chests where player_id = $1 limit 1", [A]))
       .rows[0].id;
-    const first = (await db.query<{ v: any }>('select public.open_season_chest($1) v', [Number(id)])).rows[0].v;
+    const first = (await db.query<{ v: Obj }>('select public.open_season_chest($1) v', [Number(id)])).rows[0].v;
     expect(['common', 'rare', 'epic', 'legendary']).toContain(first.rarity);
-    const again = (await db.query<{ v: any }>('select public.open_season_chest($1) v', [Number(id)])).rows[0].v;
+    const again = (await db.query<{ v: Obj }>('select public.open_season_chest($1) v', [Number(id)])).rows[0].v;
     expect(again.reopened).toBe(true);
     expect(again.item_id).toBe(first.item_id);
   });
@@ -136,7 +139,7 @@ describe('season RPCs', () => {
     const item = (await db.query<{ id: string }>(
       "select id from public.items where season = '2026-11-halloween' and lootbox_weight > 0 limit 1",
     )).rows[0].id;
-    const r = (await db.query<{ v: any }>('select public.choose_season_item($1) v', [item])).rows[0].v;
+    const r = (await db.query<{ v: Obj }>('select public.choose_season_item($1) v', [item])).rows[0].v;
     expect(r.chosen).toBe(item);
     await expect(db.query('select public.choose_season_item($1)', [item])).rejects.toThrow(/already chosen/);
   });

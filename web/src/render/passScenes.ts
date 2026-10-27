@@ -125,13 +125,18 @@ function buildScene(id: string): Promise<THREE.Group> {
   });
 }
 
-/** Synchronous group with a placeholder; the composed scene replaces it when the parts arrive. */
-export function passScene(id: string): THREE.Group {
+/** The composed scene as an independent clone (thumbnails and pictures wait for it). */
+export function loadPassScene(id: string): Promise<THREE.Group> {
   let hit = cache.get(id);
   if (!hit) {
     hit = buildScene(id);
     cache.set(id, hit);
   }
+  return hit.then((scene) => scene.clone(true));
+}
+
+/** Synchronous group with a placeholder; the composed scene replaces it when the parts arrive. */
+export function passScene(id: string): THREE.Group {
   const holder = new THREE.Group();
   const placeholder = new THREE.Mesh(
     new THREE.BoxGeometry(1.8, 0.7, 1.8),
@@ -139,10 +144,10 @@ export function passScene(id: string): THREE.Group {
   );
   placeholder.position.y = 0.35;
   holder.add(placeholder);
-  void hit.then((scene) => {
+  void loadPassScene(id).then((scene) => {
     holder.remove(placeholder);
     placeholder.geometry.dispose();
-    holder.add(scene.clone(true));
+    holder.add(scene);
   });
   return holder;
 }

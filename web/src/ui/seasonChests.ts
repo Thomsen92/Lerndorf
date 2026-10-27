@@ -1,86 +1,23 @@
 /** Season chests in the inventory (plan §5.3, U2): count, open with a short reveal, duplicates. */
-import { tr, msg, getLocale } from '../i18n';
+import { tr, msg, itemName as globalItemName } from '../i18n';
+import { ITEM_NAMES } from '../i18n/itemNames';
 import type { SeasonApi } from '../api/season';
-import { chestSvg } from './learnpass/rewardArt';
+import { RARITY, chestSvg, modelPicture, rarityOf, seasonPictures, type SeasonPictures } from './learnpass/rewardArt';
+import { openInside } from './learnpass/insideModal';
+import { SEASON_CHEST_THUMB } from '../render/itemThumbs';
+import { GLB_ITEMS } from '../render/glbItems';
 import './seasonChests.css';
+
+const SELL: Record<string, number> = { common: 15, rare: 40, epic: 100, legendary: 250 };
 
 export interface SeasonChestRow {
   id: number;
   source: 'pass' | 'streak' | 'shop';
 }
 
-const NAMES: Record<string, string> = {
-  season_warlock: 'Warlock',
-  season_house_horror: 'Haunted house',
-  season_pumpkin_patch: 'Pumpkin patch',
-  season_clock_tower: 'Spooky clock tower',
-  season_dodge: 'Pickup truck',
-  season_monster_plant: 'Monster plant',
-  season_pumpkin_tree: 'Pumpkin tree',
-  season_candy_pile: 'Candy pile',
-  season_graveyard_corner: 'Graveyard corner',
-  season_fence_lantern: 'Fence with lantern',
-  season_witch_statue: 'Witch statue',
-  season_pumpkin_girl: 'Pumpkin girl',
-  season_witch_figure: 'Witch',
-  season_mummy: 'Mummy',
-  season_skeleton: 'Skeleton',
-  season_zombie: 'Zombie',
-  season_witch_cat: 'Witch cat',
-  season_cauldron: 'Cauldron',
-  season_pumpkin_cat: 'Pumpkin cat',
-  season_ghost_kitty: 'Ghost cat',
-  season_candy_bucket: 'Candy bucket',
-  season_bat: 'Bat',
-  season_candle: 'Grave candle',
-  season_ghost: 'Little ghost',
-  season_gravestone: 'Gravestone',
-  season_jack_o_lantern: "Jack-o'-lantern",
-  season_broom: 'Broom',
-  season_sign: 'Halloween sign',
-};
-
-const NAMES_DE: Record<string, string> = {
-  season_warlock: 'Warlock',
-  season_house_horror: 'Horror-Haus',
-  season_pumpkin_patch: 'Kürbisfeld',
-  season_clock_tower: 'Spuk-Uhrturm',
-  season_dodge: 'Dodge Pickup',
-  season_monster_plant: 'Monsterpflanze',
-  season_pumpkin_tree: 'Kürbisbaum',
-  season_candy_pile: 'Süßigkeitenhaufen',
-  season_graveyard_corner: 'Friedhofsecke',
-  season_fence_lantern: 'Zaun mit Laterne',
-  season_witch_statue: 'Hexe (Statue)',
-  season_pumpkin_girl: 'Kürbismädchen',
-  season_witch_figure: 'Hexe (Figur)',
-  season_mummy: 'Mumie',
-  season_skeleton: 'Skelett',
-  season_zombie: 'Zombie',
-  season_witch_cat: 'Hexenkatze',
-  season_cauldron: 'Hexenkessel',
-  season_pumpkin_cat: 'Kürbiskatze',
-  season_ghost_kitty: 'Geisterkatze',
-  season_candy_bucket: 'Süßigkeiteneimer',
-  season_bat: 'Fledermaus',
-  season_candle: 'Grablicht',
-  season_ghost: 'Kleiner Geist',
-  season_gravestone: 'Grabstein',
-  season_jack_o_lantern: 'Kürbislaterne',
-  season_broom: 'Besen',
-  season_sign: 'Halloween-Schild',
-};
-
-const RARITY: Record<string, { label: string; color: string }> = {
-  common: { label: tr('Gewöhnlich'), color: '#b9b2c6' },
-  rare: { label: tr('Selten'), color: '#4a8ff0' },
-  epic: { label: tr('Episch'), color: '#a06bf0' },
-  legendary: { label: tr('Legendär'), color: '#f2b630' },
-};
-
+/** Display name of a season, scene or shop item: one name table for every view (review W6). */
 export function itemName(id: string, fallback = ''): string {
-  if (getLocale() === 'de') return NAMES_DE[id] ?? NAMES[id] ?? (fallback || id);
-  return NAMES[id] ?? (fallback || id);
+  return globalItemName(id, ITEM_NAMES[id] ?? (fallback || id));
 }
 
 export interface SeasonChestOptions {
@@ -122,7 +59,7 @@ export function createSeasonChests(opts: SeasonChestOptions): HTMLElement {
     row.className = 'season-chest-row';
     const icon = document.createElement('span');
     icon.className = 'season-chest-icon';
-    icon.innerHTML = chestSvg();
+    icon.innerHTML = chestSvg(56);
     const text = document.createElement('span');
     text.className = 'season-chest-text';
     text.innerHTML = `<strong>${msg`Season-Truhe ×${chests.length}`}</strong><small>${tr('Aus Pass, Serie und Shop')}</small>`;
@@ -139,6 +76,18 @@ export function createSeasonChests(opts: SeasonChestOptions): HTMLElement {
     row.append(icon, text, open);
     rows.append(row);
   }
+
+  // The chances live in one place for pass, inventory and shop (plan §14.4).
+  const insideLink = document.createElement('button');
+  insideLink.type = 'button';
+  insideLink.className = 'season-chest-inside';
+  insideLink.textContent = tr('Was ist drin?');
+  insideLink.addEventListener('click', () => {
+    const pictures = seasonPictures();
+    const pool = opts.api.state().then((st) => opts.api.pool(st.season.id));
+    openInside(document.body, { pool, pictures, onClose: () => pictures.release() });
+  });
+  section.append(insideLink);
 
   async function openNext(): Promise<void> {
     const chest = chests[0];
@@ -166,12 +115,17 @@ export function createSeasonChests(opts: SeasonChestOptions): HTMLElement {
   return section;
 }
 
+/**
+ * Opening a chest (plan §14.5): the 3D chest shakes, then rays and border in the rarity colour, the
+ * item picture (160 px), badge, name and what happened, and "Next". Without motion it shows at once.
+ */
 function reveal(
   result: { rarity: string; item_id: string; name_de?: string; duplicate: boolean; coins: number },
   opts: SeasonChestOptions,
   host: HTMLElement,
 ): void {
-  const rarity = RARITY[result.rarity] ?? RARITY.common;
+  const rarity = rarityOf(result.rarity);
+  const pictures: SeasonPictures = seasonPictures();
   const overlay = document.createElement('div');
   overlay.className = 'season-reveal';
   const card = document.createElement('div');
@@ -179,36 +133,54 @@ function reveal(
   card.setAttribute('role', 'dialog');
   card.setAttribute('aria-modal', 'true');
   card.setAttribute('aria-label', tr('Ergebnis der Season-Truhe'));
-  const chest = document.createElement('div');
-  chest.className = 'season-reveal-chest';
-  chest.innerHTML = chestSvg();
-  if (!opts.reducedMotion) chest.classList.add('shake');
-  const rarityEl = document.createElement('span');
-  rarityEl.className = 'season-reveal-rarity';
-  rarityEl.textContent = tr(rarity.label);
-  rarityEl.style.color = rarity.color;
-  rarityEl.style.borderColor = rarity.color;
+  card.style.setProperty('--r', RARITY[rarity].color);
+
+  const pic = document.createElement('div');
+  pic.className = 'season-reveal-pic';
+  pic.append(modelPicture(pictures, SEASON_CHEST_THUMB, 'deco', chestSvg(150)));
+  const result_ = document.createElement('div');
+  result_.className = 'season-reveal-result';
+  result_.setAttribute('role', 'status');
+  const badge = document.createElement('span');
+  badge.className = 'season-reveal-rarity';
+  badge.textContent = RARITY[rarity].label;
   const name = document.createElement('strong');
   name.className = 'season-reveal-name';
   name.textContent = itemName(result.item_id, result.name_de ?? '');
   const note = document.createElement('p');
   note.className = 'season-reveal-note';
-  note.textContent = result.duplicate
-    ? msg`Schon vorhanden – ${result.coins} Münzen`
-    : tr('Neu in deiner Sammlung');
+  note.textContent =
+    result.coins > 0
+      ? msg`Schon vorhanden – ${result.coins} Münzen`
+      : result.duplicate
+        ? msg`Doppelt – verkaufen für ${SELL[rarity]} Münzen`
+        : tr('Neu! Jetzt in deinem Inventar.');
   const ok = document.createElement('button');
   ok.type = 'button';
   ok.className = 'season-reveal-ok';
   ok.textContent = tr('Weiter');
-  ok.addEventListener('click', () => {
+  const finish = (): void => {
     overlay.remove();
-    ok.focus();
-  });
-  card.append(chest, rarityEl, name, note, ok);
+    pictures.release();
+  };
+  ok.addEventListener('click', finish);
+  result_.append(badge, name, note, ok);
+  card.append(pic, result_);
   overlay.append(card);
   overlay.addEventListener('click', (event) => {
-    if (event.target === overlay) overlay.remove();
+    if (event.target === overlay) finish();
   });
   host.append(overlay);
-  ok.focus();
+
+  const show = (): void => {
+    card.classList.add('revealed');
+    pic.replaceChildren(modelPicture(pictures, result.item_id, GLB_ITEMS[result.item_id]?.kind ?? 'deco'));
+    ok.focus();
+  };
+  if (opts.reducedMotion) {
+    show();
+  } else {
+    pic.classList.add('shake');
+    window.setTimeout(show, 1000);
+  }
 }

@@ -1,6 +1,7 @@
 // 0033: season titles and frames need ownership; level rewards still unlock by level.
 import { PGlite } from '@electric-sql/pglite';
 import { readFileSync } from 'node:fs';
+import { PIN_SEASON_CLOCK } from './seasonClock';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
 const MIGRATIONS = [
@@ -44,6 +45,7 @@ describe('season rewards', () => {
     db = new PGlite();
     await db.exec(AUTH_STUB);
     for (const file of MIGRATIONS) await db.exec(readFileSync(new URL(file, dir), 'utf8'));
+    await db.exec(PIN_SEASON_CLOCK);
     await db.exec(`grant select, insert, update, delete on all tables in schema public to anon, authenticated;
       grant usage, select on all sequences in schema public to anon, authenticated;
       insert into auth.users values('${A}') on conflict do nothing;

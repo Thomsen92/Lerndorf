@@ -1,6 +1,7 @@
 // L1: season control for teachers — listing, date rules, start/end and the class overview.
 import { PGlite } from '@electric-sql/pglite';
 import { readFileSync } from 'node:fs';
+import { PIN_SEASON_CLOCK, type Obj } from './seasonClock';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
 const MIGRATIONS = [
@@ -47,6 +48,7 @@ describe('teacher season control', () => {
     db = new PGlite();
     await db.exec(AUTH_STUB);
     for (const file of MIGRATIONS) await db.exec(readFileSync(new URL(file, dir), 'utf8'));
+    await db.exec(PIN_SEASON_CLOCK);
     await db.exec(`grant select, insert, update, delete on all tables in schema public to anon, authenticated;
       grant usage, select on all sequences in schema public to anon, authenticated;
       insert into auth.users values('${T}'),('${A}'),('${B}') on conflict do nothing;
@@ -62,7 +64,7 @@ describe('teacher season control', () => {
 
   it('lists seasons and rejects invalid dates', async () => {
     await asTeacher();
-    const list = (await db.query<{ v: any[] }>('select public.teacher_seasons() v')).rows[0].v;
+    const list = (await db.query<{ v: Obj[] }>('select public.teacher_seasons() v')).rows[0].v;
     expect(list).toHaveLength(1);
     expect(list[0]).toMatchObject({ id: SEASON, state: 'planned', tiers: 40, items: 40 });
     await expect(
@@ -73,7 +75,7 @@ describe('teacher season control', () => {
 
   it('starts a planned season today', async () => {
     await asTeacher();
-    const list = (await db.query<{ v: any[] }>('select public.teacher_start_season_now($1) v', [SEASON])).rows[0].v;
+    const list = (await db.query<{ v: Obj[] }>('select public.teacher_start_season_now($1) v', [SEASON])).rows[0].v;
     expect(list[0].state).toBe('running');
     const row = (await db.query<{ starts_on: string }>('select starts_on::text from public.seasons where id = $1', [SEASON]))
       .rows[0];
@@ -87,14 +89,14 @@ describe('teacher season control', () => {
       insert into public.xp_ledger(player_id,delta,reason,ref,created_at)
       values('${A}',300,'quest','teacher-seed','2026-10-25 12:00+02');`);
     await asTeacher();
-    const overview = (await db.query<{ v: any }>('select public.teacher_season_overview($1,$2) v', ['8a', SEASON]))
+    const overview = (await db.query<{ v: { season: Obj; pupils: Obj[] } }>('select public.teacher_season_overview($1,$2) v', ['8a', SEASON]))
       .rows[0].v;
     expect(overview.season.state).toBe('running');
-    const anna = overview.pupils.find((p: any) => p.nickname === 'anna');
+    const anna = overview.pupils.find((p: Obj) => p.nickname === 'anna');
     expect(anna).toMatchObject({ xp: 300, tier: 10, claims: 0 });
-    expect(overview.pupils.find((p: any) => p.nickname === 'ben')).toMatchObject({ xp: 0, tier: 0 });
+    expect(overview.pupils.find((p: Obj) => p.nickname === 'ben')).toMatchObject({ xp: 0, tier: 0 });
 
-    const ended = (await db.query<{ v: any[] }>('select public.teacher_end_season_now($1) v', [SEASON])).rows[0].v;
+    const ended = (await db.query<{ v: Obj[] }>('select public.teacher_end_season_now($1) v', [SEASON])).rows[0].v;
     expect(ended[0].state).toBe('closed');
     const claims = (await db.query<{ n: number }>(
       "select count(*)::int n from public.season_claims where player_id = $1 and season = $2",
@@ -104,8 +106,18 @@ describe('teacher season control', () => {
     await expect(
       db.query("select public.teacher_set_season_dates($1, date '2026-10-22', date '2026-11-08')", [SEASON]),
     ).rejects.toThrow(/closed/);
-    const log = (await db.query<{ v: any[] }>('select public.teacher_season_changes($1) v', [SEASON])).rows[0].v;
+    const log = (await db.query<{ v: Obj[] }>('select public.teacher_season_changes($1) v', [SEASON])).rows[0].v;
     const actions = log.map((entry) => entry.action);
     expect(actions).toEqual(expect.arrayContaining(['start', 'dates', 'end', 'close']));
+  });
+
+  it('ends a season on its start day without a date error (review W5)', async () => {
+    await db.exec(`reset role;
+      insert into public.seasons(id,label,theme,starts_on,ends_on)
+      values('2027-test','Test','test',date '2026-10-27',date '2026-11-29');`);
+    await asTeacher();
+    const list = (await db.query<{ v: Obj[] }>('select public.teacher_end_season_now($1) v', ['2027-test'])).rows[0].v;
+    expect(list.find((s) => s.id === '2027-test')).toMatchObject({ state: 'closed', ends_on: '2026-10-27' });
+    await db.exec(`reset role; delete from public.seasons where id = '2027-test';`);
   });
 });

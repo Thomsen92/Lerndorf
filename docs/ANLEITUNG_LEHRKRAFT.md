@@ -361,7 +361,6 @@ Eine Saison ist ein Zeitraum von etwa sechs Wochen mit 40 Stufen. In Season I (2
 ### Wo finden die Schüler den LearnPass?
 
 - **Profilkarte:** Im Profil steht unter dem XP-Balken „Season I – Halloween“ mit Stufe, Restzeit und der Zahl wartender Truhen. Antippen öffnet den Pass.
-- **Kürbisbude am Markt:** Während der Saison steht neben der Questtafel eine Kürbisbude. Antippen öffnet den Pass ebenfalls. Der Markt ist dann dunkler (Blutmond, Nebel), außerhalb der Saison sieht er wie gewohnt aus.
 
 ### Was die Schüler tun
 

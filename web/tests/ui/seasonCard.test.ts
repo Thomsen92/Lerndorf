@@ -37,38 +37,42 @@ async function settle(): Promise<void> {
 }
 
 describe('profile season card', () => {
-  it('shows tier, days left and the waiting chest badge', async () => {
+  it('shows tier chip, progress, days left and waiting chests, and opens the pass (plan §14.5)', async () => {
     const onOpen = vi.fn();
     const api = { state: vi.fn().mockResolvedValue(state()) } as unknown as SeasonApi;
-    const card = createSeasonCard({ api, onOpen }) as HTMLButtonElement;
+    const card = createSeasonCard({ api, onOpen });
     document.body.append(card);
     await settle();
-    expect(card.disabled).toBe(false);
-    expect(card.textContent).toContain('Tier 12 of 40 · 26 days left');
-    expect(card.querySelector('.profile-season-badge')?.textContent).toBe('×2');
-    card.click();
+    expect(card.querySelector('.profile-season-chip')?.textContent).toBe('Tier 12');
+    expect(card.querySelector('.profile-season-meta')?.textContent).toBe('26 days left · 2 chests waiting');
+    expect(card.querySelector('.profile-season-bar')).not.toBeNull();
+    const open = card.querySelector<HTMLButtonElement>('.profile-season-open');
+    expect(open?.textContent).toBe('Open LearnPass');
+    expect(open?.disabled).toBe(false);
+    open?.click();
     expect(onOpen).toHaveBeenCalled();
     card.remove();
   });
 
-  it('hides the badge without waiting chests', async () => {
+  it('leaves out the chests without waiting ones', async () => {
     const api = {
       state: vi.fn().mockResolvedValue(state({ chests: { pass: 0, streak: 0, shop: 0 } })),
     } as unknown as SeasonApi;
-    const card = createSeasonCard({ api, onOpen: vi.fn() }) as HTMLButtonElement;
+    const card = createSeasonCard({ api, onOpen: vi.fn() });
     document.body.append(card);
     await settle();
-    expect(card.querySelector<HTMLElement>('.profile-season-badge')?.hidden).toBe(true);
+    expect(card.querySelector('.profile-season-meta')?.textContent).toBe('26 days left');
     card.remove();
   });
 
-  it('stays disabled when the season cannot be loaded', async () => {
+  it('keeps the button disabled when the season cannot be loaded', async () => {
     const api = { state: vi.fn().mockRejectedValue(new Error('offline')) } as unknown as SeasonApi;
-    const card = createSeasonCard({ api, onOpen: vi.fn() }) as HTMLButtonElement;
+    const card = createSeasonCard({ api, onOpen: vi.fn() });
     document.body.append(card);
     await settle();
-    expect(card.disabled).toBe(true);
+    expect(card.querySelector<HTMLButtonElement>('.profile-season-open')?.disabled).toBe(true);
     expect(card.textContent).toContain('could not be loaded');
     card.remove();
   });
 });
+

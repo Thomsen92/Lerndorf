@@ -1,31 +1,54 @@
 // @vitest-environment happy-dom
-// U3: "What's inside?" lists the four odds and all 28 pool items, and closes on Escape.
-import { beforeEach, describe, expect, it } from 'vitest';
-import { ODDS, POOL, SELL, openInside } from '../../src/ui/learnpass/insideModal';
+// "What's inside?" (plan §14.4): four bands from Legendary to Normal, built from the pool the
+// database returns, so the shown rarity is always the rolled one (review B6).
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ODDS, openInside } from '../../src/ui/learnpass/insideModal';
+import type { PoolItem } from '../../src/api/season';
 import { setLocale } from '../../src/i18n';
 
 beforeEach(() => setLocale('en'));
 
+const POOL: PoolItem[] = [
+  { id: 'season_warlock', kind: 'deco', rarity: 'legendary', sell: 250 },
+  { id: 'season_house_horror', kind: 'house', rarity: 'legendary', sell: 250 },
+  { id: 'season_dodge', kind: 'car', rarity: 'epic', sell: 100 },
+  { id: 'season_witch_statue', kind: 'deco', rarity: 'rare', sell: 40 },
+  { id: 'season_bat', kind: 'deco', rarity: 'common', sell: 15 },
+];
+
+async function settle(): Promise<void> {
+  await Promise.resolve();
+  await Promise.resolve();
+}
 
 describe('inside modal', () => {
-  it('shows the odds summing to 100 and the sell values', () => {
-    expect(ODDS.map((o) => o.chance)).toEqual([55, 30, 12, 3]);
+  it('lists the odds from Legendary to Normal, summing to 100', () => {
+    expect(ODDS.map((o) => o.rarity)).toEqual(['legendary', 'epic', 'rare', 'common']);
+    expect(ODDS.map((o) => o.chance)).toEqual([3, 12, 30, 55]);
     expect(ODDS.reduce((sum, o) => sum + o.chance, 0)).toBe(100);
-    expect(SELL).toEqual({ common: 15, rare: 40, epic: 100, legendary: 250 });
-    expect(POOL.filter((p) => p.rarity === 'common')).toHaveLength(8);
-    expect(POOL.filter((p) => p.rarity === 'rare')).toHaveLength(13);
-    expect(POOL.filter((p) => p.rarity === 'epic')).toHaveLength(5);
-    expect(POOL.filter((p) => p.rarity === 'legendary')).toHaveLength(2);
-    expect(POOL).toHaveLength(28);
   });
 
-  it('renders the item grid and closes on Escape', () => {
-    const handle = openInside(document.body);
-    expect(handle.el.querySelectorAll('.inside-item')).toHaveLength(28);
-    expect(handle.el.textContent).toContain('55%');
-    expect(handle.el.textContent).toContain('Legendary');
-    expect(handle.el.textContent).toContain('Haunted house');
-    handle.el.ownerDocument.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  it('sorts every pool item into the band of its database rarity', async () => {
+    const handle = openInside(document.body, { pool: Promise.resolve(POOL) });
+    await settle();
+    const bands = [...handle.el.querySelectorAll('.inside-band')];
+    expect(bands).toHaveLength(4);
+    expect(bands[0].textContent).toContain('3 %');
+    expect(bands[0].textContent).toContain('Legendary · 2 items');
+    expect(bands[0].textContent).toContain('Warlock');
+    expect(bands[1].textContent).toContain('Pickup truck');
+    expect(bands[2].textContent).toContain('Witch statue');
+    expect(bands[3].textContent).toContain('Bat');
+    expect(handle.el.textContent).toContain("What's inside a season chest?");
+    expect(handle.el.textContent).not.toContain('sells for');
+    handle.close();
+  });
+
+  it('closes on Escape and reports it', () => {
+    const onClose = vi.fn();
+    openInside(document.body, { pool: POOL, onClose });
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     expect(document.querySelector('.inside-overlay')).toBeNull();
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

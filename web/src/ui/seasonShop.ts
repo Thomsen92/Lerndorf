@@ -1,7 +1,8 @@
 /** Season chest in the shop (plan §5.4, U4a): 50 coins, two per Berlin week, remaining count. */
 import { tr, msg } from '../i18n';
 import type { SeasonApi } from '../api/season';
-import { chestSvg } from './learnpass/rewardArt';
+import { chestSvg, seasonPictures } from './learnpass/rewardArt';
+import { openInside } from './learnpass/insideModal';
 import './seasonShop.css';
 
 export interface SeasonShopOptions {
@@ -20,10 +21,16 @@ export function createSeasonShopTile(opts: SeasonShopOptions): HTMLElement {
       <small class="season-shop-meta"></small>
     </div>
     <button type="button" class="season-shop-buy">${tr('Kaufen')}</button>
+    <button type="button" class="season-chest-inside season-shop-inside">${tr('Was ist drin?')}</button>
     <p class="season-shop-status" role="status" hidden></p>`;
   const meta = section.querySelector<HTMLElement>('.season-shop-meta')!;
   const buy = section.querySelector<HTMLButtonElement>('.season-shop-buy')!;
   const status = section.querySelector<HTMLElement>('.season-shop-status')!;
+  section.querySelector<HTMLButtonElement>('.season-shop-inside')!.addEventListener('click', () => {
+    const pictures = seasonPictures();
+    const pool = opts.api.state().then((st) => opts.api.pool(st.season.id));
+    openInside(document.body, { pool, pictures, onClose: () => pictures.release() });
+  });
   let left = 0;
   let running = false;
 
@@ -73,7 +80,7 @@ export function createSeasonShopTile(opts: SeasonShopOptions): HTMLElement {
           /weekly limit/.test(text)
             ? tr('Du hast diese Woche schon zwei Truhen gekauft.')
             : /not enough coins/.test(text)
-              ? tr('Not enough coins.')
+              ? tr('Nicht genug Münzen.')
               : /season not running/.test(text)
                 ? tr('Die Saison läuft nicht.')
                 : tr('Die Truhe konnte nicht gekauft werden.'),

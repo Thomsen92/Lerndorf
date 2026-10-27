@@ -7,7 +7,7 @@
     <style>
       html, body { margin: 0; height: 100%; background: #120d18; color: #f6e9d2;
         font: 16px system-ui, sans-serif; }
-      .panel { width: min(560px, 92vw); margin: 40px auto; padding: 18px; border-radius: 18px;
+      .panel { box-sizing: border-box; width: min(560px, 92vw); margin: 40px auto; padding: 18px; border-radius: 18px;
         background: #1b1322; border: 1px solid #3d2c52; }
       h2 { margin: 0 0 14px; font-size: 22px; }
     </style>
@@ -18,30 +18,17 @@
       <div id="host"></div>
     </div>
     <script type="module">
+      import '../src/style.css';
       import { setLocale } from '../src/i18n.ts';
       import { createSeasonChests } from '../src/ui/seasonChests.ts';
-      setLocale('en');
-
-      const chests = [
-        { id: 11, source: 'pass' },
-        { id: 12, source: 'pass' },
-        { id: 13, source: 'streak' },
-      ];
-      let opened = false;
-      const api = {
-        async chests() { return chests; },
-        async openChest(id) {
-          if (opened) return { rarity: 'common', item_id: 'season_candle', name_de: 'Kerze', duplicate: true, coins: 15 };
-          opened = true;
-          return { rarity: 'legendary', item_id: 'season_house_horror', name_de: 'Spukhaus', duplicate: false, coins: 0 };
-        },
-      };
-      let coins = 240;
+      import { mockSeason } from './seasonMock.ts';
+      setLocale(new URLSearchParams(location.search).get('lang') === 'de' ? 'de' : 'en');
+      const season = mockSeason();
       const section = createSeasonChests({
-        api,
-        getCoins: () => coins,
-        onCoins: (c) => { coins = c; },
-        reducedMotion: false,
+        api: season.api,
+        getCoins: season.coins,
+        onCoins: season.setCoins,
+        reducedMotion: new URLSearchParams(location.search).has('still'),
       });
       document.getElementById('host').append(section);
       window.__ready = true;

@@ -1,9 +1,12 @@
 // @vitest-environment happy-dom
 // U1: the LearnPass page renders 40 tier cards, turns the reached tier into a Collect action and
 // closes on Escape. The API is replaced by callbacks, so no network is involved.
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderLearnPass } from '../../src/ui/learnpass/learnpassView';
 import type { SeasonState, SeasonTier } from '../../src/api/season';
+import { setLocale } from '../../src/i18n';
+
+beforeEach(() => setLocale('de'));
 
 function mockState(): SeasonState {
   const chests = new Set([5, 10, 15, 20, 25, 30, 35, 40]);
@@ -89,8 +92,62 @@ describe('LearnPass page', () => {
   it('shows the coins and the shop limit', () => {
     const { view } = render();
     expect(view.el.querySelector('.lp-coins')?.textContent).toBe('240');
-    const texts = [...view.el.querySelectorAll('.lp-tile-text small')].map((el) => el.textContent ?? '');
-    expect(texts.some((t) => t.includes('1 von 2'))).toBe(true);
+    const texts = [...view.el.querySelectorAll('.lp-tile small')].map((el) => el.textContent ?? '');
+    expect(texts.some((t) => t.includes('noch 1 von 2'))).toBe(true);
+    view.destroy();
+  });
+
+  it('keeps cards as plain articles with only Collect as a button (review W7)', () => {
+    const { view } = render();
+    const cards = [...view.el.querySelectorAll('.lp-card')];
+    expect(cards.every((c) => c.tagName === 'ARTICLE')).toBe(true);
+    expect(view.el.querySelectorAll('.lp-card button')).toHaveLength(1);
+    expect(view.el.querySelector('.lp-card.ready')?.getAttribute('aria-label')).toBe('Stufe 12: 5 Münzen, bereit');
+    view.destroy();
+  });
+
+  it('puts one rail node under every card (review L3)', () => {
+    const { view } = render();
+    expect(view.el.querySelectorAll('.lp-tier')).toHaveLength(40);
+    expect(view.el.querySelectorAll('.lp-tier .lp-node')).toHaveLength(40);
+    expect(view.el.querySelectorAll('.lp-tier.done')).toHaveLength(12);
+    expect(view.el.querySelector('.lp-track .lp-rail')).not.toBeNull();
+    view.destroy();
+  });
+
+  it('asks once before buying a chest (review L8)', () => {
+    const { view, actions } = render();
+    const buy = [...view.el.querySelectorAll<HTMLButtonElement>('.lp-act')].find((b) => b.textContent === 'Kaufen');
+    buy?.click();
+    expect(actions.onBuyChest).not.toHaveBeenCalled();
+    expect(buy?.textContent).toBe('Für 50 Münzen kaufen?');
+    buy?.click();
+    expect(actions.onBuyChest).toHaveBeenCalledTimes(1);
+    view.destroy();
+  });
+
+  it('opens the tier-40 pick from the last card while the choice is open (review B2)', () => {
+    const state = mockState();
+    state.tier = 40;
+    for (const t of state.tiers) t.state = 'claimed';
+    state.choice = { open: true, item_id: null };
+    const onPickItem = vi.fn();
+    const view = renderLearnPass(
+      state,
+      {
+        onClose: vi.fn(),
+        onClaim: vi.fn(),
+        onBuyChest: vi.fn(),
+        onOpenInventory: vi.fn(),
+        onOpenInside: vi.fn(),
+        onPickItem,
+        getCoins: () => 0,
+      },
+      false,
+    );
+    document.body.append(view.el);
+    view.el.querySelector<HTMLButtonElement>('.lp-card.tier40 button')?.click();
+    expect(onPickItem).toHaveBeenCalled();
     view.destroy();
   });
 });

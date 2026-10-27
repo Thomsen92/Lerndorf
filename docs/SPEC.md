@@ -549,7 +549,7 @@ Zukünftige Quest-Versuche erhalten einen Zeitstempel, auch wenn sie falsch sind
 
 ### 13.1 Season I – LearnPass (Migrationen 0028–0032)
 
-Eine Saison läuft in einem festen Fenster (Europe/Berlin); Season I: **28.10.–06.12.2026**. Schüler öffnen den LearnPass über die Profilkarte und die Kürbisbude am Markt. Die Marktstimmung (dunkler Himmel, Nebel, Blutmond, warmes Standlicht) gilt nur im Saisonfenster; außerhalb bleibt LOOK §3 maßgeblich.
+Eine Saison läuft in einem festen Fenster (Europe/Berlin); Season I: **28.10.–06.12.2026**. Schüler öffnen den LearnPass über die Profilkarte. Markt und Welt bleiben unverändert (LOOK §3); der Halloween-Marktplatz ist ein getrennter Auftrag (Lehrkraft 27.10.2026).
 
 - **XP und Stufen:** Summe `xp_ledger.delta` im Fenster; 40 Stufen bis 3.000 XP (30/60/90/120 XP je Zehnerblock).
 - **Belohnungen:** 5 Münzen auf Stufe 1–20 und 25 Münzen je Meilenstein; Pass-Truhen auf 5, 10, …, 40; 12 Garten-Szenen auf den Deko-Stufen; 4 Titel und 4 Rahmen; Stufe 40 mit Truhe, Titel, 25 Münzen und freier Wahl aus dem Truhen-Pool.
