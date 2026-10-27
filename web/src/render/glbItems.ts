@@ -70,6 +70,16 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_delorean: { file: 'shop/delorean.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
   shop_landyroamer: { file: 'shop/landyroamer.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
   shop_tristar: { file: 'shop/tristar.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
+  // Low-poly car pack with colour variants (0042); these are modelled along Z already.
+  shop_car5: { file: 'shop/car5.glb', kind: 'car', fill: true },
+  shop_car5_green: { file: 'shop/car5-green.glb', kind: 'car', fill: true },
+  shop_car5_grey: { file: 'shop/car5-grey.glb', kind: 'car', fill: true },
+  shop_car5_police: { file: 'shop/car5-police.glb', kind: 'car', fill: true },
+  shop_car5_police_la: { file: 'shop/car5-police-la.glb', kind: 'car', fill: true },
+  shop_car8: { file: 'shop/car8.glb', kind: 'car', fill: true },
+  shop_car8_grey: { file: 'shop/car8-grey.glb', kind: 'car', fill: true },
+  shop_car8_mail: { file: 'shop/car8-mail.glb', kind: 'car', fill: true },
+  shop_car8_purple: { file: 'shop/car8-purple.glb', kind: 'car', fill: true },
   // Halloween decorations (0035): both fill the 3 x 3 pedestal when normalised.
   shop_candy_cauldron: { file: 'shop/candy-cauldron.glb', kind: 'deco', fill: true },
   shop_chibi_trick_or_treater: { file: 'shop/chibi-trick-or-treater.glb', kind: 'deco', fill: true },

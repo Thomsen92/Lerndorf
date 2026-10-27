@@ -270,6 +270,87 @@
             "triangles": 5371,
             "bytes": 56808,
             "dims": "4,30 × 1,53 × 1,93 m"
+        },
+        {
+            "file": "car5.glb",
+            "name": "Compact Car",
+            "kind": "car",
+            "price": 300,
+            "triangles": 454,
+            "bytes": 14416,
+            "dims": "2,78 × 2,05 × 7,37 m"
+        },
+        {
+            "file": "car5-green.glb",
+            "name": "Green Compact Car",
+            "kind": "car",
+            "price": 300,
+            "triangles": 454,
+            "bytes": 14012,
+            "dims": "2,78 × 2,05 × 7,37 m"
+        },
+        {
+            "file": "car5-grey.glb",
+            "name": "Grey Compact Car",
+            "kind": "car",
+            "price": 300,
+            "triangles": 454,
+            "bytes": 13844,
+            "dims": "2,78 × 2,05 × 7,37 m"
+        },
+        {
+            "file": "car5-police.glb",
+            "name": "Police Car",
+            "kind": "car",
+            "price": 350,
+            "triangles": 472,
+            "bytes": 16068,
+            "dims": "2,78 × 2,25 × 7,37 m"
+        },
+        {
+            "file": "car5-police-la.glb",
+            "name": "LA Police Car",
+            "kind": "car",
+            "price": 350,
+            "triangles": 472,
+            "bytes": 14896,
+            "dims": "2,78 × 2,25 × 7,37 m"
+        },
+        {
+            "file": "car8.glb",
+            "name": "Delivery Van",
+            "kind": "car",
+            "price": 320,
+            "triangles": 364,
+            "bytes": 11180,
+            "dims": "3,17 × 3,23 × 6,89 m"
+        },
+        {
+            "file": "car8-grey.glb",
+            "name": "Grey Delivery Van",
+            "kind": "car",
+            "price": 320,
+            "triangles": 364,
+            "bytes": 10744,
+            "dims": "3,17 × 3,23 × 6,89 m"
+        },
+        {
+            "file": "car8-mail.glb",
+            "name": "Mail Van",
+            "kind": "car",
+            "price": 340,
+            "triangles": 364,
+            "bytes": 11672,
+            "dims": "3,17 × 3,23 × 6,89 m"
+        },
+        {
+            "file": "car8-purple.glb",
+            "name": "Purple Delivery Van",
+            "kind": "car",
+            "price": 340,
+            "triangles": 364,
+            "bytes": 10740,
+            "dims": "3,17 × 3,23 × 6,89 m"
         }
     ],
     "pending": [
