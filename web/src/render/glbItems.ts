@@ -80,6 +80,11 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_car8_grey: { file: 'shop/car8-grey.glb', kind: 'car', fill: true },
   shop_car8_mail: { file: 'shop/car8-mail.glb', kind: 'car', fill: true },
   shop_car8_purple: { file: 'shop/car8-purple.glb', kind: 'car', fill: true },
+  // Sedans and estate car (0043).
+  shop_car2: { file: 'shop/car2.glb', kind: 'car', fill: true },
+  shop_car2_black: { file: 'shop/car2-black.glb', kind: 'car', fill: true },
+  shop_car2_red: { file: 'shop/car2-red.glb', kind: 'car', fill: true },
+  shop_car6: { file: 'shop/car6.glb', kind: 'car', fill: true },
   // Halloween decorations (0035): both fill the 3 x 3 pedestal when normalised.
   shop_candy_cauldron: { file: 'shop/candy-cauldron.glb', kind: 'deco', fill: true },
   shop_chibi_trick_or_treater: { file: 'shop/chibi-trick-or-treater.glb', kind: 'deco', fill: true },

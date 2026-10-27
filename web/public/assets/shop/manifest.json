@@ -351,6 +351,42 @@
             "triangles": 364,
             "bytes": 10740,
             "dims": "3,17 × 3,23 × 6,89 m"
+        },
+        {
+            "file": "car2.glb",
+            "name": "Compact Sedan",
+            "kind": "car",
+            "price": 300,
+            "triangles": 308,
+            "bytes": 11228,
+            "dims": "2,90 × 2,20 × 6,53 m"
+        },
+        {
+            "file": "car2-black.glb",
+            "name": "Black Sedan",
+            "kind": "car",
+            "price": 300,
+            "triangles": 308,
+            "bytes": 11064,
+            "dims": "2,90 × 2,20 × 6,53 m"
+        },
+        {
+            "file": "car2-red.glb",
+            "name": "Red Sedan",
+            "kind": "car",
+            "price": 300,
+            "triangles": 308,
+            "bytes": 11640,
+            "dims": "2,90 × 2,20 × 6,53 m"
+        },
+        {
+            "file": "car6.glb",
+            "name": "Estate Car",
+            "kind": "car",
+            "price": 320,
+            "triangles": 304,
+            "bytes": 14748,
+            "dims": "2,48 × 1,67 × 6,36 m"
         }
     ],
     "pending": [
