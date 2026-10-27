@@ -17,12 +17,12 @@
 | U4b | fertig | `e427c8d` | Shop zeigt die sechs Artikel mit echten 3D-Vorschaubildern (`itemThumbs` wartet auf GLB); Screenshot |
 | A2 | fertig | `ff99c48` | Asset-Vertragstest (Dateien, glTF-Magic, Fernversionen), Ausschluss der Problem-Assets, Lizenzzeile |
 | L1 | fertig | `6120b00` | 0032 mit fünf Lehrer-RPCs, Reiter „Saison“ (Daten, Start, Beenden mit Gutschrift, Abschließen, Klassenübersicht); SQL-Tests + Screenshot; Sonntagsregel nur in der RPC |
-| D1 | offen | – | Doku + Lehrer-Anleitung |
+| D1 | fertig | `e16e3bc` | SPEC §13/§13.1, Anleitung für die Lehrkraft (LearnPass, Truhen, Saison steuern, Fehlerfälle), Design-README |
 | T1 | offen | – | Abnahme |
 
 ## Prüfungen
 
-- `npm test`: **155 Dateien, 999 Tests grün** (Stand L1).
+- `npm test`: **155 Dateien, 999 Tests grün** (Stand D1).
 - `npm run build`: grün (Vite, nur die bekannte Chunk-Größen-Warnung).
 - SQL-Tests laufen mit PGlite über alle Migrationen 0001–0030.
 - Galerie: `web/test-results/season-a1.png` (8 Modelle auf Sockeln, innerhalb MAX_SIZE, Boden auf 0) und `season-a3b.png` (drei Pass-Szenen, 2,4 m breit, Boden auf 0) angesehen.
@@ -42,4 +42,4 @@
 
 ## Nächster Schritt
 
-D1: Doku und Anleitung für die Lehrkraft (Saison starten/verschieben/beenden, LearnPass, Truhen, Verkauf), dann T1 (Abnahme mit Playwright, Galerie, Tablet).
+T1: Abnahme – Playwright-Durchlauf der Kernwege, Galerie für die Dorf-/Marktoptik, Tablet- und Handy-Screenshots, Abschlussbericht.
