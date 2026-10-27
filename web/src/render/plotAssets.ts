@@ -8,6 +8,7 @@ import { tr } from '../i18n';
  */
 import * as THREE from 'three';
 import { RUIN_ID, buildRuin } from './ruin';
+import { glbAsset, isGlbItem } from './glbItems';
 
 const solidMats = new Map<string, THREE.MeshStandardMaterial>();
 const glowMats = new Map<string, THREE.MeshBasicMaterial>();
@@ -715,6 +716,8 @@ export const MODEL_IDS = {
  * Unknown ids fall back to a neutral placeholder of the right kind.
  */
 export function plotAsset(kind: string, itemId: string, tint: Tint = tintFor(0)): THREE.Group {
+  // Season and shop items are real GLB models; they arrive asynchronously behind a placeholder.
+  if (isGlbItem(itemId)) return glbAsset(itemId, kind);
   if (kind === 'house' && itemId === RUIN_ID) return buildRuin();
   if (kind === 'house') return (HOUSES[itemId] ?? houseFachwerk)(tint);
   if (kind === 'garage') return (GARAGES[itemId] ?? garageHolz)();
