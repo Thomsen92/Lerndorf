@@ -66,10 +66,25 @@ it('idempotent grant creates all level chests and rejects nonpositive XP', async
 });
 it('catalogue and strict own-row reads / no client writes', async () => {
   expect(
-    (await db.query('select kind,count(*)::int n from level_rewards group by kind order by kind')).rows,
+    (
+      await db.query(
+        'select kind,count(*)::int n from level_rewards where season is null group by kind order by kind',
+      )
+    ).rows,
   ).toEqual([
     { kind: 'frame', n: 7 },
     { kind: 'title', n: 13 },
+  ]);
+  // Season titles/frames are owned via player_rewards, not unlocked by level (plan E20).
+  expect(
+    (
+      await db.query(
+        'select kind,count(*)::int n from level_rewards where season is not null group by kind order by kind',
+      )
+    ).rows,
+  ).toEqual([
+    { kind: 'frame', n: 4 },
+    { kind: 'title', n: 4 },
   ]);
   await db.exec(`select set_config('request.jwt.claim.sub','${B}',false); set role authenticated;`);
   expect((await db.query('select * from xp_ledger')).rows).toEqual([]);

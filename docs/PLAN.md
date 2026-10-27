@@ -458,3 +458,28 @@ Grundlage sind die gelesenen Implementationen unter `Prototyp/StandardBoyShop/` 
 | A8 | [ ] | End-to-End-, WebGL-, Galerie- und Leistungsprüfung; Dokumentation |
 
 Ausführung auf Wunsch weiterhin sequenziell durch einen Agenten. Technische Schranke vor der sichtbaren Umstellung: Beide modularen Shop-Bases sind animationslos; bisherige Clips müssen erhalten bleiben. Die Boy-Integrationsnotizen beziehen sich teilweise auf den inzwischen ersetzten Jungen. Die Animationen sind übernommen; optimierte Texturen, Detailwechsel und eine Rock-Passformkorrektur sind umgesetzt. A8-Softwareprüfungen und Bildkontrolle sind lokal erfolgt (871 Tests, Build und ESLint erfolgreich; neun Kleiderschrank-Browserprüfungen bestanden); Hardware-Abnahme auf dem Schul-Tablet und spätere Veröffentlichung bleiben offen. Details: [Umsetzungsstand](AVATAR_KLEIDERSCHRANK.md).
+
+## Season I (LearnPass) – Umsetzung ab 27.10.2026
+
+Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md), Auftrag: [DeepSeek](superpowers/plans/2026-10-27-deepseek-auftrag.md).
+
+| Paket | Status | Notiz |
+| --- | --- | --- |
+| S1 | [x] | 0028 Schema, 0030 Inhalte (Saison, 28 Pool-Items, 12 Szenen, 40 Stufen, Titel/Rahmen, Serien-Nachberechnung); Schema-Tests |
+| S2 | [ ] | RPCs 0029 + Serien-Trigger |
+| S4 | [ ] | SQL-Tests (10 Fälle) |
+| A1 | [ ] | Loader: Meshopt, async GLB, Normalisierung, Fernversionen |
+| A3 | [ ] | 12 Kenney-Pass-Szenen |
+| U1 | [ ] | LearnPass-Seite nach §14 |
+| U2 | [ ] | Truhen im Inventar |
+| U3 | [ ] | What's inside? |
+| U4a | [ ] | Shop: Season-Truhe |
+| U5 | [ ] | Profilkarte/Einstieg |
+| U6 | [ ] | Markt-Stand + Stimmung |
+| U7 | [ ] | i18n/A11y |
+| S3 | [ ] | Shop-Daten 0031 |
+| U4b | [ ] | Shop: Nicht-Season-Artikel |
+| A2 | [ ] | Asset-Reste |
+| L1 | [ ] | Saison-Steuerung 0032 + Lehrer-Reiter |
+| D1 | [ ] | Doku + Lehrer-Anleitung |
+| T1 | [ ] | Abnahme |
