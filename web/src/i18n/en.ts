@@ -434,4 +434,5 @@ export const EN: Record<string, string> = {
   Grabstein: 'Gravestone',
   Hexenkessel: 'Cauldron',  '{0} Münzen': '{0} coins',
   '+ {0} Münzen': '+ {0} coins',
+  Verstanden: 'Got it',
 };

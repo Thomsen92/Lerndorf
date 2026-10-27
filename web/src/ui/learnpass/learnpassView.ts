@@ -6,6 +6,7 @@
 import { tr, msg } from '../../i18n';
 import type { SeasonState, SeasonTier } from '../../api/season';
 import { rewardArt, rewardText, coinSvg, chestSvg } from './rewardArt';
+import { openInside } from './insideModal';
 import './learnpass.css';
 
 export interface LearnPassActions {
@@ -233,7 +234,7 @@ export function renderLearnPass(
     inside.innerHTML = `<div class="lp-tile-icon">${chestSvg()}</div>
       <div class="lp-tile-text"><strong>${tr('Was ist drin?')}</strong>
       <small>${tr('Chancen und alle 28 Gegenstände')}</small></div>`;
-    inside.addEventListener('click', actions.onOpenInside);
+    inside.addEventListener('click', () => openInside(area));
 
     bottom.append(pass, streak, shop, inside);
 

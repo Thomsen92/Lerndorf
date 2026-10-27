@@ -472,7 +472,7 @@ Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md)
 | A3 | [x] | 12 Kenney-Pass-Szenen aus 32 kopierten Modellen (`passScenes.ts`), Lizenzzeile, Asset-Vertrag-Test, Galerie-Screenshot |
 | U1 | [x] | LearnPass-Seite nach §14: Kopf, Stand-Leiste, 40 Karten mit Belohnungsbildern, DU-Marke, Schienen-Punkte, vier Kacheln; API-Client, i18n, Vitest, Screenshots 1180×820 und 390×844 |
 | U2 | [x] | Season-Truhen im Inventar: Abschnitt mit Zähler, Öffnen über `open_season_chest`, Ergebnis-Karte mit Seltenheitsfarbe, Duplikat-Hinweis und Münzgutschrift; Vitest + Screenshots |
-| U3 | [ ] | What's inside? |
+| U3 | [x] | „What's inside?“: Chancen 55/30/12/3 als Balken, alle 28 Gegenstände mit Seltenheit und Verkaufswert, Duplikat-Hinweis; Escape/Backdrop, Vitest + Screenshots |
 | U4a | [ ] | Shop: Season-Truhe |
 | U5 | [ ] | Profilkarte/Einstieg |
 | U6 | [ ] | Markt-Stand + Stimmung |

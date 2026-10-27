@@ -1,0 +1,146 @@
+/* "What's inside?" dialog (U3). */
+.inside-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: #05030ad9;
+}
+.inside-dialog {
+  width: min(760px, 96vw);
+  max-height: 92vh;
+  overflow: auto;
+  border: 1px solid #3d2c52;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #241a2e, #170f22);
+  color: #f6e9d2;
+  box-shadow: 0 24px 60px #000b;
+}
+.inside-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: #241a2eee;
+  border-bottom: 1px solid #3d2c52;
+  backdrop-filter: blur(6px);
+}
+.inside-head h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.inside-close {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #3d2c52;
+  background: transparent;
+  color: #f6e9d2;
+  font-size: 18px;
+  cursor: pointer;
+}
+.inside-body {
+  padding: 16px 18px 20px;
+}
+.inside-intro {
+  margin: 0 0 12px;
+  color: #b6a5c6;
+}
+.inside-odds {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.inside-odd {
+  display: grid;
+  grid-template-columns: 110px 1fr 52px;
+  align-items: center;
+  gap: 10px;
+}
+.inside-odd-label {
+  color: var(--rarity);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+.inside-odd-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: #0d0813;
+  border: 1px solid #3d2c52;
+  overflow: hidden;
+}
+.inside-odd-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--rarity);
+}
+.inside-odd-value {
+  text-align: right;
+  font-weight: 800;
+}
+.inside-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.inside-item {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  gap: 2px 8px;
+  padding: 8px 10px;
+  border: 1px solid #3d2c52;
+  border-left: 3px solid var(--rarity);
+  border-radius: 10px;
+  background: #1b1322;
+}
+.inside-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 4px;
+  border-radius: 50%;
+  background: var(--rarity);
+}
+.inside-item-name {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+}
+.inside-item-sell {
+  grid-column: 2;
+  color: #b6a5c6;
+  font-size: 12px;
+}
+.inside-hint {
+  margin: 16px 0 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #2a1f3a;
+  color: #d9cbe6;
+  font-size: 14px;
+}
+.inside-ok {
+  min-height: 46px;
+  padding: 10px 22px;
+  border: 0;
+  border-radius: 12px;
+  background: #ff8f2b;
+  color: #2b1408;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+}
+@media (max-width: 640px) {
+  .inside-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .inside-odd {
+    grid-template-columns: 90px 1fr 44px;
+  }
+}
