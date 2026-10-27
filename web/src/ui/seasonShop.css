@@ -1,0 +1,64 @@
+/* Season chest tile in the shop (U4a). */
+.season-shop {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid #3d2c52;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #241a2e, #1b1322);
+}
+.season-shop-icon svg {
+  width: 56px;
+  height: 46px;
+}
+.season-shop-text strong {
+  display: block;
+  color: #f6e9d2;
+  font-size: 16px;
+}
+.season-shop-meta {
+  display: block;
+  margin-top: 2px;
+  color: #b6a5c6;
+  font-size: 13px;
+}
+.season-shop-buy {
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: #ff8f2b;
+  color: #2b1408;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+}
+.season-shop-buy:disabled {
+  background: #3a2a44;
+  color: #8f7f9a;
+  cursor: not-allowed;
+}
+.season-shop-status {
+  grid-column: 2 / -1;
+  margin: 0;
+  color: #a6e05a;
+  font-size: 13px;
+}
+.season-shop-status.error {
+  color: #ff9a8a;
+}
+@media (max-width: 640px) {
+  .season-shop {
+    grid-template-columns: 54px minmax(0, 1fr);
+  }
+  .season-shop-buy {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  .season-shop-status {
+    grid-column: 1 / -1;
+  }
+}

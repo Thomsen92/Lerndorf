@@ -1,6 +1,7 @@
 import { tr, msg } from '../i18n';
 import type { SeasonApi } from '../api/season';
 import { createSeasonChests } from './seasonChests';
+import { createSeasonShopTile } from './seasonShop';
 /**
  * Shop and inventory areas (non-modal, SPEC §12): a category bar and a grid of item cards.
  * A card opens the shared detail dialog (purchase flow or inventory actions). After a change the list is
@@ -81,6 +82,11 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
         onCoins: opts.onCoins,
         reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
       }),
+    );
+  }
+  if (origin === 'shop' && opts.season) {
+    content.prepend(
+      createSeasonShopTile({ api: opts.season, getCoins: opts.getCoins, onCoins: opts.onCoins }),
     );
   }
 

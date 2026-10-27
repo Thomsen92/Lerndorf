@@ -473,7 +473,7 @@ Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md)
 | U1 | [x] | LearnPass-Seite nach §14: Kopf, Stand-Leiste, 40 Karten mit Belohnungsbildern, DU-Marke, Schienen-Punkte, vier Kacheln; API-Client, i18n, Vitest, Screenshots 1180×820 und 390×844 |
 | U2 | [x] | Season-Truhen im Inventar: Abschnitt mit Zähler, Öffnen über `open_season_chest`, Ergebnis-Karte mit Seltenheitsfarbe, Duplikat-Hinweis und Münzgutschrift; Vitest + Screenshots |
 | U3 | [x] | „What's inside?“: Chancen 55/30/12/3 als Balken, alle 28 Gegenstände mit Seltenheit und Verkaufswert, Duplikat-Hinweis; Escape/Backdrop, Vitest + Screenshots |
-| U4a | [ ] | Shop: Season-Truhe |
+| U4a | [x] | Season-Truhe im Shop: 50 Münzen, zwei pro Woche, Reststand, Erfolgsmeldung und Fehlerfälle (Limit, Guthaben, Saison vorbei); Vitest + Screenshots |
 | U5 | [ ] | Profilkarte/Einstieg |
 | U6 | [ ] | Markt-Stand + Stimmung |
 | U7 | [ ] | i18n/A11y |
