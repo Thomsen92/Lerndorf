@@ -153,6 +153,17 @@
   margin: 0 0 12px;
   color: #b6a5c6;
 }
+.season-reveal-card-note {
+  margin: 0 0 12px;
+  padding: 6px 10px;
+  border: 1px solid #8f6bb0;
+  border-radius: 8px;
+  color: #f3d9ff;
+  font-weight: 700;
+}
+.season-reveal-card-note[hidden] {
+  display: none;
+}
 .season-reveal .season-reveal-ok {
   min-height: 48px;
   padding: 0 22px;

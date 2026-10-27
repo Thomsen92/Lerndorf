@@ -1,9 +1,10 @@
 /** Season chests in the inventory (plan §5.3, U2): count, open with a short reveal, duplicates. */
 import { tr, msg, itemName as globalItemName } from '../i18n';
 import { ITEM_NAMES } from '../i18n/itemNames';
-import type { SeasonApi } from '../api/season';
+import type { ChestResult, SeasonApi } from '../api/season';
 import { RARITY, chestSvg, modelPicture, rarityOf, seasonPictures, type SeasonPictures } from './learnpass/rewardArt';
 import { openInside } from './learnpass/insideModal';
+import { cardById, collectionCatalog } from '../collection/catalog';
 import { SEASON_CHEST_THUMB } from '../render/itemThumbs';
 import { GLB_ITEMS } from '../render/glbItems';
 import './seasonChests.css';
@@ -119,11 +120,7 @@ export function createSeasonChests(opts: SeasonChestOptions): HTMLElement {
  * Opening a chest (plan §14.5): the 3D chest shakes, then rays and border in the rarity colour, the
  * item picture (160 px), badge, name and what happened, and "Next". Without motion it shows at once.
  */
-function reveal(
-  result: { rarity: string; item_id: string; name_de?: string; duplicate: boolean; coins: number },
-  opts: SeasonChestOptions,
-  host: HTMLElement,
-): void {
+function reveal(result: ChestResult, opts: SeasonChestOptions, host: HTMLElement): void {
   const rarity = rarityOf(result.rarity);
   const pictures: SeasonPictures = seasonPictures();
   const overlay = document.createElement('div');
@@ -155,6 +152,25 @@ function reveal(
       : result.duplicate
         ? msg`Doppelt – verkaufen für ${SELL[rarity]} Münzen`
         : tr('Neu! Jetzt in deinem Inventar.');
+  // The card bonus is additive; the village item above stays exactly as before.
+  const cardNote = document.createElement('p');
+  cardNote.className = 'season-reveal-card-note';
+  cardNote.hidden = true;
+  if (result.card) {
+    cardNote.hidden = false;
+    cardNote.textContent = tr('Neue Sammelkarte!');
+    void collectionCatalog()
+      .then((catalog) => {
+        const definition = cardById(catalog, result.card!.id);
+        if (definition) cardNote.textContent = `${tr('Sammelkarte')}: ${definition.name}`;
+      })
+      .catch(() => {
+        // The card name is decoration; the grant already happened on the server.
+      });
+  } else if (result.cardStatus === 'complete') {
+    cardNote.hidden = false;
+    cardNote.textContent = tr('Alle Truhenkarten sind schon gesammelt.');
+  }
   const ok = document.createElement('button');
   ok.type = 'button';
   ok.className = 'season-reveal-ok';
@@ -164,7 +180,7 @@ function reveal(
     pictures.release();
   };
   ok.addEventListener('click', finish);
-  result_.append(badge, name, note, ok);
+  result_.append(badge, name, note, cardNote, ok);
   card.append(pic, result_);
   overlay.append(card);
   overlay.addEventListener('click', (event) => {

@@ -37,7 +37,15 @@ export interface SeasonState {
 
 export interface ClaimResult {
   tier: number;
-  rewards: { coins?: number; chest?: boolean; title_id?: string; frame_id?: string; item?: unknown; choice?: boolean };
+  rewards: {
+    coins?: number;
+    chest?: boolean;
+    title_id?: string;
+    frame_id?: string;
+    item?: unknown;
+    choice?: boolean;
+    cards?: Array<{ id: string; rarity: string; granted: boolean }>;
+  };
 }
 
 export interface SeasonChest {
@@ -55,6 +63,16 @@ export interface PoolItem {
 
 const SELL_BY_RARITY: Record<PoolItem['rarity'], number> = { common: 15, rare: 40, epic: 100, legendary: 250 };
 
+export interface ChestResult {
+  rarity: string;
+  item_id: string;
+  name_de?: string;
+  duplicate: boolean;
+  coins: number;
+  card?: { id: string; rarity: string } | null;
+  cardStatus?: 'awarded' | 'no-hit' | 'complete' | 'disabled' | 'legacy';
+}
+
 export interface SeasonApi {
   /** The chest pool of a season: items with a loot weight, rarity and sell value from 0030. */
   pool(seasonId: string): Promise<PoolItem[]>;
@@ -65,7 +83,7 @@ export interface SeasonApi {
   claim(tier: number): Promise<ClaimResult>;
   choose(itemId: string, seasonId?: string): Promise<{ chosen: string; duplicate?: boolean; coins?: number }>;
   buyChest(): Promise<{ left: number }>;
-  openChest(id: number): Promise<{ rarity: string; item_id: string; duplicate: boolean; coins: number }>;
+  openChest(id: number): Promise<ChestResult>;
   sell(itemId: string, qty: number): Promise<{ coins: number }>;
 }
 
