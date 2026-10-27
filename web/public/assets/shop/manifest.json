@@ -423,6 +423,60 @@
             "triangles": 9426,
             "bytes": 415136,
             "dims": "0,54 × 0,46 × 0,33 m"
+        },
+        {
+            "file": "panel-house.glb",
+            "name": "Panel House",
+            "kind": "house",
+            "price": 700,
+            "triangles": 6187,
+            "bytes": 593936,
+            "dims": "103,98 × 169,60 × 97,94 Einheiten"
+        },
+        {
+            "file": "forest-cabin.glb",
+            "name": "Forest Cabin",
+            "kind": "house",
+            "price": 600,
+            "triangles": 1689,
+            "bytes": 513532,
+            "dims": "2,08 × 2,06 × 1,86 m"
+        },
+        {
+            "file": "classroom.glb",
+            "name": "Classroom",
+            "kind": "house",
+            "price": 900,
+            "triangles": 9142,
+            "bytes": 129676,
+            "dims": "21,20 × 10,69 × 25,22 Einheiten"
+        },
+        {
+            "file": "house-3.glb",
+            "name": "House 3",
+            "kind": "house",
+            "price": 750,
+            "triangles": 1056,
+            "bytes": 24884,
+            "dims": "2,46 × 1,70 × 2,03 m"
+        },
+        {
+            "file": "home-1.glb",
+            "name": "Home 1",
+            "kind": "house",
+            "price": 850,
+            "triangles": 3982,
+            "bytes": 64236,
+            "dims": "1,37 × 1,15 × 1,17 m"
+        },
+        {
+            "file": "home-2.glb",
+            "name": "Home 2",
+            "kind": "house",
+            "price": 950,
+            "triangles": 2357,
+            "bytes": 42716,
+            "dims": "6,26 × 5,88 × 6,18 m"
         }
     ],
     "pending": [
