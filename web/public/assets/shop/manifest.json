@@ -171,6 +171,69 @@
             "triangles": 23934,
             "bytes": 372544,
             "dims": "6,02 × 7,84 × 16,64 m"
+        },
+        {
+            "file": "mascot.glb",
+            "name": "Thumbs-Up Mascot",
+            "kind": "deco",
+            "price": 120,
+            "triangles": 14894,
+            "bytes": 81284,
+            "dims": "2,30 × 4,31 × 2,41 m"
+        },
+        {
+            "file": "smartphone.glb",
+            "name": "Smartphone",
+            "kind": "deco",
+            "price": 60,
+            "triangles": 15341,
+            "bytes": 183852,
+            "dims": "1,45 × 2,95 × 0,24 m"
+        },
+        {
+            "file": "moai.glb",
+            "name": "Moai Statue",
+            "kind": "deco",
+            "price": 140,
+            "triangles": 2210,
+            "bytes": 88188,
+            "dims": "169 × 343 × 159 Einheiten"
+        },
+        {
+            "file": "water-tower.glb",
+            "name": "Water Tower",
+            "kind": "deco",
+            "price": 180,
+            "triangles": 2507,
+            "bytes": 21516,
+            "dims": "2,53 × 8,43 × 2,49 m"
+        },
+        {
+            "file": "chicken-coop.glb",
+            "name": "Chicken Coop",
+            "kind": "deco",
+            "price": 80,
+            "triangles": 948,
+            "bytes": 11828,
+            "dims": "2,41 × 1,85 × 2,15 m"
+        },
+        {
+            "file": "windmill.glb",
+            "name": "Windmill",
+            "kind": "deco",
+            "price": 160,
+            "triangles": 1440,
+            "bytes": 17688,
+            "dims": "6,51 × 11,20 × 1,90 m"
+        },
+        {
+            "file": "barn.glb",
+            "name": "Barn",
+            "kind": "deco",
+            "price": 150,
+            "triangles": 2910,
+            "bytes": 27528,
+            "dims": "7,73 × 6,01 × 8,22 m"
         }
     ],
     "pending": [

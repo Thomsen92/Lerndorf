@@ -83,6 +83,14 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_cute_frog: { file: 'shop/cute-round-frog.glb', kind: 'deco', fill: true },
   shop_cute_fox: { file: 'shop/cute-fox.glb', kind: 'deco', fill: true },
   shop_blue_engine: { file: 'shop/blue-engine.glb', kind: 'deco', fill: true },
+  // Mascot, phone, statue and farm buildings (0039).
+  shop_mascot: { file: 'shop/mascot.glb', kind: 'deco', fill: true },
+  shop_smartphone: { file: 'shop/smartphone.glb', kind: 'deco', fill: true },
+  shop_moai: { file: 'shop/moai.glb', kind: 'deco', fill: true },
+  shop_water_tower: { file: 'shop/water-tower.glb', kind: 'deco', fill: true },
+  shop_chicken_coop: { file: 'shop/chicken-coop.glb', kind: 'deco', fill: true },
+  shop_windmill: { file: 'shop/windmill.glb', kind: 'deco', fill: true },
+  shop_barn: { file: 'shop/barn.glb', kind: 'deco', fill: true },
 };
 
 const BASE = `${import.meta.env.BASE_URL}assets/`;
