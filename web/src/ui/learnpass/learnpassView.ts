@@ -133,6 +133,7 @@ export function renderLearnPass(
 
   const status = document.createElement('div');
   status.className = 'lp-status';
+  status.setAttribute('aria-live', 'polite');
 
   const trackWrap = document.createElement('div');
   trackWrap.className = 'lp-track-wrap';

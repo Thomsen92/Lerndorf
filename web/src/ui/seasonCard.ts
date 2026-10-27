@@ -18,7 +18,7 @@ export function createSeasonCard(opts: SeasonCardOptions): HTMLElement {
     <span class="profile-season-icon">${chestSvg()}</span>
     <span class="profile-season-text">
       <strong>${tr('Season I – Halloween')}</strong>
-      <span class="profile-season-meta">${tr('Loading season…')}</span>
+      <span class="profile-season-meta">${tr('Season wird geladen…')}</span>
     </span>
     <span class="profile-season-badge" hidden></span>
     <span class="profile-season-arrow" aria-hidden="true">→</span>`;
@@ -29,7 +29,7 @@ export function createSeasonCard(opts: SeasonCardOptions): HTMLElement {
     .state()
     .then((state) => {
       const waiting = state.chests.pass + state.chests.streak + state.chests.shop;
-      meta.textContent = msg`Tier ${state.tier} of 40 · ${state.season.days_left} days left`;
+      meta.textContent = msg`Stufe ${state.tier} von 40 · ${state.season.days_left} Tage übrig`;
       if (waiting > 0) {
         badge.textContent = `×${waiting}`;
         badge.hidden = false;
@@ -39,7 +39,7 @@ export function createSeasonCard(opts: SeasonCardOptions): HTMLElement {
       if (state.season.state !== 'running') card.classList.add('ended');
     })
     .catch(() => {
-      meta.textContent = tr('Season could not be loaded.');
+      meta.textContent = tr('Die Season konnte nicht geladen werden.');
     });
 
   return card;

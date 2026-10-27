@@ -535,10 +535,10 @@ export async function mountVillage(
     const banner = document.createElement('div');
     banner.className = 'season-welcome';
     const text = document.createElement('span');
-    text.innerHTML = `<strong>Season I – Halloween</strong><small>Tap the pumpkin stall at the market.</small>`;
+    text.innerHTML = `<strong>Season I – Halloween</strong><small>${tr('Tippe auf die Kürbisbude am Markt.')}</small>`;
     const open = document.createElement('button');
     open.type = 'button';
-    open.textContent = tr('Open pass');
+    open.textContent = tr('Pass öffnen');
     open.addEventListener('click', openSeasonPass);
     const close = document.createElement('button');
     close.type = 'button';

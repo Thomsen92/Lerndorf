@@ -1,8 +1,12 @@
 // @vitest-environment happy-dom
 // U2: season chests in the inventory — count, open, reveal card and duplicate note.
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createSeasonChests } from '../../src/ui/seasonChests';
 import type { SeasonApi } from '../../src/api/season';
+import { setLocale } from '../../src/i18n';
+
+beforeEach(() => setLocale('en'));
+
 
 function api(overrides: Partial<SeasonApi> = {}): SeasonApi {
   return {

@@ -1,8 +1,12 @@
 // @vitest-environment happy-dom
 // U4a: the season chest tile in the shop — weekly limit, coins and error messages.
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createSeasonShopTile } from '../../src/ui/seasonShop';
 import type { SeasonApi, SeasonState } from '../../src/api/season';
+import { setLocale } from '../../src/i18n';
+
+beforeEach(() => setLocale('en'));
+
 
 function state(left: number, running = true): SeasonState {
   return {

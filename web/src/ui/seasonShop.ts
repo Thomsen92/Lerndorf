@@ -16,7 +16,7 @@ export function createSeasonShopTile(opts: SeasonShopOptions): HTMLElement {
   section.innerHTML = `
     <div class="season-shop-icon">${chestSvg()}</div>
     <div class="season-shop-text">
-      <strong>${tr('Season chest')}</strong>
+      <strong>${tr('Season-Truhe')}</strong>
       <small class="season-shop-meta"></small>
     </div>
     <button type="button" class="season-shop-buy">${tr('Kaufen')}</button>
@@ -29,10 +29,10 @@ export function createSeasonShopTile(opts: SeasonShopOptions): HTMLElement {
 
   function render(): void {
     meta.textContent = running
-      ? msg`50 coins · ${left} of 2 left this week`
-      : tr('The season is not running.');
+      ? msg`50 Münzen · ${left} von 2 diese Woche`
+      : tr('Die Saison läuft nicht.');
     buy.disabled = !running || left <= 0;
-    buy.textContent = left <= 0 && running ? tr('Limit reached') : tr('Kaufen');
+    buy.textContent = left <= 0 && running ? tr('Limit erreicht') : tr('Kaufen');
   }
 
   function message(text: string): void {
@@ -48,7 +48,7 @@ export function createSeasonShopTile(opts: SeasonShopOptions): HTMLElement {
       running = state.season.state === 'running';
       render();
     } catch {
-      meta.textContent = tr('The season could not be loaded.');
+      meta.textContent = tr('Die Season konnte nicht geladen werden.');
       buy.disabled = true;
     }
   }
@@ -63,7 +63,7 @@ export function createSeasonShopTile(opts: SeasonShopOptions): HTMLElement {
         opts.onCoins(opts.getCoins() - 50);
         left = result.left;
         render();
-        status.textContent = tr('The chest is in your inventory.');
+        status.textContent = tr('Die Truhe liegt in deinem Inventar.');
         status.hidden = false;
         status.classList.remove('error');
       })
@@ -71,12 +71,12 @@ export function createSeasonShopTile(opts: SeasonShopOptions): HTMLElement {
         const text = error instanceof Error ? error.message : '';
         message(
           /weekly limit/.test(text)
-            ? tr('You already bought two chests this week.')
+            ? tr('Du hast diese Woche schon zwei Truhen gekauft.')
             : /not enough coins/.test(text)
               ? tr('Not enough coins.')
               : /season not running/.test(text)
-                ? tr('The season is not running.')
-                : tr('The chest could not be bought.'),
+                ? tr('Die Saison läuft nicht.')
+                : tr('Die Truhe konnte nicht gekauft werden.'),
         );
         void load();
       });

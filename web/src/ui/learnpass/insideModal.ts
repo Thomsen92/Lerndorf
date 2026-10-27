@@ -9,10 +9,10 @@ import './insideModal.css';
 export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 export const ODDS: Array<{ rarity: Rarity; chance: number; label: string; color: string }> = [
-  { rarity: 'common', chance: 55, label: tr('Normal'), color: '#b9b2c6' },
-  { rarity: 'rare', chance: 30, label: tr('Rare'), color: '#4a8ff0' },
-  { rarity: 'epic', chance: 12, label: tr('Epic'), color: '#a06bf0' },
-  { rarity: 'legendary', chance: 3, label: tr('Legendary'), color: '#f2b630' },
+  { rarity: 'common', chance: 55, label: tr('Gewöhnlich'), color: '#b9b2c6' },
+  { rarity: 'rare', chance: 30, label: tr('Selten'), color: '#4a8ff0' },
+  { rarity: 'epic', chance: 12, label: tr('Episch'), color: '#a06bf0' },
+  { rarity: 'legendary', chance: 3, label: tr('Legendär'), color: '#f2b630' },
 ];
 
 export const SELL: Record<Rarity, number> = { common: 15, rare: 40, epic: 100, legendary: 250 };
@@ -78,7 +78,7 @@ export function openInside(host: HTMLElement): InsideHandle {
 
   const intro = document.createElement('p');
   intro.className = 'inside-intro';
-  intro.textContent = tr('Every season chest rolls one of these four rarities.');
+  intro.textContent = tr('Jede Season-Truhe würfelt eine dieser vier Seltenheiten.');
 
   const odds = document.createElement('div');
   odds.className = 'inside-odds';
@@ -86,7 +86,7 @@ export function openInside(host: HTMLElement): InsideHandle {
     const row = document.createElement('div');
     row.className = 'inside-odd';
     row.style.setProperty('--rarity', o.color);
-    row.innerHTML = `<span class="inside-odd-label">${o.label}</span>
+    row.innerHTML = `<span class="inside-odd-label">${tr(o.label)}</span>
       <span class="inside-odd-bar"><span style="width:${o.chance}%"></span></span>
       <span class="inside-odd-value">${o.chance}%</span>`;
     odds.append(row);
@@ -101,14 +101,14 @@ export function openInside(host: HTMLElement): InsideHandle {
       card.style.setProperty('--rarity', COLOR[item.rarity]);
       card.innerHTML = `<span class="inside-dot" aria-hidden="true"></span>
         <span class="inside-item-name">${itemName(item.id)}</span>
-        <span class="inside-item-sell">${msg`sells for ${SELL[item.rarity]} coins`}</span>`;
+        <span class="inside-item-sell">${msg`Verkaufswert: ${SELL[item.rarity]} Münzen`}</span>`;
       grid.append(card);
     }
   }
 
   const hint = document.createElement('p');
   hint.className = 'inside-hint';
-  hint.textContent = tr('Duplicates stay in your inventory and can be sold there.');
+  hint.textContent = tr('Doppelte bleiben im Inventar und lassen sich dort verkaufen.');
 
   const close = document.createElement('button');
   close.type = 'button';

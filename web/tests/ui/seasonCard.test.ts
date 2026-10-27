@@ -1,8 +1,12 @@
 // @vitest-environment happy-dom
 // U5: season card in the profile — tier, days left, waiting chests and the click target.
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createSeasonCard } from '../../src/ui/seasonCard';
 import type { SeasonApi, SeasonState } from '../../src/api/season';
+import { setLocale } from '../../src/i18n';
+
+beforeEach(() => setLocale('en'));
+
 
 function state(overrides: Partial<SeasonState> = {}): SeasonState {
   return {

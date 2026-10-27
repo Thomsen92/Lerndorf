@@ -1,7 +1,11 @@
 // @vitest-environment happy-dom
 // U3: "What's inside?" lists the four odds and all 28 pool items, and closes on Escape.
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ODDS, POOL, SELL, openInside } from '../../src/ui/learnpass/insideModal';
+import { setLocale } from '../../src/i18n';
+
+beforeEach(() => setLocale('en'));
+
 
 describe('inside modal', () => {
   it('shows the odds summing to 100 and the sell values', () => {
