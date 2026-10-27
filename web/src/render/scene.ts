@@ -5,6 +5,7 @@
  */
 import * as THREE from 'three';
 import { MAP_SIZE } from '../world/constants';
+import { isSeasonActive } from '../world/seasonWindow';
 
 /** Horizon colour of the night panorama: fog and clear colour use it (measured from the image). */
 export const SKY_HORIZON = '#2d3a67';
@@ -21,12 +22,15 @@ export interface SceneRig {
   skyReady: Promise<THREE.Texture | null>;
 }
 
-export function setupScene(scene: THREE.Scene): SceneRig {
-  scene.background = new THREE.Color(SKY_HORIZON);
-  scene.fog = new THREE.Fog(SKY_HORIZON, MAP_SIZE * 0.42, MAP_SIZE * 1.05);
-  scene.add(new THREE.HemisphereLight('#a9b8e8', '#3a5a3a', 1.15));
+export function setupScene(scene: THREE.Scene, opts: { season?: boolean } = {}): SceneRig {
+  // During the season the market mood darkens sky, fog and light (U6); outside it LOOK §3 applies.
+  const season = opts.season ?? isSeasonActive();
+  const horizon = season ? '#241426' : SKY_HORIZON;
+  scene.background = new THREE.Color(season ? '#1a1020' : SKY_HORIZON);
+  scene.fog = new THREE.Fog(horizon, MAP_SIZE * 0.42, MAP_SIZE * (season ? 0.9 : 1.05));
+  scene.add(new THREE.HemisphereLight(season ? '#6a4a7a' : '#a9b8e8', season ? '#241a26' : '#3a5a3a', season ? 0.85 : 1.15));
 
-  const sun = new THREE.DirectionalLight('#ffd2a1', 1.6);
+  const sun = new THREE.DirectionalLight(season ? '#ff9a6a' : '#ffd2a1', season ? 1.3 : 1.6);
   const sunOffset = new THREE.Vector3(-40, 55, 25);
   sun.position.copy(sunOffset);
   sun.castShadow = true;

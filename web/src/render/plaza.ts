@@ -9,6 +9,7 @@ import { instancedModel, kenneyModel, type KenneyModel } from './kenney';
 import type { Layout } from '../world/layout';
 import { PLAZA_RADIUS } from '../world/constants';
 import { pavingTexture } from './textures';
+import { isSeasonActive } from '../world/seasonWindow';
 
 const STONE = '#a7a3a0';
 const WOOD = '#8a5a36';
@@ -347,7 +348,7 @@ function tub(layout: Layout, angle: number): THREE.Group {
 }
 
 /** The whole plaza as one group. The caller adds it to the village. */
-export function buildPlaza(layout: Layout): THREE.Group {
+export function buildPlaza(layout: Layout, opts: { season?: boolean } = {}): THREE.Group {
   const root = new THREE.Group();
   const y = layout.plazaHeight;
 
@@ -423,6 +424,30 @@ export function buildPlaza(layout: Layout): THREE.Group {
   ];
   for (const [angle, stripe, colours, goods] of stalls) {
     root.add(stall(layout, angle, 5.0, stripe, colours, goods));
+  }
+  if (opts.season ?? isSeasonActive()) {
+    // Season I stall next to the board (U6): pumpkins, orange/black awning and a click target.
+    const s = stall(layout, layout.map.boardAngle - 0.6, 4.8, '#d2462e', ['#ff8f2b', '#2a1a2a', '#ff8f2b', '#f2b630'], 'pumpkins');
+    s.name = 'seasonStall';
+    const hit = new THREE.Mesh(
+      new THREE.BoxGeometry(3.0, 2.5, 1.7),
+      new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }),
+    );
+    hit.position.y = 1.25;
+    hit.userData.kind = 'seasonStall';
+    s.add(hit);
+    const lantern = new THREE.PointLight('#ff9a4a', 18, 9, 2);
+    lantern.position.set(0, 2.6, 0.6);
+    s.add(lantern);
+    root.add(s);
+
+    // Blood moon above the market, visible only during the season.
+    const moon = new THREE.Mesh(
+      new THREE.SphereGeometry(7, 24, 16),
+      new THREE.MeshBasicMaterial({ color: '#d2462e', fog: false }),
+    );
+    moon.position.set(layout.plaza.x - 26, 24, layout.plaza.z - 18);
+    root.add(moon);
   }
   for (const angle of layout.map.benchAngles) root.add(bench(layout, angle));
   root.add(tub(layout, layout.map.benchAngles[0] + 0.7));

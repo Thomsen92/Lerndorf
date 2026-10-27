@@ -65,3 +65,49 @@
   font-weight: 800;
   vertical-align: middle;
 }
+
+.season-welcome {
+  position: fixed;
+  left: 50%;
+  bottom: 88px;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(560px, 92vw);
+  padding: 10px 14px;
+  border: 1px solid #6b3a2a;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #2a1622ee, #1a0f18ee);
+  color: #f6e9d2;
+  box-shadow: 0 12px 30px #0008;
+}
+.season-welcome span {
+  display: grid;
+}
+.season-welcome strong {
+  color: #ff8f2b;
+  font-size: 14px;
+}
+.season-welcome small {
+  color: #cbb8d8;
+  font-size: 12px;
+}
+.season-welcome button {
+  min-height: 38px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #ff8f2b;
+  color: #2b1408;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+}
+.season-welcome .season-welcome-close {
+  background: transparent;
+  color: #cbb8d8;
+  font-size: 18px;
+  padding: 0 4px;
+}

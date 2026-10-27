@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Season market – U6 check</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #140c18; }
+      canvas { display: block; width: 100%; height: 100%; }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      import * as THREE from 'three';
+      import { buildLayout } from '../src/world/layout';
+      import { buildPlaza } from '../src/render/plaza';
+      import { setupScene } from '../src/render/scene';
+      import { kenneyReady } from '../src/render/kenney';
+
+      const layout = buildLayout(11, 34, 'tal');
+      const scene = new THREE.Scene();
+      setupScene(scene, { season: true });
+      const plaza = buildPlaza(layout, { season: true });
+      scene.add(plaza);
+
+      const ground = new THREE.Mesh(
+        new THREE.CircleGeometry(60, 48),
+        new THREE.MeshStandardMaterial({ color: 0x3f5a3a, roughness: 1 }),
+      );
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.set(layout.plaza.x, layout.plazaHeight - 0.2, layout.plaza.z);
+      scene.add(ground);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      document.body.append(renderer.domElement);
+
+      const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 300);
+      const stall = plaza.getObjectByName('seasonStall');
+      window.__stall = Boolean(stall);
+      if (stall) {
+        const at = new THREE.Vector3();
+        stall.getWorldPosition(at);
+        camera.position.set(at.x - 10, at.y + 7, at.z + 12);
+        camera.lookAt(layout.plaza.x, layout.plazaHeight + 2, layout.plaza.z);
+      } else {
+        camera.position.set(layout.plaza.x + 9, layout.plazaHeight + 6.5, layout.plaza.z + 11);
+        camera.lookAt(layout.plaza.x, layout.plazaHeight + 1, layout.plaza.z);
+      }
+
+      await kenneyReady();
+      renderer.render(scene, camera);
+      window.__ready = true;
+      renderer.setAnimationLoop(() => renderer.render(scene, camera));
+    </script>
+  </body>
+</html>

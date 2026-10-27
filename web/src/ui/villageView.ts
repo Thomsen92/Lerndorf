@@ -57,6 +57,7 @@ import { openShop } from './shopView';
 import { openInventory } from './inventoryView';
 import { seasonApi } from '../api/season';
 import { openLearnPass } from './learnpass/openLearnPass';
+import { isSeasonActive } from '../world/seasonWindow';
 import { openDailyQuests } from './dailyQuestsView';
 import { loadDailyQuests } from '../api/quests';
 import { openLedger } from './ledgerView';
@@ -518,6 +519,36 @@ export async function mountVillage(
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   puffTexture = loadPuffTexture();
   fx = new BuildFx(scene, { texture: puffTexture, reducedMotion });
+
+  // Season I market (U6): stall next to the board, welcome banner and a shared LearnPass opener.
+  const seasonStallObject = isSeasonActive() ? village.getObjectByName('seasonStall') : null;
+  const openSeasonPass = (): void => {
+    openLearnPass({
+      api: seasonApi(supabase),
+      getCoins: () => coinsNow,
+      onCoins,
+      reducedMotion: reducedMotion(),
+      onOpenInventory: () => void areas?.select('inventar'),
+    });
+  };
+  if (seasonStallObject && !inTutorial) {
+    const banner = document.createElement('div');
+    banner.className = 'season-welcome';
+    const text = document.createElement('span');
+    text.innerHTML = `<strong>Season I – Halloween</strong><small>Tap the pumpkin stall at the market.</small>`;
+    const open = document.createElement('button');
+    open.type = 'button';
+    open.textContent = tr('Open pass');
+    open.addEventListener('click', openSeasonPass);
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'season-welcome-close';
+    close.textContent = '×';
+    close.setAttribute('aria-label', tr('Schließen'));
+    close.addEventListener('click', () => banner.remove());
+    banner.append(text, open, close);
+    root.append(banner);
+  }
   const applyControls = (area: NavArea): void => {
     cameraTools.hidden = inTutorial || area !== 'dorf';
     houseCards.setVisible(!inTutorial && area === 'dorf' && !marketFocused);
@@ -590,8 +621,10 @@ export async function mountVillage(
       -((ev.clientY - rect.top) / rect.height) * 2 + 1,
     );
     raycaster.setFromCamera(pointer, camera);
-    const hovered = raycaster.intersectObject(boardObject, true).length > 0;
-    boardCue.setHovered(hovered);
+    const hovered =
+      raycaster.intersectObject(boardObject, true).length > 0 ||
+      (seasonStallObject ? raycaster.intersectObject(seasonStallObject, true).length > 0 : false);
+    boardCue.setHovered(raycaster.intersectObject(boardObject, true).length > 0);
     gl.domElement.style.cursor = hovered ? 'pointer' : '';
   });
   gl.domElement.addEventListener('pointerleave', () => {
@@ -638,6 +671,10 @@ export async function mountVillage(
     // the task board: tap the board in the market
     if (hit && hit.object.userData.kind === 'board') {
       void areas?.select('aufgaben');
+      return;
+    }
+    if (hit && hit.object.userData.kind === 'seasonStall') {
+      openSeasonPass();
       return;
     }
     if (hit && hit.object.userData.kind === 'byte') {
@@ -823,17 +860,7 @@ export async function mountVillage(
           onTitle: (label) => progressFlow.titleChanged(label),
           onSettings: openSettings,
           onQuests: () => void areas?.select('aufgaben'),
-          season: {
-            api: seasonApi(supabase),
-            onOpen: () =>
-              openLearnPass({
-                api: seasonApi(supabase),
-                getCoins: () => coinsNow,
-                onCoins,
-                reducedMotion: reducedMotion(),
-                onOpenInventory: () => void areas?.select('inventar'),
-              }),
-          },
+          season: { api: seasonApi(supabase), onOpen: openSeasonPass },
           onClose: () => void areas?.select('dorf'),
           sound,
           reducedMotion: reducedMotion(),
