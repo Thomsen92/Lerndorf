@@ -12,7 +12,7 @@
 | A1 | fertig | `b07c7b3` | Meshopt im Loader, async GLB-Zweig mit Platzhalter, Normalisierung auf MAX_SIZE (Deko min. 0,8 m), THREE.LOD mit 34 Fernversionen; Tests + Galerie-Screenshot `web/dev/season.html` |
 | A3 | fertig | `aba8f37` | 12 Pass-Szenen aus 32 Kenney-Modellen (`passScenes.ts`), Lizenzzeile, Asset-Vertrag-Test, Screenshot `season-a3b.png` |
 | U1 | fertig | `58c6e91` | LearnPass-Seite nach §14 (Kopf, Stand-Leiste, 40 Karten, DU-Marke, Schienen-Punkte, vier Kacheln), API-Client, i18n, Vitest, Screenshots |
-| U2–U7 | offen | – | Truhen im Inventar, What's inside?, Shop-Truhe, Profilkarte, Markt-Stand, i18n/A11y |
+| U2 | fertig | `7b84f4d` | Season-Truhen im Inventar, Öffnen über RPC, Ergebnis-Karte, Duplikat-Münzen, Vitest + Screenshots |`n| U3–U7 | offen | – | What's inside?, Shop-Truhe, Profilkarte, Markt-Stand, i18n/A11y |
 | S3 | offen | – | Shop-Daten 0031 |
 | U4b | offen | – | Nicht-Season-Artikel |
 | A2 | offen | – | Asset-Reste |
@@ -22,7 +22,7 @@
 
 ## Prüfungen
 
-- `npm test`: **146 Dateien, 974 Tests grün** (Stand U1).
+- `npm test`: **147 Dateien, 976 Tests grün** (Stand U2).
 - `npm run build`: grün (Vite, nur die bekannte Chunk-Größen-Warnung).
 - SQL-Tests laufen mit PGlite über alle Migrationen 0001–0030.
 - Galerie: `web/test-results/season-a1.png` (8 Modelle auf Sockeln, innerhalb MAX_SIZE, Boden auf 0) und `season-a3b.png` (drei Pass-Szenen, 2,4 m breit, Boden auf 0) angesehen.
@@ -42,4 +42,4 @@
 
 ## Nächster Schritt
 
-U2: Season-Truhen im Inventar (Abschnitt, Öffnen-Animation, Ergebnis-Karte, Duplikat-Hinweis), dann U3 (Chancen-Fenster).
+U3: „What's inside?“ mit Chancen und allen 28 Gegenständen, dann U4a (Season-Truhe im Shop).
