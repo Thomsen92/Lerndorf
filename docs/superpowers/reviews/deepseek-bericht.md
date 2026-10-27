@@ -13,8 +13,8 @@
 | A3 | fertig | `aba8f37` | 12 Pass-Szenen aus 32 Kenney-Modellen (`passScenes.ts`), Lizenzzeile, Asset-Vertrag-Test, Screenshot `season-a3b.png` |
 | U1 | fertig | `58c6e91` | LearnPass-Seite nach §14 (Kopf, Stand-Leiste, 40 Karten, DU-Marke, Schienen-Punkte, vier Kacheln), API-Client, i18n, Vitest, Screenshots |
 | U2 | fertig | `7b84f4d` | Season-Truhen im Inventar, Öffnen über RPC, Ergebnis-Karte, Duplikat-Münzen, Vitest + Screenshots |`n| U3 | fertig | `1ff7e86` | „What's inside?“: Chancen 55/30/12/3, alle 28 Gegenstände mit Seltenheit/Verkaufswert, Vitest + Screenshots |`n| U4a | fertig | `390d7c6` | Season-Truhe im Shop: 50 Münzen, 2/Woche, Reststand, Fehlerfälle, Vitest + Screenshots |`n| U5 | fertig | `ca0c16b` | Profilkarte mit Stufe/Restzeit/Truhen-Badge, öffnet den LearnPass über die echte API; Inventar-Badge im Haus-Menü |`n| U6 | fertig | `e1fa089` | Saison-Stand, Willkommensbanner, dunkle Stimmung im Saisonfenster (`seasonWindow.ts`), Klick öffnet den Pass; Galerie nicht gelaufen, Markt über Dev-Seite geprüft |`n| U7 | fertig | `face58c` | Deutsche Quelltexte + englische Übersetzungen, deutsche Gegenstandsnamen, Seltenheiten zur Laufzeit, `aria-live`, i18n-Tests |
-| S3 | offen | – | Shop-Daten 0031 |
-| U4b | offen | – | Nicht-Season-Artikel |
+| S3 | fertig | `61753f8` | 0031: sechs Nicht-Season-Artikel (500–5.000 Münzen), `shop_visible`, Modelle, Kauf über `buy_item`; SQL-Tests |
+| U4b | fertig | `e427c8d` | Shop zeigt die sechs Artikel mit echten 3D-Vorschaubildern (`itemThumbs` wartet auf GLB); Screenshot |
 | A2 | offen | – | Asset-Reste |
 | L1 | offen | – | Saison-Steuerung 0032 + Lehrer-Reiter |
 | D1 | offen | – | Doku + Lehrer-Anleitung |
@@ -22,7 +22,7 @@
 
 ## Prüfungen
 
-- `npm test`: **152 Dateien, 991 Tests grün** (Stand U7).
+- `npm test`: **152 Dateien, 993 Tests grün** (Stand U4b).
 - `npm run build`: grün (Vite, nur die bekannte Chunk-Größen-Warnung).
 - SQL-Tests laufen mit PGlite über alle Migrationen 0001–0030.
 - Galerie: `web/test-results/season-a1.png` (8 Modelle auf Sockeln, innerhalb MAX_SIZE, Boden auf 0) und `season-a3b.png` (drei Pass-Szenen, 2,4 m breit, Boden auf 0) angesehen.
@@ -42,4 +42,4 @@
 
 ## Nächster Schritt
 
-S3: Shop-Daten in Migration 0031 (sechs Shop-Artikel, Season-Bezug), dann U4b (Shop-Ansicht ohne Season-Artikel).
+A2: Asset-Reste (LOD-Nachbesserung, Quellen/Lizenz, Modellprüfung), dann L1 (Saison-Steuerung im Lehrerbereich).
