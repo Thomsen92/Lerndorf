@@ -396,6 +396,15 @@
             "triangles": 60996,
             "bytes": 331652,
             "dims": "265,9 × 497,6 × 118,5 Einheiten"
+        },
+        {
+            "file": "family-house.glb",
+            "name": "Family House",
+            "kind": "house",
+            "price": 900,
+            "triangles": 3665,
+            "bytes": 53060,
+            "dims": "5,90 × 6,50 × 6,54 m"
         }
     ],
     "pending": [
