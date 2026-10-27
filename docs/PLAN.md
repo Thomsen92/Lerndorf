@@ -467,7 +467,7 @@ Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md)
 | --- | --- | --- |
 | S1 | [x] | 0028 Schema, 0030 Inhalte (Saison, 28 Pool-Items, 12 Szenen, 40 Stufen, Titel/Rahmen, Serien-Nachberechnung); Schema-Tests |
 | S2 | [x] | RPCs 0029 (state, claim, choose, buy, open, sell, close) + Serien-Trigger; Smoke-Tests |
-| S4 | [ ] | SQL-Tests (10 Fälle) |
+| S4 | [x] | 22 SQL-Tests: Schema, Zustände, Claims, Verkauf, Stufe-40-Wahl, Serie, Shop-Fenster, Chancen; `set_title`/`set_frame` folgt mit L1/U7 |
 | A1 | [ ] | Loader: Meshopt, async GLB, Normalisierung, Fernversionen |
 | A3 | [ ] | 12 Kenney-Pass-Szenen |
 | U1 | [ ] | LearnPass-Seite nach §14 |

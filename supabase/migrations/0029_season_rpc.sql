@@ -241,6 +241,8 @@ declare
   v_claim season_claims%rowtype;
   v_item items%rowtype;
   v_result jsonb;
+  v_qty int;
+  v_placed int;
 begin
   if v_uid is null then raise exception 'not logged in' using errcode = '42501'; end if;
   select * into v_season from seasons order by starts_on desc limit 1;
@@ -251,7 +253,17 @@ begin
   select * into v_item from items
     where id = p_item_id and season = v_season.id and lootbox_weight > 0;
   if not found then raise exception 'not in pool' using errcode = 'P0002'; end if;
-  v_result := public.season_add_item(v_uid, p_item_id);
+  select coalesce((select qty from inventory where player_id = v_uid and item_id = p_item_id), 0) into v_qty;
+  select count(*) into v_placed from placements where player_id = v_uid and item_id = p_item_id;
+  if v_qty > 0 or v_placed > 0 then
+    insert into coin_ledger (player_id, delta, reason, ref)
+    values (v_uid, public.season_sell_value(v_item), 'season', 'season_choice:' || p_item_id);
+    update profiles set coins = coins + public.season_sell_value(v_item) where id = v_uid;
+    v_result := jsonb_build_object('item_id', p_item_id, 'duplicate', true,
+                                  'coins', public.season_sell_value(v_item));
+  else
+    v_result := public.season_add_item(v_uid, p_item_id);
+  end if;
   update season_claims set choice_item_id = p_item_id
     where player_id = v_uid and season = v_season.id and tier = 40;
   return v_result || jsonb_build_object('chosen', p_item_id);
