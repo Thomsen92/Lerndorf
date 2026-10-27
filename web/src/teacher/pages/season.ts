@@ -28,6 +28,21 @@ interface Overview {
   }>;
 }
 
+interface ChangeRow {
+  id: number;
+  action: 'dates' | 'start' | 'end' | 'close';
+  detail: Record<string, unknown>;
+  created_at: string;
+  teacher: string;
+}
+
+const ACTION_LABEL: Record<ChangeRow['action'], string> = {
+  dates: 'Daten geändert',
+  start: 'Gestartet',
+  end: 'Beendet',
+  close: 'Abgeschlossen',
+};
+
 const STATE_LABEL: Record<SeasonRow['state'], string> = {
   planned: 'geplant',
   running: 'läuft',
@@ -67,6 +82,9 @@ export default {
     }
 
     let data: Overview | null = current ? await overview(current.id) : null;
+    const changes = current
+      ? await rpc<ChangeRow[]>(ctx, 'teacher_season_changes', { p_season: current.id }).catch(() => [])
+      : [];
     if (!ctx.alive()) return;
 
     const card = (s: SeasonRow): string => `
@@ -122,6 +140,19 @@ export default {
       <section class="season-overview">
         <h2>Klasse ${esc(ctx.classId)} · ${esc(current?.label ?? 'Keine Saison')}</h2>
         ${table(data)}
+      </section>
+      <section class="season-log">
+        <h2>Protokoll</h2>
+        ${
+          changes.length === 0
+            ? '<p>Noch keine Änderungen.</p>'
+            : `<ul>${changes
+                .map(
+                  (c) =>
+                    `<li><strong>${ACTION_LABEL[c.action]}</strong> · ${new Date(c.created_at).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' })} · ${esc(c.teacher)}</li>`,
+                )
+                .join('')}</ul>`
+        }
       </section>`;
 
     root.querySelectorAll<HTMLButtonElement>('[data-start]').forEach((button) => {

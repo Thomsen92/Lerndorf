@@ -38,7 +38,10 @@
       const ctx = {
         supabase: {
           async rpc(fn) {
-            return { data: fn === 'teacher_seasons' ? seasons : overview, error: null };
+            if (fn === 'teacher_seasons') return { data: seasons, error: null };
+            if (fn === 'teacher_season_changes')
+              return { data: [{ id: 3, action: 'dates', detail: {}, created_at: '2026-10-27T09:12:00Z', teacher: 'teacher' }, { id: 2, action: 'start', detail: {}, created_at: '2026-10-27T08:00:00Z', teacher: 'teacher' }], error: null };
+            return { data: overview, error: null };
           },
         },
         classId: '8a',

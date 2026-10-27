@@ -104,5 +104,8 @@ describe('teacher season control', () => {
     await expect(
       db.query("select public.teacher_set_season_dates($1, date '2026-10-22', date '2026-11-08')", [SEASON]),
     ).rejects.toThrow(/closed/);
+    const log = (await db.query<{ v: any[] }>('select public.teacher_season_changes($1) v', [SEASON])).rows[0].v;
+    const actions = log.map((entry) => entry.action);
+    expect(actions).toEqual(expect.arrayContaining(['start', 'dates', 'end', 'close']));
   });
 });

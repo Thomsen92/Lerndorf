@@ -823,4 +823,6 @@ button.danger {
 .season-table { width: 100%; border-collapse: collapse; }
 .season-table th, .season-table td { padding: 6px 8px; border-bottom: 1px solid #e2dceb; text-align: left; }
 .season-table .num { text-align: right; }
-button.danger { background: #b3261e; color: #fff; }
+button.danger { background: #b3261e; color: #fff; }.season-log { margin-top: 22px; }
+.season-log ul { margin: 8px 0; padding-left: 20px; color: #444; }
+.season-log li { margin: 4px 0; }

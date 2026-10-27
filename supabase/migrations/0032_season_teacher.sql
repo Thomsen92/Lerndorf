@@ -44,6 +44,10 @@ begin
     raise exception 'overlap' using errcode = 'P0001';
   end if;
   update seasons set starts_on = p_starts_on, ends_on = p_ends_on where id = p_season;
+  insert into season_changes (season, teacher_id, action, detail)
+  values (p_season, auth.uid(), 'dates', jsonb_build_object(
+    'from_start', v_season.starts_on, 'from_end', v_season.ends_on,
+    'to_start', p_starts_on, 'to_end', p_ends_on));
   return public.teacher_seasons();
 end $$;
 
@@ -67,6 +71,8 @@ begin
     raise exception 'another season runs' using errcode = 'P0001';
   end if;
   update seasons set starts_on = v_today where id = p_season;
+  insert into season_changes (season, teacher_id, action, detail)
+  values (p_season, auth.uid(), 'start', jsonb_build_object('starts_on', v_today));
   return public.teacher_seasons();
 end $$;
 
@@ -83,6 +89,8 @@ begin
     raise exception 'only running seasons can end' using errcode = 'P0001';
   end if;
   update seasons set ends_on = v_today - 1 where id = p_season;
+  insert into season_changes (season, teacher_id, action, detail)
+  values (p_season, auth.uid(), 'end', jsonb_build_object('ends_on', v_today - 1));
   perform public.close_season(p_season);
   return public.teacher_seasons();
 end $$;
@@ -113,13 +121,28 @@ begin
         order by p.nickname) from profiles p where p.role = 'student' and p.class_id = p_class), '[]'::jsonb));
 end $$;
 
+create or replace function public.teacher_season_changes(p_season text) returns jsonb
+language plpgsql security definer set search_path = public as $$
+begin
+  perform public.require_teacher();
+  return coalesce((
+    select jsonb_agg(jsonb_build_object(
+      'id', c.id, 'action', c.action, 'detail', c.detail, 'created_at', c.created_at,
+      'teacher', coalesce(p.nickname, 'Lehrkraft'))
+      order by c.created_at desc, c.id desc)
+    from season_changes c left join profiles p on p.id = c.teacher_id
+    where c.season = p_season), '[]'::jsonb);
+end $$;
+
 revoke all on function public.teacher_seasons() from public, anon;
 revoke all on function public.teacher_set_season_dates(text, date, date) from public, anon;
 revoke all on function public.teacher_start_season_now(text) from public, anon;
 revoke all on function public.teacher_end_season_now(text) from public, anon;
 revoke all on function public.teacher_season_overview(text, text) from public, anon;
+revoke all on function public.teacher_season_changes(text) from public, anon;
 grant execute on function public.teacher_seasons() to authenticated;
 grant execute on function public.teacher_set_season_dates(text, date, date) to authenticated;
 grant execute on function public.teacher_start_season_now(text) to authenticated;
 grant execute on function public.teacher_end_season_now(text) to authenticated;
 grant execute on function public.teacher_season_overview(text, text) to authenticated;
+grant execute on function public.teacher_season_changes(text) to authenticated;
