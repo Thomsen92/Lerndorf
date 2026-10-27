@@ -62,6 +62,8 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_cabin: { file: 'shop/cabin.glb', kind: 'house' },
   shop_white_house: { file: 'shop/white-house.glb', kind: 'house' },
   shop_family_house: { file: 'shop/family-house.glb', kind: 'house' },
+  shop_low_poly_house: { file: 'shop/low-poly-house.glb', kind: 'house' },
+  shop_neuschwanstein: { file: 'shop/neuschwanstein.glb', kind: 'house', fill: true },
   shop_president_car: { file: 'shop/president-car.glb', kind: 'car' },
   shop_trump: { file: 'shop/trump-statue.glb', kind: 'deco' },
   // Both cars are modelled along X; a quarter turn puts the length on Z like all cars (plan §6.2).

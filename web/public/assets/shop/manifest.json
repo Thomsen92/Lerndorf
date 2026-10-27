@@ -405,6 +405,24 @@
             "triangles": 3665,
             "bytes": 53272,
             "dims": "5,90 × 6,50 × 6,54 m"
+        },
+        {
+            "file": "low-poly-house.glb",
+            "name": "Low Poly House",
+            "kind": "house",
+            "price": 800,
+            "triangles": 1977,
+            "bytes": 164896,
+            "dims": "136,98 × 103,61 × 106,68 Einheiten"
+        },
+        {
+            "file": "neuschwanstein.glb",
+            "name": "Neuschwanstein Castle",
+            "kind": "house",
+            "price": 2500,
+            "triangles": 9426,
+            "bytes": 415136,
+            "dims": "0,54 × 0,46 × 0,33 m"
         }
     ],
     "pending": [
