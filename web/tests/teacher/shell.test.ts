@@ -17,7 +17,7 @@ it('routes pages, preserves class selection, unmounts and isolates board mode', 
   ) as unknown as Record<PageId, () => Promise<TeacherPage>>;
   const shell = mountShell(root, { auth: { signOut: vi.fn() } } as unknown as SupabaseClient, pages);
   await new Promise((r) => setTimeout(r, 0));
-  expect(root.querySelectorAll('.teacher-nav a')).toHaveLength(6);
+  expect(root.querySelectorAll('.teacher-nav a')).toHaveLength(7);
   expect(root.querySelector('[aria-current=page]')?.textContent).toBe('Übersicht');
   expect(root.querySelector('[role=status]')).not.toBeNull();
   (root.querySelector('[data-class="8b"]') as HTMLButtonElement).click();

@@ -87,12 +87,16 @@ describe('season schema and content', () => {
     expect(rows.rows[0].ends_on).toBe('2026-12-06');
   });
 
-  it('rejects a season that does not end on a Sunday', async () => {
+  it('keeps the end after the start (Sunday is enforced by the teacher RPC)', async () => {
     await expect(
       db.query(
-        "insert into public.seasons(id,label,theme,starts_on,ends_on) values('x','x','x','2026-11-01','2026-12-05')",
+        "insert into public.seasons(id,label,theme,starts_on,ends_on) values('x','x','x','2026-12-05','2026-12-04')",
       ),
     ).rejects.toThrow();
+    await db.exec(
+      "insert into public.seasons(id,label,theme,starts_on,ends_on) values('x','x','x','2026-11-01','2026-11-04')",
+    );
+    await db.exec("delete from public.seasons where id = 'x'");
   });
 
   it('has 40 tiers ending at 3000 XP with 300 coins and 8 chests', async () => {

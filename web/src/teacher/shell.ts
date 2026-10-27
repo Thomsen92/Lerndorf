@@ -9,6 +9,7 @@ export const PAGES: Record<PageId, () => Promise<TeacherPage>> = {
   quests: async () => (await import('./pages/quests')).default,
   konten: async () => (await import('./pages/accounts')).default,
   dorf: async () => (await import('./pages/village')).default,
+  saison: async () => (await import('./pages/season')).default,
   tafel: async () => (await import('./pages/board')).default,
 };
 export function mountShell(

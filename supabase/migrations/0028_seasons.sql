@@ -7,7 +7,8 @@ create table public.seasons (
   label text not null,                          -- 'Season I – Halloween'
   theme text not null,                          -- 'halloween'
   starts_on date not null,
-  ends_on date not null check (extract(isodow from ends_on) = 7 and ends_on > starts_on),
+  -- Sunday is the normal end (enforced by teacher_set_season_dates); "Jetzt beenden" may end earlier.
+  ends_on date not null check (ends_on > starts_on),
   closed_at timestamptz
 );
 

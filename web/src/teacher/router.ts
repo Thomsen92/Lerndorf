@@ -1,5 +1,5 @@
 export type ClassId = '8a' | '8b';
-export type PageId = 'uebersicht' | 'schueler' | 'muenzen' | 'quests' | 'konten' | 'dorf' | 'tafel';
+export type PageId = 'uebersicht' | 'schueler' | 'muenzen' | 'quests' | 'konten' | 'dorf' | 'saison' | 'tafel';
 export interface Route {
   classId: ClassId;
   page: PageId;
@@ -13,6 +13,7 @@ export const PAGE_LABELS: Record<PageId, string> = {
   quests: 'Daily Quests',
   konten: 'Konten',
   dorf: 'Dorf & Regeln',
+  saison: 'Saison',
   tafel: 'Tafelmodus',
 };
 export function parseRoute(hash: string): Route {
