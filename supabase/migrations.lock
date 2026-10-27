@@ -25,5 +25,11 @@
   "0024_four_daily_quests.sql": "49becf4add0aac80ce5488d3f43a2dd0d2248d9cc2ccd0afc17602f8c0dd8e34",
   "0025_economy_balance.sql": "3e7f10dca4c0160d39e4032ae83688763e536105900348649c39df2e72295501",
   "0026_shared_avatar_accessories.sql": "47737b89b4181f7a9fcde5cb01cb385af7bf4c206e216b92ba867556fdc277ec",
-  "0027_public_visitor_profiles.sql": "4a764844c53be523de67bcdeaf025347120ee0117605589f7d472c12b0114943"
+  "0027_public_visitor_profiles.sql": "4a764844c53be523de67bcdeaf025347120ee0117605589f7d472c12b0114943",
+  "0028_seasons.sql": "997caabacd5b0abba04d6c56417e18787cb80ad8d25f83a91e58dca162fd8887",
+  "0029_season_rpc.sql": "52bf431e943676d115bc83b94b8d778e96146cb551b03f11fcff0a7ae62e3187",
+  "0030_season_content.sql": "4aa3b4894a65d8e0cd49e4123d8fa3c01678c42b6fc216f4c8dc611604cffa01",
+  "0031_season_shop.sql": "6ef52aae5e88214ecff456df58b7b266b9878702199155472e9dff73e65bf399",
+  "0032_season_teacher.sql": "4f2845fee96e91aee91a218df66c05dfb62d2bf4ed7bc7acfe8781354477e84a",
+  "0033_season_rewards.sql": "14b3cb3e336f9f658670147a4dae85d8f44c25eef70a91988f825a8bc1ed9218"
 }
