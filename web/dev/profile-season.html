@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile season card – UI harness (U5)</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #120d18; color: #f6e9d2;
+        font: 16px system-ui, sans-serif; }
+      .panel { box-sizing: border-box; width: min(560px, 94vw); margin: 40px auto; padding: 18px; border-radius: 18px;
+        background: #1b1322; border: 1px solid #3d2c52; }
+      h2 { margin: 0 0 14px; font-size: 22px; }
+      .profile-progress { margin-bottom: 12px; color: #b6a5c6; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <h2>My profile</h2>
+      <p class="profile-progress">48 XP to level 13</p>
+      <div id="host"></div>
+    </div>
+    <script type="module">
+      import '../src/style.css';
+      import { setLocale } from '../src/i18n.ts';
+      import { createSeasonCard } from '../src/ui/seasonCard.ts';
+      import { mockSeason } from './seasonMock.ts';
+      setLocale(new URLSearchParams(location.search).get('lang') === 'de' ? 'de' : 'en');
+      const season = mockSeason();
+      document.getElementById('host').append(createSeasonCard({ api: season.api, onOpen: () => {} }));
+      window.__ready = true;
+    </script>
+  </body>
+</html>

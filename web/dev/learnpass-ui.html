@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LearnPass – UI harness</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #0f0a17; color: #f6e9d2; font: 16px system-ui, sans-serif; }
+      #open { position: fixed; left: 16px; bottom: 16px; z-index: 1; padding: 10px 16px; border-radius: 10px;
+        border: 0; background: #ff8f2b; color: #2b1408; font-weight: 800; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <button id="open" type="button">Open LearnPass</button>
+    <script type="module">
+      // The game page styles load the local Comic Neue font, like in the village.
+      import '../src/style.css';
+      import { openLearnPass } from '../src/ui/learnpass/openLearnPass.ts';
+      import { setLocale } from '../src/i18n.ts';
+      import { mockSeason } from './seasonMock.ts';
+      const params = new URLSearchParams(location.search);
+      setLocale(params.get('lang') === 'de' ? 'de' : 'en');
+      const season = mockSeason({ tier: Number(params.get('tier') ?? 12) });
+      let overlay = null;
+      function open() {
+        overlay?.close();
+        overlay = openLearnPass({
+          api: season.api,
+          getCoins: season.coins,
+          onCoins: season.setCoins,
+          reducedMotion: params.has('still'),
+          onOpenInventory: () => {},
+        });
+      }
+      document.getElementById('open').addEventListener('click', open);
+      open();
+      window.__ready = true;
+    </script>
+  </body>
+</html>

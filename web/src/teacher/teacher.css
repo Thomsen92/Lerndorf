@@ -806,3 +806,23 @@ button.danger {
     flex: 1 1 180px;
   }
 }
+
+/* Season control (L1) */
+.season-control { display: grid; gap: 12px; margin-bottom: 22px; }
+.season-card { border: 1px solid var(--line, #3d2c52); border-radius: 12px; padding: 12px 14px; background: #fff; }
+.season-card header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.season-state { padding: 2px 8px; border-radius: 999px; background: #eee; font-size: 12px; font-weight: 700; }
+.season-card.running .season-state { background: #ffe3b0; }
+.season-card.closed .season-state { background: #d9f2d0; }
+.season-card p { margin: 6px 0; color: #555; font-size: 14px; }
+.season-note { color: #6b5a3a; font-size: 13px; }
+.season-actions { display: flex; gap: 8px; margin: 8px 0; }
+.season-dates { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; margin-top: 8px; }
+.season-dates label { display: grid; gap: 4px; font-size: 13px; }
+.season-dates input { padding: 6px 8px; border: 1px solid #bbb; border-radius: 6px; }
+.season-table { width: 100%; border-collapse: collapse; }
+.season-table th, .season-table td { padding: 6px 8px; border-bottom: 1px solid #e2dceb; text-align: left; }
+.season-table .num { text-align: right; }
+button.danger { background: #b3261e; color: #fff; }.season-log { margin-top: 22px; }
+.season-log ul { margin: 8px 0; padding-left: 20px; color: #444; }
+.season-log li { margin: 4px 0; }

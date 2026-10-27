@@ -1,0 +1,174 @@
+/* "What's inside?" (plan §14.4) and the tier-40 pick (§14.5) share the overlay and the grid. */
+.inside-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 75;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: #05030acc;
+}
+.inside-dialog {
+  width: min(860px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  padding: 22px 24px;
+  border-radius: 22px;
+  border: 1px solid #3d2c52;
+  background: linear-gradient(180deg, #23173a, #140d1f);
+  color: #f6e9d2;
+  box-shadow: 0 30px 80px #000;
+}
+.inside-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.inside-head h2 {
+  flex: 1;
+  margin: 0;
+  font: 700 28px 'Comic Neue', 'Comic Sans MS', cursive;
+}
+.inside-close {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid #3d2c52;
+  background: #120b1ccc;
+  color: #f6e9d2;
+  font-size: 22px;
+  cursor: pointer;
+}
+.inside-close:focus-visible,
+.inside-dialog button:focus-visible {
+  outline: 3px solid #ffd16d;
+  outline-offset: 3px;
+}
+.inside-intro {
+  margin: 6px 0 16px;
+  color: #b6a5c6;
+}
+.inside-band {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 14px 0;
+  border-top: 1px solid #ffffff14;
+}
+.inside-pct {
+  font: 700 34px/1 'Comic Neue', 'Comic Sans MS', cursive;
+  color: var(--r);
+}
+.inside-pct small {
+  display: block;
+  margin-top: 4px;
+  font: 700 14px system-ui, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.inside-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  gap: 8px;
+}
+.inside-items figure {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.2;
+  color: #b6a5c6;
+  overflow-wrap: anywhere;
+}
+.inside-box {
+  aspect-ratio: 1;
+  margin-bottom: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  border: 2px solid color-mix(in srgb, var(--r) 70%, #000);
+  background: #0f0a17;
+}
+.inside-box .lp-pic,
+.pick-grid .lp-pic {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+.inside-box img,
+.pick-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* tier-40 pick */
+.pick-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+.pick-grid button {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 4px;
+  border-radius: 12px;
+  border: 2px solid color-mix(in srgb, var(--r) 75%, #000);
+  background: #0f0a17;
+  cursor: pointer;
+}
+.pick-grid button.owned::after {
+  content: attr(data-owned);
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: #000b;
+  color: #f6e9d2;
+  font-size: 11px;
+}
+.pick-grid button[aria-pressed='true'] {
+  border-color: #f6e9d2;
+  box-shadow: 0 0 0 3px #ff8f2b;
+}
+.pick-note {
+  min-height: 1.4em;
+  margin: 12px 0;
+  color: #b6a5c6;
+  font-size: 14px;
+}
+.pick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.pick-confirm {
+  min-height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 12px;
+  background: #ff8f2b;
+  color: #120912;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pick-confirm:disabled {
+  background: #2d2040;
+  color: #b6a5c6;
+  cursor: default;
+}
+.pick-confirm.alt {
+  border: 1px solid #3d2c52;
+  background: #2d2040;
+  color: #f6e9d2;
+}
+
+@media (max-width: 860px) {
+  .inside-band {
+    grid-template-columns: 1fr;
+  }
+  .pick-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

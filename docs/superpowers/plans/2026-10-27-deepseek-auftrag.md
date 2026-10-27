@@ -26,7 +26,7 @@ git checkout -b feature/season-learnpass
 
 ## 2. Reihenfolge
 
-**S1 → S2 → S4 → A1 → A3 → U1 → U2 → U3 → U4a → U5 → U6 → U7 → S3 → U4b → A2 → L1 → D1 → T1** (Inhalte je Paket: Plan §8).
+**S1 → S2 → S4 → A1 → A3 → U1 → U2 → U3 → U4a → U5 → ~~U6~~ (gestrichen 27.10., Markt und Welt baut ChatGPT) → U7 → S3 → U4b → A2 → L1 → D1 → T1** (Inhalte je Paket: Plan §8).
 
 ## 3. Fertig ist ein Paket erst, wenn
 

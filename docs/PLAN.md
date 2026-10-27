@@ -471,3 +471,30 @@ Grundlage sind die gelesenen Implementationen unter `Prototyp/StandardBoyShop/` 
 | A8 | [ ] | End-to-End-, WebGL-, Galerie- und Leistungsprüfung; Dokumentation |
 
 Ausführung auf Wunsch weiterhin sequenziell durch einen Agenten. Technische Schranke vor der sichtbaren Umstellung: Beide modularen Shop-Bases sind animationslos; bisherige Clips müssen erhalten bleiben. Die Boy-Integrationsnotizen beziehen sich teilweise auf den inzwischen ersetzten Jungen. Die Animationen sind übernommen; optimierte Texturen, Detailwechsel und eine Rock-Passformkorrektur sind umgesetzt. A8-Softwareprüfungen und Bildkontrolle sind lokal erfolgt (871 Tests, Build und ESLint erfolgreich; neun Kleiderschrank-Browserprüfungen bestanden); Hardware-Abnahme auf dem Schul-Tablet und spätere Veröffentlichung bleiben offen. Details: [Umsetzungsstand](AVATAR_KLEIDERSCHRANK.md).
+
+## Season I (LearnPass) – Umsetzung ab 27.10.2026
+
+Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md), Auftrag: [DeepSeek](superpowers/plans/2026-10-27-deepseek-auftrag.md).
+
+| Paket | Status | Notiz |
+| --- | --- | --- |
+| S1 | [x] | 0028 Schema, 0030 Inhalte (Saison, 28 Pool-Items, 12 Szenen, 40 Stufen, Titel/Rahmen, Serien-Nachberechnung); Schema-Tests |
+| S2 | [x] | RPCs 0029 (state, claim, choose, buy, open, sell, close) + Serien-Trigger; Smoke-Tests |
+| S4 | [x] | 22 SQL-Tests: Schema, Zustände, Claims, Verkauf, Stufe-40-Wahl, Serie, Shop-Fenster, Chancen; `set_title`/`set_frame` folgt mit L1/U7 |
+| A1 | [x] | Meshopt im Loader, async GLB-Zweig mit Platzhalter, Normalisierung auf `MAX_SIZE` (Deko min. 0,8 m), `THREE.LOD` mit Fernversionen (34 Dateien); Galerie-Screenshot `web/dev/season.html`; 8 Fernversionen bleiben topologiebedingt über 2.000 Dreiecke |
+| A3 | [x] | 12 Kenney-Pass-Szenen aus 32 kopierten Modellen (`passScenes.ts`), Lizenzzeile, Asset-Vertrag-Test, Galerie-Screenshot |
+| U1 | [x] | LearnPass-Seite nach §14: Kopf, Stand-Leiste, 40 Karten mit Belohnungsbildern, DU-Marke, Schienen-Punkte, vier Kacheln; API-Client, i18n, Vitest, Screenshots 1180×820 und 390×844 |
+| U2 | [x] | Season-Truhen im Inventar: Abschnitt mit Zähler, Öffnen über `open_season_chest`, Ergebnis-Karte mit Seltenheitsfarbe, Duplikat-Hinweis und Münzgutschrift; Vitest + Screenshots |
+| U3 | [x] | „What's inside?“: Chancen 55/30/12/3 als Balken, alle 28 Gegenstände mit Seltenheit und Verkaufswert, Duplikat-Hinweis; Escape/Backdrop, Vitest + Screenshots |
+| U4a | [x] | Season-Truhe im Shop: 50 Münzen, zwei pro Woche, Reststand, Erfolgsmeldung und Fehlerfälle (Limit, Guthaben, Saison vorbei); Vitest + Screenshots |
+| U5 | [x] | Profilkarte „Season I – Halloween“ mit Stufe, Restzeit und Truhen-Badge; öffnet den LearnPass über `openLearnPass` (echte API, Claims, Shop-Truhe, Inventar-Link); Badge am Inventar-Button im Haus-Menü; Vitest + Screenshot |
+| U6 | – | **Gestrichen 27.10.2026 (Lehrkraft):** Markt und Welt gehören nicht zu diesem Plan, den Halloween-Marktplatz baut ChatGPT getrennt. Kürbisbude, Willkommensbanner, Blutmond und Saison-Stimmung (`plaza.ts`, `scene.ts`, `seasonWindow.ts`, `dev/season-market.html`) sind zurückgenommen; `plaza.ts` und `scene.ts` entsprechen wieder `main`. |
+| U7 | [x] | i18n/A11y: deutsche Quelltexte + englische Übersetzungen für alle neuen Flächen (Truhen, Shop, Profilkarte, Innenansicht, Banner), deutsche Gegenstandsnamen, Seltenheiten zur Laufzeit übersetzt, `aria-live` an der Stand-Leiste; i18n-Tests |
+| S3 | [x] | Migration 0031: sechs Nicht-Season-Artikel (Blockhütte 500, Beatall 600, Toyoyo 700, Präsidentenwagen 2.000, Trump-Statue 2.000, Weißes Haus 5.000), `shop_visible`, `model = 'shop/…'`, Kauf über `buy_item`; SQL-Tests |
+| U4b | [x] | Shop zeigt die sechs Nicht-Season-Artikel mit 3D-Vorschaubildern: `itemThumbs` wartet für GLB-Items auf das geladene Modell; Screenshot `shop-u4b.png` (Häuser), Preis/Kauf über `buy_item` unverändert |
+| A2 | [x] | Asset-Reste: Vertragstest über alle `items.model` (Datei existiert, echtes glTF, Fernversion vorhanden), Ausschluss der bekannten Problem-Assets (Tristar, Landyroamer, DeLorean, DAE-Häuser, `the_halloween_cat`), Lizenzzeile ergänzt |
+| L1 | [x] | Migration 0032: `teacher_seasons`, `teacher_set_season_dates`, `teacher_start_season_now`, `teacher_end_season_now`, `teacher_season_overview`; Reiter „Saison“ mit Datumsformular, Start/Beenden/Abschließen und Klassenübersicht; SQL-Tests + Screenshot. Sonntagsregel nur noch in der RPC (frühes Beenden erlaubt) |
+| D1 | [x] | Doku: SPEC §13/§13.1 (RPCs, Regeln, Reiter), Anleitung für die Lehrkraft (LearnPass, Truhen, Saison steuern, Fehlermeldungen), Design-README mit Dateizuordnung |
+| T1 | [x] | Abnahme: 1004 Tests + Build grün, Galerie (37 Bilder) und alle Screenshots angesehen; Nachbesserungen 0033 (Besitz von Season-Titeln/-Rahmen), Sammlungslabels, Verkaufen im Inventar, Änderungsprotokoll; Abschlussbericht `docs/superpowers/reviews/deepseek-bericht.md` |
+| R1 | [x] | **Korrekturrunde nach Review (Claude, 27.10.2026)** – [Review](superpowers/reviews/2026-10-27-claude-review-season.md) §9. SQL: aktuelle statt neueste Saison (`season_current`), Shop-Kauf sperrt vor dem Zählen, Stufe-40-Wahl über alle Saisons, „Jetzt beenden“ am Starttag, Münz-Referenzen mit Saison, eine Uhr `season_today()` (Tests unabhängig vom Datum), 10.000-Würfe-Test. 3D: eigene Klone je Grundstück/Vorschaubild, nie größer als modelliert, Autos gedreht, Katzen gedeckelt, Fernversion erst nach dem Hauptmodell. Oberfläche nach §14: Karten-Bilder in 3D, Schiene unter jeder Karte, Silhouette/Nebel, Kaufen mit Rückfrage, „What's inside?“ aus der Datenbank mit Bildern, Stufe-40-Wahl, Truhe öffnen mit Strahlenkranz, Profilkarte, vier Season-Rahmen, englische Namen für 46 Items, Lehrer-Reiter mit Rückfragen und deutschen Meldungen. 1019 Tests, Lint, Build grün; Galerie unverändert (Welt-Draw-Calls gleich) |
+| R2 | [x] | Abnahme der Korrekturrunde durch die Lehrkraft am 27.10.2026 („passt“) anhand der Screenshots in `designs/learnpass/korrektur/`. Offen bis zum Live-Gang: Durchlauf in der Test-Umgebung mit echter Datenbank und Modellgrößen auf dem Grundstück |

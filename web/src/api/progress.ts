@@ -43,6 +43,9 @@ export interface Reward {
   kind: 'title' | 'frame';
   level: number;
   label: string;
+  /** Season rewards are owned through the pass, not through a level. */
+  season?: string | null;
+  owned?: boolean;
 }
 export interface ProgressApi {
   load(): Promise<Outcome<Progress>>;
@@ -176,10 +179,19 @@ export function supabaseProgressApi(supabase: SupabaseClient): ProgressApi {
         catalogue ??= (async () => {
           const { data, error } = await supabase
             .from('level_rewards')
-            .select('id, kind, level, label')
+            .select('id, kind, level, label, season')
             .order('sort');
           if (error) throw error;
-          return ((data ?? []) as Reward[]).map((reward) => ({ ...reward, label: tr(reward.label) }));
+          const { data: owned, error: ownedError } = await supabase
+            .from('player_rewards')
+            .select('reward_id');
+          if (ownedError) throw ownedError;
+          const ownedIds = new Set((owned ?? []).map((r) => r.reward_id as string));
+          return ((data ?? []) as Reward[]).map((reward) => ({
+            ...reward,
+            label: tr(reward.label),
+            owned: ownedIds.has(reward.id),
+          }));
         })().catch((error) => {
           catalogue = null;
           throw error;

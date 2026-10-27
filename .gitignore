@@ -49,3 +49,4 @@ web/.tmp-build/
 # Approved reference prototype and its asset copies stay local.
 # Already tracked files in Prototyp/ remain tracked.
 /Prototyp/
+.tmp-build/

@@ -21,7 +21,7 @@ Eine **6-wöchige Saison** (Season I – Halloween) mit einem kostenlosen **Lear
 
 | # | Frage | Entscheidung | Quelle |
 |---|---|---|---|
-| E1 | Einstieg | **Profilkarte + Season-Stand am Markt**, mit Willkommensnachricht und düsterer Stimmung (nur während der Saison) | bestätigt 27.10. |
+| E1 | Einstieg | **Profilkarte** (Knopf „LearnPass“). **Kein** Season-Stand, keine Willkommensnachricht und keine Halloween-Stimmung im Dorf oder am Markt: Das baut ChatGPT getrennt (`2026-10-27-chatgpt-marktplatz-auftrag.md`). | bestätigt 27.10.; Markt und Welt herausgenommen 27.10. (Lehrkraft) |
 | E2 | Saisonfenster | **Mi 28.10.2026 – So 06.12.2026** (40 Tage, knapp 6 Wochen), als **Berlin-Datum** (`starts_on`/`ends_on`). Ende immer an einem Sonntag, damit die Shop-Woche (ab Montag) aufgeht. Eine Tabellenzeile, verschiebbar. | Beginn: Lehrkraft 27.10.; Ende entschieden 27.10. |
 | E24 | Start vor Fertigstellung | Die Saison beginnt, bevor der LearnPass live ist. **XP zählen rückwirkend** ab 28.10. (Summe aus `xp_ledger`). Die **Truhen-Serie wird beim Einspielen aus `daily_quest_results` nachberechnet**. Shop-Truhen vergangener Wochen verfallen. | entschieden 27.10. |
 | E25 | Saison-Steuerung | Die Lehrkraft **startet, verschiebt und beendet** Saisons selbst im Lehrerbereich (Paket L1, §3.6). Neue Saison-**Inhalte** (Gegenstände, Stufen) bereitet weiterhin ein Entwickler als Migration vor; sie stehen dann als „geplant“ bereit. | Lehrkraft 27.10. |
@@ -239,7 +239,7 @@ XP sind kumulativ. ★ = Meilenstein (Truhe + 25 Münzen).
 
 ### 5.1 Einstieg
 - **Profil:** Karte „Season I · Halloween“ mit Stufe, Restzeit (vor einem Saisonstart: „startet am …“), Knopf „LearnPass“.
-- **Markt:** Saison-Stand (Kürbisbude) neben der Tafel, Willkommensnachricht „Season I – Halloween“, düstere Stimmung (Blutmond, Nebel, Lampions) **nur während der Saison**. Antippen öffnet den Pass. Vergleich mit `web/dev/marktplatz.html` und der Galerie (LOOK.md bleibt außerhalb der Saison maßgeblich).
+- **Markt und Welt:** **nicht Teil dieses Plans** (Lehrkraft 27.10.). Kein Saison-Stand, kein Banner, keine Änderung an Himmel, Nebel, Licht oder `plaza.ts`/`scene.ts`. Der Halloween-Marktplatz entsteht getrennt bei ChatGPT; eine spätere Anbindung an den LearnPass ist ein eigener Auftrag.
 - **News-Glocke:** unverändert.
 
 ### 5.2 LearnPass-Seite
@@ -343,7 +343,7 @@ Tristar Racer, Landyroamer, DeLorean (Achsen/Größe), DAE-Häuser (Blender 5.2 
 | U3 | What's inside? | Chancen-Fenster nach §14.4 | 0,5 Tag | U1 |
 | U4a | Shop: Season-Truhe | Kauf, Wochenzähler | 0,5 Tag | S2 |
 | U5 | Profilkarte/Einstieg | Karte, Verlinkung | 0,5 Tag | U1 |
-| U6 | Markt-Stand | 3D-Bude, Willkommen, Stimmung, Tap | 1,5 Tage | U1 |
+| ~~U6~~ | ~~Markt-Stand~~ | **gestrichen 27.10.** – Markt und Welt baut ChatGPT getrennt; der Code dazu ist zurückgenommen | – | – |
 | U7 | i18n/A11y | Texte, aria, reduzierte Bewegung | 0,5 Tag | U1–U4a |
 | S3 | Shop-Daten | 0031 | 0,5 Tag | S1, A1 |
 | U4b | Shop: Nicht-Season-Artikel | Anzeige, Kauf, Platzierung | 0,5 Tag | S3 |
@@ -352,7 +352,7 @@ Tristar Racer, Landyroamer, DeLorean (Achsen/Größe), DAE-Häuser (Blender 5.2 
 | D1 | Doku + Lehrerbereich | PLAN, SPEC, Design, Anleitung für die Lehrkraft (Saison starten/verschieben/beenden) | 0,5 Tag | S2, L1 |
 | T1 | Abnahme | Playwright + Galerie + Tablet-Test | 1 Tag | alle |
 
-**Reihenfolge (Auftrag 27.10.):** S1 → S2 → S4 → A1 → **A3** → U1 → U2 → U3 → **U4a** → U5 → U6 → U7 → S3 → **U4b** → A2 → **L1** → D1 → T1.
+**Reihenfolge (Auftrag 27.10.):** S1 → S2 → S4 → A1 → **A3** → U1 → U2 → U3 → **U4a** → U5 → ~~U6~~ → U7 → S3 → **U4b** → A2 → **L1** → D1 → T1.
 A3 ist eingeschoben, weil die Pass-Szenen ab U1 sichtbar sein müssen; U4 ist geteilt, weil die Nicht-Season-Artikel von S3 abhängen; L1 (Saison-Steuerung, Auftrag 27.10.) steht vor D1, damit die Anleitung sie beschreibt.
 
 ---
@@ -451,7 +451,7 @@ A3 ist eingeschoben, weil die Pass-Szenen ab U1 sichtbar sein müssen; U4 ist ge
 
 ### 12.5 Marktplatz
 
-Der Prototyp `web/dev/marktplatz.html` zeigt die Richtung (Blutmond, Nebel, Lampions, Kürbisse, Gräber, Zombies, Horror-Haus, Warlock). Umsetzung in U6: Saison-Stand neben der Tafel, Willkommensnachricht, Stimmung nur im Saisonfenster; Galerie-Vergleich.
+**Nicht Teil dieses Plans** (Lehrkraft 27.10.). Der Halloween-Marktplatz (Blutmond, Nebel, Lampions, Season-Stand) entsteht getrennt bei ChatGPT, siehe `2026-10-27-chatgpt-marktplatz-auftrag.md`. Dieser Plan ändert weder `plaza.ts` noch `scene.ts` noch andere Welt-Dateien.
 
 ### 12.6 Definition of Done je Paket
 
@@ -489,6 +489,7 @@ Kein Tauschen (v1), keine Rangliste, keine Echtgeld-Truhen, keine Pechhilfe, kei
 | 20 | Offene Design-Fragen §12 | 5 offen | 1: A + B · 2: 28.10.–06.12. · 3: Horror-Haus als Haus · 4: exklusiv · 5: 55/30/12/3 |
 | 21 | Saisonbeginn | Montag 02.11. (Standard) | Mittwoch 28.10. (Lehrkraft); Ende So 06.12.; XP rückwirkend, Serie nachberechnet (E2, E24) |
 | 22 | Saison starten | nur über das Datum in einer Migration | Lehrkraft startet, verschiebt und beendet im Lehrerbereich (E25, L1, §3.6); Inhalte weiter per Migration |
+| 23 | Markt und Welt | Season-Stand am Markt, düstere Stimmung im Saisonfenster (E1, U6) | **gestrichen** (Lehrkraft 27.10.): ChatGPT baut den Halloween-Marktplatz getrennt; Einstieg nur über die Profilkarte; Code aus U6 zurückgenommen |
 
 ---
 
@@ -539,7 +540,7 @@ Vollbild-Overlay wie das Profil (pausiert das Dorf). Von oben nach unten:
 
 Alle 3D-Bilder über **einen** Vorschau-Renderer (`render/itemThumbs.ts`, Meshopt), zwischengespeichert; ohne WebGL bleibt die Karte mit Platzhalter lesbar.
 
-### 14.3 Stimmung (nur während der Saison)
+### 14.3 Stimmung der LearnPass-Seite (nur Oberfläche, nicht das Dorf)
 
 | Was | Wert |
 |---|---|
@@ -558,7 +559,7 @@ Modal (`role="dialog"`, Fokus auf Schließen, Esc schließt, Tipp neben das Fens
 - **Profilkarte** (im Profil über den Truhen): Blutmond-Ecke, „SEASON I · HALLOWEEN“, Chip „Tier 12“, Balken, „26 days left · 1 chest waiting“, Knopf **Open LearnPass**.
 - **Truhe öffnen** (Inventar): bestehende Truhe wackelt → Strahlenkranz und Rand in Seltenheitsfarbe → Bild 160 px, Abzeichen „RARE“, Name, Zeile „New! It's in your inventory now.“ / „Duplicate – sell for 40 coins“ / „Already owned – 100 coins“, Knopf **Next**. Ergebnis mit `role="status"`.
 - **Stufe-40-Wahl:** Raster aller 28 Truhen-Gegenstände (Tablet 6 Spalten, Handy 4), Rand in Seltenheitsfarbe, Abzeichen „owned“, Auswahl mit hellem Rand + orangem Hof; darunter „You already own the pumpkin patch. Picking it gives you 100 coins.“ und **Pick this item** mit Rückfrage.
-- **Markt-Stand (U6)** und Profilkarte öffnen den LearnPass; der LearnPass verlinkt ins Inventar und öffnet „What's inside?“.
+- Die **Profilkarte** öffnet den LearnPass; der LearnPass verlinkt ins Inventar und öffnet „What's inside?“.
 
 ### 14.6 Feste Werte
 

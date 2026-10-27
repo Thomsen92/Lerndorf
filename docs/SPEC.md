@@ -516,7 +516,7 @@ Datenschnittstelle ab Teil 1: Tageslisten enthalten drei oder vier Quests; `data
 
 ## 13. Lehrer-Bereich (`/lehrer/`)
 
-Sechs Arbeitsseiten mit Klassenwahl 8a/8b, Abmelden und Adressen wie `#8a/muenzen`. Die Navigation klappt unter 1 024 px hinter „Menü“. Details: [Lehrerbereich, Fassung 2](superpowers/specs/2026-10-21-teacher-ui-design.md).
+Sieben Arbeitsseiten mit Klassenwahl 8a/8b, Abmelden und Adressen wie `#8a/muenzen`. Die Navigation klappt unter 1 024 px hinter „Menü“. Details: [Lehrerbereich, Fassung 2](superpowers/specs/2026-10-21-teacher-ui-design.md).
 
 | Seite | Inhalt |
 | --- | --- |
@@ -526,6 +526,7 @@ Sechs Arbeitsseiten mit Klassenwahl 8a/8b, Abmelden und Adressen wie `#8a/muenze
 | Daily Quests | Vorhandene Abdeckung, Importfehler und Vorschau der nächsten 7 Tage mit Lösungen; keine alte Aufgaben-Statistik |
 | Konten | Einzeln/Liste anlegen, Passwort zurücksetzen, geschütztes Löschen; Zugangskärtchen mit lokal erzeugten QR-Codes, nur für in dieser Sitzung angelegte/zurückgesetzte Zugänge |
 | Dorf & Regeln | Shop/Bauen, Vorlage und Seed mit Bestätigung, Spielregeln und verkaufte Gegenstände |
+| Saison | Saisons mit Zustand, Start/Ende ändern (Ende Sonntag), „Jetzt starten“, „Jetzt beenden“ mit automatischer Gutschrift, „Saison abschließen“, Klassenübersicht mit XP/Stufe/Truhen/Serie |
 | Tafelmodus | Nur aggregierte Klassenwerte und Nachricht, jede Minute aktualisiert, Vollbild/Zurück; keine Spitznamen, individuellen Münzstände, XP oder Inaktivität |
 
 Nachrichten stehen als Text auf einem Zettel an der Tafel und einmal als Karte im Dorf. Beim normalen Login kommt die Karte vor der Fortschritts-Willkommenskarte, während des Tutorials erst nach dessen Ende. Gesehen-Merker vertragen gesperrten lokalen Speicher. QR-Zugänge stehen nur im URL-Fragment; dieses wird sofort aus Adresse/Verlauf entfernt. Anmeldung erfolgt ausschließlich über die normale Authentifizierung, ohne externen QR-Dienst.
@@ -545,6 +546,28 @@ Nachrichten stehen als Text auf einem Zettel an der Tafel und einmal als Karte i
 | `teacher_pupil_quests(player_id)` | Heute/gestern mit gelöst/Versuche, ohne Lösung oder Tipp |
 
 Zukünftige Quest-Versuche erhalten einen Zeitstempel, auch wenn sie falsch sind. Alte ungelöste Versuche ohne Zeitstempel werden bei der Migration nicht als neue Aktivität ausgegeben. Alle Änderungen an Münzen bleiben serverseitig; Rückgängig ist eine Gegenbuchung mit ursprünglicher Notiz und kann bei inzwischen ausgegebenen Münzen vollständig scheitern.
+
+### 13.1 Season I – LearnPass (Migrationen 0028–0032)
+
+Eine Saison läuft in einem festen Fenster (Europe/Berlin); Season I: **28.10.–06.12.2026**. Schüler öffnen den LearnPass über die Profilkarte. Markt und Welt bleiben unverändert (LOOK §3); der Halloween-Marktplatz ist ein getrennter Auftrag (Lehrkraft 27.10.2026).
+
+- **XP und Stufen:** Summe `xp_ledger.delta` im Fenster; 40 Stufen bis 3.000 XP (30/60/90/120 XP je Zehnerblock).
+- **Belohnungen:** 5 Münzen auf Stufe 1–20 und 25 Münzen je Meilenstein; Pass-Truhen auf 5, 10, …, 40; 12 Garten-Szenen auf den Deko-Stufen; 4 Titel und 4 Rahmen; Stufe 40 mit Truhe, Titel, 25 Münzen und freier Wahl aus dem Truhen-Pool.
+- **Truhen:** Chancen 55/30/12/3 % innerhalb der Seltenheit gleich verteilt. Duplikate bleiben als Menge im Inventar und sind für 15/40/100/250 Münzen verkaufbar, aber nur unplatzierte Season-Gegenstände. Haus, Garage und Auto zahlen beim zweiten Treffer den Verkaufswert.
+- **Serie:** eigener Kalenderzähler; jeder dritte Tag in Folge mit mindestens einer gelösten Quest gibt eine Truhe. Die Schultags-Serie bleibt unverändert. Shop-Truhe: 50 Münzen, zwei pro Berliner Woche.
+- **Saisonende:** erreichte, nicht abgeholte Stufen werden automatisch gutgeschrieben (beim nächsten Aufruf und über „Jetzt beenden“); ungeöffnete Truhen und die Stufe-40-Wahl bleiben danach möglich.
+
+**Lehrer-RPCs (0032, nur Lehrkräfte, Zeilensperre):**
+
+| RPC | Zweck |
+| --- | --- |
+| `teacher_seasons()` | alle Saisons mit Zustand (`planned`/`running`/`ended`/`closed`), Tagen, Stufen, Gegenständen |
+| `teacher_set_season_dates(season, start, ende)` | Daten ändern; Ende Sonntag, nach Start, ohne Überschneidung, nicht vor heute solange laufend, nicht nach `closed_at` |
+| `teacher_start_season_now(season)` | geplante Saison beginnt heute; keine zweite laufende Saison |
+| `teacher_end_season_now(season)` | Ende auf gestern, danach `close_season` mit Gutschrift |
+| `teacher_season_overview(class, season)` | XP, Stufe, abgeholte Stufen, Truhen und Serie je Schüler |
+
+Datumsänderungen wirken sofort: Abgeholte Stufen bleiben, XP vor dem neuen Start zählen nicht mehr. Die Sonntagsregel prüft nur `teacher_set_season_dates`; „Jetzt beenden“ darf früher enden. Details für die Lehrkraft: [Anleitung für die Lehrkraft](ANLEITUNG_LEHRKRAFT.md#season-i--halloween-learnpass).
 
 ## 14. Wirtschaft (Standardwerte; je Instanz in `classes` änderbar, Preise in `items`)
 

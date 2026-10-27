@@ -13,6 +13,30 @@ import {
   PREVIEW_STILL_YAW,
 } from './itemPreview';
 import { plotAsset, tintFor } from './plotAssets';
+import { isGlbItem, loadGlbItem } from './glbItems';
+import { PASS_SCENES, loadPassScene } from './passScenes';
+import { createChestModel } from './chestPreview';
+
+/** Pseudo item id for the purple season chest picture (LearnPass, inventory, reveal). */
+export const SEASON_CHEST_THUMB = 'season_chest';
+
+/** The big 3D chest with season-purple wood (plan §14.2). */
+export function seasonChestModel(): THREE.Group {
+  const chest = createChestModel('big').root;
+  chest.traverse((o) => {
+    const mat = (o as THREE.Mesh).material as THREE.MeshStandardMaterial | undefined;
+    if (mat?.color?.getHexString() === '536491') mat.color.set('#5b2c6f');
+  });
+  return chest;
+}
+
+/** Models that arrive asynchronously; everything else is built synchronously by plotAsset. */
+async function modelFor(kind: SlotKind, itemId: string): Promise<{ model: THREE.Object3D; shared: boolean }> {
+  if (itemId === SEASON_CHEST_THUMB) return { model: seasonChestModel(), shared: false };
+  if (isGlbItem(itemId)) return { model: await loadGlbItem(itemId), shared: true };
+  if (itemId in PASS_SCENES) return { model: await loadPassScene(itemId), shared: true };
+  return { model: plotAsset(kind, itemId, tintFor(0)), shared: false };
+}
 
 /** Data URL (PNG) of the item, or null for items without a model (avatar) or on failure. */
 export type ThumbItem = Pick<ItemEntry, 'id' | 'kind' | 'fits'>;
@@ -64,7 +88,7 @@ export function createThumbSource(
 
 /** One lazily created offscreen renderer (256x192, alpha); null when WebGL is unavailable. */
 export function createWebGLThumbRender(): {
-  render: (kind: SlotKind, itemId: string) => string;
+  render: (kind: SlotKind, itemId: string) => Promise<string>;
   dispose(): void;
 } | null {
   let renderer: THREE.WebGLRenderer;
@@ -83,8 +107,9 @@ export function createWebGLThumbRender(): {
   camera.aspect = THUMB_W / THUMB_H;
   camera.updateProjectionMatrix();
   return {
-    render(kind, itemId) {
-      const model = plotAsset(kind, itemId, tintFor(0));
+    async render(kind, itemId) {
+      // GLB and pass-scene clones share geometry with the village: those are never disposed.
+      const { model, shared } = await modelFor(kind, itemId);
       try {
         model.rotation.y = PREVIEW_STILL_YAW;
         scene.add(model);
@@ -96,10 +121,12 @@ export function createWebGLThumbRender(): {
         return url;
       } finally {
         scene.remove(model);
-        model.traverse((o) => {
-          // materials are shared and cached by plotAssets (the village uses them too): never dispose them
-          if (o instanceof THREE.Mesh) o.geometry.dispose();
-        });
+        if (!shared) {
+          model.traverse((o) => {
+            // materials are shared and cached by plotAssets (the village uses them too): never dispose them
+            if (o instanceof THREE.Mesh) o.geometry.dispose();
+          });
+        }
       }
     },
     dispose() {

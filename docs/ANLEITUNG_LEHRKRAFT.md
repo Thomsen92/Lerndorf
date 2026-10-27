@@ -405,3 +405,45 @@ Im Hausmenü öffnet „Kleiderschrank“ das Ankleidezimmer. Die Figur wird mit
 Kaufen erfolgt weiter im Haus-Shop. Danach gibt es „Zum Kleiderschrank“, im Inventar „Anziehen“. Ein geschlossener Shop sperrt neue Käufe; bereits gekaufte Dinge bleiben anziehbar. Jede Figur behält einen eigenen Look.
 
 Aktuell lokal vorbereitet: Die neue Migration 0023 und die Veröffentlichung sind noch nicht live ausgeführt. Eine Vorschau mit Testbesitz läuft unter http://localhost:5175/dev/wardrobe.html (Mädchen: ?character=girl). Weitere Details und Prüfstand: [Avatar-Kleiderschrank](AVATAR_KLEIDERSCHRANK.md).
+
+## Season I – Halloween (LearnPass)
+
+Eine Saison ist ein Zeitraum von etwa sechs Wochen mit 40 Stufen. In Season I (28.10.–06.12.2026) sammeln die Schüler **Season-XP** und holen sich Münzen, Truhen, Titel, Rahmen und Gartenszenen. Am Ende winkt eine freie Wahl aus allen Truhen-Gegenständen.
+
+### Wo finden die Schüler den LearnPass?
+
+- **Profilkarte:** Im Profil steht unter dem XP-Balken „Season I – Halloween“ mit Stufe, Restzeit und der Zahl wartender Truhen. Antippen öffnet den Pass.
+
+### Was die Schüler tun
+
+1. **Quests lösen** – jede Buchung im Saisonfenster zählt als Season-XP.
+2. **Stufen abholen** – erreichte Stufen leuchten orange; „Abholen“ gibt Münzen, Truhen, Titel, Rahmen oder eine Gartenszene.
+3. **Truhen öffnen** – im Inventar unter „Season-Truhen“. Pass-Truhen kommen auf Stufe 5, 10, 15, …, 40; die **Truhen-Serie** gibt zusätzlich eine Truhe an jedem dritten Tag in Folge mit gelöster Quest; im Shop gibt es **zwei Truhen pro Woche für je 50 Münzen**.
+4. **Stufe 40** – Truhe, Titel „Halloween Legend“, 25 Münzen und eine **freie Wahl** aus den 28 Truhen-Gegenständen. Wer den Gegenstand schon besitzt, bekommt stattdessen seinen Verkaufswert in Münzen.
+5. **Doppelte verkaufen** – im Inventar bei den Season-Gegenständen. Nur unplatzierte Exemplare, Werte: 15 / 40 / 100 / 250 Münzen je Seltenheit.
+
+### Saison steuern (Lehrerbereich)
+
+1. Im Lehrerbereich anmelden und oben **Saison** wählen.
+2. Jede Saison erscheint als Karte mit Zustand: **geplant**, **läuft**, **beendet** oder **abgeschlossen**.
+3. **Daten ändern:** Start und Ende eintragen, „Daten speichern“. Das Ende muss ein **Sonntag** sein, nach dem Start liegen und darf sich nicht mit einer anderen Saison überschneiden. Solange die Saison läuft, darf das Ende nicht vor heute liegen – dafür gibt es „Jetzt beenden“.
+4. **Jetzt starten:** Eine geplante Saison beginnt heute. Das geht nur, wenn keine andere Saison läuft.
+5. **Jetzt beenden:** Die Saison endet gestern. Erreichte, noch nicht abgeholte Stufen werden **allen Schülern sofort gutgeschrieben**. Ungeöffnete Truhen bleiben danach noch öffnbar.
+6. **Saison abschließen:** nach dem Ende möglich; schreibt offene Stufen gut und sperrt die Daten endgültig.
+7. Die Tabelle darunter zeigt je Schüler: Saison-XP, Stufe, abgeholte Stufen, wartende und geöffnete Truhen sowie die Truhen-Serie.
+
+**Wichtig bei Datumsänderungen:** Abgeholte Stufen bleiben abgeholt. XP, die vor dem neuen Start gesammelt wurden, zählen nicht mehr – die Oberfläche weist darauf hin.
+
+### Nach der Saison
+
+Season-Gegenstände bleiben im Besitz, sind aber nicht mehr im Shop zu kaufen. Truhen lassen sich weiterhin öffnen, und die Stufe-40-Wahl bleibt offen, bis sie getroffen wurde. Gartenszenen, Titel und Rahmen bleiben dauerhaft.
+
+### Wenn etwas nicht klappt
+
+| Meldung | Bedeutung |
+| --- | --- |
+| „Die Saison läuft nicht.“ | Der Shop verkauft keine Truhen außerhalb des Saisonfensters. |
+| „Limit erreicht“ | Zwei Shop-Truhen pro Woche sind gekauft; nächste Woche wieder zwei. |
+| „Dafür reichen die Münzen nicht.“ | Der Shop-Kauf kostet 50 Münzen; Quests bringen neue. |
+| „Saison beendet“ | Stufen werden automatisch gutgeschrieben; nichts weiter tun. |
+| „Ende muss Sonntag sein“ | Beim Ändern der Daten ein Sonntagsdatum wählen. |

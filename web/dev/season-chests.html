@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Season chests – UI harness (U2)</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #120d18; color: #f6e9d2;
+        font: 16px system-ui, sans-serif; }
+      .panel { box-sizing: border-box; width: min(560px, 92vw); margin: 40px auto; padding: 18px; border-radius: 18px;
+        background: #1b1322; border: 1px solid #3d2c52; }
+      h2 { margin: 0 0 14px; font-size: 22px; }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <h2>Inventory</h2>
+      <div id="host"></div>
+    </div>
+    <script type="module">
+      import '../src/style.css';
+      import { setLocale } from '../src/i18n.ts';
+      import { createSeasonChests } from '../src/ui/seasonChests.ts';
+      import { mockSeason } from './seasonMock.ts';
+      setLocale(new URLSearchParams(location.search).get('lang') === 'de' ? 'de' : 'en');
+      const season = mockSeason();
+      const section = createSeasonChests({
+        api: season.api,
+        getCoins: season.coins,
+        onCoins: season.setCoins,
+        reducedMotion: new URLSearchParams(location.search).has('still'),
+      });
+      document.getElementById('host').append(section);
+      window.__ready = true;
+    </script>
+  </body>
+</html>

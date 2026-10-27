@@ -6,6 +6,8 @@ export interface HouseMenuOptions {
   onBuild: () => void;
   onShop: () => void;
   onInventory: () => void;
+  /** Waiting season chests shown as a badge on the inventory button (U5). */
+  inventoryBadge?: number;
   onWardrobe?: () => void;
   onSettings: (button: HTMLButtonElement) => void;
   onBack: () => void;
@@ -35,7 +37,13 @@ export function openHouseMenu(opts: HouseMenuOptions): AreaHandle {
   const build = make(tr('Bauen'), () => opts.onBuild());
   if (opts.onWardrobe) make(tr('Kleiderschrank'), opts.onWardrobe);
   make(tr('Shop'), () => opts.onShop());
-  make(tr('Inventar'), () => opts.onInventory());
+  const inventory = make(tr('Inventar'), () => opts.onInventory());
+  if (opts.inventoryBadge) {
+    const badge = document.createElement('span');
+    badge.className = 'house-menu-badge';
+    badge.textContent = String(opts.inventoryBadge);
+    inventory.append(' ', badge);
+  }
   make(tr('Einstellungen'), (b) => opts.onSettings(b));
   make(tr('Zurück'), () => opts.onBack());
 

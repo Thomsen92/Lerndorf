@@ -55,6 +55,9 @@ import { supabaseWardrobeApi } from '../api/wardrobe';
 import { emptyLook, readWardrobe } from '../avatars/look';
 import { openShop } from './shopView';
 import { openInventory } from './inventoryView';
+import { seasonApi } from '../api/season';
+import { avatarPortrait } from './frames';
+import { openLearnPass } from './learnpass/openLearnPass';
 import { openDailyQuests } from './dailyQuestsView';
 import { loadDailyQuests } from '../api/quests';
 import { openLedger } from './ledgerView';
@@ -516,6 +519,20 @@ export async function mountVillage(
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   puffTexture = loadPuffTexture();
   fx = new BuildFx(scene, { texture: puffTexture, reducedMotion });
+
+  // Season I: the LearnPass opens from the profile card (U5). The market is not part of this plan.
+  const openSeasonPass = (): void => {
+    openLearnPass({
+      api: seasonApi(supabase),
+      getCoins: () => coinsNow,
+      onCoins,
+      reducedMotion: reducedMotion(),
+      onOpenInventory: () => void areas?.select('inventar'),
+      // frame rewards show the player's own portrait in the season frame (plan §14.2)
+      portrait: (frameId) =>
+        avatarPortrait({ character: myCharacter, look: myWardrobe[myCharacter ?? 'boy'], frameId, size: 'small' }),
+    });
+  };
   const applyControls = (area: NavArea): void => {
     cameraTools.hidden = inTutorial || area !== 'dorf';
     houseCards.setVisible(!inTutorial && area === 'dorf' && !marketFocused);
@@ -771,6 +788,7 @@ export async function mountVillage(
   let shopFromWardrobe = false;
   const itemOptions = (area: 'shop' | 'inventar') => ({
     api: supabaseItemApi(supabase, profile.id),
+    season: seasonApi(supabase),
     getCoins: () => coinsNow,
     onCoins,
     shopOpen,
@@ -820,6 +838,7 @@ export async function mountVillage(
           onTitle: (label) => progressFlow.titleChanged(label),
           onSettings: openSettings,
           onQuests: () => void areas?.select('aufgaben'),
+          season: { api: seasonApi(supabase), onOpen: openSeasonPass },
           onClose: () => void areas?.select('dorf'),
           sound,
           reducedMotion: reducedMotion(),
@@ -829,10 +848,15 @@ export async function mountVillage(
           showNotice(tr('Du hast noch kein Grundstück.'));
           return null;
         }
+        const season = await seasonApi(supabase)
+          .state()
+          .catch(() => null);
+        const waiting = season ? season.chests.pass + season.chests.streak + season.chests.shop : 0;
         return openHouseMenu({
           onBuild: () => void areas?.select('bauen'),
           onShop: () => void areas?.select('shop'),
           onInventory: () => void areas?.select('inventar'),
+          inventoryBadge: waiting,
           onWardrobe: () => void areas?.select('kleiderschrank'),
           onSettings: openSettings,
           onBack: () => void areas?.select('dorf'),

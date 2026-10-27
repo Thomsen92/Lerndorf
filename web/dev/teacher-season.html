@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lehrer · Saison (L1)</title>
+  </head>
+  <body>
+    <main class="teacher" style="max-width: 1000px; margin: 24px auto; padding: 0 16px">
+      <div class="teacher-page-heading"><p class="teacher-class">Klasse 8a</p><h1>Saison</h1></div>
+      <p class="status" role="status" aria-live="polite"></p>
+      <div id="host"></div>
+    </main>
+    <script type="module">
+      import '../src/teacher/teacher.css';
+      import page from '../src/teacher/pages/season.ts';
+
+      const seasons = [
+        {
+          id: '2026-11-halloween', label: 'Season I – Halloween',
+          starts_on: '2026-10-22', ends_on: '2026-11-01',
+          state: 'running', days_left: 5, tiers: 40, items: 40, closed_at: null,
+        },
+        {
+          id: '2027-02-winter', label: 'Season II – Winter (Entwurf)',
+          starts_on: '2027-02-01', ends_on: '2027-03-14',
+          state: 'planned', days_left: 0, tiers: 40, items: 0, closed_at: null,
+        },
+      ];
+      const overview = {
+        season: { id: '2026-11-halloween', label: 'Season I – Halloween', starts_on: '2026-10-22', ends_on: '2026-11-01', state: 'running' },
+        pupils: [
+          { id: 'a', nickname: 'anna', xp: 452, tier: 12, claims: 11, chests_open: 3, chests_waiting: 1, streak: 2 },
+          { id: 'b', nickname: 'ben', xp: 300, tier: 10, claims: 10, chests_open: 2, chests_waiting: 0, streak: 4 },
+          { id: 'c', nickname: 'cem', xp: 120, tier: 4, claims: 4, chests_open: 1, chests_waiting: 1, streak: 0 },
+        ],
+      };
+      const ctx = {
+        supabase: {
+          async rpc(fn) {
+            if (fn === 'teacher_seasons') return { data: seasons, error: null };
+            if (fn === 'teacher_season_changes')
+              return { data: [{ id: 3, action: 'dates', detail: {}, created_at: '2026-10-27T09:12:00Z', teacher: 'teacher' }, { id: 2, action: 'start', detail: {}, created_at: '2026-10-27T08:00:00Z', teacher: 'teacher' }], error: null };
+            return { data: overview, error: null };
+          },
+        },
+        classId: '8a',
+        route: { classId: '8a', page: 'saison' },
+        alive: () => true,
+        status: () => {},
+        go: () => {},
+        refresh: () => {},
+      };
+      await page.mount(document.getElementById('host'), ctx);
+      window.__ready = true;
+    </script>
+  </body>
+</html>
