@@ -91,6 +91,8 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_chicken_coop: { file: 'shop/chicken-coop.glb', kind: 'deco', fill: true },
   shop_windmill: { file: 'shop/windmill.glb', kind: 'deco', fill: true },
   shop_barn: { file: 'shop/barn.glb', kind: 'deco', fill: true },
+  // Stone well (0040), imported from the FBX farm pack.
+  shop_well: { file: 'shop/well.glb', kind: 'deco', fill: true },
 };
 
 const BASE = `${import.meta.env.BASE_URL}assets/`;

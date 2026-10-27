@@ -14,12 +14,13 @@
     <canvas id="c"></canvas>
     <div id="hud">3 × 3 pedestals – mascot, phone, moai and farm buildings</div>
     <div class="label" style="left: 1%">Mascot</div>
-    <div class="label" style="left: 15%">Smartphone</div>
-    <div class="label" style="left: 29%">Moai</div>
-    <div class="label" style="left: 42%">Water Tower</div>
-    <div class="label" style="left: 56%">Chicken Coop</div>
-    <div class="label" style="left: 70%">Windmill</div>
-    <div class="label" style="left: 85%">Barn</div>
+    <div class="label" style="left: 13.5%">Smartphone</div>
+    <div class="label" style="left: 26%">Moai</div>
+    <div class="label" style="left: 38.5%">Well</div>
+    <div class="label" style="left: 51%">Water Tower</div>
+    <div class="label" style="left: 63.5%">Chicken Coop</div>
+    <div class="label" style="left: 76%">Windmill</div>
+    <div class="label" style="left: 88.5%">Barn</div>
     <script type="module">
       import * as THREE from 'three';
       import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -33,7 +34,7 @@
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x1a1020);
       const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 160);
-      camera.position.set(0, 9, 27);
+      camera.position.set(0, 9.5, 31);
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.target.set(0, 1.5, 0);
       controls.enableDamping = true;
@@ -55,13 +56,14 @@
       const pedestal = new THREE.MeshStandardMaterial({ color: 0x3a3050, roughness: 0.9 });
       const sizes = [];
       const items = [
-        ['shop_mascot', -10.5],
-        ['shop_smartphone', -7],
-        ['shop_moai', -3.5],
-        ['shop_water_tower', 0],
-        ['shop_chicken_coop', 3.5],
-        ['shop_windmill', 7],
-        ['shop_barn', 10.5],
+        ['shop_mascot', -12.25],
+        ['shop_smartphone', -8.75],
+        ['shop_moai', -5.25],
+        ['shop_well', -1.75],
+        ['shop_water_tower', 1.75],
+        ['shop_chicken_coop', 5.25],
+        ['shop_windmill', 8.75],
+        ['shop_barn', 12.25],
       ];
       for (const [id, x] of items) {
         const base = new THREE.Mesh(new THREE.BoxGeometry(3, 0.2, 3), pedestal);

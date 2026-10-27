@@ -234,6 +234,15 @@
             "triangles": 2910,
             "bytes": 27528,
             "dims": "7,73 × 6,01 × 8,22 m"
+        },
+        {
+            "file": "well.glb",
+            "name": "Well",
+            "kind": "deco",
+            "price": 70,
+            "triangles": 2880,
+            "bytes": 38928,
+            "dims": "1,28 × 2,15 × 1,49 m"
         }
     ],
     "pending": [
