@@ -17,7 +17,9 @@ Figur, Code und vorhandene Sprachaufnahmen: eigene Werke des Auftraggebers, [Tho
 | Forest Kit (14.07.2026) | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets | `web/public/assets/kenney/forests/` (tree, tree-high, Textures/colormap.png; unverändert) |
 | Survival Kit 2.0 (03.04.2024) | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets/survival-kit | `web/public/assets/kenney/survival/` (tree-tall, tree-autumn-tall, rock-a, rock-b, rock-c, Textures/colormap.png; unverändert). Neu für die Ruine (23.10.2026): barrel, floor-old, metal-panel, metal-panel-screws, resource-planks, structure-metal-wall (unverändert) |
 | Fantasy Town Kit 2.0 (03.08.2025) | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets/fantasy-town-kit | `web/public/assets/kenney/town/` (tree-high, tree-high-round, tree-high-crooked, rock-small, rock-wide, rock-large, fountain-round-detail, lantern, stall-green, fence-gate, Textures/colormap.png; unverändert). Neu für die Ruine (23.10.2026): chimney, fence-broken, pillar-wood, planks, planks-half, roof-gable, roof-point, stairs-wood, wall-broken, wall-wood, wall-wood-broken, wall-wood-corner, wall-wood-doorway-square, wall-wood-half, wall-wood-side, wall-wood-window-shutters (unverändert) |
-| Graveyard Kit (23.10.2026) | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets/graveyard-kit | `web/public/assets/kenney/graveyard/` (debris, debris-wood, fence-damaged, Textures/colormap.png; unverändert, aus `Kenny/Graveyard`) |
+| Graveyard Kit (23.10.2026) | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets/graveyard-kit | `web/public/assets/kenney/graveyard/` (debris, debris-wood, fence-damaged, Textures/colormap.png; unverändert, aus `Kenny/Graveyard`). Neu für den LearnPass (26.10.2026): pumpkin, pumpkin-carved, detail-bowl, lantern-candle, candle-multiple, gravestone-round (unverändert) |
+| Season I – Halloween (26.10.2026) | Auftraggeber (eigene Sammlung) | CC0 1.0 | – | `web/public/assets/season1/` (28 GLB: house-horror, warlock, witch, pumpkin-girl, clock-tower, dodge-pickup, 15× kit-*, jack-o-lantern-tree, spooky-pumpkin-cat, ghost-kitty, candy-pile, pumpkin-patch, graveyard-corner, fence-lamp; aus `Assets/Season I`, `Downloads` und dem Halloween-Set, decimiert/gebündelt, 512–2048 px WebP, meshopt; Details in `manifest.json`) |
+| Nicht-Season-Shop (27.10.2026) | Auftraggeber (eigene Sammlung, `Assets/Season I/Nicht Season`) | CC0 1.0 (vom Auftraggeber bestätigt, 27.10.2026) | – | `web/public/assets/shop/` (6 GLB: cabin, beatall, toyoyo-highlight, president-car, trump-statue, white-house; decimiert, WebP-Texturen, meshopt; Details in `manifest.json`) |
 | Food Kit 2.0 (26.06.2024) | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets/food-kit | `web/public/assets/kenney/food/` (apple, pumpkin, loaf-round, Textures/colormap.png; unverändert) |
 | Nature Kit 2.1 (29.04.2020) | Kenney (www.kenney.nl) | CC0 1.0 | https://kenney.nl/assets/nature-kit | `web/public/assets/kenney/nature/` (flower_red/purple/yellow A–C, path_stone, stone_smallFlatA–C; unverändert, Blumenfarben im Code auf LOOK-Blumenfarben gesetzt) |
 | Junge und Mädchen (23.10.2026) | eigene Erstellung der Lehrkraft mit Tripo AI (Rig und Animationen walk, Catwalk, Tänze) | **Tarif/Lizenz bei Tripo prüfen** (Projektregel: nur CC0 oder eigene Modelle) | – | `web/public/assets/characters/girl.glb` und daraus gerendertes `girl.png`; ursprünglicher Junge am 26.10. ersetzt |
@@ -52,3 +54,23 @@ Die interaktiven 3D-Truhen (`web/src/render/chestPreview.ts`) und ihre SVG-Ersat
 | Offener Kleiderschrank | Nutzerdatei C:/Users/Thomas/Downloads/wooden wardrobe 3d model.glb; Referenz mit integriertem Imagegen erzeugt, Modell vom Nutzer mit Tripo erstellt. Texturen der Spielkopie reduziert; Geometrie unverändert. | Vom Nutzer bereitgestellt; Tripo-Lizenzstatus wie oben. Ziel assets/wardrobe/wardrobe.glb. |
 | Runder Teppich | Nutzerdatei C:/Users/Thomas/Downloads/round+decorative+rug+3d+model.glb; Referenz mit integriertem Imagegen erzeugt, Modell vom Nutzer mit Tripo erstellt. Texturen der Spielkopie reduziert; Geometrie unverändert. | Vom Nutzer bereitgestellt; Tripo-Lizenzstatus wie oben. Ziel assets/wardrobe/rug.glb. |
 | Zimmerwände, Boden, Licht, UI und Blur | Eigene Geometrie und Code; kein fremdes Raum-Asset. Referenzbilder und Prompts liegen unter blender/sources/references/. | Eigene Erstellung. |
+
+
+## Profilrahmen und Level-Medaillen (27.10.2026)
+
+- Kenney **Medals 1.1**, CC0: kreisrunde Medaillengeometrie aus `Kenny/Medals/Vector/medals_vector.svg`, für die sieben bestehenden Levelstufen eingefärbt und um gut lesbare Levelzahlen ergänzt. Quelle: https://kenney.nl/assets/medals
+- Kenney **UI Pack – Adventure 1.1**, CC0: Rahmen aus `Kenny/UI 2/Vector/panel_border_brown.svg`, mit transparentem Portraitausschnitt und vorhandenen Rangfarben. Quelle: https://kenney.nl/assets/ui-pack-adventure
+- Abgeleitete Vektorpfade: `content/ui/awards-artwork.json`; mitgelieferte Original-Lizenztexte: `web/public/assets/kenney/profile/LICENSE-medals.txt` und `LICENSE-adventure.txt`. Bestehende Freischalt-IDs bleiben erhalten.
+
+
+## Neue Rangschilde und Avatarrahmen (27.10.2026)
+
+Die aktuell verwendeten Rangschilde und runden Avatarrahmen sind eigene SVG-/Canvas-Vektorgrafiken in `web/src/ui/rankArtwork.ts`. Die vom Nutzer bereitgestellten Vecteezy-/Rahmenbilder dienen als Stilreferenz für gesättigte Farben, metallische Facetten, Kronen, Flügel und Edelsteine. Keine Bildausschnitte oder Vektordaten dieser Referenzen werden ausgeliefert. Die zuvor abgeleiteten Kenney-Grafiken werden für Profilrahmen und Rangabzeichen nicht mehr verwendet; deren Quellen/Lizenzen bleiben als Herkunftsverlauf dokumentiert.
+
+Die Titelplaketten (27.10.2026) sind ebenfalls eigene Vektorgeometrien in `rankArtwork.ts`; die vom Nutzer gelieferten Plakettenbilder dienen ausschließlich als Stilreferenz. Keine Bilddaten dieser Referenzen werden ausgeliefert.
+
+
+## Hinweis-Pfeil der Questtafel (27.10.2026)
+
+Kenney UI Pack 2.0, CC0: `Kenny/UI/Vector/Yellow/arrow_decorative_s.svg`, unverändert als `web/public/assets/kenney/ui/quest-arrow.svg` ausgeliefert. Original-Lizenz unter `web/public/assets/kenney/ui/LICENSE.txt`. Quelle: https://kenney.nl/assets/ui-pack
+Die goldene Tafelkontur und der Hinweis-Button sind eigene Geometrie/UI. Der Sir-Byte-Button verwendet das bereits vorhandene Portrait `assets/sir-byte/preview.png`.
