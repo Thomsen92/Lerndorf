@@ -470,7 +470,7 @@ Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md)
 | S4 | [x] | 22 SQL-Tests: Schema, Zustände, Claims, Verkauf, Stufe-40-Wahl, Serie, Shop-Fenster, Chancen; `set_title`/`set_frame` folgt mit L1/U7 |
 | A1 | [x] | Meshopt im Loader, async GLB-Zweig mit Platzhalter, Normalisierung auf `MAX_SIZE` (Deko min. 0,8 m), `THREE.LOD` mit Fernversionen (34 Dateien); Galerie-Screenshot `web/dev/season.html`; 8 Fernversionen bleiben topologiebedingt über 2.000 Dreiecke |
 | A3 | [x] | 12 Kenney-Pass-Szenen aus 32 kopierten Modellen (`passScenes.ts`), Lizenzzeile, Asset-Vertrag-Test, Galerie-Screenshot |
-| U1 | [ ] | LearnPass-Seite nach §14 |
+| U1 | [x] | LearnPass-Seite nach §14: Kopf, Stand-Leiste, 40 Karten mit Belohnungsbildern, DU-Marke, Schienen-Punkte, vier Kacheln; API-Client, i18n, Vitest, Screenshots 1180×820 und 390×844 |
 | U2 | [ ] | Truhen im Inventar |
 | U3 | [ ] | What's inside? |
 | U4a | [ ] | Shop: Season-Truhe |
