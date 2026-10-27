@@ -64,8 +64,12 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_president_car: { file: 'shop/president-car.glb', kind: 'car' },
   shop_trump: { file: 'shop/trump-statue.glb', kind: 'deco' },
   // Both cars are modelled along X; a quarter turn puts the length on Z like all cars (plan §6.2).
-  shop_toyoyo: { file: 'shop/toyoyo-highlight.glb', kind: 'car', yaw: Math.PI / 2 },
-  shop_beatall: { file: 'shop/beatall.glb', kind: 'car', yaw: Math.PI / 2 },
+  shop_toyoyo: { file: 'shop/toyoyo-highlight.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
+  shop_beatall: { file: 'shop/beatall.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
+  // Three more cars from the same pack (0041), textured with their .fbm maps.
+  shop_delorean: { file: 'shop/delorean.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
+  shop_landyroamer: { file: 'shop/landyroamer.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
+  shop_tristar: { file: 'shop/tristar.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
   // Halloween decorations (0035): both fill the 3 x 3 pedestal when normalised.
   shop_candy_cauldron: { file: 'shop/candy-cauldron.glb', kind: 'deco', fill: true },
   shop_chibi_trick_or_treater: { file: 'shop/chibi-trick-or-treater.glb', kind: 'deco', fill: true },

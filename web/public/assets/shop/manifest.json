@@ -39,20 +39,20 @@
         },
         {
             "name": "Toyoyo Pickup",
-            "bytes": 99700,
-            "dims": "2,16 × 4,51 × 2,20 m",
+            "bytes": 90128,
+            "dims": "4,59 × 2,24 × 2,20 m",
             "price": 700,
             "kind": "car",
-            "triangles": 9012,
+            "triangles": 8303,
             "file": "toyoyo-highlight.glb"
         },
         {
             "name": "Beatall",
-            "bytes": 69772,
-            "dims": "1,73 × 4,60 × 1,77 m",
+            "bytes": 65588,
+            "dims": "3,45 × 1,30 × 1,32 m",
             "price": 600,
             "kind": "car",
-            "triangles": 6741,
+            "triangles": 6428,
             "file": "beatall.glb"
         },
         {
@@ -243,6 +243,33 @@
             "triangles": 2880,
             "bytes": 38928,
             "dims": "1,28 × 2,15 × 1,49 m"
+        },
+        {
+            "file": "delorean.glb",
+            "name": "Retro Sports Car",
+            "kind": "car",
+            "price": 700,
+            "triangles": 10921,
+            "bytes": 113332,
+            "dims": "4,62 × 1,38 × 2,20 m"
+        },
+        {
+            "file": "landyroamer.glb",
+            "name": "Off-Road Rover",
+            "kind": "car",
+            "price": 450,
+            "triangles": 8063,
+            "bytes": 84264,
+            "dims": "3,88 × 2,05 × 1,61 m"
+        },
+        {
+            "file": "tristar.glb",
+            "name": "Racing GT",
+            "kind": "car",
+            "price": 550,
+            "triangles": 5371,
+            "bytes": 56808,
+            "dims": "4,30 × 1,53 × 1,93 m"
         }
     ],
     "pending": [
