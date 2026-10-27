@@ -1,79 +1,97 @@
 {
-    "note":  "Nicht-Season-Shop, Preise in Münzen",
-    "items":  [
-                  {
-                      "file":  "cabin.glb",
-                      "name":  "Blockhütte",
-                      "kind":  "house",
-                      "price":  500,
-                      "triangles":  744,
-                      "bytes":  90164,
-                      "dims":  "5,90 × 3,68 × 5,71 m"
-                  },
-                  {
-                      "file":  "president-car.glb",
-                      "name":  "Präsidentenwagen",
-                      "kind":  "car",
-                      "price":  2000,
-                      "triangles":  15114,
-                      "bytes":  152956,
-                      "dims":  "1,90 × 4,60 × 1,51 m"
-                  },
-                  {
-                      "name":  "Trump-Statue",
-                      "bytes":  194080,
-                      "dims":  "2,88 × 1,19 × 2,70 m",
-                      "price":  2000,
-                      "kind":  "deco",
-                      "triangles":  10588,
-                      "file":  "trump-statue.glb"
-                  },
-                  {
-                      "name":  "Weißes Haus",
-                      "bytes":  108716,
-                      "dims":  "5,90 × 3,00 × 4,11 m",
-                      "price":  5000,
-                      "kind":  "house",
-                      "triangles":  15184,
-                      "file":  "white-house.glb"
-                  },
-                  {
-                      "name":  "Toyoyo Pickup",
-                      "bytes":  99700,
-                      "dims":  "2,16 × 4,51 × 2,20 m",
-                      "price":  700,
-                      "kind":  "car",
-                      "triangles":  9012,
-                      "file":  "toyoyo-highlight.glb"
-                  },
-                  {
-                      "name":  "Beatall",
-                      "bytes":  69772,
-                      "dims":  "1,73 × 4,60 × 1,77 m",
-                      "price":  600,
-                      "kind":  "car",
-                      "triangles":  6741,
-                      "file":  "beatall.glb"
-                  }
-              ],
-    "pending":  [
-                    {
-                        "price":  900,
-                        "name":  "Tristar Racer",
-                        "reason":  "Länge liegt auf X – muss um 90° gedreht werden",
-                        "kind":  "car"
-                    },
-                    {
-                        "price":  800,
-                        "name":  "Landyroamer",
-                        "reason":  "Länge liegt auf X – muss um 90° gedreht werden",
-                        "kind":  "car"
-                    },
-                    {
-                        "price":  1200,
-                        "name":  "DeLorean",
-                        "reason":  "liegt kopfüber und ist 57 m groß – Achsen und Maß korrigieren",
-                        "kind":  "car"
-                    }
-                ]
+    "note": "Nicht-Season-Shop, Preise in Münzen",
+    "items": [
+        {
+            "file": "cabin.glb",
+            "name": "Blockhütte",
+            "kind": "house",
+            "price": 500,
+            "triangles": 744,
+            "bytes": 90164,
+            "dims": "5,90 × 3,68 × 5,71 m"
+        },
+        {
+            "file": "president-car.glb",
+            "name": "Präsidentenwagen",
+            "kind": "car",
+            "price": 2000,
+            "triangles": 15114,
+            "bytes": 152956,
+            "dims": "1,90 × 4,60 × 1,51 m"
+        },
+        {
+            "name": "Trump-Statue",
+            "bytes": 194080,
+            "dims": "2,88 × 1,19 × 2,70 m",
+            "price": 2000,
+            "kind": "deco",
+            "triangles": 10588,
+            "file": "trump-statue.glb"
+        },
+        {
+            "name": "Weißes Haus",
+            "bytes": 108716,
+            "dims": "5,90 × 3,00 × 4,11 m",
+            "price": 5000,
+            "kind": "house",
+            "triangles": 15184,
+            "file": "white-house.glb"
+        },
+        {
+            "name": "Toyoyo Pickup",
+            "bytes": 99700,
+            "dims": "2,16 × 4,51 × 2,20 m",
+            "price": 700,
+            "kind": "car",
+            "triangles": 9012,
+            "file": "toyoyo-highlight.glb"
+        },
+        {
+            "name": "Beatall",
+            "bytes": 69772,
+            "dims": "1,73 × 4,60 × 1,77 m",
+            "price": 600,
+            "kind": "car",
+            "triangles": 6741,
+            "file": "beatall.glb"
+        },
+        {
+            "file": "chibi-trick-or-treater.glb",
+            "name": "Trick-or-Treater",
+            "kind": "deco",
+            "price": 150,
+            "triangles": 18788,
+            "bytes": 262200,
+            "dims": "0,98 × 0,93 × 0,74 m"
+        },
+        {
+            "file": "candy-cauldron.glb",
+            "name": "Candy Cauldron",
+            "kind": "deco",
+            "price": 80,
+            "triangles": 10112,
+            "bytes": 249588,
+            "dims": "0,95 × 1,00 × 0,81 m"
+        }
+    ],
+    "pending": [
+        {
+            "price": 900,
+            "name": "Tristar Racer",
+            "reason": "Länge liegt auf X – muss um 90° gedreht werden",
+            "kind": "car"
+        },
+        {
+            "price": 800,
+            "name": "Landyroamer",
+            "reason": "Länge liegt auf X – muss um 90° gedreht werden",
+            "kind": "car"
+        },
+        {
+            "price": 1200,
+            "name": "DeLorean",
+            "reason": "liegt kopfüber und ist 57 m groß – Achsen und Maß korrigieren",
+            "kind": "car"
+        }
+    ]
 }

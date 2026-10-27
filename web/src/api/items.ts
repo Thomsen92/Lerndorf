@@ -27,6 +27,8 @@ export interface ItemEntry {
   fits: SlotId[];
   /** Season items can be sold from the inventory. */
   seasonItem?: boolean;
+  /** English shop description from items.description. */
+  description?: string | null;
 }
 
 export const KIND_ORDER: readonly ItemKind[] = ['house', 'garage', 'car', 'deco', 'avatar'];
@@ -63,6 +65,7 @@ export function buildItemBook(
       free: Math.max(0, owned - placedIn.length),
       fits,
       seasonItem: Boolean(c.season),
+      description: c.description ?? null,
     };
   });
 }

@@ -249,3 +249,15 @@ describe('season selling', () => {
     expect(calls.onChanged).toHaveBeenCalled();
   });
 });
+describe('description', () => {
+  it('shows the English description in the detail', () => {
+    const { h } = open({
+      origin: 'shop',
+      entry: { ...deco, description: 'A bubbling cauldron overflowing with Halloween candy.' },
+    });
+    expect(document.querySelector('.item-description')?.textContent).toBe(
+      'A bubbling cauldron overflowing with Halloween candy.',
+    );
+    h.close();
+  });
+});

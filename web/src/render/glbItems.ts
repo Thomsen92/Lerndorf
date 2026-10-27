@@ -19,6 +19,8 @@ export interface GlbItem {
   yaw?: number;
   /** Height cap in metres for models whose file size is wrong (plan §6.2), below MAX_SIZE. */
   maxHeight?: number;
+  /** Upscale the model so it fills the MAX_SIZE footprint (new shop decorations, 0035). */
+  fill?: boolean;
 }
 
 /**
@@ -64,6 +66,9 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   // Both cars are modelled along X; a quarter turn puts the length on Z like all cars (plan §6.2).
   shop_toyoyo: { file: 'shop/toyoyo-highlight.glb', kind: 'car', yaw: Math.PI / 2 },
   shop_beatall: { file: 'shop/beatall.glb', kind: 'car', yaw: Math.PI / 2 },
+  // Halloween decorations (0035): both fill the 3 x 3 pedestal when normalised.
+  shop_candy_cauldron: { file: 'shop/candy-cauldron.glb', kind: 'deco', fill: true },
+  shop_chibi_trick_or_treater: { file: 'shop/chibi-trick-or-treater.glb', kind: 'deco', fill: true },
 };
 
 const BASE = `${import.meta.env.BASE_URL}assets/`;
@@ -94,9 +99,10 @@ export function normaliseGlb(scene: THREE.Object3D, spec: GlbItem): THREE.Group 
   const height = Math.min(max.h, spec.maxHeight ?? max.h);
   const fit = Math.min(max.w / safe(size.x), max.d / safe(size.z), height / safe(size.y));
   // Never larger than modelled: a grave candle stays a candle. A broken unit (203 m cat) still shrinks.
-  let scale = Math.min(1, fit);
+  // Items marked `fill` are the exception: they grow until the footprint (or height) fills MAX_SIZE.
+  let scale = spec.fill ? fit : Math.min(1, fit);
   const longest = Math.max(size.x, size.y, size.z);
-  if (spec.kind === 'deco' && longest * scale < MIN_DECO_SIZE) {
+  if (!spec.fill && spec.kind === 'deco' && longest * scale < MIN_DECO_SIZE) {
     scale = Math.min(MIN_DECO_SIZE / safe(longest), fit);
   }
   turned.scale.setScalar(scale);

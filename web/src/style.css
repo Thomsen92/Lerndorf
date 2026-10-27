@@ -670,6 +670,12 @@ table.ledger td {
   aspect-ratio: 4 / 3;
   max-height: 40vh;
 }
+.item-description {
+  margin: 8px 0 4px;
+  color: #5b4a6b;
+  font-size: 14px;
+  line-height: 1.45;
+}
 .item-actions {
   display: flex;
   flex-wrap: wrap;
