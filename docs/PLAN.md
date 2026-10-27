@@ -477,7 +477,7 @@ Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md)
 | U5 | [x] | Profilkarte „Season I – Halloween“ mit Stufe, Restzeit und Truhen-Badge; öffnet den LearnPass über `openLearnPass` (echte API, Claims, Shop-Truhe, Inventar-Link); Badge am Inventar-Button im Haus-Menü; Vitest + Screenshot |
 | U6 | [x] | Saison-Stand am Markt (Kürbisbude neben der Tafel, Klickziel), Willkommensbanner mit Pass-Link, düstere Stimmung (dunkler Himmel, Nebel, warmes Licht, Blutmond) nur im Saisonfenster (`seasonWindow.ts`); Test + Screenshot. Abweichung: Galerie nicht gelaufen, Markt über `web/dev/season-market.html` geprüft |
 | U7 | [x] | i18n/A11y: deutsche Quelltexte + englische Übersetzungen für alle neuen Flächen (Truhen, Shop, Profilkarte, Innenansicht, Banner), deutsche Gegenstandsnamen, Seltenheiten zur Laufzeit übersetzt, `aria-live` an der Stand-Leiste; i18n-Tests |
-| S3 | [ ] | Shop-Daten 0031 |
+| S3 | [x] | Migration 0031: sechs Nicht-Season-Artikel (Blockhütte 500, Beatall 600, Toyoyo 700, Präsidentenwagen 2.000, Trump-Statue 2.000, Weißes Haus 5.000), `shop_visible`, `model = 'shop/…'`, Kauf über `buy_item`; SQL-Tests |
 | U4b | [ ] | Shop: Nicht-Season-Artikel |
 | A2 | [ ] | Asset-Reste |
 | L1 | [ ] | Saison-Steuerung 0032 + Lehrer-Reiter |
