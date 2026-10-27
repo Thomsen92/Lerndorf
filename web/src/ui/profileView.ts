@@ -3,6 +3,7 @@ import { PROGRESS_ERROR, levelFraction, type Progress, type ProgressApi, type Re
 import type { CharacterKind } from '../render/character';
 import { avatarPortrait, frameSvg } from './frames';
 import { crestSvg } from './crest';
+import { titlePlaque } from './titlePlaque';
 import type { AreaHandle } from './areas';
 import type { Sound } from './sound';
 import { createChestControl, type ChestControl } from './chestControl';
@@ -102,6 +103,8 @@ export function openProfile(opts: {
       () => show('collection', 'title'),
       'profile-current-title',
     );
+    const equippedTitle = rewards.find((r) => r.id === p.titleId);
+    if (equippedTitle) titleButton.replaceChildren(titlePlaque(equippedTitle.label, p.level));
     titleButton.title = tr('Titel ändern');
     identity.append(titleButton);
     text(identity, 'p', msg`${opts.getCoins()} Münzen`, 'profile-wallet');
@@ -272,7 +275,7 @@ export function openProfile(opts: {
     }
     content.append(tabs);
     const list = document.createElement('section');
-    list.className = 'collection-grid';
+    list.className = `collection-grid${category === 'title' ? ' collection-grid--titles' : ''}`;
     list.id = panelId;
     list.setAttribute('role', 'tabpanel');
     list.setAttribute('aria-labelledby', `${panelId}-${category}`);
@@ -300,11 +303,9 @@ export function openProfile(opts: {
       b.disabled = locked || busy;
       if (selected) b.setAttribute('aria-disabled', 'true');
       if (category === 'frame') b.append(frameSvg(reward!.id, 104));
-      else {
-        const emblem = text(b, 'span', reward ? 'Aa' : '—', 'collection-title-emblem');
-        emblem.setAttribute('aria-hidden', 'true');
-      }
-      text(b, 'strong', reward?.label ?? tr('Kein Titel'));
+      else if (reward) b.append(titlePlaque(reward.label, Math.max(p.level, reward.level)));
+      else text(b, 'span', '—', 'collection-title-emblem').setAttribute('aria-hidden', 'true');
+      if (category === 'frame' || !reward) text(b, 'strong', reward?.label ?? tr('Kein Titel'));
       text(
         b,
         'span',

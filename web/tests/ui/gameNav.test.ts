@@ -4,6 +4,7 @@ import { NAV_BUTTONS, createGameNav, navButtonFor, type GameNav } from '../../sr
 
 let onSelect: ReturnType<typeof vi.fn>;
 let onAccount: ReturnType<typeof vi.fn>;
+let onNews: ReturnType<typeof vi.fn>;
 let nav: GameNav;
 
 const buttons = (): HTMLButtonElement[] => [...nav.el.querySelectorAll<HTMLButtonElement>('button.nav-btn')];
@@ -13,7 +14,8 @@ beforeEach(() => {
   document.body.innerHTML = '';
   onSelect = vi.fn();
   onAccount = vi.fn();
-  nav = createGameNav({ nickname: 'Fuchs', coins: 130, onSelect, onAccount });
+  onNews = vi.fn();
+  nav = createGameNav({ nickname: 'Fuchs', coins: 130, onSelect, onAccount, onNews });
   document.body.append(nav.el);
 });
 
@@ -43,7 +45,7 @@ describe('gameNav', () => {
     expect(nav.el.tagName).toBe('NAV');
     expect(nav.el.getAttribute('aria-label')).toBe('Hauptmenü');
     expect(buttons()).toHaveLength(2);
-    expect(buttons().map(b => b.getAttribute('aria-label'))).toEqual(['Aufgaben', 'Mein Haus']);
+    expect(buttons().map((b) => b.getAttribute('aria-label'))).toEqual(['Aufgaben', 'Mein Haus']);
     expect(nav.el.querySelector('[data-area=dorf]')).toBeNull();
     for (const b of buttons()) {
       expect(b.querySelector('[aria-hidden="true"]')).not.toBeNull();
@@ -55,6 +57,14 @@ describe('gameNav', () => {
       'Aufgaben',
       'Mein Haus',
     ]);
+  });
+
+  it('opens the news feed from the bell under the avatar', () => {
+    const bell = nav.el.querySelector<HTMLButtonElement>('.nav-bell')!;
+    expect(bell.getAttribute('aria-label')).toBe('Neuigkeiten');
+    expect(nav.el.querySelector('.nav-user')?.lastElementChild).toBe(bell);
+    bell.click();
+    expect(onNews).toHaveBeenCalledOnce();
   });
 
   it('marks exactly one button active', () => {
@@ -99,4 +109,21 @@ describe('gameNav', () => {
     expect(live().textContent).toBe('Du hast jetzt 120 Münzen.');
     expect(nav.el.querySelector('.gain')).toBeNull();
   });
+});
+
+it('offers Sir Byte as a camera shortcut and blocks it during the tutorial', () => {
+  const onByte = vi.fn();
+  const shortcut = createGameNav({ nickname: 'Fuchs', coins: 0, onSelect, onAccount, onByte });
+  const b = shortcut.el.querySelector<HTMLButtonElement>('.nav-byte')!;
+  expect(b).not.toBeNull();
+  expect(b.querySelector('img')?.src).toContain('sir-byte/preview.png');
+  b.click();
+  expect(onByte).toHaveBeenCalledWith(b);
+  shortcut.setLocked(true);
+  b.click();
+  expect(onByte).toHaveBeenCalledTimes(1);
+  expect(b.getAttribute('aria-disabled')).toBe('true');
+  shortcut.setLocked(false);
+  b.click();
+  expect(onByte).toHaveBeenCalledTimes(2);
 });

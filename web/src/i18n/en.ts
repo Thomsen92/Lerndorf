@@ -1,5 +1,19 @@
 /** Presentation only: German source strings remain intact; IDs and saved data are never translated. */
 export const EN: Record<string, string> = {
+  'Profil ansehen': 'View profile',
+  'Das Profil konnte nicht geladen werden.': 'The profile could not be loaded.',
+  'Noch kein Titel': 'No title yet',
+  'Haus von {0} öffnen': 'Open {0}’s house',
+  'Profil von {0} öffnen': 'View {0}’s profile',
+  Kamerasteuerung: 'Camera controls',
+  'Zu Sir Byte und der Questtafel': 'Go to Sir Byte and the quest board',
+  'Questtafel öffnen – Tagesaufgaben': 'Open quest board – daily quests',
+  Tagesaufgaben: 'Daily quests',
+  Vergrößern: 'Zoom in',
+  Verkleinern: 'Zoom out',
+  'Zum eigenen Haus': 'Back to your house',
+  'Ziehen: drehen · Zwei Finger: zoomen': 'Drag to rotate · Pinch to zoom',
+  'Deine Figur. Ziehen zum Drehen, zwei Finger zum Zoomen.': 'Your character. Drag to rotate, pinch to zoom.',
   'T-Shirt': 'T-shirt',
   Hoodie: 'Hoodie',
   Shorts: 'Shorts',
@@ -377,6 +391,11 @@ export const EN: Record<string, string> = {
   Jeans: 'Jeans',
   Faltenrock: 'Pleated skirt',
   Sprache: 'Language',
+  Neuigkeiten: 'News',
+  'Größe der Oberfläche': 'Interface size',
+  Klein: 'Small',
+  Mittel: 'Medium',
+  Groß: 'Large',
   'Die Verbindung zum Server ist nicht eingerichtet. Bitte die Lehrkraft fragen.':
     'The server connection is not set up. Please ask your teacher.',
 };

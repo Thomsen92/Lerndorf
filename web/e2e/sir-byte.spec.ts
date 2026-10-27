@@ -24,9 +24,8 @@ test('market greeting actually plays the existing ready recording and stops on W
   });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/dev/tutorial.html?char=girl');
-  await expect(page.locator('.byte-world-bubble')).toContainText("Hello! I'm Sir Byte.", { timeout: 60000 });
-  await page.getByRole('button', { name: 'Weiter', exact: true }).click();
-  await expect(page.locator('.byte-world-bubble')).toContainText('Welcome to Lerndorf');
+  await expect(page.locator('.byte-world-bubble')).toContainText("Hello! I'm Sir Byte", { timeout: 60000 });
+  await expect(page.locator('.byte-world-bubble')).toContainText('Welcome to your class village!');
   await page.getByRole('button', { name: 'Weiter', exact: true }).click();
   await expect(page.locator('.byte-world-bubble')).toContainText('Ready when you are.');
   await expect(page.locator('body')).toHaveAttribute('data-byte-voice-started', 'true');
@@ -62,17 +61,14 @@ test('phone tutorial keeps the guide, pupil and next button usable', async ({ pa
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/dev/tutorial.html?char=girl');
-  for (const line of [
-    "Hello! I'm Sir Byte.",
-    'Welcome to Lerndorf, your class village!',
-    'Ready when you are.',
-  ]) {
+  for (const line of ["Hello! I'm Sir Byte", 'Ready when you are.']) {
     await expect(page.locator('.byte-world-bubble')).toContainText(line, { timeout: 60_000 });
     await page.getByRole('button', { name: 'Weiter', exact: true }).click();
   }
-  await expect(page.locator('.byte-world-bubble')).toContainText('Oh no, your house is a ruin!', {
-    timeout: 30_000,
-  });
+  await expect(page.locator('.byte-world-bubble')).toContainText(
+    "Don't worry. Let's build it up again!",
+    { timeout: 30_000 },
+  );
   await page.screenshot({ path: `${shots}/phone-tutorial-plot.png` });
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Weiter', exact: true }).click();
   await expect(page.locator('.tutorial-quiz .byte-stage')).toBeVisible();

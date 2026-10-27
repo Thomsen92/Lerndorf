@@ -1,4 +1,7 @@
 import { tr } from '../i18n';
+import { artworkDefs, artworkSvg, frameArtwork } from './rankArtwork';
+import type { CrestTier } from './crest';
+import './awards.css';
 import { characterAssetUrl, type CharacterKind } from '../render/character';
 import type { PortraitSource } from '../render/portrait';
 import type { AvatarLook } from '../avatars/look';
@@ -30,31 +33,17 @@ export function frameStyle(id: string | null | undefined): FrameStyle {
 let serial = 0;
 export function frameSvg(id: string, size: number): SVGSVGElement {
   const f = frameStyle(id),
-    key = `frame-metal-${++serial}`;
+    tier = f.id.slice(6) as CrestTier,
+    key = `rank-frame-${++serial}`;
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('viewBox', '0 0 100 100');
   svg.setAttribute('width', String(size));
   svg.setAttribute('height', String(size));
   svg.setAttribute('aria-hidden', 'true');
   svg.classList.add('portrait-frame');
-  let ornament = '';
-  for (let i = 0; i < 12; i++) {
-    const angle = (i * Math.PI) / 6,
-      x = 50 + 44 * Math.cos(angle),
-      y = 50 + 44 * Math.sin(angle);
-    ornament +=
-      f.ornament === 'grain'
-        ? `<path d="M ${x - 2} ${y - 2} l 4 4"/>`
-        : f.ornament === 'spikes'
-          ? `<path d="M ${x - 3} ${y + 2} L ${x} ${y - 5} L ${x + 3} ${y + 2} Z"/>`
-          : f.ornament === 'gems'
-            ? `<path d="M ${x} ${y - 4} l 3 4 -3 4 -3 -4 Z" fill="${f.colours[1]}"/>`
-            : `<circle cx="${x}" cy="${y}" r="1.7"/>`;
-  }
-  if (f.ornament === 'crown')
-    ornament += '<path d="M 33 12 L 30 2 42 8 50 0 58 8 70 2 67 12 Z" fill="#ffdc70"/>';
-  svg.innerHTML = `<defs><linearGradient id="${key}" x2="1" y2="1"><stop stop-color="${f.colours[1]}"/><stop offset=".48" stop-color="${f.colours[0]}"/><stop offset="1" stop-color="${f.colours[1]}"/></linearGradient></defs><circle cx="50" cy="50" r="43" fill="none" stroke="#493421" stroke-width="12"/><circle cx="50" cy="50" r="43" fill="none" stroke="url(#${key})" stroke-width="9"/><circle cx="50" cy="50" r="37.5" fill="none" stroke="${f.colours[1]}"/><g data-ornament="${f.ornament}" stroke="#503826" fill="${f.colours[1]}" stroke-width="1.1">${ornament}</g>`;
-  if (f.ornament === 'shimmer') svg.classList.add('frame-shimmer');
+  svg.dataset.rank = tier;
+  svg.innerHTML = `${artworkDefs(key, tier)}<defs><mask id="${key}-opening" maskUnits="userSpaceOnUse"><rect width="100" height="100" fill="white"/><circle cx="50" cy="55" r="29.5" fill="black"/></mask></defs><g data-art="rank-frame" data-ornament="${f.ornament}" mask="url(#${key}-opening)">${artworkSvg(frameArtwork(tier), key, tier)}</g>`;
+  if (tier === 'rainbow') svg.classList.add('rank-legendary');
   return svg;
 }
 export function avatarPortrait(opts: {
@@ -65,7 +54,7 @@ export function avatarPortrait(opts: {
   look?: AvatarLook;
 }): HTMLElement {
   const el = document.createElement('span');
-  el.className = `avatar-portrait avatar-portrait--${opts.size}`;
+  el.className = `avatar-portrait avatar-portrait--${opts.size} avatar-portrait--rank`;
   const img = document.createElement('img');
   img.alt = '';
   const kind = opts.character ?? 'boy';

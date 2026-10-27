@@ -6,9 +6,11 @@ import { createWardrobeRoom } from './wardrobeRoom';
 import { AvatarCustomizer } from '../avatars/customizer';
 import type { AvatarLook } from '../avatars/look';
 import { createWardrobeIdle } from './wardrobeIdle';
+import { bindWardrobeGestures } from './wardrobeGestures';
 export interface WardrobeStage {
   applyLook(look: AvatarLook): Promise<void>;
   rotateBy(angle: number): void;
+  zoomBy?(factor: number): void;
   resetView(): void;
   dispose(): void;
 }
@@ -26,13 +28,14 @@ export async function createWardrobeStage(
   const gl = new T.WebGLRenderer({ antialias: true, alpha: false });
   configurePreviewRenderer(gl);
   gl.setPixelRatio(Math.min(devicePixelRatio, opts.maxPixelRatio ?? 1.5, 1.5));
-  gl.domElement.setAttribute('aria-label', tr('Deine Figur. Zum Drehen nach links oder rechts ziehen.'));
+  gl.domElement.setAttribute('aria-label', tr('Deine Figur. Ziehen zum Drehen, zwei Finger zum Zoomen.'));
   gl.domElement.tabIndex = 0;
   host.append(gl.domElement);
   let room: Awaited<ReturnType<typeof createWardrobeRoom>> | undefined,
     customizer: AvatarCustomizer | undefined,
     closed = false;
   let completeDispose: (() => void) | undefined;
+  let releaseGestures = () => {};
   let releaseFigure = () => {};
   const abort = () => {
     if (completeDispose) completeDispose();
@@ -101,15 +104,28 @@ export async function createWardrobeStage(
     const render = () => {
       if (!closed && !document.hidden) gl.render(scene, camera);
     };
+    let zoom = 1,
+      gesturing = false;
+    const frameFigure = () => {
+      camera.zoom = zoom;
+      camera.lookAt(0, 0.74 + ((zoom - 1) / 1.4) * 0.55, 0);
+      camera.updateProjectionMatrix();
+    };
+    const zoomBy = (factor: number) => {
+      if (!Number.isFinite(factor) || factor <= 0) return;
+      zoom = Math.max(1, Math.min(2.4, zoom * factor));
+      frameFigure();
+      render();
+    };
     const resize = () => {
       const w = Math.max(1, host.clientWidth),
         h = Math.max(1, host.clientHeight);
       gl.setSize(w, h);
       camera.aspect = w / h;
       camera.position.set(0, 1.03, Math.max(3.9, 3.2 / camera.aspect));
-      camera.lookAt(0, 0.74, 0);
-      camera.updateProjectionMatrix();
+      frameFigure();
       const roomCamera = camera.clone();
+      roomCamera.zoom = 1;
       roomCamera.position.set(0.25, 1.25, 4.9);
       roomCamera.lookAt(-0.2, 1, -0.5);
       roomCamera.updateProjectionMatrix();
@@ -125,32 +141,28 @@ export async function createWardrobeStage(
       gl.setRenderTarget(null);
       render();
     };
-    let drag: { id: number; x: number } | null = null;
-    const down = (e: PointerEvent) => {
-      if (!e.isPrimary) return;
-      drag = { id: e.pointerId, x: e.clientX };
-      gl.domElement.setPointerCapture(e.pointerId);
-    };
-    const move = (e: PointerEvent) => {
-      if (drag?.id !== e.pointerId) return;
-      figure.root.rotation.y += (e.clientX - drag.x) * 0.012;
-      drag.x = e.clientX;
-      render();
-    };
-    const up = () => {
-      drag = null;
-    };
+    const gestures = bindWardrobeGestures(gl.domElement, {
+      rotate: (angle) => {
+        figure.root.rotation.y += angle;
+        render();
+      },
+      zoom: zoomBy,
+      active: (on) => {
+        gesturing = on;
+      },
+    });
+    releaseGestures = () => gestures.dispose();
     const key = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
         figure.root.rotation.y += e.key === 'ArrowLeft' ? -0.25 : 0.25;
         render();
       }
+      if (e.key === '+' || e.key === '=' || e.key === '-') {
+        e.preventDefault();
+        zoomBy(e.key === '-' ? 1 / 1.2 : 1.2);
+      }
     };
-    gl.domElement.addEventListener('pointerdown', down);
-    gl.domElement.addEventListener('pointermove', move);
-    gl.domElement.addEventListener('pointerup', up);
-    gl.domElement.addEventListener('pointercancel', up);
     gl.domElement.addEventListener('keydown', key);
     let frameId = 0,
       lastFrame = 0;
@@ -159,7 +171,7 @@ export async function createWardrobeStage(
       frameId = requestAnimationFrame(animate);
       if (now - lastFrame < 1000 / 30) return;
       lastFrame = now;
-      idle(now / 1000, !drag);
+      idle(now / 1000, !gesturing);
       render();
     };
     const visibility = () => {
@@ -184,13 +196,17 @@ export async function createWardrobeStage(
         figure.root.rotation.y += angle;
         render();
       },
+      zoomBy,
       resetView() {
         figure.root.rotation.y = 0.12;
+        zoom = 1;
+        frameFigure();
         render();
       },
       dispose() {
         if (closed) return;
         closed = true;
+        gestures.dispose();
         opts.signal?.removeEventListener('abort', abort);
         observer.disconnect();
         cancelAnimationFrame(frameId);
@@ -217,6 +233,7 @@ export async function createWardrobeStage(
     return handle;
   } catch (error) {
     closed = true;
+    releaseGestures();
     customizer?.dispose();
     releaseFigure();
     opts.signal?.removeEventListener('abort', abort);

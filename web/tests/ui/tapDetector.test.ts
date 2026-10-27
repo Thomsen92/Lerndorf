@@ -12,6 +12,13 @@ describe('tap detector', () => {
     t.down(1, 0, 0);
     expect(t.up(1, 9, 0)).toBe(false);
   });
+  it('never treats a drag returning to its starting point as a tap', () => {
+    const t = createTapDetector();
+    t.down(1, 0, 0);
+    t.move(1, 80, 0);
+    t.move(1, 0, 0);
+    expect(t.up(1, 0, 0)).toBe(false);
+  });
   it('two pointers are never a tap, also the last finger lifted', () => {
     const t = createTapDetector();
     t.down(1, 0, 0);

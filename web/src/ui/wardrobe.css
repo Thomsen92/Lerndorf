@@ -93,6 +93,21 @@
 .wardrobe-stage canvas:active {
   cursor: grabbing;
 }
+.wardrobe-zoom {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wardrobe-zoom button {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  font-size: 27px;
+  background: #fffaf0e8;
+}
 .wardrobe-rotate {
   position: absolute;
   bottom: 56px;
@@ -100,11 +115,16 @@
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 14px;
-  white-space: nowrap;
+  gap: 8px;
+  width: calc(100% - 24px);
+  max-width: 450px;
+  justify-content: center;
   font-size: 15px;
 }
 .wardrobe-rotate span {
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.2;
   background: #fff5dce8;
   border-radius: 30px;
   padding: 10px 15px;
@@ -123,7 +143,7 @@
   transform: translateX(-50%);
   font-size: 14px;
   background: #fff5dce0;
-  min-height: 40px;
+  min-height: 48px;
   white-space: nowrap;
 }
 .wardrobe-inventory {

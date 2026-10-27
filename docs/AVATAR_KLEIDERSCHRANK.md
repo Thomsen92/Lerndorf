@@ -62,3 +62,7 @@ Keine Cloth-Simulation und kein Nachweis für beliebige künftige Animationsclip
 
 
 Änderung 26.10.2026 nach Nutzer-Review: Hintergrund mit nur noch dezentem Fokusabstand statt starker Unschärfe; höhere Auflösung des einmal gerenderten Raumhintergrunds. Die Figur atmet und bewegt den Kopf ruhig im Stand (maximal 30 Renderbilder/s). Beim Drehen pausiert die Zusatzbewegung, bei reduzierter Bewegung bleibt die Figur still. Verdeckte Tabs und Schließen stoppen die Animationsschleife.
+
+Änderung 26.10.2026 – gemeinsames Zubehör: Alle vorhandenen Zubehörteile sind für Junge und Mädchen verwendbar, darunter Hellebarde, Ketten, Taschen, Kopfbedeckungen, Brillen und Haarschmuck. `character` im Katalog bezeichnet weiterhin den Herkunftsordner der Modelle; IDs, Besitz und Preise bleiben bestehen. `canWear()` vereinheitlicht Filter in Shop, Inventar und Kleiderschrank sowie die Look-Prüfung. Nur die geriggten Hosen/Röcke (`bottoms`) bleiben modellgebunden. Fremde Zubehörteile dürfen keine Sichtbarkeitsregeln für Mesh-Namen ihrer ursprünglichen Grundfigur auf die andere Figur anwenden.
+
+Migration `0026_shared_avatar_accessories.sql` erlaubt entsprechendes Zubehör auch beim serverseitigen Speichern. Rollen-, Eigentums-, Konflikt-, Farb- und Revisionsprüfung sowie getrennte Looks bleiben erhalten. 65 gezielte Runtime-, UI-, API- und SQL-Tests bestanden. Sichtabnahme übernimmt der Nutzer über `http://127.0.0.1:5175/dev/wardrobe.html?character=girl` (Extras → Halberd). Lokal umgesetzt, Migration noch nicht live angewendet.

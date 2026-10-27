@@ -125,8 +125,10 @@ export function createCompanion(
       );
     },
     say(key: LineKey) {
-      revision++;
-      bubble.show(mascot.say(key), true);
+      const token = ++revision;
+      void mascot.say(key).then((say) => {
+        if (!disposed && token === revision) bubble.show(say, true);
+      });
     },
     react,
     async answer(key: string, correct: boolean, allDone = false) {
@@ -150,7 +152,9 @@ export function createCompanion(
           () => {
             if (!disposed && revision === token) {
               void mascot.react('surprise', { silent: true });
-              bubble.show(mascot.say('allDone'));
+              void mascot.say('allDone').then((say) => {
+                if (!disposed && revision === token) bubble.show(say);
+              });
             }
           },
           Math.max(2300, seconds * 1000),

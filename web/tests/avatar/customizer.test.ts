@@ -34,6 +34,19 @@ it('reduces distant detail without changing the saved outfit and restores it nea
   expect(short.visible).toBe(true);
   c.dispose();
 });
+it('attaches the boy halberd to the girl spine and never applies foreign base-mesh visibility rules', async () => {
+  const root = base(),
+    body = new Group();
+  body.name = 'tripo_part_0';
+  root.add(body);
+  const c = new AvatarCustomizer(root, 'girl', async () => new Group());
+  await c.equip('avatar_boy_halberd');
+  expect(root.getObjectByName('mixamorig:Spine2')?.children).toHaveLength(1);
+  await c.equip('avatar_boy_feathered_helmet');
+  expect(body.visible).toBe(true);
+  expect(c.getLook().items).toEqual(['avatar_boy_halberd', 'avatar_boy_feathered_helmet']);
+  c.dispose();
+});
 function deferred<T>() {
   let resolve!: (v: T) => void;
   let reject!: (e: Error) => void;

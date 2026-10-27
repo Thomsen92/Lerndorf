@@ -1,0 +1,50 @@
+.title-plaque {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  vertical-align: middle;
+  isolation: isolate;
+  width: max-content;
+  min-width: min(160px, 100%);
+  max-width: 100%;
+  min-height: 52px;
+  padding: 14px 26px;
+  color: #fff6dc;
+  font:
+    700 14px/1.25 'Atkinson Hyperlegible',
+    Verdana,
+    sans-serif;
+  text-align: center;
+  filter: drop-shadow(0 2px 1px #1a123c44);
+}
+.title-plaque-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.title-plaque-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #fff6dc;
+  text-shadow: 0 1px 2px #0008;
+}
+.title-plaque--compact {
+  min-width: 0;
+  min-height: 30px;
+  padding: 8px 15px;
+  font-size: 10px;
+  line-height: 1.2;
+}
+.title-plaque--compact .title-plaque-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

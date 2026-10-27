@@ -8,6 +8,8 @@ export interface SpeechFrame {
 }
 export interface VoicePlayer {
   play(reaction: VoicedReaction): Promise<number | null>;
+  /** Plays one recording by file name (without folder and extension). */
+  playFile(file: string): Promise<number | null>;
   unlock(): void;
   stop(): void;
   frame(): SpeechFrame;
@@ -78,51 +80,52 @@ export function createVoicePlayer(opts: {
     gain = null;
     if (active === player) active = null;
   };
+  const playFile = async (file: string): Promise<number | null> => {
+    active?.stop();
+    stop();
+    if (!unlocked || !opts.sound.enabled || disposed || !ctx) return null;
+    active = player;
+    const token = sequence,
+      context = ctx;
+    try {
+      let buffer = buffers.get(file);
+      if (!buffer) {
+        const response = await (opts.fetchFn ?? fetch)(
+          `${opts.base ?? import.meta.env.BASE_URL}assets/sir-byte/voice/${file}.mp3`,
+        );
+        if (!response.ok) return null;
+        buffer = await context.decodeAudioData(await response.arrayBuffer());
+        if (disposed) return null;
+        buffers.set(file, buffer);
+      }
+      if (token !== sequence || disposed || !opts.sound.enabled || context.state !== 'running') return null;
+      const node = context.createBufferSource();
+      source = node;
+      gain = context.createGain();
+      analyser = context.createAnalyser();
+      analyser.fftSize = 256;
+      node.buffer = buffer;
+      gain.gain.value = 0.8;
+      node.connect(analyser);
+      analyser.connect(gain);
+      gain.connect(context.destination);
+      started = context.currentTime;
+      duration = buffer.duration;
+      node.onended = () => {
+        if (source === node) stop();
+      };
+      node.start();
+      return duration;
+    } catch {
+      if (token === sequence) stop();
+      return null;
+    }
+  };
   const player: VoicePlayer = {
     unlock,
     stop,
-    async play(reaction) {
-      active?.stop();
-      stop();
-      if (!unlocked || !opts.sound.enabled || disposed || !ctx) return null;
-      active = player;
-      const token = sequence,
-        context = ctx,
-        file = VOICE[reaction].file;
-      try {
-        let buffer = buffers.get(file);
-        if (!buffer) {
-          const response = await (opts.fetchFn ?? fetch)(
-            `${opts.base ?? import.meta.env.BASE_URL}assets/sir-byte/voice/${file}.mp3`,
-          );
-          if (!response.ok) return null;
-          buffer = await context.decodeAudioData(await response.arrayBuffer());
-          if (disposed) return null;
-          buffers.set(file, buffer);
-        }
-        if (token !== sequence || disposed || !opts.sound.enabled || context.state !== 'running') return null;
-        const node = context.createBufferSource();
-        source = node;
-        gain = context.createGain();
-        analyser = context.createAnalyser();
-        analyser.fftSize = 256;
-        node.buffer = buffer;
-        gain.gain.value = 0.8;
-        node.connect(analyser);
-        analyser.connect(gain);
-        gain.connect(context.destination);
-        started = context.currentTime;
-        duration = buffer.duration;
-        node.onended = () => {
-          if (source === node) stop();
-        };
-        node.start();
-        return duration;
-      } catch {
-        if (token === sequence) stop();
-        return null;
-      }
-    },
+    play: (reaction) => playFile(VOICE[reaction].file),
+    playFile,
     frame() {
       if (!opts.sound.enabled && (source || active === player)) stop();
       let level = 0;

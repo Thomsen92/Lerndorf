@@ -16,11 +16,6 @@ export const SAD_TEXT = tr('Oh nein, mein Haus ist eine Ruine!');
 /** Final bubble while the figure dances (spec §9.2, exact wording). */
 export const FINAL_TEXT = tr('Jetzt wird gelernt und Dailys gemacht!');
 
-/** Before the quiz: what happens next. */
-export const QUIZ_INTRO = tr(
-  'Drei kurze Fragen. Tippe auf die richtige Antwort. Danach bekommst du Münzen für dein Haus.',
-);
-
 /** Reward of the tutorial quiz in coins (server: tutorial_reward()). Only used for the text. */
 export const REWARD = 50;
 export const QUIZ_DONE = msg`Super, alles richtig! Du bekommst ${REWARD} Münzen.`;

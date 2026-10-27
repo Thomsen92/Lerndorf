@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LearnPass – Prototyp</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #10162a;
+        --panel: #1b2340;
+        --panel-2: #232c4d;
+        --ink: #f4ecd9;
+        --muted: #a9b3cc;
+        --gold: #e3b84b;
+        --line: #33406b;
+        --normal: #9aa0a6;
+        --rare: #4a8ff0;
+        --epic: #a06bf0;
+        --legendary: #f0b429;
+        --good: #6fd08c;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(1200px 600px at 70% -10%, #22305a, var(--bg) 60%);
+        color: var(--ink);
+        font: 16px/1.4 system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+      header.top {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 12px; padding: 16px 20px;
+        background: #0d1224cc; border-bottom: 1px solid var(--line);
+        position: sticky; top: 0; backdrop-filter: blur(6px); z-index: 5;
+      }
+      .season { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+      .season small { color: var(--muted); letter-spacing: .16em; font-weight: 700; }
+      .season strong { font-size: 20px; color: var(--gold); }
+      .season .days { color: var(--muted); font-size: 14px; }
+      .wallet { font-weight: 700; font-size: 18px; background: #0b1020; border: 1px solid var(--line);
+                padding: 8px 14px; border-radius: 999px; }
+      main { max-width: 1100px; margin: 0 auto; padding: 18px 20px 60px; }
+      h1 { margin: 8px 0 2px; font-size: 28px; letter-spacing: .02em; }
+      .sub { color: var(--muted); margin: 0 0 12px; }
+      .bar { height: 14px; border-radius: 999px; background: #0b1020; border: 1px solid var(--line); overflow: hidden; }
+      .bar > span { display: block; height: 100%; background: linear-gradient(90deg, #6fd08c, #b8e986); width: 0; transition: width .4s ease; }
+      .hero { margin-bottom: 18px; }
+      h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 24px 0 10px; }
+      h2 .dot { color: var(--gold); margin-left: 6px; }
+
+      .track-wrap { position: relative; }
+      .track {
+        display: flex; gap: 8px; overflow-x: auto; padding: 10px 2px 14px;
+        scroll-behavior: smooth; scrollbar-width: thin;
+      }
+      .tier {
+        flex: 0 0 64px; height: 86px; border-radius: 12px; border: 2px solid var(--line);
+        background: var(--panel); color: var(--ink); display: grid; place-content: center; gap: 2px;
+        text-align: center; cursor: pointer; padding: 4px; font: inherit;
+      }
+      .tier .num { font-weight: 800; font-size: 15px; }
+      .tier .icon { font-size: 20px; line-height: 1; }
+      .tier .tag { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+      .tier.chest { border-color: #6c5a2a; background: linear-gradient(180deg, #2b2a22, #1b1d2a); }
+      .tier.reached { border-color: var(--good); box-shadow: 0 0 0 2px #6fd08c22 inset; }
+      .tier.claimed { opacity: .45; }
+      .tier.next { border-color: var(--gold); box-shadow: 0 0 14px #e3b84b44; }
+      .tier.locked { color: #7d86a0; }
+      .arrows { position: absolute; top: 36%; display: flex; gap: 6px; }
+      .arrows button { border-radius: 50%; width: 36px; height: 36px; border: 1px solid var(--line);
+                       background: #0b1020dd; color: var(--ink); cursor: pointer; font-size: 18px; }
+      .arrows.left { left: -6px; } .arrows.right { right: -6px; }
+
+      .rows { display: grid; gap: 8px; }
+      .row { display: flex; align-items: center; gap: 12px; background: var(--panel); border: 1px solid var(--line);
+             border-radius: 12px; padding: 10px 14px; }
+      .row .who { width: 56px; font-weight: 800; color: var(--gold); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+      .row .what { flex: 1; color: var(--ink); }
+      .row .what small { display: block; color: var(--muted); font-size: 13px; }
+      .btn { border: 0; border-radius: 10px; background: var(--gold); color: #2b1d12; font-weight: 800;
+             padding: 9px 16px; cursor: pointer; font: inherit; min-height: 44px; }
+      .btn:disabled { background: #3a4363; color: #8f98b2; cursor: not-allowed; }
+      .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+
+      .tier.milestone { border-color: var(--gold); background: linear-gradient(180deg, #3a3120, #221f2c); }
+      .tier.milestone .star { position: absolute; top: 2px; right: 5px; font-size: 11px; color: var(--gold); }
+      .tier { position: relative; }
+
+      .preview { display: flex; align-items: center; gap: 14px; background: var(--panel); border: 1px solid var(--line);
+                 border-radius: 14px; padding: 14px; margin-top: 10px; }
+      .preview .gift { font-size: 44px; line-height: 1; }
+      .preview .grow { flex: 1; }
+      .odds { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px; text-align: left; }
+      .odds li { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+      .odds .items { color: var(--muted); font-size: 13px; display: block; }
+      .odds .pct { font-weight: 800; white-space: nowrap; }
+
+      .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+               background: #0b1020; border: 1px solid var(--gold); color: var(--ink); padding: 10px 18px;
+               border-radius: 12px; opacity: 0; pointer-events: none; transition: .25s ease; z-index: 40; }
+      .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+      .modal { position: fixed; inset: 0; background: #05070fcc; display: grid; place-items: center; z-index: 50; }
+      .modal[hidden] { display: none; }
+      .card { width: min(360px, 92vw); background: var(--panel); border: 2px solid var(--line); border-radius: 18px;
+              padding: 22px; text-align: center; }
+      .chest-big { font-size: 78px; line-height: 1; filter: drop-shadow(0 8px 18px #0008); }
+      .chest-big.shake { animation: shake .45s ease-in-out 2; }
+      @keyframes shake { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-6deg) scale(1.03)} 75%{transform:rotate(6deg) scale(1.03)} }
+      .rarity { display: inline-block; margin: 10px 0 2px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+                font-weight: 800; padding: 3px 10px; border-radius: 999px; border: 1px solid currentColor; }
+      .item-icon { font-size: 54px; margin: 8px 0 2px; }
+      .item-name { font-size: 20px; font-weight: 800; }
+      .hint { color: var(--muted); font-size: 14px; }
+
+      .legend { display: flex; gap: 14px; flex-wrap: wrap; color: var(--muted); font-size: 13px; margin-top: 8px; }
+      .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+      .collection { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+      .chip { background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <div class="season">
+        <small>SEASON I</small><strong>Halloween</strong><span class="days" id="days">noch 18 Tage</span>
+      </div>
+      <div class="wallet">🪙 <span id="coins">240</span> Münzen</div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>LearnPass</h1>
+        <p class="sub" id="progressText">Stufe 10 von 40 · 340 / 360 XP</p>
+        <div class="bar"><span id="barFill"></span></div>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--normal)"></i>Normal 55 %</span>
+          <span><i class="dot" style="background:var(--rare)"></i>Rare 30 %</span>
+          <span><i class="dot" style="background:var(--epic)"></i>Epic 12 %</span>
+          <span><i class="dot" style="background:var(--legendary)"></i>Legendary 3 %</span>
+        </div>
+      </section>
+
+      <h2>Stufen</h2>
+      <div class="track-wrap">
+        <div class="arrows left"><button type="button" id="left" aria-label="nach links">‹</button></div>
+        <div class="track" id="track" aria-label="LearnPass-Stufen"></div>
+        <div class="arrows right"><button type="button" id="right" aria-label="nach rechts">›</button></div>
+      </div>
+
+      <h2>Truhen</h2>
+      <div class="rows" id="rows"></div>
+
+      <div class="preview">
+        <div class="gift">🎁</div>
+        <div class="grow">
+          <strong>Season-Truhe</strong>
+          <div class="hint">Ein Gegenstand · Chancen offen</div>
+        </div>
+        <button class="btn ghost" type="button" id="previewBtn">Inhalt ansehen</button>
+      </div>
+
+      <h2>Inventar <span class="dot" id="invDot" hidden>●</span></h2>
+      <div class="rows" id="inventory"></div>
+
+      <h2>Meine Saison-Gegenstände</h2>
+      <div class="collection" id="collection"><span class="hint">noch nichts – öffne eine Truhe</span></div>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <div class="modal" id="modal" hidden>
+      <div class="card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="chest-big" id="chestBig">🎁</div>
+        <h3 id="modalTitle" style="margin:6px 0 2px">Truhe öffnen</h3>
+        <p class="hint" id="modalHint">Einen Moment …</p>
+        <div id="reveal" hidden>
+          <span class="rarity" id="rarity"></span>
+          <div class="item-icon" id="itemIcon"></div>
+          <div class="item-name" id="itemName"></div>
+          <p class="hint" id="itemNote"></p>
+        </div>
+        <div style="display:flex; gap:8px; justify-content:center; margin-top:14px">
+          <button class="btn" type="button" id="modalOk" disabled>Weiter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="preview" hidden>
+      <div class="card" role="dialog" aria-modal="true" aria-labelledby="previewTitle" style="width:min(430px,94vw)">
+        <h3 id="previewTitle" style="margin:0">Season-Truhe – Inhalt</h3>
+        <p class="hint">Jede Truhe enthält genau einen Gegenstand.</p>
+        <ul class="odds" id="odds"></ul>
+        <p class="hint" style="margin-top:12px">Die Chancen gelten bei jeder Truhe gleich – es gibt keine Garantie.</p>
+        <button class="btn" type="button" id="previewClose">Schließen</button>
+      </div>
+    </div>
+
+    <script>
+      // ---- Platzhalterdaten: Regeln aus dem Design, ohne Server ---------------------------
+      const MILESTONES = new Set([5, 10, 15, 20, 25, 30, 35, 40]);
+      const FRAME_TIERS = new Set([8, 18, 28, 38]);
+      const TITLE_TIERS = new Set([12, 22, 32, 40]);
+      const DECO = [
+        ['Kürbislaterne', '🎃'],
+        ['Spinnennetz', '🕸️'],
+        ['Fledermaus', '🦇'],
+        ['Grableuchte', '🕯️'],
+        ['Süßigkeiteneimer', '🍬'],
+        ['Kürbisbeet', '🌱'],
+      ];
+      const tiers = [];
+      let at = 0;
+      for (let tier = 1; tier <= 40; tier++) {
+        at += tier <= 10 ? 30 : tier <= 20 ? 60 : tier <= 30 ? 90 : 120;
+        const milestone = MILESTONES.has(tier);
+        const frame = FRAME_TIERS.has(tier);
+        const title = TITLE_TIERS.has(tier);
+        const kind = milestone ? 'milestone' : frame ? 'frame' : title ? 'title' : tier % 2 === 0 ? 'coins' : 'deco';
+        tiers.push({
+          tier,
+          at,
+          milestone,
+          frame,
+          title,
+          kind,
+          coins: kind === 'coins' ? (tier <= 20 ? 10 : 15) : milestone ? 25 : 0,
+          deco: kind === 'deco' ? DECO[tier % DECO.length] : null,
+        });
+      }
+      const state = {
+        xp: 340,
+        coins: 240,
+        claimed: new Set(),
+        chests: 1, // eine aus der 3-Tage-Serie; Stufe 10 wartet noch auf das Abholen
+        shopLeft: 2,
+        streakDays: 3,
+        items: [],
+      };
+      const RARITY = {
+        normal: { name: 'Normal', color: 'var(--normal)', weight: 55 },
+        rare: { name: 'Rare', color: 'var(--rare)', weight: 30 },
+        epic: { name: 'Epic', color: 'var(--epic)', weight: 12 },
+        legendary: { name: 'Legendary', color: 'var(--legendary)', weight: 3 },
+      };
+      const POOL = {
+        normal: [['Geschnitzter Kürbis','🎃'],['Süßigkeitenschale','🍬'],['Grableuchte','🕯️'],['Kerzengruppe','🕯️'],['Runder Grabstein','🪦']],
+        rare: [['Hexe','🧙'],['Kürbismädchen','🎃'],['Skelettkatze','🐈‍⬛'],['Vampir','🧛'],['Vogelscheuche','🧹'],['Horrorpuppe','🪆'],['Schwarzer Fuchs','🦊']],
+        epic: [['Dodge Pickup','🚙'],['Kürbis-Auto','🚗'],['Halloween-Auto','🚗'],['Devilish Hot Rod','🔥'],['Spuk-Uhrturm','🕰️'],['Kürbis-Zauberer','🧙‍♂️']],
+        legendary: [['Horror-Haus','🏚️']],
+      };
+      const SELL = { normal: 15, rare: 40, epic: 100, legendary: 250 };
+
+      const $ = (id) => document.getElementById(id);
+      const reachedTier = () => tiers.filter((t) => t.at <= state.xp).length;
+
+      function toast(text) {
+        const el = $('toast');
+        el.textContent = text;
+        el.classList.add('on');
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => el.classList.remove('on'), 2200);
+      }
+
+      function renderHeader() {
+        const reached = reachedTier();
+        const next = tiers[Math.min(reached, 39)];
+        $('coins').textContent = state.coins;
+        $('progressText').textContent = `Stufe ${reached} von 40 · ${state.xp} / ${next.at} XP`;
+        $('barFill').style.width = `${Math.min(100, (100 * state.xp) / next.at)}%`;
+      }
+
+      function renderTrack() {
+        const track = $('track');
+        track.innerHTML = '';
+        const reached = reachedTier();
+        for (const t of tiers) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'tier';
+          const isReached = t.at <= state.xp;
+          if (t.milestone) b.classList.add('chest', 'milestone');
+          if (isReached) b.classList.add('reached');
+          else b.classList.add('locked');
+          if (state.claimed.has(t.tier)) b.classList.add('claimed');
+          if (t.tier === reached + 1) b.classList.add('next');
+          const icon = t.milestone ? '🎁' : t.frame ? '🖼️' : t.title ? '🏷️' : t.kind === 'coins' ? '🪙' : t.deco?.[1] ?? '🎃';
+          const tag = t.milestone ? 'Meilenstein' : t.frame ? 'Rahmen' : t.title ? 'Titel' : t.kind === 'coins' ? `+${t.coins} 🪙` : 'Deko';
+          b.innerHTML = `<span class="num">${t.tier}</span><span class="icon">${icon}</span><span class="tag">${tag}</span>${
+            t.milestone ? '<span class="star">★</span>' : ''
+          }`;
+          b.setAttribute(
+            'aria-label',
+            `Stufe ${t.tier}${t.milestone ? ', Meilenstein mit Truhe' : ''}${isReached ? ', erreicht' : ', gesperrt'}`,
+          );
+          b.addEventListener('click', () => onTier(t, isReached));
+          track.append(b);
+        }
+        const next = track.children[reached];
+        if (next) next.scrollIntoView({ inline: 'center', block: 'nearest' });
+      }
+
+      function onTier(t, isReached) {
+        if (!isReached) return toast(`Noch ${t.at - state.xp} XP bis Stufe ${t.tier}`);
+        if (state.claimed.has(t.tier)) return toast('Schon abgeholt');
+        state.claimed.add(t.tier);
+        if (t.milestone) {
+          if (t.tier === 40) {
+            if (!state.items.some((i) => i.name === 'Horror-Haus'))
+              state.items.push({ name: 'Horror-Haus', icon: '🏚️', rarity: 'legendary' });
+            state.coins += 25;
+            toast('Finale! Horror-Haus + 25 Münzen');
+          } else {
+            state.chests += 1;
+            state.coins += 25;
+            toast(`Meilenstein! Season-Truhe + 25 Münzen${t.title ? ' + Titel' : ''}`);
+          }
+        } else if (t.kind === 'coins') {
+          state.coins += t.coins;
+          toast(`+${t.coins} Münzen`);
+        } else if (t.kind === 'deco') {
+          if (t.deco && !state.items.some((i) => i.name === t.deco[0]))
+            state.items.push({ name: t.deco[0], icon: t.deco[1], rarity: 'normal' });
+          toast(`${t.deco?.[1] ?? '🎃'} ${t.deco?.[0] ?? 'Deko'} freigeschaltet`);
+        } else if (t.frame) toast('Rahmen freigeschaltet: Kürbis');
+        else if (t.title) toast('Titel freigeschaltet: Halloween Legend');
+        renderAll();
+      }
+
+      function renderRows() {
+        const rows = $('rows');
+        rows.innerHTML = '';
+        rows.append(
+          row('Pass', `Stufe ${reachedTier()} erreicht`,
+            state.chests ? `${state.chests} Season-Truhe(n) im Inventar` : 'noch keine Truhe verdient',
+            ['Zum Inventar', toInventory], state.chests === 0),
+          row('Serie', state.streakDays >= 3 ? 'Serie geschafft' : `noch ${3 - state.streakDays} Tag(e) bis zur Truhe`,
+            state.streakDays >= 3 ? 'Truhe liegt im Inventar' : 'jede 3-Tage-Serie = 1 Truhe', null),
+          row('Shop', 'Season-Truhe · 50 Münzen', `${state.shopLeft} von 2 übrig diese Woche`,
+            ['Kaufen', buyChest], state.shopLeft === 0 || state.coins < 50),
+        );
+      }
+
+      function row(who, what, small, action, disabled = false) {
+        const el = document.createElement('div');
+        el.className = 'row';
+        el.innerHTML = `<span class="who">${who}</span><span class="what">${what}<small>${small}</small></span>`;
+        if (action) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'btn';
+          b.textContent = action[0];
+          b.disabled = disabled;
+          b.addEventListener('click', action[1]);
+          el.append(b);
+        }
+        return el;
+      }
+
+      function toInventory() {
+        $('inventory').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast('Truhen liegen im Inventar');
+      }
+
+      function buyChest() {
+        if (state.shopLeft === 0) return toast('Diese Woche schon zwei gekauft');
+        if (state.coins < 50) return toast('Nicht genug Münzen');
+        state.coins -= 50;
+        state.shopLeft -= 1;
+        state.chests += 1;
+        toast('Season-Truhe gekauft – liegt im Inventar');
+        renderAll();
+      }
+
+      function renderInventory() {
+        const box = $('inventory');
+        box.innerHTML = '';
+        $('invDot').hidden = state.chests === 0;
+        if (state.chests === 0) {
+          const empty = document.createElement('div');
+          empty.className = 'row';
+          empty.innerHTML = '<span class="who">Truhen</span><span class="what">Keine Truhe offen<small>verdiene eine über Pass, Serie oder Shop</small></span>';
+          box.append(empty);
+          return;
+        }
+        box.append(
+          row('Truhen', `Season-Truhe ×${state.chests}`, 'Saison I · Halloween', ['Öffnen', openChest]),
+        );
+      }
+
+      function rollRarity() {
+        const r = Math.random() * 100;
+        if (r < 3) return 'legendary';
+        if (r < 15) return 'epic';
+        if (r < 45) return 'rare';
+        return 'normal';
+      }
+
+      function openChest() {
+        if (state.chests <= 0) return toast('Keine Truhe im Inventar');
+        state.chests -= 1;
+        const modal = $('modal');
+        const big = $('chestBig');
+        modal.hidden = false;
+        $('reveal').hidden = true;
+        $('modalHint').hidden = false;
+        $('modalOk').disabled = true;
+        big.hidden = false;
+        big.textContent = '🎁';
+        big.classList.add('shake');
+        setTimeout(() => big.classList.remove('shake'), 950);
+        setTimeout(reveal, 1000);
+        renderAll();
+      }
+
+      function reveal() {
+        const rarity = rollRarity();
+        const pool = POOL[rarity];
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        const known = state.items.some((i) => i.name === pick[0]);
+        $('modalHint').hidden = true;
+        $('reveal').hidden = false;
+        $('chestBig').hidden = true;
+        const badge = $('rarity');
+        badge.textContent = RARITY[rarity].name;
+        badge.style.color = RARITY[rarity].color;
+        $('itemIcon').textContent = pick[1];
+        $('itemName').textContent = pick[0];
+        $('itemNote').textContent = known
+          ? `Schon vorhanden – Verkauf möglich für ${SELL[rarity]} Münzen`
+          : 'Neu in deiner Sammlung!';
+        if (!known) state.items.push({ name: pick[0], icon: pick[1], rarity });
+        $('modalOk').disabled = false;
+        $('modalOk').focus();
+        $('modalOk').onclick = () => {
+          $('modal').hidden = true;
+          renderAll();
+          toast(known ? `Doppelt – später verkaufbar für ${SELL[rarity]} Münzen` : 'Zur Sammlung hinzugefügt');
+        };
+      }
+
+      function renderCollection() {
+        const box = $('collection');
+        if (!state.items.length) {
+          box.innerHTML = '<span class="hint">noch nichts – öffne eine Truhe</span>';
+          return;
+        }
+        box.innerHTML = state.items
+          .map((i) => `<span class="chip" style="border-color:${RARITY[i.rarity].color}">${i.icon} ${i.name}</span>`)
+          .join('');
+      }
+
+      function renderAll() {
+        renderHeader();
+        renderTrack();
+        renderRows();
+        renderInventory();
+        renderCollection();
+      }
+
+      function renderOdds() {
+        const ul = $('odds');
+        ul.innerHTML = '';
+        for (const key of ['normal', 'rare', 'epic', 'legendary']) {
+          const li = document.createElement('li');
+          li.innerHTML = `<span><strong style="color:${RARITY[key].color}">${RARITY[key].name}</strong><span class="items">${POOL[
+            key
+          ]
+            .map(([name]) => name)
+            .join(', ')}</span></span><span class="pct">${RARITY[key].weight} %</span>`;
+          ul.append(li);
+        }
+      }
+      $('previewBtn').onclick = () => {
+        renderOdds();
+        $('preview').hidden = false;
+        $('previewClose').focus();
+      };
+      $('previewClose').onclick = () => {
+        $('preview').hidden = true;
+      };
+
+      $('left').onclick = () => $('track').scrollBy({ left: -320, behavior: 'smooth' });
+      $('right').onclick = () => $('track').scrollBy({ left: 320, behavior: 'smooth' });
+      renderAll();
+    </script>
+  </body>
+</html>

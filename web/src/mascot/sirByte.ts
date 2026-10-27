@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { createSirByte, type Reaction } from './vendor/sir-byte.mjs';
-import { LINES, VOICE, bubbleSeconds, type LineKey } from './lines';
+import { CLIPS, LINES, VOICE, bubbleSeconds, type LineKey } from './lines';
 import type { VoicePlayer } from './voice';
 import { nextPraise, type Praise } from './praise';
 export interface Say {
@@ -10,11 +10,19 @@ export interface Say {
 }
 export type MascotReaction = Exclude<Reaction, 'dry' | 'smug'>;
 export type Mascot = ReturnType<typeof createMascot>;
-export function createMascot(opts: { voice: VoicePlayer; quality?: 'high' | 'low' }) {
+export function createMascot(opts: { voice: VoicePlayer; quality?: 'high' | 'low'; lift?: boolean }) {
   const byte = createSirByte();
   const mistakes = new Map<string, number>();
   const originals = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   const low = new Set<THREE.Material>();
+  const lifted = new Set<THREE.Material>();
+  const lift = opts.lift ?? false;
+  /** Brighter base colour plus a faint self-glow, so he reads in the village shade. */
+  const brighten = <T extends THREE.MeshStandardMaterial>(m: T): T => {
+    m.color.multiplyScalar(1.12);
+    m.emissive.add(m.color.clone().multiplyScalar(0.1));
+    return m;
+  };
   let disposed = false,
     revision = 0,
     textStart = 0,
@@ -30,9 +38,22 @@ export function createMascot(opts: { voice: VoicePlayer; quality?: 'high' | 'low
   const setQuality = (quality: 'high' | 'low'): void => {
     low.forEach((m) => m.dispose());
     low.clear();
+    lifted.forEach((m) => m.dispose());
+    lifted.clear();
     for (const mesh of meshes) {
       const convert = (m: THREE.Material): THREE.Material => {
-        if (quality === 'high' || !(m instanceof THREE.MeshPhysicalMaterial)) return m;
+        if (quality === 'high') {
+          if (!lift || !(m instanceof THREE.MeshStandardMaterial)) return m;
+          const copy = brighten(m.clone());
+          lifted.add(copy);
+          return copy;
+        }
+        if (!(m instanceof THREE.MeshPhysicalMaterial)) {
+          if (!lift || !(m instanceof THREE.MeshStandardMaterial)) return m;
+          const copy = brighten(m.clone());
+          lifted.add(copy);
+          return copy;
+        }
         const simple = new THREE.MeshStandardMaterial({
           color: m.color,
           roughness: m.roughness,
@@ -41,7 +62,7 @@ export function createMascot(opts: { voice: VoicePlayer; quality?: 'high' | 'low
           emissiveIntensity: m.emissiveIntensity,
         });
         low.add(simple);
-        return simple;
+        return lift ? brighten(simple) : simple;
       };
       const material = originals.get(mesh)!;
       mesh.material = Array.isArray(material) ? material.map(convert) : convert(material);
@@ -91,10 +112,14 @@ export function createMascot(opts: { voice: VoicePlayer; quality?: 'high' | 'low
         }
       );
     },
-    say(key: LineKey): Say {
-      revision++;
+    async say(key: LineKey): Promise<Say> {
+      const token = ++revision;
       opts.voice.stop();
-      return sayText(LINES[key], null);
+      const file = CLIPS[key];
+      const clip = file ? await opts.voice.playFile(file) : null;
+      if (token !== revision || disposed)
+        return { text: LINES[key], voiced: clip !== null, seconds: bubbleSeconds(LINES[key], clip) };
+      return sayText(LINES[key], clip);
     },
     point(target: THREE.Vector3) {
       byte.pointAtTask(target);
@@ -129,7 +154,7 @@ export function createMascot(opts: { voice: VoicePlayer; quality?: 'high' | 'low
       disposed = true;
       revision++;
       opts.voice.dispose();
-      const materials = new Set<THREE.Material>(low),
+      const materials = new Set<THREE.Material>([...low, ...lifted]),
         geometries = new Set<THREE.BufferGeometry>();
       originals.forEach((ms, mesh) => {
         geometries.add(mesh.geometry);

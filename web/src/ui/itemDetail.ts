@@ -10,7 +10,7 @@ import { THUMB_PLACEHOLDER, type ThumbSource } from '../render/itemThumbs';
 import { slotById, type SlotId, type SlotKind } from '../world/plotPlan';
 import { openModal, type ModalHandle } from './dialog';
 import { esc } from './esc';
-import { partById, partUrl } from '../avatars/catalog';
+import { partById, partUrl, canWear } from '../avatars/catalog';
 import type { CharacterKind } from '../render/character';
 
 export type ItemOrigin = 'shop' | 'inventar';
@@ -270,7 +270,7 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
     // inventory
     if (entry.kind === 'avatar') {
       const part = partById(entry.id);
-      if (part && opts.onWardrobe && (!opts.character || part.character === opts.character))
+      if (part && opts.onWardrobe && (!opts.character || canWear(part, opts.character)))
         actions.append(
           button(
             tr('Anziehen'),

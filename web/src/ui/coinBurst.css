@@ -1,0 +1,26 @@
+.coin-burst {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+}
+
+.coin-burst-coin {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe9a8, #e0a72c 60%, #a8741a);
+  box-shadow:
+    0 0 0 1px #7a5312 inset,
+    0 1px 2px #0006;
+}
+
+.coin-burst-gain {
+  position: fixed;
+  transform: translate(-50%, 0);
+  font: 700 15px var(--font, system-ui, sans-serif);
+  color: #ffd76a;
+  text-shadow: 0 1px 2px #0009;
+  white-space: nowrap;
+}

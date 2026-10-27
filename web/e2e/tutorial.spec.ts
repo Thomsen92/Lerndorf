@@ -60,21 +60,17 @@ for (const viewport of [
     await page.locator('.character-choice').nth(1).click();
 
     // Sir Byte greets at the market, then accompanies the pupil to the ruin.
-    for (const [i, line] of [
-      "Hello! I'm Sir Byte.",
-      'Welcome to Lerndorf, your class village!',
-      'Ready when you are.',
-    ].entries()) {
+    for (const [i, line] of ["Hello! I'm Sir Byte", 'Ready when you are.'].entries()) {
       await expect(page.locator('.byte-world-bubble')).toContainText(line, { timeout: 60_000 });
       await shot(`02-market-byte-${i}`);
       await page.getByRole('button', { name: 'Weiter', exact: true }).click();
     }
-    await expect(page.locator('.byte-world-bubble')).toContainText('Oh no, your house is a ruin!', {
-      timeout: 30_000,
-    });
-    await expect(page.locator('.speech-bubble--sad')).toBeVisible();
-    await page.waitForTimeout(800);
+    await expect(page.locator('.speech-bubble--sad')).toBeVisible({ timeout: 30_000 });
     await shot('02-camera-end-sad-bubble');
+    await expect(page.locator('.byte-world-bubble')).toContainText(
+      "Don't worry. Let's build it up again!",
+      { timeout: 30_000 },
+    );
     for (let i = 0; i < 3; i++) {
       await shot(`03-byte-explanation-${i}`);
       await page.getByRole('button', { name: 'Weiter', exact: true }).click();
@@ -116,11 +112,16 @@ for (const viewport of [
     await page.waitForTimeout(700);
     await shot('14-placed');
 
-    // dance with the happy bubble, then the Daily Quest area opens
+    // dance with the happy bubble, then Sir Byte walks to the board before the quests open
     await expect(page.locator('.byte-world-bubble')).toContainText("Now let's do your Daily Quests!", {
       timeout: 30_000,
     });
     await shot('15-dance-final-bubble');
+    await page.locator('.byte-world-bubble button').click();
+    await expect(page.locator('.byte-world-bubble')).toContainText('on this board!', { timeout: 20_000 });
+    await page.waitForTimeout(600);
+    await shot('15b-market-board');
+    await page.locator('.byte-world-bubble button').click();
     await page.getByRole('heading', { name: 'Level 2!', exact: true }).waitFor({ timeout: 30_000 });
     await expect(page.locator('.avatar-badge')).toHaveAttribute('aria-label', /Level 2/);
     await expect(page.locator('.quest-rule')).toHaveCount(0);
@@ -139,6 +140,12 @@ test('resumed placement confirms the XP badge and one chest payment before quest
   await page.goto('/dev/tutorial.html?step=place&answered=3&char=girl');
   await page.locator('.build-bar--guided [data-item]').click();
   await page.getByRole('button', { name: 'Haus hinstellen' }).click();
+  await expect(page.locator('.byte-world-bubble')).toContainText("Now let's do your Daily Quests!", {
+    timeout: 30_000,
+  });
+  await page.locator('.byte-world-bubble button').click();
+  await expect(page.locator('.byte-world-bubble')).toContainText('on this board!', { timeout: 20_000 });
+  await page.locator('.byte-world-bubble button').click();
   await page.getByRole('heading', { name: 'Level 2!', exact: true }).waitFor({ timeout: 30_000 });
   await expect(page.locator('.avatar-badge')).toHaveAttribute('aria-label', /Level 2/);
   await page.getByRole('button', { name: 'Truhe öffnen', exact: true }).click();

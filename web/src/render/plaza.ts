@@ -134,6 +134,10 @@ function board(layout: Layout): THREE.Group {
     note.rotation.z = (((i * 37) % 9) - 4) * 0.03;
     part(new THREE.BoxGeometry(0.08, 0.08, 0.04), mat('#d64545'), nx, y + ny + 0.3, 0.12, g);
   });
+  // Roof, paper and posts are clickable too, and must retain their identity after static baking.
+  g.traverse((object) => {
+    if (object instanceof THREE.Mesh) object.userData.kind = 'board';
+  });
   return g;
 }
 

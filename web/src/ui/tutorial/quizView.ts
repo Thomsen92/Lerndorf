@@ -8,7 +8,7 @@ import type { Result } from '../../api/build';
 import type { TutorialAnswerResult, TutorialQuestion } from '../../api/tutorial';
 import { loadVoices, speakEnglish } from '../../quests/speech';
 import { stringList } from '../../tasks/answer';
-import { NETWORK_ERROR, NEXT, QUIZ_DONE, QUIZ_INTRO, RETRY } from './messages';
+import { NETWORK_ERROR, NEXT, QUIZ_DONE, RETRY } from './messages';
 import { createCompanion } from '../../mascot/mascotStage';
 import type { Sound } from '../sound';
 
@@ -112,7 +112,6 @@ export function openQuiz(opts: QuizOptions): QuizHandle {
   const render = (q: TutorialQuestion): void => {
     const data = (q.data && typeof q.data === 'object' ? q.data : {}) as Record<string, unknown>;
     heading(msg`Frage ${q.nr} von ${q.total}`);
-    if (q.nr === 1) panel.append(el('p', 'quest-rule', QUIZ_INTRO));
     const prompt = el('p', 'tutorial-prompt', q.prompt);
     prompt.lang = 'en';
     panel.append(prompt);

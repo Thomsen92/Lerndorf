@@ -1,0 +1,40 @@
+.avatar-portrait--rank img {
+  inset: 25% 20% 15%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 25%, #d9f3ff, #b7bbeb);
+}
+.avatar-portrait--rank .portrait-frame,
+.level-crest--rank {
+  overflow: visible;
+  filter: drop-shadow(0 2px 1px #27134455);
+}
+.game-nav .avatar-badge svg.level-crest--rank {
+  width: 48px;
+  height: 48px;
+}
+.rank-legendary {
+  animation: rank-glint 5s ease-in-out infinite;
+}
+@keyframes rank-glint {
+  0%,
+  70%,
+  100% {
+    filter: drop-shadow(0 2px 2px #801dcc66);
+  }
+  80% {
+    filter: drop-shadow(0 0 4px #e341ff88) brightness(1.14);
+  }
+}
+@media (max-width: 600px) {
+  .game-nav .avatar-badge svg.level-crest--rank {
+    width: 42px;
+    height: 42px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rank-legendary {
+    animation: none;
+  }
+}

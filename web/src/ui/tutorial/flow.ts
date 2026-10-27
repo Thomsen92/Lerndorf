@@ -68,6 +68,12 @@ export interface TutorialVillage {
   pauseForQuiz?(paused: boolean): void;
   /** Camera: panorama -> market -> own plot; resolves at the end (short and calm with reduced motion). */
   flyIntro(reducedMotion: boolean): Promise<void>;
+  /** Comic wipe into the plot, used instead of the long flight when available. */
+  showPlot?(reducedMotion: boolean): Promise<void>;
+  /** Comic wipe to the market, then the camera frames Sir Byte and the board. */
+  showMarketBoard?(reducedMotion: boolean): Promise<void>;
+  /** Short camera push onto the quest board before the Daily Quests open. */
+  zoomBoard?(reducedMotion: boolean): Promise<void>;
   /** Camera: closer to the figure for the final scene. */
   flyCloseUp(reducedMotion: boolean): Promise<void>;
   /** Own figure stands still in front of the house slot (ruin). */
@@ -103,6 +109,8 @@ export interface TutorialContext {
   signal?: AbortSignal;
   /** pause after the dance before the Daily Quests open, in ms */
   endPauseMs?: number;
+  /** pause that lets the pupil read the sad line, in ms (default 1500) */
+  sadPauseMs?: number;
 }
 
 class Aborted extends Error {}
@@ -232,13 +240,15 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
       if (guide) {
         await ui.guard(village.flyMarket?.(reduced()) ?? Promise.resolve());
         await ui.guard(guide.ask('hello'));
-        await ui.guard(guide.ask('welcome'));
         await ui.guard(guide.ask('ready'));
         guide.atPlot();
       }
-      await ui.guard(village.flyIntro(reduced()));
+      await ui.guard(village.showPlot?.(reduced()) ?? village.flyIntro(reduced()));
       const sad = ui.bubble(SAD_TEXT, 'sad');
       if (guide) {
+        // Let the pupil read the sad line, then clear it before Sir Byte answers: never two bubbles.
+        await ui.guard(new Promise<void>((resolve) => setTimeout(resolve, ctx.sadPauseMs ?? 1500)));
+        sad();
         for (const key of ['ruin', 'quests', 'coins'] as const) await ui.guard(guide.ask(key));
       } else for (const text of MESSAGES) await ui.guard(ui.card(text, NEXT));
       // continueTutorial answers ok after errcode 22023 with a re-read state; if that is still
@@ -299,15 +309,22 @@ export async function runTutorial(ctx: TutorialContext): Promise<void> {
       state = { ...state, step: 'done', needed: false };
     }
 
-    // 7. closing scene: closer camera, one dance, the final line, then the Daily Quests
+    // 7. closing scene: closer camera, one dance, then the board at the market
     await ui.guard(village.flyCloseUp(reduced()));
     guide?.react('celebrate');
     const happy = guide ? () => guide.hideBubble() : ui.bubble(FINAL_TEXT, 'happy');
     const dance = village.danceOnce();
     const finish = safe(() => api.finish());
     await ui.guard(dance);
-    guide?.say('final');
-    await ui.guard(new Promise((r) => setTimeout(r, ctx.endPauseMs ?? 1500)));
+    if (guide) {
+      await ui.guard(guide.ask('final'));
+      await ui.guard(village.showMarketBoard?.(reduced()) ?? Promise.resolve());
+      guide.pointBoard?.();
+      await ui.guard(guide.ask('board'));
+      await ui.guard(village.zoomBoard?.(reduced()) ?? Promise.resolve());
+    } else {
+      await ui.guard(new Promise((r) => setTimeout(r, ctx.endPauseMs ?? 1500)));
+    }
     happy();
     let result = await ui.guard(finish);
     while (!result.ok) {

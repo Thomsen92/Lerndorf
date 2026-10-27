@@ -115,6 +115,8 @@ export class AvatarCustomizer {
     for (const { part, root } of this.current) {
       root.visible = this.detailed;
       if (!this.detailed) continue;
+      // Mesh names describe the source base, and may name unrelated meshes on the other base.
+      if (part.character !== this.kind) continue;
       for (const name of part.hideMeshes ?? []) {
         const o = this.root.getObjectByName(name);
         if (o) o.visible = false;

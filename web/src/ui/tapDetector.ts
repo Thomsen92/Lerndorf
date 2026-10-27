@@ -5,6 +5,7 @@
 export interface TapDetector {
   /** A primary pointer starts a fresh gesture: stale ids from lost events are dropped. */
   down(id: number, x: number, y: number, isPrimary?: boolean): void;
+  move(id: number, x: number, y: number): void;
   /** Forgets a pointer whose up event ended elsewhere (window level); never counts as a tap. */
   release(id: number): void;
   /** Returns true when the finished gesture counts as a tap. */
@@ -31,6 +32,9 @@ export function createTapDetector(maxMove = 8): TapDetector {
       startId = id;
       start = { x, y };
       tainted = false;
+    },
+    move(id, x, y) {
+      if (active.has(id) && id === startId && Math.hypot(x - start.x, y - start.y) > maxMove) tainted = true;
     },
     up(id, x, y) {
       const had = active.delete(id);

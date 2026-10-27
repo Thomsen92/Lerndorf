@@ -5,6 +5,7 @@ import type { AvatarSlot } from './look';
 export interface AvatarPart {
   id: string;
   runtimeId: string;
+  /** Source asset directory; accessories can be worn by either character. */
   character: CharacterKind;
   name: string;
   price: number;
@@ -25,6 +26,9 @@ export const avatarCatalog = (manifest.items as AvatarPart[]).map((part) => ({
   name: tr(part.name),
 }));
 export const partById = (id: string): AvatarPart | undefined => avatarCatalog.find((i) => i.id === id);
+export function canWear(part: AvatarPart | undefined, character: CharacterKind): boolean {
+  return !!part && (part.slot !== 'bottoms' || part.character === character);
+}
 export function partUrl(part: AvatarPart, thumbnail = false): string {
   return `${import.meta.env.BASE_URL}assets/characters/wardrobe/${part.character}/${thumbnail ? part.thumbnail : part.url}`;
 }

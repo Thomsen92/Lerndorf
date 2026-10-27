@@ -9,15 +9,15 @@ export const VOICE = {
 export type VoicedReaction = keyof typeof VOICE;
 export const LINES = {
   ready: VOICE.idle.line,
-  hello: "Hello! I'm Sir Byte.",
-  welcome: 'Welcome to Lerndorf, your class village!',
+  hello:
+    "Hello! I'm Sir Byte, your cheeky tutor. At your service... apparently. Welcome to your class village!",
   toHouse: "Let's go to your house!",
-  ruin: "Oh no, your house is a ruin! Let's fix it.",
-  quests: 'Every day there are Daily Quests. They are short English tasks.',
-  coins: 'Right answers give you coins. You can buy things for your house.',
-  quiz: 'Answer three easy questions. Then you get coins for a new house.',
-  buy: 'Well done! Now buy the new house.',
-  place: 'Put your new house here.',
+  ruin: "Don't worry. Let's build it up again!",
+  quests: 'Every day there are new Daily Quests. Just a few short English tasks.',
+  coins: 'Right answers earn you coins. Coins buy things for your house.',
+  quiz: 'Three little questions. Then you get coins for a new house.',
+  buy: 'Splendid! Now buy your new house.',
+  place: 'Put it right here. Go on!',
   final: "Now let's do your Daily Quests!",
   board: 'Your Daily Quests are on this board!',
   allDone: "That's all for today. See you tomorrow!",
@@ -25,5 +25,20 @@ export const LINES = {
   catchUp: "You can still do yesterday's quests.",
 } as const;
 export type LineKey = keyof typeof LINES;
+/** Recordings of single lines, as file names without folder and extension. */
+export const CLIPS: Partial<Record<LineKey, string>> = {
+  hello: 'hello',
+  ruin: 'ruin',
+  quests: 'quests',
+  coins: 'coins',
+  quiz: 'quiz',
+  buy: 'buy',
+  place: 'place',
+  final: 'final',
+  board: 'board',
+  catchUp: 'catch-up',
+  allDone: 'all-done',
+  allDoneMarket: 'all-done-market',
+};
 export const bubbleSeconds = (text: string, clip: number | null): number =>
   clip === null ? Math.min(8, 2.5 + 0.06 * text.length) : clip + 1.5;

@@ -1,5 +1,7 @@
 import { tr, msg } from '../i18n';
 import type { AvatarBadge } from './avatarBadge';
+import { coinBurst } from './coinBurst';
+import './gameNav.css';
 /**
  * Two accessible shortcuts beside the avatar in the top right. No village/market shortcut or rail.
  */
@@ -41,6 +43,12 @@ export function createGameNav(opts: {
   coins: number;
   onSelect: (area: NavButton, button: HTMLButtonElement) => void;
   onAccount: (button: HTMLButtonElement) => void;
+  /** Opens the news feed (coin history and notices) from the bell under the avatar. */
+  onNews?: () => void;
+  /** Return to the market and frame Sir Byte with the quest board. */
+  onByte?: (button: HTMLButtonElement) => void;
+  sound?: { play(name: 'coins'): void };
+  reducedMotion?: () => boolean;
 }): GameNav {
   const el = document.createElement('nav');
   el.className = 'game-nav';
@@ -89,7 +97,40 @@ export function createGameNav(opts: {
   live.setAttribute('aria-live', 'polite');
 
   const statusElement = opts.badge?.el ?? status;
-  el.append(statusElement, live);
+  const bell = document.createElement('button');
+  bell.type = 'button';
+  bell.className = 'nav-bell';
+  bell.setAttribute('aria-label', tr('Neuigkeiten'));
+  bell.title = tr('Neuigkeiten');
+  bell.innerHTML =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" focusable="false" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>';
+  bell.addEventListener('click', () => opts.onNews?.());
+  const user = document.createElement('div');
+  user.className = 'nav-user';
+  let byteButton: HTMLButtonElement | undefined;
+  user.append(statusElement);
+  if (opts.onByte) {
+    byteButton = document.createElement('button');
+    byteButton.type = 'button';
+    byteButton.className = 'nav-byte';
+    byteButton.setAttribute('aria-label', tr('Zu Sir Byte und der Questtafel'));
+    byteButton.title = tr('Zu Sir Byte und der Questtafel');
+    const portrait = document.createElement('img'),
+      label = document.createElement('span');
+    portrait.src = `${import.meta.env.BASE_URL}assets/sir-byte/preview.png`;
+    portrait.alt = '';
+    portrait.draggable = false;
+    label.textContent = 'Sir Byte';
+    byteButton.append(portrait, label);
+    byteButton.onclick = () => {
+      if (!locked) opts.onByte?.(byteButton!);
+    };
+    const actions = document.createElement('div');
+    actions.className = 'nav-user-actions';
+    actions.append(byteButton, bell);
+    user.append(actions);
+  } else user.append(bell);
+  el.append(user, live);
 
   let coinsNow = opts.coins;
   const renderStatus = (): void => {
@@ -127,6 +168,10 @@ export function createGameNav(opts: {
     },
     setLocked(on) {
       locked = on;
+      if (byteButton) {
+        if (on) byteButton.setAttribute('aria-disabled', 'true');
+        else byteButton.removeAttribute('aria-disabled');
+      }
       for (const b of buttons.values()) {
         if (on) b.setAttribute('aria-disabled', 'true');
         else b.removeAttribute('aria-disabled');
@@ -139,6 +184,12 @@ export function createGameNav(opts: {
       opts.badge?.setCoins?.(coins);
       live.textContent = msg`Du hast jetzt ${coins} Münzen.`;
       if (diff > 0) {
+        coinBurst({
+          at: coinsEl,
+          amount: diff,
+          reduced: opts.reducedMotion?.() ?? false,
+          sound: opts.sound,
+        });
         const tag = document.createElement('span');
         tag.className = 'gain';
         tag.setAttribute('aria-hidden', 'true');

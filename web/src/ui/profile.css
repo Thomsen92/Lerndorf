@@ -101,6 +101,10 @@
   color: #d3bde9;
   font-size: 16px;
 }
+.profile-area .profile-current-title:has(.title-plaque) {
+  padding: 0;
+  border-bottom: 0;
+}
 .profile-area .profile-wallet {
   margin: 9px 0 0;
   color: #ffd16d;
@@ -282,6 +286,12 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 12px;
+}
+.collection-grid--titles {
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+.profile-area .collection-grid--titles .collection-card > button {
+  min-height: 116px;
 }
 .collection-card {
   overflow: hidden;

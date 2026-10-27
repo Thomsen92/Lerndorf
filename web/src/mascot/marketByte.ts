@@ -13,6 +13,8 @@ export interface TutorialGuide {
   react(reaction: MascotReaction): void;
   atPlot(plot?: Plot): void;
   pointHouse(): void;
+  /** Points the cane at the quest board without opening it. */
+  pointBoard(): void;
   hideBubble(): void;
   restore(): void;
 }
@@ -20,13 +22,30 @@ export function marketPose(layout: Layout) {
   const face = Math.atan2(layout.plaza.x - layout.board.x, layout.plaza.z - layout.board.z);
   return {
     position: new THREE.Vector3(
-      layout.board.x - 3.0 * Math.cos(face) + Math.sin(face) * 0.6,
+      layout.board.x - 3.5 * Math.cos(face) + Math.sin(face) * 1.0,
       layout.plazaHeight + 0.9,
-      layout.board.z + 3.0 * Math.sin(face) + Math.cos(face) * 0.6,
+      layout.board.z + 3.5 * Math.sin(face) + Math.cos(face) * 1.0,
     ),
     face,
   };
 }
+
+/** Camera stop in front of Sir Byte: 5.5 m away and a little lower than eye level. */
+export function marketStopPose(at: THREE.Vector3, face: number) {
+  return {
+    position: at.clone().add(new THREE.Vector3(Math.sin(face) * 5.5, 2.6, Math.cos(face) * 5.5)),
+    target: at.clone().add(new THREE.Vector3(0, 1.35, 0)),
+  };
+}
+/** Camera pose that frames Sir Byte together with the quest board. */
+export function marketBoardPose(byte: THREE.Vector3, face: number, layout: Layout) {
+  const board = new THREE.Vector3(layout.board.x, layout.plazaHeight + 1.6, layout.board.z);
+  return {
+    position: byte.clone().add(new THREE.Vector3(Math.sin(face) * 6.5, 2.9, Math.cos(face) * 6.5)),
+    target: byte.clone().lerp(board, 0.45),
+  };
+}
+
 export type MarketByte = ReturnType<typeof createMarketByte>;
 export function createMarketByte(opts: {
   scene: THREE.Scene;
@@ -35,7 +54,11 @@ export function createMarketByte(opts: {
   openQuests: () => void;
   questState?: () => Promise<{ todayOpen: boolean; catchUpOpen: boolean }>;
 }) {
-  const mascot = createMascot({ voice: createVoicePlayer({ sound: opts.sound }), quality: 'low' });
+  const mascot = createMascot({
+    voice: createVoicePlayer({ sound: opts.sound }),
+    quality: 'low',
+    lift: true,
+  });
   const root = new THREE.Group();
   root.name = 'Sir Byte';
   root.add(mascot.root);
@@ -78,12 +101,14 @@ export function createMarketByte(opts: {
           if (token === ticket) mascot.stopVoice();
         });
       }
-      mascot.say(key);
+      void mascot.say(key);
       return bubble.ask(LINES[key]);
     },
     say(key) {
-      ticket++;
-      bubble.show(mascot.say(key), true);
+      const token = ++ticket;
+      void mascot.say(key).then((say) => {
+        if (!disposed && token === ticket) bubble.show(say, true);
+      });
     },
     react(reaction) {
       const token = ++ticket;
@@ -122,6 +147,13 @@ export function createMarketByte(opts: {
       mascot.point(world);
       guide.say('place');
     },
+    pointBoard() {
+      pointing = true;
+      root.updateMatrixWorld(true);
+      mascot.point(
+        new THREE.Vector3(opts.layout.board.x, opts.layout.plazaHeight + 2, opts.layout.board.z),
+      );
+    },
     hideBubble() {
       ticket++;
       bubble.hide();
@@ -159,7 +191,10 @@ export function createMarketByte(opts: {
           guide.react('celebrate');
           const token = ticket;
           window.setTimeout(() => {
-            if (!disposed && token === ticket) bubble.show(mascot.say('allDoneMarket'));
+            if (disposed || token !== ticket) return;
+            void mascot.say('allDoneMarket').then((say) => {
+              if (!disposed && token === ticket) bubble.show(say);
+            });
           }, 3700);
         } else {
           pointing = true;
@@ -167,12 +202,18 @@ export function createMarketByte(opts: {
           mascot.point(
             new THREE.Vector3(opts.layout.board.x, opts.layout.plazaHeight + 2, opts.layout.board.z),
           );
-          bubble.show(mascot.say(state.todayOpen ? 'board' : 'catchUp'));
+          const token = ticket;
+          void mascot.say(state.todayOpen ? 'board' : 'catchUp').then((say) => {
+            if (!disposed && token === ticket) bubble.show(say);
+          });
         }
       } catch {
         if (!disposed && !covered) {
           pointing = true;
-          bubble.show(mascot.say('board'));
+          const token = ticket;
+          void mascot.say('board').then((say) => {
+            if (!disposed && token === ticket) bubble.show(say);
+          });
         }
       } finally {
         busy = false;

@@ -1,5 +1,5 @@
 import type { CharacterKind } from '../render/character';
-import { partById } from './catalog';
+import { partById, canWear } from './catalog';
 export type AvatarSlot = 'headwear' | 'hair' | 'face' | 'necklace' | 'back' | 'bag' | 'wrist' | 'bottoms';
 export type ColorChannel = 'hair' | 'skin' | 'shoes' | 'bottoms' | 'top';
 export interface AvatarLook {
@@ -77,7 +77,7 @@ export function validateLook(
     throw Error('Invalid parts');
   for (const id of look.items) {
     const p = partById(id);
-    if (!p || p.character !== kind || !owned.includes(id)) throw Error('Part unavailable');
+    if (!canWear(p, kind) || !owned.includes(id)) throw Error('Part unavailable');
     if (look.items.some((other) => other !== id && conflicts(id, other))) throw Error('Conflicting parts');
   }
   for (const [c, value] of Object.entries(look.colors)) {

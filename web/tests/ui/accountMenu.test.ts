@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { openAccountMenu } from '../../src/ui/accountMenu';
+import { setUiScale } from '../../src/ui/uiScale';
 import { getLocale, setLocale } from '../../src/i18n';
 import type { ModalHandle } from '../../src/ui/dialog';
 
@@ -14,7 +15,6 @@ function setup(over: Partial<Parameters<typeof openAccountMenu>[0]> = {}) {
     coins: 42,
     quality: 'auto' as const,
     onQuality: vi.fn(),
-    onLedger: vi.fn(),
     onLogout: vi.fn(),
     ...over,
   };
@@ -85,16 +85,18 @@ describe('openAccountMenu', () => {
     expect(btn('Auto').getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('Kontoauszug closes the menu before calling onLedger', () => {
-    let openWhenCalled: boolean | null = null;
-    const { handle: h } = setup({
-      onLedger: () => {
-        openWhenCalled = h.isOpen;
-      },
-    });
-    btn('Kontoauszug').click();
-    expect(openWhenCalled).toBe(false);
-    expect(document.querySelector('[role="dialog"]')).toBeNull();
+  it('offers three interface sizes and applies the chosen one', () => {
+    setUiScale('m');
+    setup();
+    expect(btn('Mittel').getAttribute('aria-pressed')).toBe('true');
+    btn('Groß').click();
+    expect(document.documentElement.dataset.ui).toBe('l');
+    expect(btn('Groß').getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('no longer carries the ledger, that moved to the news bell', () => {
+    setup();
+    expect(document.body.textContent).not.toContain('Kontoauszug');
   });
 
   it('Abmelden calls onLogout', () => {

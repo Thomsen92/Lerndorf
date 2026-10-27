@@ -161,6 +161,7 @@ function run(f: ReturnType<typeof fakeServer>, extra: { signal?: AbortSignal } =
     reducedMotion: () => false,
     thumbs: async () => null,
     endPauseMs: 0,
+    sadPauseMs: 0,
     ...extra,
   });
   return { done, onCoins, openDailyQuests, villageFn };
@@ -187,6 +188,7 @@ describe('runTutorial', () => {
       react: vi.fn(),
       atPlot: vi.fn(),
       pointHouse: vi.fn(),
+      pointBoard: vi.fn(),
       hideBubble: vi.fn(),
       restore: vi.fn(),
     };
@@ -198,7 +200,6 @@ describe('runTutorial', () => {
     await until(() => document.querySelector('.tutorial-quiz') !== null, 'quiz with guide');
     expect(byte.ask.mock.calls.map((c) => c[0])).toEqual([
       'hello',
-      'welcome',
       'ready',
       'ruin',
       'quests',

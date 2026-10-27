@@ -9,6 +9,19 @@ import { tr } from '../i18n';
  */
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import {
+  configureTabletCamera,
+  bindVillageTwist,
+  limitVillagePan,
+  stopOrbitMotion,
+  zoomVillageCamera,
+} from '../render/tabletCamera';
+import { createCameraTools } from './cameraTools';
+import { createHouseCards } from './houseCards';
+import { createQuestBoardCue } from './questBoardCue';
+import { questBoardView } from '../render/questBoardCamera';
+import { openVisitorProfile } from './visitorProfile';
+import { loadPublicProfile } from '../api/publicProfile';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { AutoLogout, AUTO_LOGOUT_MS } from '../auth/autoLogout';
 import {
@@ -50,7 +63,7 @@ import { openCharacterPicker } from './characterPicker';
 import { BuildMode, type EnterOptions } from '../render/buildMode';
 import { BuildFx, loadPuffTexture } from '../render/buildFx';
 import { createSound } from './sound';
-import { createMarketByte, type MarketByte } from '../mascot/marketByte';
+import { createMarketByte, marketBoardPose, marketStopPose, type MarketByte } from '../mascot/marketByte';
 import { silenceSirByte } from '../mascot/voice';
 import { acquireSessionThumbs } from '../render/itemThumbs';
 import type { SlotId } from '../world/plotPlan';
@@ -58,6 +71,7 @@ import { sheetViewOffset } from '../render/houseCamera';
 import { FLIGHT_SECONDS, houseView, lerpPose, onPlot, type CameraPose } from '../render/houseCamera';
 import { closeUpPath, introPath, type CameraPath } from '../render/introCamera';
 import { frameTutorialSubjects } from '../render/tutorialFraming';
+import { runComicWipe } from './comicWipe';
 import { finishTutorial, getTutorialState, type TutorialState } from '../api/tutorial';
 import { runTutorial, type TutorialVillage } from './tutorial/flow';
 import { PLACE_BUTTON, PLACE_HINT } from './tutorial/messages';
@@ -170,6 +184,9 @@ export async function mountVillage(
   document.addEventListener('keydown', onEscape);
 
   let removeWindowPointer: (() => void) | null = null;
+  let disposeCameraControls = () => {};
+  let disposeHouseCards = () => {};
+  let disposeBoardCue = () => {};
   let disposeCrowd = () => {};
   const stop = (): void => {
     tutorialAbort.abort();
@@ -193,6 +210,9 @@ export async function mountVillage(
     removeWindowPointer?.();
     autoLogout.stop();
     running = false;
+    disposeCameraControls();
+    disposeHouseCards();
+    disposeBoardCue();
     renderer?.setAnimationLoop(null);
     window.removeEventListener('resize', resize);
     for (const ev of activity) window.removeEventListener(ev, onActivity);
@@ -343,6 +363,37 @@ export async function mountVillage(
     }));
   const village = buildVillage(layout, labels, ownPlot);
   scene.add(village);
+  village.userData.externalHouseCards = true;
+  village.traverse((object) => {
+    if (object instanceof THREE.Sprite && object.userData.house) {
+      object.visible = false;
+      object.raycast = () => {};
+    }
+  });
+  const showVisitor = (id: string, opener?: HTMLElement) => {
+    stopOrbitMotion(controls);
+    modals.track(
+      openVisitorProfile({
+        id,
+        opener,
+        load: async (playerId) => {
+          const result = await loadPublicProfile(supabase, playerId);
+          if (result.ok && running) houseCards.updateMember(result.value);
+          return result;
+        },
+      }),
+    );
+  };
+  const houseCards = createHouseCards({
+    host: root,
+    plots: layout.plots,
+    members,
+    ownId: profile.id,
+    onOwn: () => void areas?.select('haus'),
+    onVisit: showVisitor,
+  });
+  houseCards.setVisible(!inTutorial);
+  disposeHouseCards = () => houseCards.dispose();
   const classNotice = loadClassNotice(supabase, profile.classId).then((n) => {
     if (running) setBoardNote(village, n?.text ?? null);
     return n;
@@ -408,23 +459,67 @@ export async function mountVillage(
   const homeTarget = home ? new THREE.Vector3(home.x, home.h, home.z) : new THREE.Vector3(-2, 0, 2);
   const marketTarget = new THREE.Vector3(layout.plaza.x, layout.plazaHeight, layout.plaza.z);
   const camera = cameraRef;
+  let marketCameraElevation = 0;
+  let marketFocused = false;
   camera.position.copy(homeTarget).add(new THREE.Vector3(14, 22, 26));
   const controls = new OrbitControls(camera, gl.domElement);
   controls.target.copy(homeTarget);
-  controls.enableDamping = true;
-  controls.minDistance = 12;
-  controls.maxDistance = 150;
-  controls.maxPolarAngle = 1.2;
+  configureTabletCamera(controls, window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
   controls.update();
+  const releaseTwist = bindVillageTwist(gl.domElement, controls);
+  controls.addEventListener?.('start', () => {
+    if (marketFocused) {
+      marketFocused = false;
+      houseCards.setVisible(!inTutorial && (areas?.current ?? 'dorf') === 'dorf');
+    }
+  });
+  const cameraTools = createCameraTools({
+    home: !!home,
+    zoom: (factor) => zoomVillageCamera(controls, factor),
+    reset: () => {
+      byte.guide.hideBubble();
+      marketCameraElevation = 0;
+      marketFocused = false;
+      houseCards.setVisible(!inTutorial);
+      stopOrbitMotion(controls);
+      flight = null;
+      camera.position.copy(homeTarget).add(new THREE.Vector3(14, 22, 26));
+      controls.target.copy(homeTarget);
+      controls.enabled = true;
+      controls.enablePan = true;
+      controls.update();
+    },
+  });
+  cameraTools.hidden = inTutorial;
+  root.append(cameraTools);
+  disposeCameraControls = () => {
+    releaseTwist();
+    cameraTools.remove();
+    controls.dispose?.();
+  };
 
   // camera flight into the house view (animation loop advances it)
-  let flight: { from: CameraPose; to: CameraPose; t: number } | null = null;
+  let flight: { from: CameraPose; to: CameraPose; t: number; onArrive?: () => void } | null = null;
   let paused = false;
+  const boardObject = village.getObjectByName('questBoard');
+  const boardCue = createQuestBoardCue({
+    host: root,
+    board: boardObject,
+    layout,
+    onOpen: () => {
+      if (!inTutorial && !flight) void areas?.select('aufgaben');
+    },
+  });
+  boardCue.setVisible(!inTutorial);
+  disposeBoardCue = () => boardCue.dispose();
   const reducedMotion = (): boolean =>
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   puffTexture = loadPuffTexture();
   fx = new BuildFx(scene, { texture: puffTexture, reducedMotion });
   const applyControls = (area: NavArea): void => {
+    cameraTools.hidden = inTutorial || area !== 'dorf';
+    houseCards.setVisible(!inTutorial && area === 'dorf' && !marketFocused);
+    boardCue.setVisible(!inTutorial && area === 'dorf');
     if (!HOUSE_AREAS.has(area)) {
       flight = null; // leaving the house cancels a running flight
       controls.enabled = true;
@@ -446,14 +541,20 @@ export async function mountVillage(
   };
   const finishFlight = (): void => {
     if (!flight) return;
-    setPose(lerpPose(flight.from, flight.to, 1));
+    const arrived = flight;
+    setPose(lerpPose(arrived.from, arrived.to, 1));
     flight = null;
+    arrived.onArrive?.();
   };
   const onAreaChange = (area: NavArea, previous: NavArea): void => {
     if (!running) return;
     if (inTutorial) return;
     nav?.setActive(area);
     if (home && HOUSE_AREAS.has(area) && !HOUSE_AREAS.has(previous)) {
+      byte.guide.hideBubble();
+      marketCameraElevation = 0;
+      marketFocused = false;
+      stopOrbitMotion(controls);
       const from: CameraPose = { position: camera.position.clone(), target: controls.target.clone() };
       flight = { from, to: houseView(home), t: 0 };
       if (reducedMotion()) finishFlight();
@@ -476,10 +577,31 @@ export async function mountVillage(
   // tap a villager: it waves. A drag (camera move) is not a tap.
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
+  gl.domElement.addEventListener('pointermove', (ev) => {
+    if (inTutorial || paused || flight || ev.buttons || !boardObject) {
+      boardCue.setHovered(false);
+      return;
+    }
+    const rect = gl.domElement.getBoundingClientRect();
+    pointer.set(
+      ((ev.clientX - rect.left) / rect.width) * 2 - 1,
+      -((ev.clientY - rect.top) / rect.height) * 2 + 1,
+    );
+    raycaster.setFromCamera(pointer, camera);
+    const hovered = raycaster.intersectObject(boardObject, true).length > 0;
+    boardCue.setHovered(hovered);
+    gl.domElement.style.cursor = hovered ? 'pointer' : '';
+  });
+  gl.domElement.addEventListener('pointerleave', () => {
+    boardCue.setHovered(false);
+    gl.domElement.style.cursor = '';
+  });
   const taps = createTapDetector(8);
   gl.domElement.addEventListener('pointerdown', (ev) =>
     taps.down(ev.pointerId, ev.clientX, ev.clientY, ev.isPrimary),
   );
+  gl.domElement.addEventListener('pointermove', (ev) => taps.move(ev.pointerId, ev.clientX, ev.clientY));
+  gl.domElement.addEventListener('lostpointercapture', (ev) => taps.cancel(ev.pointerId));
   // up/cancel may end outside the canvas (nav, menu): window listeners keep the detector from getting stuck
   const onWindowPointerEnd = (ev: PointerEvent): void => taps.release(ev.pointerId);
   const onWindowPointerCancel = (ev: PointerEvent): void => taps.cancel(ev.pointerId);
@@ -521,7 +643,20 @@ export async function mountVillage(
       return;
     }
     // the own house: tap opens the house menu
-    if (hit && home && onPlot(home, hit.point)) void areas?.select('haus');
+    if (hit && home && onPlot(home, hit.point)) {
+      void areas?.select('haus');
+      return;
+    }
+    if (hit) {
+      const owner = members.find(
+        (m) =>
+          m.id !== profile.id &&
+          m.plotIndex !== null &&
+          layout.plots[m.plotIndex] &&
+          onPlot(layout.plots[m.plotIndex], hit.point),
+      );
+      if (owner) showVisitor(owner.id);
+    }
   });
 
   // build mode: only on the own plot
@@ -625,7 +760,6 @@ export async function mountVillage(
           choice = q;
           applyQuality();
         },
-        onLedger: () => modals.track(openLedger(supabase, opener)),
         onCharacter: () => pickCharacter(false, opener),
         onLogout: () => void logout(),
       }),
@@ -759,8 +893,38 @@ export async function mountVillage(
     nickname: profile.nickname,
     coins: coinsNow,
     badge,
+    sound,
+    reducedMotion,
     onSelect: (area) => void ctl.select(area),
     onAccount: openSettings,
+    onNews: () => modals.track(openLedger(supabase, nav?.el ?? document.body)),
+    onByte: () => {
+      if (inTutorial) return;
+      void ctl.select('dorf').then(() => {
+        if (!running || inTutorial || ctl.current !== 'dorf') return;
+        stopOrbitMotion(controls);
+        marketFocused = true;
+        houseCards.setVisible(false);
+        byte.restore();
+        byte.guide.pointBoard();
+        const to = questBoardView(layout, camera.aspect, camera.fov);
+        marketCameraElevation = to.target.y - layout.terrain.groundHeight(to.target.x, to.target.z);
+        flight = {
+          from: { position: camera.position.clone(), target: controls.target.clone() },
+          to,
+          t: 0,
+          onArrive: () => {
+            if (running && !inTutorial && !paused && !modals.anyOpen && ctl.current === 'dorf')
+              byte.guide.say('board');
+          },
+        };
+        controls.enabled = false;
+        if (reducedMotion()) {
+          finishFlight();
+          applyControls('dorf');
+        }
+      });
+    },
   });
   root.appendChild(nav.el);
   nav.setActive('dorf');
@@ -776,6 +940,7 @@ export async function mountVillage(
     updateTag: (info) => {
       const tag = { nickname: profile.nickname, ...info };
       (village.userData.updateOwnTag as ((info: typeof tag) => void) | undefined)?.(tag);
+      houseCards.updateMember({ id: profile.id, ...tag });
       crowd.setOwnTag?.(tag);
     },
     setQuestBadge: (n) => nav?.setQuestBadge(n),
@@ -832,13 +997,7 @@ export async function mountVillage(
       byte.setCovered(on);
     },
     flyMarket: (reduced) => {
-      const at = byte.root.position.clone();
-      const face = byte.root.rotation.y;
-      const target = at.clone().add(new THREE.Vector3(0, 1.2, 0));
-      const to = {
-        position: at.clone().add(new THREE.Vector3(Math.sin(face) * 7, 3.2, Math.cos(face) * 7)),
-        target,
-      };
+      const to = marketStopPose(byte.root.position, byte.root.rotation.y);
       const from = {
         position: marketTarget.clone().add(new THREE.Vector3(25, 35, 30)),
         target: marketTarget.clone(),
@@ -850,6 +1009,25 @@ export async function mountVillage(
       ownPlot === null
         ? Promise.resolve()
         : playPath(pathFrom(currentPose(), withByte(introPath(layout, ownPlot, reduced), true))),
+    showPlot: (reduced) => {
+      if (ownPlot === null) return Promise.resolve();
+      const path = withByte(introPath(layout, ownPlot, reduced), true);
+      const pose = path.at(path.duration);
+      return runComicWipe(() => setPose(pose), reduced);
+    },
+    showMarketBoard: (reduced) =>
+      runComicWipe(() => {
+        byte.restore();
+        setPose(marketBoardPose(byte.root.position, byte.root.rotation.y, layout));
+      }, reduced),
+    zoomBoard: (reduced) => {
+      const from = currentPose();
+      const target = new THREE.Vector3(layout.board.x, layout.plazaHeight + 1.6, layout.board.z);
+      const dir = from.position.clone().sub(from.target).normalize();
+      const to = { position: target.clone().addScaledVector(dir, 3.2), target };
+      const duration = reduced ? 0.2 : 0.45;
+      return playPath({ duration, at: (t) => lerpPose(from, to, Math.min(1, t / duration)) });
+    },
     flyCloseUp: (reduced) =>
       ownPlot === null
         ? Promise.resolve()
@@ -903,6 +1081,9 @@ export async function mountVillage(
   worldOnCoins = onCoins;
   const setTutorialMode = (on: boolean): void => {
     inTutorial = on;
+    cameraTools.hidden = on || (areas?.current ?? 'dorf') !== 'dorf';
+    houseCards.setVisible(!on && (areas?.current ?? 'dorf') === 'dorf');
+    boardCue.setVisible(!on && (areas?.current ?? 'dorf') === 'dorf');
     nav?.setLocked(on);
     controls.enabled = !on;
   };
@@ -967,7 +1148,18 @@ export async function mountVillage(
     (village.userData.labelUpdate as ((c: THREE.Camera) => void) | undefined)?.(camera);
     crowd.updateLabels(camera);
     controls.update();
+    if (!inTutorial && !flight && (areas?.current ?? 'dorf') === 'dorf') {
+      limitVillagePan(
+        camera,
+        controls.target,
+        (x, z) => layout.terrain.groundHeight(x, z),
+        undefined,
+        marketCameraElevation,
+      );
+    }
     rig.follow(controls.target);
+    houseCards.update(camera);
+    boardCue.update(camera);
     buildMode?.update(now / 1000);
     fx?.update(dt, camera);
     gl.render(scene, camera);

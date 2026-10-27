@@ -53,7 +53,6 @@ function home() {
         coins,
         quality: 'auto',
         onQuality: () => {},
-        onLedger: () => {},
         onLogout: () => {},
         sound: { on: true, onChange: () => {} },
       }),

@@ -1,0 +1,56 @@
+.quest-board-cue {
+  position: fixed;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transform: translate(-50%, -100%);
+  min-width: 140px;
+  min-height: 72px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  font:
+    800 14px/1.2 'Atkinson Hyperlegible',
+    Verdana,
+    sans-serif;
+}
+.quest-board-cue[hidden] {
+  display: none;
+}
+.quest-board-label {
+  padding: 9px 14px;
+  background: #182747;
+  color: #fff5c4;
+  border: 2px solid #ffce38;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px #121a3866;
+}
+.quest-board-cue img {
+  width: 38px;
+  height: 38px;
+  filter: drop-shadow(0 2px 2px #16213c99);
+  animation: quest-arrow 1.5s ease-in-out infinite;
+}
+.quest-board-cue.is-highlighted .quest-board-label {
+  background: #25466d;
+  border-color: #fff6b0;
+}
+.quest-board-cue:focus-visible {
+  outline: 3px solid #75f5ff;
+  outline-offset: 5px;
+  border-radius: 12px;
+}
+@keyframes quest-arrow {
+  50% {
+    transform: translateY(5px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quest-board-cue img {
+    animation: none;
+  }
+}

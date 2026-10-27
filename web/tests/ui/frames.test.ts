@@ -5,6 +5,8 @@ import { crestTier, crestSvg } from '../../src/ui/crest';
 it('falls back to wood and draws gold ornament', () => {
   expect(frameStyle('x').id).toBe('frame_wood');
   expect(frameSvg('frame_gold', 80).querySelector('[data-ornament=crown]')).not.toBeNull();
+  expect(frameSvg('frame_gold', 80).querySelector('[data-art="rank-frame"]')).not.toBeNull();
+  expect(crestSvg(7, 64).querySelector('[data-art="rank-shield"]')).not.toBeNull();
 });
 it('uses tier boundaries and meaningful ribbon', () => {
   expect([4, 5, 10, 15, 20, 25, 30].map(crestTier)).toEqual([

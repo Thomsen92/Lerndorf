@@ -94,6 +94,13 @@ it('keeps a failed selection unchanged, retries and prevents choosing locked tit
   await new Promise((r) => setTimeout(r, 0));
   expect(onTitle).toHaveBeenCalledWith('Quest Rookie');
   expect(all().find((b) => b.getAttribute('aria-label') === 'Quest Rookie, gewählt')).toBeTruthy();
+  all()
+    .find((b) => b.getAttribute('aria-label') === 'Zurück zum Profil')!
+    .click();
+  expect(document.querySelector('.profile-current-title .title-plaque')?.getAttribute('data-rank')).toBe(
+    'bronze',
+  );
+  expect(document.querySelector('.profile-current-title')?.textContent).toBe('Quest Rookie');
   h.close();
 });
 

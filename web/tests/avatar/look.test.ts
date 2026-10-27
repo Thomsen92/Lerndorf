@@ -18,7 +18,9 @@ describe('wardrobe rules', () => {
   it('rejects unowned, incompatible, duplicate and conflicting parts', () => {
     const id = 'avatar_boy_gold_chain';
     expect(() => validateLook({ items: [id], colors: {} }, 'boy', [])).toThrow();
-    expect(() => validateLook({ items: [id], colors: {} }, 'girl', [id])).toThrow();
+    expect(() =>
+      validateLook({ items: ['avatar_girl_slim_jeans'], colors: {} }, 'boy', ['avatar_girl_slim_jeans']),
+    ).toThrow();
     expect(() => validateLook({ items: [id, id], colors: {} }, 'boy', [id])).toThrow();
     expect(() =>
       validateLook(
@@ -41,5 +43,15 @@ describe('wardrobe rules', () => {
     expect(lookKey({ items: ['b', 'a'], colors: { hair: '#5b3a29', shoes: '#d9d9e6' } })).toBe(
       lookKey({ items: ['a', 'b'], colors: { shoes: '#d9d9e6', hair: '#5b3a29' } }),
     );
+  });
+  it('accepts every owned accessory on both characters, with unchanged item IDs', () => {
+    for (const part of avatarCatalog.filter((p) => p.slot !== 'bottoms'))
+      for (const kind of ['boy', 'girl'] as const) {
+        expect(
+          () => validateLook({ items: [part.id], colors: {} }, kind, [part.id]),
+          `${kind}: ${part.id}`,
+        ).not.toThrow();
+        expect(() => validateLook({ items: [part.id], colors: {} }, kind, [])).toThrow(/unavailable/);
+      }
   });
 });

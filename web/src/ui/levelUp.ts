@@ -4,6 +4,7 @@ import { PROGRESS_ERROR } from '../api/progress';
 import { openModal, type ModalHandle } from './dialog';
 import type { Sound } from './sound';
 import { crestSvg } from './crest';
+import { titlePlaque } from './titlePlaque';
 import { createChestControl, type ChestControl } from './chestControl';
 export { chestResultText } from './chestControl';
 const button = (label: string, run: (b: HTMLButtonElement) => void): HTMLButtonElement => {
@@ -85,6 +86,7 @@ export function openLevelUp(opts: CelebrationOptions): ModalHandle {
     error.setAttribute('role', 'status');
     row.append(
       label,
+      ...(reward.kind === 'title' ? [titlePlaque(reward.label, opts.levelTo)] : []),
       button(reward.kind === 'title' ? tr('Jetzt wählen') : tr('Jetzt anlegen'), (b) => {
         b.disabled = true;
         void (reward.kind === 'title' ? opts.api.setTitle(reward.id) : opts.api.setFrame(reward.id))

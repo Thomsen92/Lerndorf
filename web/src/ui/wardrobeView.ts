@@ -1,7 +1,7 @@
 import { tr, html } from '../i18n';
 import './wardrobe.css';
 import type { WardrobeApi, WardrobeData } from '../api/wardrobe';
-import { avatarCatalog, partById, partUrl } from '../avatars/catalog';
+import { avatarCatalog, partById, partUrl, canWear } from '../avatars/catalog';
 import { emptyLook, equipInLook, lookKey, type AvatarLook, type ColorChannel } from '../avatars/look';
 import { createWardrobeStage, type WardrobeStage } from '../render/wardrobeStage';
 import type { AreaHandle } from './areas';
@@ -21,7 +21,7 @@ export function openWardrobe(opts: {
   el.setAttribute('aria-modal', 'true');
   el.setAttribute('aria-label', tr('Kleiderschrank'));
   el.innerHTML = html(
-    `<header class="wardrobe-head"><button type="button" data-action="back">← Zurück</button><h1>Kleiderschrank</h1><button type="button" class="wardrobe-done" data-action="done" disabled>Fertig</button></header><div class="wardrobe-layout"><div class="wardrobe-scene"><div class="wardrobe-stage"></div><div class="wardrobe-rotate"><button type="button" aria-label="Nach links drehen">↶</button><span>Ziehe, um dich zu drehen</span><button type="button" aria-label="Nach rechts drehen">↷</button></div><button type="button" class="wardrobe-reset">Ansicht zurücksetzen</button></div><aside class="wardrobe-inventory" aria-label="Deine Sachen"><nav class="wardrobe-tabs" aria-label="Auswahlbereiche"></nav><div class="wardrobe-list"></div></aside></div><p class="wardrobe-status" role="status" aria-live="polite">Dein Kleiderschrank wird vorbereitet …</p>`,
+    `<header class="wardrobe-head"><button type="button" data-action="back">← Zurück</button><h1>Kleiderschrank</h1><button type="button" class="wardrobe-done" data-action="done" disabled>Fertig</button></header><div class="wardrobe-layout"><div class="wardrobe-scene"><div class="wardrobe-stage"></div><div class="wardrobe-zoom" role="group" aria-label="Zoom"><button type="button" data-zoom="in" aria-label="Vergrößern">+</button><button type="button" data-zoom="out" aria-label="Verkleinern">−</button></div><div class="wardrobe-rotate"><button type="button" aria-label="Nach links drehen">↶</button><span>Ziehen: drehen · Zwei Finger: zoomen</span><button type="button" aria-label="Nach rechts drehen">↷</button></div><button type="button" class="wardrobe-reset">Ansicht zurücksetzen</button></div><aside class="wardrobe-inventory" aria-label="Deine Sachen"><nav class="wardrobe-tabs" aria-label="Auswahlbereiche"></nav><div class="wardrobe-list"></div></aside></div><p class="wardrobe-status" role="status" aria-live="polite">Dein Kleiderschrank wird vorbereitet …</p>`,
   );
   document.body.append(el);
   const list = el.querySelector<HTMLElement>('.wardrobe-list')!,
@@ -48,7 +48,7 @@ export function openWardrobe(opts: {
     return b;
   };
   const owned = () =>
-    avatarCatalog.filter((p) => p.character === data?.character && data.ownedIds.includes(p.id));
+    data ? avatarCatalog.filter((p) => canWear(p, data!.character) && data!.ownedIds.includes(p.id)) : [];
   const belongs = (slot: string, t: Tab) =>
     t === 'head'
       ? ['headwear', 'hair', 'face'].includes(slot)
@@ -276,7 +276,7 @@ export function openWardrobe(opts: {
       if (
         opts.initialItem &&
         data.ownedIds.includes(opts.initialItem) &&
-        partById(opts.initialItem)?.character === data.character
+        canWear(partById(opts.initialItem), data.character)
       ) {
         const p = partById(opts.initialItem)!;
         tab = belongs(p.slot, 'head') ? 'head' : belongs(p.slot, 'clothing') ? 'clothing' : 'extras';
@@ -323,6 +323,8 @@ export function openWardrobe(opts: {
     }
   };
   el.querySelector<HTMLButtonElement>('[data-action="back"]')!.onclick = () => leave(opts.onClose);
+  el.querySelector<HTMLButtonElement>('[data-zoom="in"]')!.onclick = () => stage?.zoomBy?.(1.2);
+  el.querySelector<HTMLButtonElement>('[data-zoom="out"]')!.onclick = () => stage?.zoomBy?.(1 / 1.2);
   const turns = el.querySelectorAll<HTMLButtonElement>('.wardrobe-rotate button');
   turns[0].onclick = () => stage?.rotateBy(-0.3);
   turns[1].onclick = () => stage?.rotateBy(0.3);

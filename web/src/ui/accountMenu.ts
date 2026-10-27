@@ -5,6 +5,7 @@ import { tr, msg, getLocale, setLocale, type Locale } from '../i18n';
  */
 import type { QualityChoice } from '../render/quality';
 import { openModal, type ModalHandle } from './dialog';
+import { readUiScale, setUiScale, type UiScale } from './uiScale';
 
 const QUALITY_LABEL: ReadonlyArray<readonly [QualityChoice, string]> = [
   ['auto', 'Auto'],
@@ -19,7 +20,6 @@ export function openAccountMenu(opts: {
   quality: QualityChoice;
   sound?: { on: boolean; onChange: (on: boolean) => void };
   onQuality: (q: QualityChoice) => void;
-  onLedger: () => void;
   /** opens the figure choice (boy or girl); omitted: no button */
   onCharacter?: () => void;
   onLogout: () => void;
@@ -55,6 +55,35 @@ export function openAccountMenu(opts: {
   }
   modal.body.append(language);
 
+  const size = document.createElement('div');
+  size.className = 'seg ui-size-group';
+  size.setAttribute('role', 'group');
+  size.setAttribute('aria-label', tr('Größe der Oberfläche'));
+  const sizeButtons = new Map<UiScale, HTMLButtonElement>();
+  let scale = readUiScale();
+  const refreshSize = (): void => {
+    for (const [value, b] of sizeButtons) b.setAttribute('aria-pressed', String(value === scale));
+  };
+  for (const [value, label] of [
+    ['s', tr('Klein')],
+    ['m', tr('Mittel')],
+    ['l', tr('Groß')],
+  ] as const) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    b.dataset.uiScale = value;
+    b.addEventListener('click', () => {
+      scale = value;
+      refreshSize();
+      setUiScale(value);
+    });
+    sizeButtons.set(value, b);
+    size.append(b);
+  }
+  refreshSize();
+  modal.body.append(size);
+
   const who = document.createElement('p');
   who.className = 'account-who';
   who.textContent = msg`${opts.nickname} · ${opts.coins} Münzen`;
@@ -82,14 +111,6 @@ export function openAccountMenu(opts: {
   }
   refresh();
 
-  const ledger = document.createElement('button');
-  ledger.type = 'button';
-  ledger.textContent = tr('Kontoauszug');
-  ledger.addEventListener('click', () => {
-    modal.close();
-    opts.onLedger();
-  });
-
   const figure = document.createElement('button');
   figure.type = 'button';
   figure.textContent = tr('Figur wechseln');
@@ -103,7 +124,7 @@ export function openAccountMenu(opts: {
   logout.textContent = tr('Abmelden');
   logout.addEventListener('click', () => opts.onLogout());
 
-  modal.body.append(who, group, ledger, ...(opts.onCharacter ? [figure] : []), logout);
+  modal.body.append(who, group, ...(opts.onCharacter ? [figure] : []), logout);
   if (opts.sound) {
     const setting = opts.sound;
     let on = setting.on;

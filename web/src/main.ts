@@ -6,9 +6,11 @@ import { renderLogin } from './ui/loginView';
 import { mountVillage, type VillageHandle } from './ui/villageView';
 import { takeLoginFragment } from './auth/qrLogin';
 import { isTeacherSession } from './teacher/api';
+import { applyUiScale } from './ui/uiScale';
 
 // Clear credentials before client setup, session loading or any rendering/network call.
 let qrLogin = takeLoginFragment();
+applyUiScale();
 
 async function main(): Promise<void> {
   const root = document.getElementById('app');

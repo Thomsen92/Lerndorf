@@ -6,7 +6,7 @@ import { tr, msg } from '../i18n';
  * The inventory view reuses openItemArea with origin 'inventar'.
  */
 import { KIND_LABEL, KIND_ORDER, type ItemApi, type ItemEntry, type ItemKind } from '../api/items';
-import { partById } from '../avatars/catalog';
+import { partById, canWear } from '../avatars/catalog';
 import type { CharacterKind } from '../render/character';
 import type { PreviewFactory } from '../render/itemPreview';
 import { acquireSessionThumbs, type ThumbSource } from '../render/itemThumbs';
@@ -106,7 +106,7 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
       origin === 'shop'
         ? !e.starter &&
           e.shopVisible !== false &&
-          (e.kind !== 'avatar' || !opts.character || partById(e.id)?.character === opts.character)
+          (e.kind !== 'avatar' || !opts.character || canWear(partById(e.id), opts.character))
         : e.owned > 0,
     );
   const kinds = (): ItemKind[] =>

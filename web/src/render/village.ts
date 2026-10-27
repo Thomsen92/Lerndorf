@@ -1,4 +1,4 @@
-import { CREST_COLOURS, CREST_PATHS, crestParts, crestTier, type CrestTier } from '../ui/crest';
+import { drawMedal, crestTier, type CrestTier } from '../ui/crest';
 /**
  * Builds the 3D village from a Layout: terrain, river, lanes, bridges, plaza and plots.
  * Placeholder models only (boxes and cones). The comic models come in Stufe 2.
@@ -201,26 +201,7 @@ export function drawTagCrest(
   y: number,
   size: number,
 ): void {
-  const tier = crestTier(level);
-  cx.save();
-  cx.translate(x, y);
-  cx.scale(size / 100, size / 100);
-  cx.fillStyle = CREST_COLOURS[tier];
-  cx.strokeStyle = '#493724';
-  cx.lineWidth = 3;
-  for (const key of crestParts(level)) {
-    cx.fillStyle =
-      key === 'ribbon' || key === 'rivets' ? '#fff0c9' : key === 'crown' ? '#f5d479' : CREST_COLOURS[tier];
-    const shape = new Path2D(CREST_PATHS[key]);
-    cx.fill(shape);
-    cx.stroke(shape);
-  }
-  cx.fillStyle = '#302416';
-  cx.font = 'bold 24px Georgia';
-  cx.textAlign = 'center';
-  cx.textBaseline = 'middle';
-  cx.fillText(`Lv.${level}`, 50, 75, 70);
-  cx.restore();
+  drawMedal(cx, level, x, y, size);
 }
 export function nameTagLayout(
   info: TagInfo,
@@ -538,16 +519,6 @@ function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): TH
   tag.position.set(house.lx, 7.2, house.lz);
   tag.userData = { house: true, own };
   g.add(tag);
-  if (own) {
-    // marker: a small yellow cone above the own house
-    const marker = new THREE.Mesh(
-      new THREE.ConeGeometry(0.35, 0.7, 8),
-      new THREE.MeshBasicMaterial({ color: '#ffd23f' }),
-    );
-    marker.position.set(house.lx, 8.2, house.lz);
-    marker.rotation.x = Math.PI;
-    g.add(marker);
-  }
   const contents = plotContents(p, member.slots ?? {});
   contents.name = 'contents';
   if (own) keepLive(contents);
@@ -623,7 +594,9 @@ export function buildVillage(
     const near = new THREE.Vector3();
     for (const tag of houseTags) {
       tag.getWorldPosition(near);
-      tag.visible = Boolean(tag.userData.own) || near.distanceTo(cam.position) < 28;
+      tag.visible =
+        root.userData.externalHouseCards !== true &&
+        (Boolean(tag.userData.own) || near.distanceTo(cam.position) < 28);
     }
   };
   root.userData.setSky = (sky: THREE.Texture): void => {

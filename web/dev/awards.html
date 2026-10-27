@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>Profile & awards preview</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <style>
+      body {
+        overflow: auto;
+        background: #f7efdd;
+        color: #34343f;
+        font-family: 'Atkinson Hyperlegible', Verdana, sans-serif;
+      }
+      main {
+        max-width: 1100px;
+        margin: auto;
+        padding: 32px 20px;
+      }
+      h1 {
+        font-size: 28px;
+        margin: 0 0 8px;
+      }
+      main > p {
+        color: #77664d;
+        margin-bottom: 28px;
+      }
+      .award-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+      }
+      .award-sample {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px 12px;
+        border-radius: 22px;
+        border: 1px solid #d8c8a7;
+        background: #fffaf0;
+        color: #34343f;
+        cursor: pointer;
+      }
+      .award-sample strong {
+        font-size: 16px;
+      }
+      .award-sample .avatar-portrait {
+        width: 112px;
+        height: 112px;
+      }
+      .award-sample:focus-visible {
+        outline: 3px solid #34778b;
+      }
+      .preview-note {
+        margin-top: 28px;
+        font-size: 14px;
+      }
+      h2 {
+        margin: 36px 0 16px;
+        font-size: 23px;
+      }
+      .title-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .title-sample {
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        padding: 20px;
+        background: #fffaf0;
+        border: 1px solid #d8c8a7;
+        border-radius: 18px;
+      }
+      .title-sample small {
+        color: #77664d;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Frames & rank badges</h1>
+      <p>Select a rank to preview its visitor profile. Sample data only.</p>
+      <div class="award-grid" id="awards"></div>
+      <h2>Title frames · grow with your level</h2>
+      <div class="title-grid" id="titles"></div>
+      <p class="preview-note">Original vector artwork · Existing frame IDs and level thresholds retained.</p>
+    </main>
+    <script type="module" src="./awards.ts"></script>
+  </body>
+</html>

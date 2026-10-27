@@ -1,0 +1,30 @@
+.camera-tools {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 12;
+  display: flex;
+  gap: 8px;
+}
+.camera-tools[hidden] {
+  display: none;
+}
+.camera-tools button {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid #c6b693;
+  border-radius: 14px;
+  background: #fff6e2ed;
+  color: #34343f;
+  font:
+    27px 'Comic Neue',
+    sans-serif;
+  touch-action: manipulation;
+  box-shadow: 0 2px 8px #0002;
+  cursor: pointer;
+}
+.camera-tools button:focus-visible {
+  outline: 3px solid #2d6775;
+  outline-offset: 3px;
+}

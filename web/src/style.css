@@ -151,7 +151,12 @@ button:disabled {
 }
 
 .overlay.modal {
-  z-index: 30;
+  z-index: 45;
+}
+
+/* The world bubble stays behind the modal; an opaque panel keeps it from ghosting through. */
+.overlay.modal .panel {
+  background: #161c30;
 }
 
 .overlay .panel {
@@ -1349,3 +1354,51 @@ table.ledger td {
 .reduced-motion .chest--wobble {
   animation: none;
 }
+
+/* Interface size: small, medium (default, a little smaller than before) or large.
+   Zoom scales the layout, so centred panels stay centred. */
+:root {
+  --ui: 0.9;
+}
+:root[data-ui='s'] {
+  --ui: 0.8;
+}
+:root[data-ui='m'] {
+  --ui: 0.9;
+}
+:root[data-ui='l'] {
+  --ui: 1;
+}
+.game-nav,
+.overlay .panel,
+.tutorial-card {
+  zoom: var(--ui);
+}
+
+/* Top right: the avatar badge, with the news bell right below it. */
+.nav-user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.nav-bell {
+  width: 40px;
+  height: 40px;
+  padding: 9px;
+  border-radius: 12px;
+  border: 2px solid #9a794d;
+  background: #fff4d9;
+  color: #513b24;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 3px 0 #795637;
+}
+.nav-bell:hover {
+  filter: brightness(1.04);
+}
+.nav-bell svg {
+  width: 22px;
+  height: 22px;
+}
+

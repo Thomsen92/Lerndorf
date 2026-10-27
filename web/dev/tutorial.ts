@@ -150,9 +150,14 @@ async function rpc(fn: string, args: Record<string, unknown> = {}) {
       return ok(null);
     case 'village_members':
       return ok([
-        ...others,
+        ...others.map((m,i)=>({...m,level:7+i,title_label:i<3?'Busy Bee':'Grammar Explorer',frame_id:i<3?'frame_bronze':'frame_silver'})),
         { id: 'u1', nickname: 'Fuchs', plot_index: s.plot, avatar: { character: s.character } },
       ]);
+    case 'public_profile': {
+      const m=others.find(p=>p.id===args.p_player_id);if(!m)return err('profile unavailable');
+      const i=others.indexOf(m);
+      return ok({id:m.id,nickname:m.nickname,level:7+i,title_label:i<3?'Busy Bee':'Grammar Explorer',frame_id:i<3?'frame_bronze':'frame_silver',current_streak:3+i,character:m.avatar.character,look:{items:[],colors:{}}});
+    }
     case 'my_daily_quests':
       return ok([]);
     default:
