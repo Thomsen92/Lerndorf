@@ -74,6 +74,9 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_monitor_02: { file: 'shop/monitor-02.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
   shop_monitor_05: { file: 'shop/monitor-05.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
   shop_monitor_06: { file: 'shop/monitor-06.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  // CRT televisions (0037): same FBX pack, textured with the MasterMaterial palette.
+  shop_tv_crt_07: { file: 'shop/tv-crt-07.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  shop_tv_crt_09: { file: 'shop/tv-crt-09.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
 };
 
 const BASE = `${import.meta.env.BASE_URL}assets/`;
