@@ -77,6 +77,12 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   // CRT televisions (0037): same FBX pack, textured with the MasterMaterial palette.
   shop_tv_crt_07: { file: 'shop/tv-crt-07.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
   shop_tv_crt_09: { file: 'shop/tv-crt-09.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  // Game cases, figurines and a little blue engine (0038).
+  shop_gta6_ps5_case: { file: 'shop/gta6-ps5-case.glb', kind: 'deco', fill: true },
+  shop_gta6_phone_case: { file: 'shop/gta6-phone-case.glb', kind: 'deco', fill: true },
+  shop_cute_frog: { file: 'shop/cute-round-frog.glb', kind: 'deco', fill: true },
+  shop_cute_fox: { file: 'shop/cute-fox.glb', kind: 'deco', fill: true },
+  shop_blue_engine: { file: 'shop/blue-engine.glb', kind: 'deco', fill: true },
 };
 
 const BASE = `${import.meta.env.BASE_URL}assets/`;

@@ -126,6 +126,51 @@
             "triangles": 2019,
             "bytes": 40228,
             "dims": "0,76 × 1,00 × 1,00 m"
+        },
+        {
+            "file": "gta6-ps5-case.glb",
+            "name": "Game Case",
+            "kind": "deco",
+            "price": 40,
+            "triangles": 1555,
+            "bytes": 111960,
+            "dims": "2,02 × 2,06 × 1,31 m (aufgerichtet)"
+        },
+        {
+            "file": "gta6-phone-case.glb",
+            "name": "Phone Case",
+            "kind": "deco",
+            "price": 45,
+            "triangles": 200,
+            "bytes": 179768,
+            "dims": "0,39 × 4,89 × 3,84 m"
+        },
+        {
+            "file": "cute-round-frog.glb",
+            "name": "Round Frog",
+            "kind": "deco",
+            "price": 60,
+            "triangles": 19980,
+            "bytes": 592080,
+            "dims": "1,90 × 1,64 × 1,48 m"
+        },
+        {
+            "file": "cute-fox.glb",
+            "name": "Cute Fox",
+            "kind": "deco",
+            "price": 120,
+            "triangles": 20054,
+            "bytes": 100160,
+            "dims": "3,53 × 3,67 × 2,30 m"
+        },
+        {
+            "file": "blue-engine.glb",
+            "name": "Little Blue Engine",
+            "kind": "deco",
+            "price": 180,
+            "triangles": 23934,
+            "bytes": 372544,
+            "dims": "6,02 × 7,84 × 16,64 m"
         }
     ],
     "pending": [
