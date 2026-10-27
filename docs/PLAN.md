@@ -479,7 +479,7 @@ Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md)
 | U7 | [x] | i18n/A11y: deutsche Quelltexte + englische Übersetzungen für alle neuen Flächen (Truhen, Shop, Profilkarte, Innenansicht, Banner), deutsche Gegenstandsnamen, Seltenheiten zur Laufzeit übersetzt, `aria-live` an der Stand-Leiste; i18n-Tests |
 | S3 | [x] | Migration 0031: sechs Nicht-Season-Artikel (Blockhütte 500, Beatall 600, Toyoyo 700, Präsidentenwagen 2.000, Trump-Statue 2.000, Weißes Haus 5.000), `shop_visible`, `model = 'shop/…'`, Kauf über `buy_item`; SQL-Tests |
 | U4b | [x] | Shop zeigt die sechs Nicht-Season-Artikel mit 3D-Vorschaubildern: `itemThumbs` wartet für GLB-Items auf das geladene Modell; Screenshot `shop-u4b.png` (Häuser), Preis/Kauf über `buy_item` unverändert |
-| A2 | [ ] | Asset-Reste |
+| A2 | [x] | Asset-Reste: Vertragstest über alle `items.model` (Datei existiert, echtes glTF, Fernversion vorhanden), Ausschluss der bekannten Problem-Assets (Tristar, Landyroamer, DeLorean, DAE-Häuser, `the_halloween_cat`), Lizenzzeile ergänzt |
 | L1 | [ ] | Saison-Steuerung 0032 + Lehrer-Reiter |
 | D1 | [ ] | Doku + Lehrer-Anleitung |
 | T1 | [ ] | Abnahme |
