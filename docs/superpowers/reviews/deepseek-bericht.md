@@ -9,7 +9,7 @@
 | S1 | fertig | `f0f4b32` | 0028 Schema, 0030 Inhalte (Saison 28.10.–06.12., 28 Pool-Items, 12 Szenen, 40 Stufen, 4 Titel, 4 Rahmen, Serien-Nachberechnung); `season-schema.test.ts` |
 | S2 | fertig | `b306391` | 0029 RPCs (`season_state`, `claim_season_tier`, `choose_season_item`, `buy_season_chest`, `open_season_chest`, `sell_item`, `close_season`), Serien-Trigger, Rechte; `season-rpc.test.ts` |
 | S4 | fertig | `1831e48` | 22 SQL-Tests in drei Dateien: Schema, Zustände (upcoming/running/ended), Claims, Verkauf (platziert/fremd/zu viel), Stufe-40-Wahl (Besitz → Münzen), Serie (Lücke, Tag 3), Shop-Fenster, Chancen 55/30/12/3 (400 Ziehungen) |
-| A1 | offen | – | Loader: Meshopt, async GLB-Zweig, Normalisierung, Fernversionen, Galerie |
+| A1 | fertig | `b07c7b3` | Meshopt im Loader, async GLB-Zweig mit Platzhalter, Normalisierung auf MAX_SIZE (Deko min. 0,8 m), THREE.LOD mit 34 Fernversionen; Tests + Galerie-Screenshot `web/dev/season.html` |
 | A3 | offen | – | 12 Kenney-Pass-Szenen |
 | U1–U7 | offen | – | UI nach §14 |
 | S3 | offen | – | Shop-Daten 0031 |
@@ -21,10 +21,10 @@
 
 ## Prüfungen
 
-- `npm test`: **143 Dateien, 963 Tests grün** (Stand S4).
+- `npm test`: **144 Dateien, 967 Tests grün** (Stand A1).
 - `npm run build`: grün (Vite, nur die bekannte Chunk-Größen-Warnung).
 - SQL-Tests laufen mit PGlite über alle Migrationen 0001–0030.
-- Keine Screenshots/Galerie in diesem Abschnitt (noch keine UI/3D-Änderung).
+- Galerie: `web/test-results/season-a1.png` angesehen (8 Modelle auf Sockeln, alle innerhalb MAX_SIZE, Boden auf 0).
 
 ## Abweichungen
 
@@ -37,8 +37,8 @@
 ## Offene Fragen
 
 - Keine blockierenden Fragen bisher. `set_title`/`set_frame` für Season-Titel folgt mit L1/U7.
-- A1 braucht eine Entscheidung, wie die Item-Katalogdaten (Spalte `model`) in die Dorf-Ansicht gelangen; wird beim Paket geprüft.
+- Die GLB-Registry liegt im Client (`glbItems.ts`) und wird per Test gegen beide Manifeste geprüft; die Spalte `items.model` bleibt die Server-Wahrheit.
 
 ## Nächster Schritt
 
-A1 (Loader) beginnen: `MeshoptDecoder`, asynchroner GLB-Zweig mit Platzhalter, Normalisierung auf `MAX_SIZE`, Drehung pro Item, Fernversionen, Galerie-Prüfung.
+A3: 12 Kenney-Pass-Szenen (Kopien ins öffentliche Asset-Verzeichnis, Lizenzzeile, Asset-Vertrag-Test, Galerie).
