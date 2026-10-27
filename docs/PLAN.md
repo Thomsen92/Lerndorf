@@ -482,4 +482,4 @@ Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md)
 | A2 | [x] | Asset-Reste: Vertragstest über alle `items.model` (Datei existiert, echtes glTF, Fernversion vorhanden), Ausschluss der bekannten Problem-Assets (Tristar, Landyroamer, DeLorean, DAE-Häuser, `the_halloween_cat`), Lizenzzeile ergänzt |
 | L1 | [x] | Migration 0032: `teacher_seasons`, `teacher_set_season_dates`, `teacher_start_season_now`, `teacher_end_season_now`, `teacher_season_overview`; Reiter „Saison“ mit Datumsformular, Start/Beenden/Abschließen und Klassenübersicht; SQL-Tests + Screenshot. Sonntagsregel nur noch in der RPC (frühes Beenden erlaubt) |
 | D1 | [x] | Doku: SPEC §13/§13.1 (RPCs, Regeln, Reiter), Anleitung für die Lehrkraft (LearnPass, Truhen, Saison steuern, Fehlermeldungen), Design-README mit Dateizuordnung |
-| T1 | [ ] | Abnahme |
+| T1 | [x] | Abnahme: 1004 Tests + Build grün, Galerie (37 Bilder) und alle Screenshots angesehen; Nachbesserungen 0033 (Besitz von Season-Titeln/-Rahmen), Sammlungslabels, Verkaufen im Inventar, Änderungsprotokoll; Abschlussbericht `docs/superpowers/reviews/deepseek-bericht.md` |
