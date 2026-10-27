@@ -7,6 +7,8 @@ import { titlePlaque } from './titlePlaque';
 import type { AreaHandle } from './areas';
 import type { Sound } from './sound';
 import { createChestControl, type ChestControl } from './chestControl';
+import { createSeasonCard } from './seasonCard';
+import type { SeasonApi } from '../api/season';
 import './profile.css';
 import type { AvatarLook } from '../avatars/look';
 let serial = 0;
@@ -22,6 +24,8 @@ export function openProfile(opts: {
   onSettings: (b: HTMLButtonElement) => void;
   onClose: () => void;
   onQuests?: () => void;
+  /** Season entry card (U5); omitted in read-only views without a season. */
+  season?: { api: SeasonApi; onOpen: () => void };
   sound?: Sound;
   reducedMotion: boolean;
 }): AreaHandle {
@@ -125,6 +129,7 @@ export function openProfile(opts: {
     bar.append(fill);
     xp.append(bar);
     content.append(xp);
+    if (opts.season) content.append(createSeasonCard({ api: opts.season.api, onOpen: opts.season.onOpen }));
     const daily = document.createElement('div');
     daily.className = 'profile-daily';
     const streak = document.createElement('div');

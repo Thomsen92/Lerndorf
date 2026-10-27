@@ -474,7 +474,7 @@ Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md)
 | U2 | [x] | Season-Truhen im Inventar: Abschnitt mit Zähler, Öffnen über `open_season_chest`, Ergebnis-Karte mit Seltenheitsfarbe, Duplikat-Hinweis und Münzgutschrift; Vitest + Screenshots |
 | U3 | [x] | „What's inside?“: Chancen 55/30/12/3 als Balken, alle 28 Gegenstände mit Seltenheit und Verkaufswert, Duplikat-Hinweis; Escape/Backdrop, Vitest + Screenshots |
 | U4a | [x] | Season-Truhe im Shop: 50 Münzen, zwei pro Woche, Reststand, Erfolgsmeldung und Fehlerfälle (Limit, Guthaben, Saison vorbei); Vitest + Screenshots |
-| U5 | [ ] | Profilkarte/Einstieg |
+| U5 | [x] | Profilkarte „Season I – Halloween“ mit Stufe, Restzeit und Truhen-Badge; öffnet den LearnPass über `openLearnPass` (echte API, Claims, Shop-Truhe, Inventar-Link); Badge am Inventar-Button im Haus-Menü; Vitest + Screenshot |
 | U6 | [ ] | Markt-Stand + Stimmung |
 | U7 | [ ] | i18n/A11y |
 | S3 | [ ] | Shop-Daten 0031 |

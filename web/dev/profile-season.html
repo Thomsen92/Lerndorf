@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile season card – UI harness (U5)</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #120d18; color: #f6e9d2;
+        font: 16px system-ui, sans-serif; }
+      .panel { width: min(560px, 94vw); margin: 40px auto; padding: 18px; border-radius: 18px;
+        background: #1b1322; border: 1px solid #3d2c52; }
+      h2 { margin: 0 0 14px; font-size: 22px; }
+      .profile-progress { margin-bottom: 12px; color: #b6a5c6; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <h2>My profile</h2>
+      <p class="profile-progress">48 XP to level 13</p>
+      <div id="host"></div>
+    </div>
+    <script type="module">
+      import { setLocale } from '../src/i18n.ts';
+      import { createSeasonCard } from '../src/ui/seasonCard.ts';
+      setLocale('en');
+
+      const api = {
+        async state() {
+          return {
+            season: { id: '2026-11-halloween', label: 'Season I', theme: 'halloween', starts_on: '2026-10-28', ends_on: '2026-12-06', state: 'running', days_left: 26 },
+            xp: 452, tier: 12, tiers: [], next: null,
+            chests: { pass: 2, streak: 0, shop: 0 },
+            shop: { price: 50, left: 1, week_start: '2026-10-26' },
+            streak: { current: 2, best: 4, last_day: '2026-10-26', to_chest: 1 },
+            choice: { open: false, item_id: null },
+          };
+        },
+      };
+      document.getElementById('host').append(createSeasonCard({ api, onOpen: () => {} }));
+      window.__ready = true;
+    </script>
+  </body>
+</html>

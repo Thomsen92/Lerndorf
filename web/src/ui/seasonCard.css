@@ -1,0 +1,67 @@
+/* Season card in the profile (U5). */
+.profile-season {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px 14px;
+  border: 1px solid #3d2c52;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #2a1f3a, #1b1322);
+  color: #f6e9d2;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.profile-season:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+.profile-season.ended {
+  border-color: #6b5a3a;
+}
+.profile-season-icon svg {
+  width: 50px;
+  height: 42px;
+}
+.profile-season-text strong {
+  display: block;
+  font-size: 16px;
+}
+.profile-season-meta {
+  display: block;
+  margin-top: 2px;
+  color: #b6a5c6;
+  font-size: 13px;
+}
+.profile-season-badge {
+  min-width: 30px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ff8f2b;
+  color: #2b1408;
+  font-weight: 800;
+  font-size: 13px;
+  text-align: center;
+}
+.profile-season-arrow {
+  color: #b6a5c6;
+  font-size: 18px;
+}
+
+.house-menu-badge {
+  display: inline-grid;
+  place-content: center;
+  min-width: 22px;
+  height: 22px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ff8f2b;
+  color: #2b1408;
+  font-size: 12px;
+  font-weight: 800;
+  vertical-align: middle;
+}

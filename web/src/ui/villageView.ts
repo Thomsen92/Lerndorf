@@ -56,6 +56,7 @@ import { emptyLook, readWardrobe } from '../avatars/look';
 import { openShop } from './shopView';
 import { openInventory } from './inventoryView';
 import { seasonApi } from '../api/season';
+import { openLearnPass } from './learnpass/openLearnPass';
 import { openDailyQuests } from './dailyQuestsView';
 import { loadDailyQuests } from '../api/quests';
 import { openLedger } from './ledgerView';
@@ -822,6 +823,17 @@ export async function mountVillage(
           onTitle: (label) => progressFlow.titleChanged(label),
           onSettings: openSettings,
           onQuests: () => void areas?.select('aufgaben'),
+          season: {
+            api: seasonApi(supabase),
+            onOpen: () =>
+              openLearnPass({
+                api: seasonApi(supabase),
+                getCoins: () => coinsNow,
+                onCoins,
+                reducedMotion: reducedMotion(),
+                onOpenInventory: () => void areas?.select('inventar'),
+              }),
+          },
           onClose: () => void areas?.select('dorf'),
           sound,
           reducedMotion: reducedMotion(),
@@ -831,10 +843,15 @@ export async function mountVillage(
           showNotice(tr('Du hast noch kein Grundstück.'));
           return null;
         }
+        const season = await seasonApi(supabase)
+          .state()
+          .catch(() => null);
+        const waiting = season ? season.chests.pass + season.chests.streak + season.chests.shop : 0;
         return openHouseMenu({
           onBuild: () => void areas?.select('bauen'),
           onShop: () => void areas?.select('shop'),
           onInventory: () => void areas?.select('inventar'),
+          inventoryBadge: waiting,
           onWardrobe: () => void areas?.select('kleiderschrank'),
           onSettings: openSettings,
           onBack: () => void areas?.select('dorf'),

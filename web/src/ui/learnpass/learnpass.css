@@ -534,3 +534,21 @@ button.lp-tile {
     grid-template-columns: 1fr;
   }
 }
+
+.learnpass-error {
+  position: fixed;
+  inset: auto 0 24px;
+  z-index: 90;
+  width: min(420px, 92vw);
+  margin: 0 auto;
+  padding: 16px;
+  border: 1px solid #a33;
+  border-radius: 14px;
+  background: #2a0f14;
+  color: #ffd9d9;
+  text-align: center;
+  box-shadow: 0 16px 40px #000a;
+}
+.learnpass-error p {
+  margin: 0 0 12px;
+}
