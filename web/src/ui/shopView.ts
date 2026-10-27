@@ -1,4 +1,6 @@
 import { tr, msg } from '../i18n';
+import type { SeasonApi } from '../api/season';
+import { createSeasonChests } from './seasonChests';
 /**
  * Shop and inventory areas (non-modal, SPEC §12): a category bar and a grid of item cards.
  * A card opens the shared detail dialog (purchase flow or inventory actions). After a change the list is
@@ -33,6 +35,8 @@ export interface ItemAreaOptions {
   createPreview?: PreviewFactory;
   /** Thumbnail source; default: the session WebGL source (renderer released when the area closes). */
   thumbs?: ThumbSource;
+  /** Season API: shows the season chest block in the inventory. */
+  season?: SeasonApi;
 }
 
 let counter = 0;
@@ -69,6 +73,16 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
   panel.append(head, content);
   area.appendChild(panel);
   document.body.appendChild(area);
+  if (origin === 'inventar' && opts.season) {
+    content.prepend(
+      createSeasonChests({
+        api: opts.season,
+        getCoins: opts.getCoins,
+        onCoins: opts.onCoins,
+        reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+      }),
+    );
+  }
 
   let closed = false;
   let book: ItemEntry[] | null = null;

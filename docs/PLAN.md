@@ -471,7 +471,7 @@ Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md)
 | A1 | [x] | Meshopt im Loader, async GLB-Zweig mit Platzhalter, Normalisierung auf `MAX_SIZE` (Deko min. 0,8 m), `THREE.LOD` mit Fernversionen (34 Dateien); Galerie-Screenshot `web/dev/season.html`; 8 Fernversionen bleiben topologiebedingt über 2.000 Dreiecke |
 | A3 | [x] | 12 Kenney-Pass-Szenen aus 32 kopierten Modellen (`passScenes.ts`), Lizenzzeile, Asset-Vertrag-Test, Galerie-Screenshot |
 | U1 | [x] | LearnPass-Seite nach §14: Kopf, Stand-Leiste, 40 Karten mit Belohnungsbildern, DU-Marke, Schienen-Punkte, vier Kacheln; API-Client, i18n, Vitest, Screenshots 1180×820 und 390×844 |
-| U2 | [ ] | Truhen im Inventar |
+| U2 | [x] | Season-Truhen im Inventar: Abschnitt mit Zähler, Öffnen über `open_season_chest`, Ergebnis-Karte mit Seltenheitsfarbe, Duplikat-Hinweis und Münzgutschrift; Vitest + Screenshots |
 | U3 | [ ] | What's inside? |
 | U4a | [ ] | Shop: Season-Truhe |
 | U5 | [ ] | Profilkarte/Einstieg |

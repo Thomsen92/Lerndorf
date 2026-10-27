@@ -40,8 +40,14 @@ export interface ClaimResult {
   rewards: { coins?: number; chest?: boolean; title_id?: string; frame_id?: string; item?: unknown; choice?: boolean };
 }
 
+export interface SeasonChest {
+  id: number;
+  source: 'pass' | 'streak' | 'shop';
+}
+
 export interface SeasonApi {
   state(): Promise<SeasonState>;
+  chests(): Promise<SeasonChest[]>;
   claim(tier: number): Promise<ClaimResult>;
   choose(itemId: string): Promise<{ chosen: string; coins?: number }>;
   buyChest(): Promise<{ left: number }>;
@@ -59,6 +65,14 @@ export function seasonApi(supabase: SupabaseClient): SeasonApi {
     async state() {
       const { data, error } = await supabase.rpc('season_state');
       return unwrap<SeasonState>(data, error);
+    },
+    async chests() {
+      const { data, error } = await supabase
+        .from('season_chests')
+        .select('id, source')
+        .is('opened_at', null)
+        .order('id');
+      return unwrap<SeasonChest[]>(data, error);
     },
     async claim(tier) {
       const { data, error } = await supabase.rpc('claim_season_tier', { p_tier: tier });

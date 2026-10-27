@@ -55,6 +55,7 @@ import { supabaseWardrobeApi } from '../api/wardrobe';
 import { emptyLook, readWardrobe } from '../avatars/look';
 import { openShop } from './shopView';
 import { openInventory } from './inventoryView';
+import { seasonApi } from '../api/season';
 import { openDailyQuests } from './dailyQuestsView';
 import { loadDailyQuests } from '../api/quests';
 import { openLedger } from './ledgerView';
@@ -771,6 +772,7 @@ export async function mountVillage(
   let shopFromWardrobe = false;
   const itemOptions = (area: 'shop' | 'inventar') => ({
     api: supabaseItemApi(supabase, profile.id),
+    season: seasonApi(supabase),
     getCoins: () => coinsNow,
     onCoins,
     shopOpen,
