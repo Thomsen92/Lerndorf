@@ -69,6 +69,11 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   // Halloween decorations (0035): both fill the 3 x 3 pedestal when normalised.
   shop_candy_cauldron: { file: 'shop/candy-cauldron.glb', kind: 'deco', fill: true },
   shop_chibi_trick_or_treater: { file: 'shop/chibi-trick-or-treater.glb', kind: 'deco', fill: true },
+  // Retro monitor decorations (0036): imported from FBX, they fill the 3 x 3 pedestal too.
+  shop_monitor_01: { file: 'shop/monitor-01.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  shop_monitor_02: { file: 'shop/monitor-02.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  shop_monitor_05: { file: 'shop/monitor-05.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  shop_monitor_06: { file: 'shop/monitor-06.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
 };
 
 const BASE = `${import.meta.env.BASE_URL}assets/`;

@@ -72,6 +72,42 @@
             "triangles": 10112,
             "bytes": 249588,
             "dims": "0,95 × 1,00 × 0,81 m"
+        },
+        {
+            "file": "monitor-01.glb",
+            "name": "Retro Monitor",
+            "kind": "deco",
+            "price": 40,
+            "triangles": 1400,
+            "bytes": 11796,
+            "dims": "0,29 × 0,56 × 0,60 m"
+        },
+        {
+            "file": "monitor-02.glb",
+            "name": "Retro Workstation",
+            "kind": "deco",
+            "price": 70,
+            "triangles": 2228,
+            "bytes": 18516,
+            "dims": "0,63 × 0,56 × 0,60 m"
+        },
+        {
+            "file": "monitor-05.glb",
+            "name": "Terminal Console",
+            "kind": "deco",
+            "price": 110,
+            "triangles": 3688,
+            "bytes": 32296,
+            "dims": "0,69 × 0,63 × 0,60 m"
+        },
+        {
+            "file": "monitor-06.glb",
+            "name": "Mainframe Terminal",
+            "kind": "deco",
+            "price": 90,
+            "triangles": 815,
+            "bytes": 7852,
+            "dims": "0,71 × 0,94 × 0,65 m"
         }
     ],
     "pending": [
