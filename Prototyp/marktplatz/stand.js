@@ -1,0 +1,27 @@
+import * as T from './vendor/three.module.js';
+import {OrbitControls} from './vendor/OrbitControls.js';
+import {GLTFLoader} from './vendor/GLTFLoader.js';
+const $=id=>document.getElementById(id),stage=$('stand-stage'),scene=new T.Scene();
+scene.background=new T.Color('#2d3a67');scene.fog=new T.Fog('#2d3a67',20,48);
+const renderer=new T.WebGLRenderer({antialias:true,powerPreference:'low-power'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;stage.append(renderer.domElement);
+const camera=new T.PerspectiveCamera(38,1,.1,70),controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.enablePan=false;controls.minDistance=5.5;controls.maxDistance=16;controls.minPolarAngle=.38;controls.maxPolarAngle=1.45;controls.target.set(0,1.55,0);
+const hemi=new T.HemisphereLight('#a9b8e8','#3a5a3a',1.15),sun=new T.DirectionalLight('#ffd2a1',1.6);sun.position.set(-5,8,6);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-5,right:5,top:5,bottom:-5,near:.1,far:25});sun.shadow.bias=-.0006;sun.shadow.normalBias=.04;scene.add(hemi,sun);
+const ground=new T.Mesh(new T.PlaneGeometry(70,70),new T.MeshStandardMaterial({color:'#5f8f52',roughness:.88}));ground.rotation.x=-Math.PI/2;ground.position.y=-.035;ground.receiveShadow=true;scene.add(ground);
+const paving=new T.Mesh(new T.CylinderGeometry(3.6,3.7,.055,48),new T.MeshStandardMaterial({color:'#b9a98f',roughness:.88}));paving.position.y=-.025;paving.receiveShadow=true;scene.add(paving);
+for(const r of [2.4,3.3]){const ring=new T.Mesh(new T.RingGeometry(r,r+.023,48),new T.MeshStandardMaterial({color:'#9d8d75',roughness:1}));ring.rotation.x=-Math.PI/2;ring.position.y=.006;scene.add(ring);}
+let model,raf=0,night=false,down=null;const errors=[],dialog=$('stand-dialog');let opener=$('stand-welcome');
+function showWelcome(from){opener=from||$('stand-welcome');if(!dialog.open)dialog.showModal();}
+$('stand-welcome').addEventListener('click',()=>showWelcome($('stand-welcome')));$('season-ticket').addEventListener('click',()=>showWelcome($('season-ticket')));$('stand-dialog-close').addEventListener('click',()=>dialog.close());dialog.addEventListener('close',()=>opener.focus({preventScroll:true}));
+function pose(back=false){controls.enableDamping=false;controls.update();camera.position.set(back?-5.4:5.4,4.3,back?-8:8);controls.target.set(0,1.55,0);controls.update();controls.enableDamping=true;}
+$('stand-front').addEventListener('click',()=>pose());$('stand-back').addEventListener('click',()=>pose(true));
+$('stand-light').addEventListener('click',()=>{night=!night;hemi.intensity=night?.60:1.15;sun.intensity=night?.95:1.6;sun.color.set(night?'#db6466':'#ffd2a1');renderer.toneMappingExposure=night?.78:1.05;$('stand-light').setAttribute('aria-pressed',String(night));});
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;camera.aspect=w/h;camera.fov=w<h?52:38;camera.updateProjectionMatrix();renderer.setSize(w,h);}
+addEventListener('resize',resize);new ResizeObserver(resize).observe(stage);
+const ray=new T.Raycaster(),pointer=new T.Vector2(),hitBounds=new T.Box3();
+function hits(e){if(!model)return false;const r=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);hitBounds.setFromObject(model);return ray.ray.intersectsBox(hitBounds);}
+stage.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY};});stage.addEventListener('pointerup',e=>{if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<6&&hits(e))showWelcome($('stand-welcome'));down=null;});stage.addEventListener('pointercancel',()=>{down=null;});
+stage.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();showWelcome(stage);}if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const offset=camera.position.clone().sub(controls.target);offset.applyAxisAngle(new T.Vector3(0,1,0),e.key==='ArrowLeft'?-.14:.14);camera.position.copy(controls.target).add(offset);controls.update();}});
+function frame(){controls.update();renderer.render(scene,camera);raf=requestAnimationFrame(frame);}document.addEventListener('visibilitychange',()=>{cancelAnimationFrame(raf);if(!document.hidden)frame();});
+function textures(){const sizes=new Set();model.traverse(o=>{if(o.isMesh)for(const m of [].concat(o.material))for(const t of [m.map,m.normalMap,m.roughnessMap].filter(Boolean))sizes.add(t.image.width+'x'+t.image.height);});return [...sizes];}
+try{const gltf=await new GLTFLoader().loadAsync('./assets/season-starter/halloween-shop-event.glb');model=gltf.scene;model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});scene.add(model);renderer.shadowMap.needsUpdate=true;$('stand-loading').hidden=true;resize();pose();frame();window.standPreview={ready:true,front:()=>pose(),back:()=>pose(true),welcome:()=>showWelcome(),stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,errors:[...errors],size:new T.Box3().setFromObject(model).getSize(new T.Vector3()).toArray(),textures:textures()})};}catch(e){errors.push(e.message);$('stand-loading').textContent='Stand konnte nicht geladen werden: '+e.message;console.error(e);}

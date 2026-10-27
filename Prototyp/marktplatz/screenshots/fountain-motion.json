@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "displacement": 0.14435315132141113,
+  "centralBursts": true,
+  "reducedMotionFreezesJets": true,
+  "errors": [],
+  "stats": {
+    "fps": 70,
+    "calls": 112,
+    "triangles": 115179,
+    "maxCalls": 120,
+    "maxTriangles": 125437,
+    "loadMs": 547,
+    "quality": 1,
+    "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 (0x00002786) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "frames": 323,
+    "sceneTriangles": 115179,
+    "reducedMotion": true,
+    "tour": false,
+    "failures": []
+  }
+}

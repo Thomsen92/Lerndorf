@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 128" role="img" aria-labelledby="title desc">
+  <title id="title">Season I Halloween ticket</title>
+  <desc id="desc">A purple fairground ticket with golden edges, a crescent moon, bats and a little pumpkin.</desc>
+  <defs><linearGradient id="paper" x2="0" y2="1"><stop stop-color="#372344"/><stop offset="1" stop-color="#160e24"/></linearGradient><linearGradient id="gold" x2="1" y2="1"><stop stop-color="#ffdf8d"/><stop offset="1" stop-color="#bd783e"/></linearGradient></defs>
+  <path d="M17 9H223Q231 9 231 17V43A21 21 0 0 0 231 85V111Q231 119 223 119H17Q9 119 9 111V85A21 21 0 0 0 9 43V17Q9 9 17 9Z" fill="url(#paper)" stroke="url(#gold)" stroke-width="4"/>
+  <path d="M178 19V109" stroke="#d6a85d" stroke-width="2" stroke-dasharray="4 5"/>
+  <path d="M20 30V20H39M148 20H165V35M20 97V108H39M147 108H165V96" fill="none" stroke="#926d54" stroke-width="2"/>
+  <path d="M52 27A15 15 0 1 0 68 47A16 16 0 0 1 52 27Z" fill="#f5cd78"/>
+  <path d="m92 29 8 4 6-7 6 7 8-4-5 13-9-4-9 4Z" fill="#a98ac0"/>
+  <text x="94" y="72" text-anchor="middle" fill="#ffe1a0" font-family="Georgia,serif" font-weight="bold" font-size="25">SEASON I</text>
+  <text x="94" y="94" text-anchor="middle" fill="#bfb0cb" font-family="Arial,sans-serif" font-size="11" letter-spacing="2">HALLOWEEN</text>
+  <path d="m201 43 5-6 5 2-5 9" fill="none" stroke="#85956b" stroke-width="4"/>
+  <ellipse cx="205" cy="67" rx="16" ry="21" fill="#c66b35"/><ellipse cx="205" cy="67" rx="10" ry="21" fill="#e99549"/>
+  <path d="m196 59 6 6h-8Zm12 0 7 6h-8Zm-13 14 9 4 11-4-5 9h-10Z" fill="#2a192d"/>
+</svg>

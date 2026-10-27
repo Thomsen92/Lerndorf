@@ -1,0 +1,150 @@
+{
+  "counts": {
+    "fountain": 1,
+    "carved": 34,
+    "candle": 3,
+    "pumpkin": 28,
+    "stall": 4,
+    "lantern": 8,
+    "cauldron": 1,
+    "bowl": 1,
+    "candy": 2,
+    "cat": 1,
+    "tree": 4,
+    "headstone": 7,
+    "grave": 7,
+    "candles": 4,
+    "iron": 6,
+    "fence": 4,
+    "bench": 2,
+    "rubble": 2,
+    "pine": 34,
+    "rock": 11,
+    "zombie": 2,
+    "skeleton": 1,
+    "vampire": 1,
+    "keeper": 1
+  },
+  "files": [
+    {
+      "file": "kenney/graveyard/bench.glb",
+      "bytes": 15952,
+      "triangles": 160
+    },
+    {
+      "file": "kenney/graveyard/candle-multiple.glb",
+      "bytes": 17304,
+      "triangles": 162
+    },
+    {
+      "file": "kenney/graveyard/candle.glb",
+      "bytes": 6800,
+      "triangles": 54
+    },
+    {
+      "file": "kenney/graveyard/character-keeper.glb",
+      "bytes": 250200,
+      "triangles": 1141
+    },
+    {
+      "file": "kenney/graveyard/character-skeleton.glb",
+      "bytes": 202796,
+      "triangles": 658
+    },
+    {
+      "file": "kenney/graveyard/character-vampire.glb",
+      "bytes": 248132,
+      "triangles": 1100
+    },
+    {
+      "file": "kenney/graveyard/character-zombie.glb",
+      "bytes": 245500,
+      "triangles": 1078
+    },
+    {
+      "file": "kenney/graveyard/debris.glb",
+      "bytes": 25132,
+      "triangles": 240
+    },
+    {
+      "file": "kenney/graveyard/detail-bowl.glb",
+      "bytes": 17472,
+      "triangles": 176
+    },
+    {
+      "file": "kenney/graveyard/fence-damaged.glb",
+      "bytes": 30152,
+      "triangles": 320
+    },
+    {
+      "file": "kenney/graveyard/grave.glb",
+      "bytes": 25080,
+      "triangles": 256
+    },
+    {
+      "file": "kenney/graveyard/gravestone-round.glb",
+      "bytes": 16832,
+      "triangles": 178
+    },
+    {
+      "file": "kenney/graveyard/iron-fence.glb",
+      "bytes": 38576,
+      "triangles": 376
+    },
+    {
+      "file": "kenney/graveyard/lantern-candle.glb",
+      "bytes": 22124,
+      "triangles": 224
+    },
+    {
+      "file": "kenney/graveyard/pine-crooked.glb",
+      "bytes": 35944,
+      "triangles": 336
+    },
+    {
+      "file": "kenney/graveyard/pumpkin-carved.glb",
+      "bytes": 46164,
+      "triangles": 486
+    },
+    {
+      "file": "kenney/graveyard/pumpkin.glb",
+      "bytes": 35344,
+      "triangles": 348
+    },
+    {
+      "file": "kenney/town/fountain-round-detail.glb",
+      "bytes": 136888,
+      "triangles": 1628
+    },
+    {
+      "file": "kenney/town/rock-small.glb",
+      "bytes": 12620,
+      "triangles": 128
+    },
+    {
+      "file": "kenney/town/stall-green.glb",
+      "bytes": 27120,
+      "triangles": 322
+    },
+    {
+      "file": "season1/candy-pile.glb",
+      "bytes": 191116,
+      "triangles": 1796
+    },
+    {
+      "file": "season1/jack-o-lantern-tree.glb",
+      "bytes": 425452,
+      "triangles": 3069.666666666667
+    },
+    {
+      "file": "season1/kit-cauldron.glb",
+      "bytes": 170144,
+      "triangles": 1371.6666666666667
+    },
+    {
+      "file": "season1/spooky-pumpkin-cat.glb",
+      "bytes": 271352,
+      "triangles": 1070.6666666666667
+    }
+  ]
+}

@@ -1,0 +1,878 @@
+{
+  "success": true,
+  "models": [
+    {
+      "id": "lantern-verbs",
+      "triangles": 1492,
+      "materials": 5,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.0062699997797608376,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "pumpkin-comparisons",
+      "triangles": 1264,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.007645003031939268,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "ghost-questions",
+      "triangles": 1288,
+      "materials": 5,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.006170002743601799,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "witch-recipe",
+      "triangles": 1436,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.00697000278159976,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "haunted-prepositions",
+      "triangles": 1628,
+      "materials": 4,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.005570000037550926,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "blood-moon-story",
+      "triangles": 1100,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.007569999899715185,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "night-light",
+      "triangles": 1072,
+      "materials": 5,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.00797000015154481,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "bat-cat",
+      "triangles": 1404,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.009818063583225012,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "moon-spoon",
+      "triangles": 1100,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.007569999899715185,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "book-look",
+      "triangles": 1404,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.009818063583225012,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "adjective-key",
+      "triangles": 1328,
+      "materials": 4,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.0057700015604496,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "past-footsteps",
+      "triangles": 1416,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.007319999858736992,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "talking-pumpkin",
+      "triangles": 1220,
+      "materials": 5,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.007170002907514572,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "time-for-tea",
+      "triangles": 1600,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.007069999817758799,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "better-late",
+      "triangles": 1700,
+      "materials": 5,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.007170002907514572,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "two-heads",
+      "triangles": 1488,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.00787000311538577,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "practice-perfect",
+      "triangles": 1856,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.006120000500231981,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "friend-in-need",
+      "triangles": 1020,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.007470000069588423,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "hidden-key",
+      "triangles": 1540,
+      "materials": 5,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.0072700027376413345,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "slow-steady",
+      "triangles": 1572,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.008069999981671572,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "rain-train",
+      "triangles": 1512,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.005969999823719263,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "quiet-mouse",
+      "triangles": 1372,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.00797000015154481,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "silver-lining",
+      "triangles": 1224,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.007069999817758799,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "book-cover",
+      "triangles": 1604,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.007470000069588423,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "actions-words",
+      "triangles": 1188,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.00646999990567565,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "birds-feather",
+      "triangles": 1144,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.006620001047849655,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "sleepy-skeletons",
+      "triangles": 1628,
+      "materials": 5,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.00827000243589282,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "echo-verse",
+      "triangles": 1436,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.00697000278159976,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "fortune-brave",
+      "triangles": 1076,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.00866999989375472,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "knowledge-power",
+      "triangles": 1376,
+      "materials": 6,
+      "textures": [
+        [
+          1024,
+          768
+        ]
+      ],
+      "dimensionsXYZ": [
+        0.07199999690055847,
+        0.008870000019669533,
+        0.1080000028014183
+      ],
+      "frontAndBack": true,
+      "sourceMatchesExport": true
+    }
+  ],
+  "motifs": [
+    {
+      "id": "lantern-verbs",
+      "triangles": 536,
+      "materials": 2,
+      "dimensionsXYZ": [
+        0.019999999552965164,
+        0.002700004377402365,
+        0.022850003093481064
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "pumpkin-comparisons",
+      "triangles": 308,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.022314809262752533,
+        0.005274999886751175,
+        0.022502011619508266
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "ghost-questions",
+      "triangles": 332,
+      "materials": 2,
+      "dimensionsXYZ": [
+        0.019999999552965164,
+        0.0025999998906627297,
+        0.023999999277293682
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "witch-recipe",
+      "triangles": 480,
+      "materials": 4,
+      "dimensionsXYZ": [
+        0.024000000208616257,
+        0.004199999384582043,
+        0.030210833996534348
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "haunted-prepositions",
+      "triangles": 672,
+      "materials": 1,
+      "dimensionsXYZ": [
+        0.02419999986886978,
+        0.0022000070894137025,
+        0.02309470158070326
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "blood-moon-story",
+      "triangles": 144,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.03799999877810478,
+        0.005399999674409628,
+        0.026999999769032
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "night-light",
+      "triangles": 116,
+      "materials": 2,
+      "dimensionsXYZ": [
+        0.026629582047462463,
+        0.00430000014603138,
+        0.025326237082481384
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "bat-cat",
+      "triangles": 448,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.028117815032601357,
+        0.007748062955215573,
+        0.022000000812113285
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "moon-spoon",
+      "triangles": 144,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.03799999877810478,
+        0.005399999674409628,
+        0.026999999769032
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "book-look",
+      "triangles": 448,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.028117815032601357,
+        0.007748062955215573,
+        0.022000000812113285
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "adjective-key",
+      "triangles": 372,
+      "materials": 1,
+      "dimensionsXYZ": [
+        0.027665686793625355,
+        0.002000005915760994,
+        0.02283480577170849
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "past-footsteps",
+      "triangles": 460,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.02500000037252903,
+        0.003649999969638884,
+        0.024899999611079693
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "talking-pumpkin",
+      "triangles": 264,
+      "materials": 2,
+      "dimensionsXYZ": [
+        0.02800000086426735,
+        0.0034000000450760126,
+        0.023000000976026058
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "time-for-tea",
+      "triangles": 644,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.0277999984100461,
+        0.004399999510496855,
+        0.028020179830491543
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "better-late",
+      "triangles": 744,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.026200000196695328,
+        0.003800000878982246,
+        0.026200003921985626
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "two-heads",
+      "triangles": 532,
+      "materials": 4,
+      "dimensionsXYZ": [
+        0.024412695318460464,
+        0.0051999997813254595,
+        0.02700000163167715
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "practice-perfect",
+      "triangles": 900,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.029100479558110237,
+        0.0020129189360886812,
+        0.029221887700259686
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "friend-in-need",
+      "triangles": 64,
+      "materials": 2,
+      "dimensionsXYZ": [
+        0.02800000086426735,
+        0.003999999957159162,
+        0.02599999960511923
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "hidden-key",
+      "triangles": 584,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.020999999716877937,
+        0.003999999957159162,
+        0.023500001057982445
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "slow-steady",
+      "triangles": 616,
+      "materials": 4,
+      "dimensionsXYZ": [
+        0.026314809918403625,
+        0.006399999372661114,
+        0.018000000156462193
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "rain-train",
+      "triangles": 556,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.02800000086426735,
+        0.001999999862164259,
+        0.02759999968111515
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "quiet-mouse",
+      "triangles": 416,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.02251057792454958,
+        0.004699999699369073,
+        0.023000000044703484
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "silver-lining",
+      "triangles": 268,
+      "materials": 2,
+      "dimensionsXYZ": [
+        0.02941269427537918,
+        0.004399999510496855,
+        0.01800000062212348
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "book-cover",
+      "triangles": 648,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.02199999988079071,
+        0.004900000058114529,
+        0.02800000086426735
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "actions-words",
+      "triangles": 232,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.029000001028180122,
+        0.0034000007435679436,
+        0.028868365101516247
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "birds-feather",
+      "triangles": 188,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.02935223001986742,
+        0.002600001636892557,
+        0.030575952492654324
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "sleepy-skeletons",
+      "triangles": 672,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.019021157175302505,
+        0.006199999712407589,
+        0.023499999195337296
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "echo-verse",
+      "triangles": 480,
+      "materials": 4,
+      "dimensionsXYZ": [
+        0.024000000208616257,
+        0.004199999384582043,
+        0.030210833996534348
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "fortune-brave",
+      "triangles": 120,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.024000000208616257,
+        0.005100000184029341,
+        0.03099999949336052
+      ],
+      "sourceMatchesExport": true
+    },
+    {
+      "id": "knowledge-power",
+      "triangles": 420,
+      "materials": 3,
+      "dimensionsXYZ": [
+        0.02199999988079071,
+        0.006799999624490738,
+        0.030950001440942287
+      ],
+      "sourceMatchesExport": true
+    }
+  ],
+  "visualReview": "User review pending"
+}

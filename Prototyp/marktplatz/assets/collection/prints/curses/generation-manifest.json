@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-27",
+  "mode": "built-in Imagegen",
+  "items": [
+    {
+      "id": "bloody-friday-card",
+      "name": "Bloody Friday",
+      "tool": "built-in Imagegen",
+      "artwork": "prints/curses/bloody-friday-card-art.png",
+      "prompt": "Generate one standalone illustration for a Halloween classroom comedy collectible card. Landscape 3:2 artwork only, no printed card border and NO text, letters, numerals, logos or watermarks. A distinctive stylized low-poly 3D prop diorama with tactile matte materials, crisp readable silhouettes, cinematic warm pumpkin-orange light, deep plum shadows, muted teal accents, a crimson moon through a gothic classroom window, tiny bats and candles. Dry British humour through absurdly over-serious school stationery. Cheerful spooky atmosphere, no gore, no actual people or identifiable pupils. Compose the important props centrally with room around the edges; the artwork will be printed onto a thin 3D card and text will be typeset separately. Scene: An empty school detention desk after the final Friday bell: a very solemn little ghost-shaped alarm clock, a dramatically padlocked weekend picnic basket, cold tea in a china cup, a red exercise book and a candle. The empty chair has a tiny pumpkin sitting on it like an absurd headmaster. No people. The scene feels like the weekend is just out of reach."
+    },
+    {
+      "id": "school-rules-card",
+      "name": "Hausordnung abschreiben",
+      "tool": "built-in Imagegen",
+      "artwork": "prints/curses/school-rules-card-art.png",
+      "prompt": "Generate one standalone illustration for a Halloween classroom comedy collectible card. Landscape 3:2 artwork only, no printed card border and NO text, letters, numerals, logos or watermarks. A distinctive stylized low-poly 3D prop diorama with tactile matte materials, crisp readable silhouettes, cinematic warm pumpkin-orange light, deep plum shadows, muted teal accents, a crimson moon through a gothic classroom window, tiny bats and candles. Dry British humour through absurdly over-serious school stationery. Cheerful spooky atmosphere, no gore, no actual people or identifiable pupils. Compose the important props centrally with room around the edges; the artwork will be printed onto a thin 3D card and text will be typeset separately. Scene: An absurdly long blank parchment scroll unrolling across an empty antique school desk and curling into a perfect spiral, a small skeleton hand holding a quill above a blank exercise book, a stern pumpkin-shaped inkpot and a tea cup. No readable writing anywhere. Treat bureaucracy like an extremely grand Halloween adventure."
+    },
+    {
+      "id": "official-reprimand-card",
+      "name": "Verweis",
+      "tool": "built-in Imagegen",
+      "artwork": "prints/curses/official-reprimand-card-art.png",
+      "prompt": "Generate one standalone illustration for a Halloween classroom comedy collectible card. Landscape 3:2 artwork only, no printed card border and NO text, letters, numerals, logos or watermarks. A distinctive stylized low-poly 3D prop diorama with tactile matte materials, crisp readable silhouettes, cinematic warm pumpkin-orange light, deep plum shadows, muted teal accents, a crimson moon through a gothic classroom window, tiny bats and candles. Dry British humour through absurdly over-serious school stationery. Cheerful spooky atmosphere, no gore, no actual people or identifiable pupils. Compose the important props centrally with room around the edges; the artwork will be printed onto a thin 3D card and text will be typeset separately. Scene: One grand sealed dark-plum envelope on a school desk, with a large pumpkin wax seal, tiny bat-shaped paper wings and an oversized brass rubber stamp leaning beside it like a pompous royal sceptre. Blank paperwork, candlelight, a modest cup of tea. The envelope itself seems hilariously stern without any human face or text."
+    },
+    {
+      "id": "vaping-reprimand-card",
+      "name": "Verschärfter Verweis für Vapen",
+      "tool": "built-in Imagegen",
+      "artwork": "prints/curses/vaping-reprimand-card-art.png",
+      "prompt": "Generate one standalone illustration for a Halloween classroom comedy collectible card. Landscape 3:2 artwork only, no printed card border and NO text, letters, numerals, logos or watermarks. A distinctive stylized low-poly 3D prop diorama with tactile matte materials, crisp readable silhouettes, cinematic warm pumpkin-orange light, deep plum shadows, muted teal accents, a crimson moon through a gothic classroom window, tiny bats and candles. Dry British humour through absurdly over-serious school stationery. Cheerful spooky atmosphere, no gore, no actual people or identifiable pupils. Compose the important props centrally with room around the edges; the artwork will be printed onto a thin 3D card and text will be typeset separately. Scene: An extremely grand pumpkin-sealed school envelope inside two more oversized official envelopes, next to a bewildered little Halloween fog machine that has produced one small ghost-shaped puff. A simple pictogram of a cloud crossed by a diagonal line on a round placard, no text. An open window lets in fresh air. Satirise excessive paperwork and poor judgement; no vaping device, no smoking person, no product branding."
+    },
+    {
+      "id": "forgotten-homework-card",
+      "name": "Strich! Hausaufgabe vergessen",
+      "tool": "built-in Imagegen",
+      "artwork": "prints/curses/forgotten-homework-card-art.png",
+      "prompt": "Generate one standalone illustration for a Halloween classroom comedy collectible card. Landscape 3:2 artwork only, no printed card border and NO text, letters, numerals, logos or watermarks. A distinctive stylized low-poly 3D prop diorama with tactile matte materials, crisp readable silhouettes, cinematic warm pumpkin-orange light, deep plum shadows, muted teal accents, a crimson moon through a gothic classroom window, tiny bats and candles. Dry British humour through absurdly over-serious school stationery. Cheerful spooky atmosphere, no gore, no actual people or identifiable pupils. Compose the important props centrally with room around the edges; the artwork will be printed onto a thin 3D card and text will be typeset separately. Scene: An empty open school satchel with a tiny cobweb inside, a second satchel tantalisingly on a far shelf, one enormous red pencil hovering over a blank attendance notebook and a small apologetic sheet-ghost made of blank homework paper. No writing, no letters or numbers. A pumpkin desk lamp illuminates the completely missing homework with exaggerated importance."
+    },
+    {
+      "id": "cool-box-card",
+      "name": "Kerim ab in die Kühlbox",
+      "tool": "built-in Imagegen",
+      "artwork": "prints/curses/cool-box-card-art.png",
+      "prompt": "Generate one standalone illustration for a Halloween classroom comedy collectible card. Landscape 3:2 artwork only, no printed card border and NO text, letters, numerals, logos or watermarks. A distinctive stylized low-poly 3D prop diorama with tactile matte materials, crisp readable silhouettes, cinematic warm pumpkin-orange light, deep plum shadows, muted teal accents, a crimson moon through a gothic classroom window, tiny bats and candles. Dry British humour through absurdly over-serious school stationery. Cheerful spooky atmosphere, no gore, no actual people or identifiable pupils. Compose the important props centrally with room around the edges; the artwork will be printed onto a thin 3D card and text will be typeset separately. Scene: A fantastically over-equipped open picnic cooler repurposed as a tiny theatre for a cooling-off break: a dignified toy penguin wearing a little brass monocle sits on a cushion beside it, blue ice cubes, a miniature cup of warm tea, pumpkin lantern and blank pause-sign prop made of two vertical bars. The cooler is visibly open and contains only ice and a tea flask. No person or child inside the cooler, no school pupil, no human portrait or name."
+    },
+    {
+      "id": "cuess-digga-card",
+      "name": "Cüss digga das Schwer",
+      "tool": "built-in Imagegen",
+      "artwork": "prints/curses/cuess-digga-card-art.png",
+      "prompt": "Generate one standalone illustration for a Halloween classroom comedy collectible card. Landscape 3:2 artwork only, no printed card border and NO text, letters, numerals, logos or watermarks. A distinctive stylized low-poly 3D prop diorama with tactile matte materials, crisp readable silhouettes, cinematic warm pumpkin-orange light, deep plum shadows, muted teal accents, a crimson moon through a gothic classroom window, tiny bats and candles. Dry British humour through absurdly over-serious school stationery. Cheerful spooky atmosphere, no gore, no actual people or identifiable pupils. Compose the important props centrally with room around the edges; the artwork will be printed onto a thin 3D card and text will be typeset separately. Scene: A tiny theatrical paper ghost dramatically fainting onto a chaise longue made of school rulers, faced with one absurdly heavy blank exercise book balanced on a miniature weighing scale. A pumpkin-shaped cup of tea and a feather make the contrast comically disproportionate. The joke is the exaggerated difficulty and theatrical sigh, not any particular person. No people and no writing."
+    },
+    {
+      "id": "toilet-question-card",
+      "name": "Can I go of the toilet",
+      "tool": "built-in Imagegen",
+      "artwork": "prints/curses/toilet-question-card-art.png",
+      "prompt": "Generate one standalone illustration for a Halloween classroom comedy collectible card. Landscape 3:2 artwork only, no printed card border and NO text, letters, numerals, logos or watermarks. A distinctive stylized low-poly 3D prop diorama with tactile matte materials, crisp readable silhouettes, cinematic warm pumpkin-orange light, deep plum shadows, muted teal accents, a crimson moon through a gothic classroom window, tiny bats and candles. Dry British humour through absurdly over-serious school stationery. Cheerful spooky atmosphere, no gore, no actual people or identifiable pupils. Compose the important props centrally with room around the edges; the artwork will be printed onto a thin 3D card and text will be typeset separately. Scene: A tidy whimsical haunted school corridor with a dignified closed washroom door, a little ghost-shaped brass key, a pumpkin wearing a tiny bow tie waiting politely outside, and two small loose puzzle tiles swapping places in mid-air, completely blank. A polite moonlit atmosphere and amusingly over-formal plumbing fixtures. No toilet use, no people, no written labels, no text."
+    }
+  ]
+}

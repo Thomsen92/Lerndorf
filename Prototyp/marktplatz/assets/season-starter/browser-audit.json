@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-27T22:24:24.116Z",
+  "revision": "r14",
+  "activeModel": "halloween-shop-event.glb",
+  "stats": {
+    "calls": 7,
+    "triangles": 20204,
+    "errors": [],
+    "size": [
+      4.568629741668701,
+      3.6000001430511475,
+      3.6401731371879578
+    ],
+    "textures": [
+      "1024x1024"
+    ]
+  },
+  "errors": [],
+  "audio": [
+    {
+      "path": "assets/listening/a85b2ba2.mp3",
+      "duration": 1.872
+    },
+    {
+      "path": "assets/listening/9388e983.mp3",
+      "duration": 1.872
+    },
+    {
+      "path": "assets/listening/81c46a4b.mp3",
+      "duration": 2.304
+    },
+    {
+      "path": "assets/listening/76258e74.mp3",
+      "duration": 2.184
+    }
+  ],
+  "checks": [
+    "supplied shop composition loads",
+    "only largest cat island retained",
+    "old stand preserved on bench",
+    "welcome only quiz/150XP/LearnPass; no collectible card copy",
+    "1024px runtime maps",
+    "triangle/material budget",
+    "ticket opens welcome",
+    "escape restores focus",
+    "actual model click opens welcome",
+    "orbit drag does not click",
+    "back view",
+    "light switch",
+    "tablet welcome",
+    "phone no horizontal overflow",
+    "four Edge TTS MP3s decode in browser"
+  ],
+  "artisticApproval": "user-review-pending"
+}

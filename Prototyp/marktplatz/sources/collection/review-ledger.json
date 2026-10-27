@@ -1,0 +1,81 @@
+{
+  "revision": "r10-classroom-curses",
+  "scope": "50 active cards: 30 relief cards, 12 textbook/cover prints, eight original comedy cards; eight earlier figures benched",
+  "visualTarget": "Recognisable textbook photos and exact source teaching boxes printed on cards, with Halloween atmosphere and supplemental examples",
+  "visualReview": "Claude/user artistic and English-humour acceptance pending; no screenshots",
+  "sourceVerification": "Eight built-in Imagegen originals and exact prompts stored; editable front/back SVG typography; deterministic catalog regeneration",
+  "exportVerification": "20 printed GLBs reimported in Blender, each 112 triangles and three materials with embedded front/back textures",
+  "browserVerification": "288 almanac checks, 48 comedy checks and 19 book checks passed",
+  "repairs": [
+    {
+      "target": "Embossed polygon silhouettes",
+      "finding": "Builder accepted mixed point winding",
+      "operation": "Normalize signed polygon area before extrusion so the front points outwards",
+      "verification": "Re-exported GLBs and reimport audit passed"
+    },
+    {
+      "target": "Native save side effects",
+      "finding": "Initial Blender save attempted an OS thumbnail outside the prototype and was denied",
+      "operation": "Disable file previews in the isolated Blender process",
+      "verification": "Second native save completed without the thumbnail error"
+    }
+  ],
+  "limitations": [
+    "No gameplay ownership, reward unlocking or live account integration",
+    "Visual acceptance belongs to the user",
+    "Physical school-tablet performance not measured"
+  ],
+  "references": [
+    "assets/collection/textbook/reference-book-cover.png",
+    "assets/collection/textbook/reference-back-cover.png",
+    "assets/collection/textbook/reference-traffic-stop.png"
+  ],
+  "concept": {
+    "tool": "Built-in Imagegen",
+    "image": "assets/collection/textbook/highlight-halloween-cover.png",
+    "prompt": "sources/collection/BOOK-COVER-PROMPT.md",
+    "role": "Edited textbook cover, used directly as book-face texture; previous ensemble benched"
+  },
+  "budgets": {
+    "bookTriangles": 868,
+    "bookMaterials": 5,
+    "frontTexture": [
+      744,
+      1024
+    ],
+    "backTexture": [
+      744,
+      1024
+    ]
+  },
+  "production": {
+    "modelPasses": 1,
+    "technicalRepairPasses": 0,
+    "acceptance": "Technical checks passed; Claude/user acceptance pending"
+  },
+  "printBudgets": {
+    "models": 20,
+    "trianglesEach": 112,
+    "materialsEach": 3,
+    "textureMaxEdge": 1024
+  },
+  "printReferenceRecord": "sources/collection/PRINT-STUDIES-PROMPTS.md",
+  "handoff": "CLAUDE_HANDOFF.md",
+  "futureRequirements": [
+    "Teacher-authorized normal/Halloween switch synchronized per classroom world",
+    "First-entry welcome keyed by player/world/season revision",
+    "Real seasonal boxes and LearnPass not implemented"
+  ],
+  "rarityCounts": {
+    "normal": 18,
+    "rare": 17,
+    "epic": 14,
+    "legendary": 1
+  },
+  "comedy": {
+    "series": "classroom-curses",
+    "cards": 8,
+    "effectMode": "flavour-only",
+    "prompts": "assets/collection/prints/curses/generation-manifest.json"
+  }
+}

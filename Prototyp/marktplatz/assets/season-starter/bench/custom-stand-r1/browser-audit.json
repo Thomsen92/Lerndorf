@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-27T22:15:06.038Z",
+  "stats": {
+    "calls": 13,
+    "triangles": 11408,
+    "errors": [],
+    "size": [
+      3.880000114440918,
+      3.6100001111626625,
+      2.7102500200271606
+    ],
+    "textures": [
+      "1024x1024"
+    ]
+  },
+  "errors": [],
+  "audio": [
+    {
+      "path": "assets/listening/a85b2ba2.mp3",
+      "duration": 1.872
+    },
+    {
+      "path": "assets/listening/9388e983.mp3",
+      "duration": 1.872
+    },
+    {
+      "path": "assets/listening/81c46a4b.mp3",
+      "duration": 2.304
+    },
+    {
+      "path": "assets/listening/76258e74.mp3",
+      "duration": 2.184
+    }
+  ],
+  "checks": [
+    "actual GLB loads",
+    "1024px runtime maps",
+    "triangle/material budget",
+    "ticket opens welcome",
+    "escape restores focus",
+    "actual model click opens welcome",
+    "orbit drag does not click",
+    "back view",
+    "light switch",
+    "tablet welcome",
+    "phone no horizontal overflow",
+    "four Edge TTS MP3s decode in browser"
+  ],
+  "artisticApproval": "user-review-pending"
+}

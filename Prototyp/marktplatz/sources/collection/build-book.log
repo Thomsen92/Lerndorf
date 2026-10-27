@@ -1,0 +1,29 @@
+C:\Users\Thomas\Projekte\Wochenpläne 8r\Lerndorf\Prototyp\marktplatz\sources\collection\build-book.py:14: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  material=bpy.data.materials.new(name);material.use_nodes=True
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+19:15:27 | INFO: Starting glTF 2.0 export
+19:15:27 | INFO: Extracting primitive: Cube.001
+19:15:27 | INFO: Primitives created: 1
+19:15:27 | INFO: Extracting primitive: Full cover face UV
+19:15:27 | INFO: Primitives created: 1
+19:15:27 | INFO: Extracting primitive: Cube.002
+19:15:27 | INFO: Primitives created: 1
+19:15:27 | INFO: Extracting primitive: Full back cover face UV
+19:15:27 | INFO: Primitives created: 1
+19:15:27 | INFO: Extracting primitive: Cube.005
+19:15:27 | INFO: Primitives created: 1
+19:15:27 | INFO: Finished glTF 2.0 export in 0.06590509414672852 s
+
+Info: Saved as "highlight-halloween-book.blend"
+19:15:27 | INFO: Data are loaded, start creating Blender stuff
+19:15:27 | INFO: Blender create Mesh node Cube.001
+19:15:27 | INFO: Blender create Mesh node Full cover face UV
+19:15:27 | INFO: Blender create Mesh node Cube.002
+19:15:27 | INFO: Blender create Mesh node Full back cover face UV
+19:15:27 | INFO: Blender create Mesh node Cube.005
+19:15:27 | INFO: glTF import finished in 0.01s
+BOOK_EXPORT_AUDIT_PASSED {"success": true, "source": {"triangles": 868, "materials": 5, "size": [0.20000000298023224, 0.017023999243974686, 0.2752104699611664]}, "export": {"triangles": 868, "materials": 5, "size": [0.20000000298023224, 0.017023999243974686, 0.2752104699611664]}, "coverOriginalSize": [1069, 1471], "embeddedTexture": [744, 1024], "backOriginalSize": [1069, 1472], "embeddedBackTexture": [744, 1024], "fullCoverUV": true, "frontNormalCorrect": true, "fullBackUV": true, "backNormalCorrect": true, "backNotMirrored": true, "bytes": 1995284, "visualReview": "User review pending"}
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

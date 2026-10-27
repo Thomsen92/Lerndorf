@@ -1,0 +1,12 @@
+{
+  "revision": "r14",
+  "active": "halloween-shop-event.glb",
+  "includes": ["supplied Halloween shop", "one large Halloween cat", "candy cauldron in front"],
+  "separateAlternatives": ["halloween-shop.glb", "halloween-cat-large.glb", "halloween-candy-cauldron.glb"],
+  "doNotDoublePlaceAlternatives": true,
+  "benched": "bench/custom-stand-r1/spooky-stand.glb",
+  "welcome": ["Spooky English Quiz", "150 XP", "Open LearnPass"],
+  "collectibleCardsInWelcome": false,
+  "preview": "../../stand.html",
+  "integration": "../../STAND_INTEGRATION.md"
+}

@@ -1,0 +1,53 @@
+{
+  "revision": "r1",
+  "sourceCatSha256": "cecee5c953cef238d04989662c6affe9463d7291fff392e1324ecd75165b1f49",
+  "originalCatTriangles": 7372,
+  "originalCatDimensions": [
+    0.9782410860061646,
+    0.58770751953125,
+    0.70257568359375
+  ],
+  "triangles": 11022,
+  "materials": 9,
+  "sourceDimensions": [
+    3.880000114440918,
+    2.710249900817871,
+    3.6100001335144043
+  ],
+  "catGroundContactZ": 1.190000057220459,
+  "counterTopZ": 1.19,
+  "forward": "GLB +Z",
+  "up": "GLB +Y",
+  "anchor": "ground center",
+  "artisticApproval": "user-review-pending",
+  "textures": [
+    {
+      "name": "halloween_cat_3d_model_Clone1_basecolor",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "name": "halloween_cat_3d_model_Clone1_normal",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "name": "halloween_cat_3d_model_Clone1_rm",
+      "size": [
+        1024,
+        1024
+      ]
+    }
+  ],
+  "reimportTriangles": 11022,
+  "reimportDimensions": [
+    3.880000114440918,
+    2.710249900817871,
+    3.6100001335144043
+  ],
+  "exportVerified": true
+}

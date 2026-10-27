@@ -1,0 +1,228 @@
+{
+  "seasonId": "2026-11-halloween",
+  "policy": {
+    "version": "r11",
+    "duplicates": false,
+    "ownershipLimit": 1,
+    "learnpass": {
+      "rarities": [
+        "normal",
+        "rare"
+      ],
+      "coinTiers": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        25,
+        30,
+        35,
+        40
+      ],
+      "additionalToCoins": true,
+      "order": "normal-first-then-rare-by-number",
+      "allocation": "equal-progress-one-or-two-per-coin-tier"
+    },
+    "chest": {
+      "rarities": [
+        "epic",
+        "legendary"
+      ],
+      "cardIds": [
+        "witch-recipe",
+        "blood-moon-story",
+        "silver-lining",
+        "book-cover",
+        "actions-words",
+        "birds-feather",
+        "sleepy-skeletons",
+        "echo-verse",
+        "fortune-brave",
+        "knowledge-power",
+        "manhattan-postcard",
+        "towers-after-dark-card",
+        "highlight-halloween-card",
+        "bloody-friday-card",
+        "vaping-reprimand-card"
+      ],
+      "excludeOwnedBeforeDraw": true,
+      "exhausted": "no-card-bonus-original-village-item-unchanged",
+      "cardHitRate": null,
+      "rarityWeights": null
+    },
+    "implementationStatus": "prototype-metadata-and-plan-only"
+  },
+  "passRewards": [
+    {
+      "tier": 1,
+      "cardIds": [
+        "pumpkin-comparisons"
+      ]
+    },
+    {
+      "tier": 2,
+      "cardIds": [
+        "haunted-prepositions"
+      ]
+    },
+    {
+      "tier": 3,
+      "cardIds": [
+        "night-light",
+        "bat-cat"
+      ]
+    },
+    {
+      "tier": 4,
+      "cardIds": [
+        "moon-spoon"
+      ]
+    },
+    {
+      "tier": 5,
+      "cardIds": [
+        "book-look",
+        "adjective-key"
+      ]
+    },
+    {
+      "tier": 6,
+      "cardIds": [
+        "past-footsteps"
+      ]
+    },
+    {
+      "tier": 7,
+      "cardIds": [
+        "talking-pumpkin",
+        "time-for-tea"
+      ]
+    },
+    {
+      "tier": 8,
+      "cardIds": [
+        "midnight-focus-card"
+      ]
+    },
+    {
+      "tier": 9,
+      "cardIds": [
+        "two-ways-boo-card",
+        "become-go-grow-card"
+      ]
+    },
+    {
+      "tier": 10,
+      "cardIds": [
+        "spooky-sounds-card"
+      ]
+    },
+    {
+      "tier": 11,
+      "cardIds": [
+        "spooky-as-as-card",
+        "school-rules-card"
+      ]
+    },
+    {
+      "tier": 12,
+      "cardIds": [
+        "forgotten-homework-card"
+      ]
+    },
+    {
+      "tier": 13,
+      "cardIds": [
+        "toilet-question-card"
+      ]
+    },
+    {
+      "tier": 14,
+      "cardIds": [
+        "lantern-verbs",
+        "ghost-questions"
+      ]
+    },
+    {
+      "tier": 15,
+      "cardIds": [
+        "better-late"
+      ]
+    },
+    {
+      "tier": 16,
+      "cardIds": [
+        "two-heads",
+        "practice-perfect"
+      ]
+    },
+    {
+      "tier": 17,
+      "cardIds": [
+        "friend-in-need"
+      ]
+    },
+    {
+      "tier": 18,
+      "cardIds": [
+        "hidden-key",
+        "slow-steady"
+      ]
+    },
+    {
+      "tier": 19,
+      "cardIds": [
+        "rain-train"
+      ]
+    },
+    {
+      "tier": 20,
+      "cardIds": [
+        "quiet-mouse",
+        "empire-state-postcard"
+      ]
+    },
+    {
+      "tier": 25,
+      "cardIds": [
+        "midnight-map-card"
+      ]
+    },
+    {
+      "tier": 30,
+      "cardIds": [
+        "midnight-bird-card",
+        "haunted-definitions-card"
+      ]
+    },
+    {
+      "tier": 35,
+      "cardIds": [
+        "official-reprimand-card"
+      ]
+    },
+    {
+      "tier": 40,
+      "cardIds": [
+        "cool-box-card",
+        "cuess-digga-card"
+      ]
+    }
+  ]
+}

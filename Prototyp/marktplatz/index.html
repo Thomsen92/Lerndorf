@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2d3a67">
+  <meta name="description" content="A little Halloween night market in Lerndorf. Explore under the blood moon.">
+  <title>Halloween night market · Lerndorf</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23ba5849'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main id="stage" aria-label="Halloween market. Drag to rotate; scroll or pinch to zoom." tabindex="0"></main>
+  <div class="vignette" aria-hidden="true"></div>
+  <header class="masthead">
+    <div class="wordmark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M24 25A13 13 0 0 1 12 3a13 13 0 1 0 12 22Z" fill="currentColor"/><path d="m24 6 1.2 3.8L29 11l-3.8 1.2L24 16l-1.2-3.8L19 11l3.8-1.2Z" fill="currentColor"/></svg><span>Lerndorf <i>8a / 8b</i></span></div>
+    <p class="eyebrow">A village after dark</p>
+    <h1>Halloween<br><em>night market.</em></h1>
+    <p class="subtitle">Warm lights. Strange little things.</p>
+  </header>
+
+  <aside class="moon-note" aria-label="Scene atmosphere"><span class="red-moon" aria-hidden="true"></span><span>Under the blood moon<small>Season I · Halloween</small></span></aside>
+  <button id="plot-view" class="plot-view" type="button" aria-pressed="false">Example plot ↗</button>
+  <a href="./collection.html" class="collection-link">Season collection ↗</a>
+  <a href="./stand.html" class="stand-link">Spooky-Stand &amp; Katze ↗</a>
+
+  <section class="welcome" aria-labelledby="welcome-title">
+    <span class="ticket-edge" aria-hidden="true"></span>
+    <p class="eyebrow">Welcome under the blood moon</p>
+    <h2 id="welcome-title">Season I – Halloween</h2>
+    <p>Mach das Spooky English Quiz<br>und verdiene 150 XP für deinen LearnPass.</p>
+    <span class="season-boxes-badge">✦ Spooky English Quiz · 150 XP</span>
+    <button id="welcome-button" class="primary" type="button">Die Season entdecken <span aria-hidden="true">↗</span></button>
+  </section>
+
+  <footer class="controls">
+    <div class="camera-controls" role="group" aria-label="Camera controls">
+      <button id="tour" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6v12M16 6v12"/></svg><span>Pause tour</span></button>
+      <span class="divider" aria-hidden="true"></span>
+      <button id="reset" type="button" aria-label="Reset camera"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9a8 8 0 1 1 0 7M5 4v5h5"/></svg></button>
+    </div>
+    <p class="gesture-hint">Drag to look <span>·</span> Scroll to zoom</p>
+    <label class="motion"><input id="less-motion" type="checkbox"><span class="toggle" aria-hidden="true"></span>Weniger Bewegung</label>
+  </footer>
+
+  <details id="performance" class="performance"><summary>Scene details <span aria-hidden="true">＋</span></summary><dl>
+    <dt>Frames / sec</dt><dd id="fps">—</dd><dt>Draw calls</dt><dd id="calls">—</dd><dt>Triangles</dt><dd id="triangles">—</dd><dt>Quality</dt><dd id="quality">—</dd><dt>Seed</dt><dd>131026</dd>
+  </dl><p>Standalone style prototype<br>Kenney CC0 · Season I</p></details>
+
+  <div id="loading" role="status"><div class="loading-moon" aria-hidden="true"></div><p>Lighting the lanterns…</p><small id="loading-progress">Opening the market</small></div>
+  <div id="error" role="alert" hidden><h2>The market could not open.</h2><p id="error-message"></p><button type="button" onclick="location.reload()">Try again</button></div>
+  <dialog id="season-dialog" aria-labelledby="season-title">
+    <form method="dialog"><button class="close" aria-label="Close welcome message">×</button><p class="eyebrow">The pumpkin stall welcomes you</p><div class="pumpkin-icon" aria-hidden="true">✦</div><h2 id="season-title">Welcome to<br>Season I – Halloween!</h2>
+    <p class="season-intro-copy">Mach das <strong>Spooky English Quiz</strong> und verdiene 150 XP – genug für Tier 5, ganz ohne Stempel. Öffne danach deinen LearnPass und hole deine erreichten Belohnungen ab.</p>
+    <div class="season-explainer"><button type="button" disabled>Spooky English Quiz · folgt im Spiel</button><button type="button" disabled>Open LearnPass · folgt im Spiel</button></div>
+    <a class="season-collection-action" href="./stand.html">Den Halloween-Shop mit Maskottchen ansehen ↗</a>
+    <p class="prototype-note">Vorschau · Quiz und LearnPass werden bei der Spielintegration verbunden.</p><button class="primary" value="close">Zum Marktplatz <span aria-hidden="true">↗</span></button></form>
+  </dialog>
+  <noscript>This market needs JavaScript and WebGL. Please enable JavaScript and open it through a static server.</noscript>
+  <script type="module" src="./scene.js"></script>
+</body>
+</html>

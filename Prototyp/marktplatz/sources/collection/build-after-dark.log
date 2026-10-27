@@ -1,0 +1,957 @@
+C:\Users\Thomas\Projekte\Wochenpläne 8r\Lerndorf\Prototyp\marktplatz\sources\collection\build-cards.py:26: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+18:50:42 | INFO: Starting glTF 2.0 export
+18:50:42 | INFO: Extracting primitive: Cube.009
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Torus.002
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Finished glTF 2.0 export in 0.19414663314819336 s
+
+18:50:42 | INFO: Starting glTF 2.0 export
+18:50:42 | INFO: Extracting primitive: Cube.006
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Cube.001
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Cube.002
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Two readable printed sides
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Cylinder
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Finished glTF 2.0 export in 0.10586929321289062 s
+C:\Users\Thomas\Projekte\Wochenpläne 8r\Lerndorf\Prototyp\marktplatz\sources\collection\build-cards.py:26: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+
+18:50:42 | INFO: Starting glTF 2.0 export
+18:50:42 | INFO: Extracting primitive: Carved eye.002
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Icosphere.003
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Cylinder.003
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Finished glTF 2.0 export in 0.04115033149719238 s
+
+18:50:42 | INFO: Starting glTF 2.0 export
+18:50:42 | INFO: Extracting primitive: Cube.012
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Cube.013
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Two readable printed sides.001
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Icosphere
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Cylinder.002
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Extracting primitive: Cylinder.001
+18:50:42 | INFO: Primitives created: 1
+18:50:42 | INFO: Finished glTF 2.0 export in 0.06911230087280273 s
+
+18:50:43 | INFO: Starting glTF 2.0 export
+18:50:43 | INFO: Extracting primitive: Icosphere.009
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Ghost silhouette.001
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Finished glTF 2.0 export in 0.014196395874023438 s
+
+18:50:43 | INFO: Starting glTF 2.0 export
+18:50:43 | INFO: Extracting primitive: Cube.017
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Cube.018
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Ghost silhouette
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Two readable printed sides.002
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Cylinder.004
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Finished glTF 2.0 export in 0.09138703346252441 s
+
+18:50:43 | INFO: Starting glTF 2.0 export
+18:50:43 | INFO: Extracting primitive: Icosphere.014
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Cauldron lip.001
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Cylinder.019
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Icosphere.015
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Finished glTF 2.0 export in 0.03976154327392578 s
+
+18:50:43 | INFO: Starting glTF 2.0 export
+18:50:43 | INFO: Extracting primitive: Cube.022
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Cube.023
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Cylinder.008
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Icosphere.013
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Two readable printed sides.003
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Cylinder.005
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Finished glTF 2.0 export in 0.09197878837585449 s
+
+18:50:43 | INFO: Starting glTF 2.0 export
+18:50:43 | INFO: Extracting primitive: Cylinder.053
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Finished glTF 2.0 export in 0.0166928768157959 s
+
+18:50:43 | INFO: Starting glTF 2.0 export
+18:50:43 | INFO: Extracting primitive: Cube.027
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Cube.028
+18:50:43 | INFO: Primitives created: 1
+18:50:43 | INFO: Extracting primitive: Two readable printed sides.004
+18:50:43 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Cylinder.028
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Finished glTF 2.0 export in 0.08871865272521973 s
+
+18:50:44 | INFO: Starting glTF 2.0 export
+18:50:44 | INFO: Extracting primitive: Bat wing.002
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Open book left.001
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Icosphere.017
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Finished glTF 2.0 export in 0.032341718673706055 s
+
+18:50:44 | INFO: Starting glTF 2.0 export
+18:50:44 | INFO: Extracting primitive: Cube.032
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Cube.033
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Open book left
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Two readable printed sides.005
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Cylinder.077
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Icosphere.016
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Finished glTF 2.0 export in 0.07497477531433105 s
+
+18:50:44 | INFO: Starting glTF 2.0 export
+18:50:44 | INFO: Extracting primitive: Icosphere.019
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Star of light.001
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Finished glTF 2.0 export in 0.01794719696044922 s
+
+18:50:44 | INFO: Starting glTF 2.0 export
+18:50:44 | INFO: Extracting primitive: Cube.037
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Cube.038
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Two readable printed sides.006
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Cylinder.078
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Icosphere.018
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Finished glTF 2.0 export in 0.0824747085571289 s
+
+18:50:44 | INFO: Starting glTF 2.0 export
+18:50:44 | INFO: Extracting primitive: Icosphere.025
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Icosphere.024
+18:50:44 | INFO: Primitives created: 1
+18:50:44 | INFO: Extracting primitive: Cylinder.084
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Finished glTF 2.0 export in 0.04335927963256836 s
+
+18:50:45 | INFO: Starting glTF 2.0 export
+18:50:45 | INFO: Extracting primitive: Cube.042
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Icosphere.020
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Cube.043
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Two readable printed sides.007
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Cylinder.079
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Cylinder.080
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Finished glTF 2.0 export in 0.0891420841217041 s
+
+18:50:45 | INFO: Starting glTF 2.0 export
+18:50:45 | INFO: Extracting primitive: Bat wing.006
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Open book left.003
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Icosphere.029
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Finished glTF 2.0 export in 0.0488741397857666 s
+
+18:50:45 | INFO: Starting glTF 2.0 export
+18:50:45 | INFO: Extracting primitive: Cube.047
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Cube.048
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Open book left.002
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Two readable printed sides.008
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Cylinder.088
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Extracting primitive: Icosphere.028
+18:50:45 | INFO: Primitives created: 1
+18:50:45 | INFO: Finished glTF 2.0 export in 0.199127197265625 s
+
+18:50:46 | INFO: Starting glTF 2.0 export
+18:50:46 | INFO: Extracting primitive: Icosphere.035
+18:50:46 | INFO: Primitives created: 1
+18:50:46 | INFO: Extracting primitive: Icosphere.034
+18:50:46 | INFO: Primitives created: 1
+18:50:46 | INFO: Extracting primitive: Cylinder.094
+18:50:46 | INFO: Primitives created: 1
+18:50:46 | INFO: Finished glTF 2.0 export in 0.04541277885437012 s
+
+18:50:46 | INFO: Starting glTF 2.0 export
+18:50:46 | INFO: Extracting primitive: Cube.052
+18:50:46 | INFO: Primitives created: 1
+18:50:46 | INFO: Extracting primitive: Icosphere.030
+18:50:46 | INFO: Primitives created: 1
+18:50:46 | INFO: Extracting primitive: Cube.053
+18:50:46 | INFO: Primitives created: 1
+18:50:46 | INFO: Extracting primitive: Two readable printed sides.009
+18:50:46 | INFO: Primitives created: 1
+18:50:46 | INFO: Extracting primitive: Cylinder.089
+18:50:46 | INFO: Primitives created: 1
+18:50:46 | INFO: Extracting primitive: Cylinder.090
+18:50:46 | INFO: Primitives created: 1
+18:50:46 | INFO: Finished glTF 2.0 export in 0.06655550003051758 s
+
+18:50:46 | INFO: Starting glTF 2.0 export
+18:50:47 | INFO: Extracting primitive: Torus.014
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Finished glTF 2.0 export in 0.028052806854248047 s
+
+18:50:47 | INFO: Starting glTF 2.0 export
+18:50:47 | INFO: Extracting primitive: Cube.057
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Extracting primitive: Cube.058
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Extracting primitive: Two readable printed sides.010
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Extracting primitive: Cylinder.098
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Finished glTF 2.0 export in 0.07106709480285645 s
+
+18:50:47 | INFO: Starting glTF 2.0 export
+18:50:47 | INFO: Extracting primitive: Cube.072
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Extracting primitive: Cube.071
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Extracting primitive: Walking boot.001
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Finished glTF 2.0 export in 0.0774834156036377 s
+
+18:50:47 | INFO: Starting glTF 2.0 export
+18:50:47 | INFO: Extracting primitive: Cube.068
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Extracting primitive: Cube.062
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Extracting primitive: Cube.063
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Extracting primitive: Two readable printed sides.011
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Extracting primitive: Cylinder.105
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Extracting primitive: Walking boot
+18:50:47 | INFO: Primitives created: 1
+18:50:47 | INFO: Finished glTF 2.0 export in 0.13280653953552246 s
+
+18:50:48 | INFO: Starting glTF 2.0 export
+18:50:48 | INFO: Extracting primitive: Speech bubble.001
+18:50:48 | INFO: Primitives created: 1
+18:50:48 | INFO: Extracting primitive: Icosphere.041
+18:50:48 | INFO: Primitives created: 1
+18:50:48 | INFO: Finished glTF 2.0 export in 0.02573537826538086 s
+
+18:50:48 | INFO: Starting glTF 2.0 export
+18:50:48 | INFO: Extracting primitive: Cube.075
+18:50:48 | INFO: Primitives created: 1
+18:50:48 | INFO: Extracting primitive: Cube.076
+18:50:48 | INFO: Primitives created: 1
+18:50:48 | INFO: Extracting primitive: Two readable printed sides.012
+18:50:48 | INFO: Primitives created: 1
+18:50:48 | INFO: Extracting primitive: Cylinder.106
+18:50:48 | INFO: Primitives created: 1
+18:50:48 | INFO: Extracting primitive: Speech bubble
+18:50:48 | INFO: Primitives created: 1
+18:50:48 | INFO: Finished glTF 2.0 export in 0.06420636177062988 s
+
+18:50:48 | INFO: Starting glTF 2.0 export
+18:50:48 | INFO: Extracting primitive: Torus.019
+18:50:48 | INFO: Primitives created: 1
+18:50:48 | INFO: Extracting primitive: Icosphere.045
+18:50:48 | INFO: Primitives created: 1
+18:50:48 | INFO: Extracting primitive: Cylinder.114
+18:50:48 | INFO: Primitives created: 1
+18:50:48 | INFO: Finished glTF 2.0 export in 0.020704269409179688 s
+
+18:50:49 | INFO: Starting glTF 2.0 export
+18:50:49 | INFO: Extracting primitive: Cube.080
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Cube.081
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Two readable printed sides.013
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Cylinder.107
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Icosphere.044
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Cylinder.108
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Finished glTF 2.0 export in 0.054718732833862305 s
+
+18:50:49 | INFO: Starting glTF 2.0 export
+18:50:49 | INFO: Extracting primitive: Icosphere.051
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Cylinder.123
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Torus.022
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Finished glTF 2.0 export in 0.01480245590209961 s
+
+18:50:49 | INFO: Starting glTF 2.0 export
+18:50:49 | INFO: Extracting primitive: Cube.087
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Icosphere.046
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Cube.088
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Two readable printed sides.014
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Cylinder.120
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Finished glTF 2.0 export in 0.06468081474304199 s
+
+18:50:49 | INFO: Starting glTF 2.0 export
+18:50:49 | INFO: Extracting primitive: Cylinder.127
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Icosphere.063
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Icosphere.062
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Icosphere.065
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Finished glTF 2.0 export in 0.013936519622802734 s
+
+18:50:49 | INFO: Starting glTF 2.0 export
+18:50:49 | INFO: Extracting primitive: Cube.092
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Cube.093
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Icosphere.056
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Icosphere.059
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Two readable printed sides.015
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Extracting primitive: Cylinder.125
+18:50:49 | INFO: Primitives created: 1
+18:50:49 | INFO: Finished glTF 2.0 export in 0.032878875732421875 s
+
+18:50:50 | INFO: Starting glTF 2.0 export
+18:50:50 | INFO: Extracting primitive: Cylinder.130
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Torus.028
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Torus.029
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Finished glTF 2.0 export in 0.01100301742553711 s
+
+18:50:50 | INFO: Starting glTF 2.0 export
+18:50:50 | INFO: Extracting primitive: Cube.097
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cube.098
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cylinder.129
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Torus.026
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Two readable printed sides.016
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cylinder.128
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Finished glTF 2.0 export in 0.03218555450439453 s
+
+18:50:50 | INFO: Starting glTF 2.0 export
+18:50:50 | INFO: Extracting primitive: Friendship heart.001
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cylinder.133
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Finished glTF 2.0 export in 0.008004426956176758 s
+
+18:50:50 | INFO: Starting glTF 2.0 export
+18:50:50 | INFO: Extracting primitive: Cube.102
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cube.103
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Friendship heart
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cylinder.132
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Two readable printed sides.017
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cylinder.131
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Finished glTF 2.0 export in 0.03646397590637207 s
+
+18:50:50 | INFO: Starting glTF 2.0 export
+18:50:50 | INFO: Extracting primitive: Icosphere.069
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cube.114
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Torus.034
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Finished glTF 2.0 export in 0.012869119644165039 s
+
+18:50:50 | INFO: Starting glTF 2.0 export
+18:50:50 | INFO: Extracting primitive: Cube.107
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cube.108
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cube.112
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Two readable printed sides.018
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Extracting primitive: Cylinder.134
+18:50:50 | INFO: Primitives created: 1
+18:50:50 | INFO: Finished glTF 2.0 export in 0.03740119934082031 s
+
+18:50:51 | INFO: Starting glTF 2.0 export
+18:50:51 | INFO: Extracting primitive: Icosphere.077
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Extracting primitive: Cylinder.138
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Extracting primitive: Icosphere.083
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Extracting primitive: Icosphere.078
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Finished glTF 2.0 export in 0.02554607391357422 s
+
+18:50:51 | INFO: Starting glTF 2.0 export
+18:50:51 | INFO: Extracting primitive: Cube.116
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Extracting primitive: Cube.117
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Extracting primitive: Icosphere.070
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Extracting primitive: Two readable printed sides.019
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Extracting primitive: Cylinder.135
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Extracting primitive: Icosphere.071
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Finished glTF 2.0 export in 0.05668187141418457 s
+
+18:50:51 | INFO: Starting glTF 2.0 export
+18:50:51 | INFO: Extracting primitive: Icosphere.086
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Extracting primitive: Umbrella canopy.001
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Extracting primitive: Cylinder.142
+18:50:51 | INFO: Primitives created: 1
+18:50:51 | INFO: Finished glTF 2.0 export in 0.020812034606933594 s
+
+18:50:52 | INFO: Starting glTF 2.0 export
+18:50:52 | INFO: Extracting primitive: Cube.121
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Cube.122
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Two readable printed sides.020
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Icosphere.084
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Cylinder.140
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Umbrella canopy
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Finished glTF 2.0 export in 0.06954360008239746 s
+
+18:50:52 | INFO: Starting glTF 2.0 export
+18:50:52 | INFO: Extracting primitive: Icosphere.093
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Icosphere.095
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Mouse face.001
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Finished glTF 2.0 export in 0.011443614959716797 s
+
+18:50:52 | INFO: Starting glTF 2.0 export
+18:50:52 | INFO: Extracting primitive: Cube.126
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Cube.127
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Icosphere.088
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Mouse face
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Two readable printed sides.021
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Cylinder.143
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Finished glTF 2.0 export in 0.030039072036743164 s
+
+18:50:52 | INFO: Starting glTF 2.0 export
+18:50:52 | INFO: Extracting primitive: Icosphere.101
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Cylinder.146
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Finished glTF 2.0 export in 0.009067296981811523 s
+
+18:50:52 | INFO: Starting glTF 2.0 export
+18:50:52 | INFO: Extracting primitive: Cube.131
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Icosphere.098
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Cube.132
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Two readable printed sides.022
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Cylinder.144
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Extracting primitive: Cylinder.145
+18:50:52 | INFO: Primitives created: 1
+18:50:52 | INFO: Finished glTF 2.0 export in 0.03414583206176758 s
+
+18:50:53 | INFO: Starting glTF 2.0 export
+18:50:53 | INFO: Extracting primitive: Cube.150
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cube.148
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cube.147
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Finished glTF 2.0 export in 0.014992475509643555 s
+
+18:50:53 | INFO: Starting glTF 2.0 export
+18:50:53 | INFO: Extracting primitive: Cube.142
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cube.141
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cube.136
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cube.137
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Two readable printed sides.023
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cylinder.147
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Finished glTF 2.0 export in 0.04690098762512207 s
+
+18:50:53 | INFO: Starting glTF 2.0 export
+18:50:53 | INFO: Extracting primitive: Megaphone horn.001
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cube.159
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cylinder.154
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Finished glTF 2.0 export in 0.01189112663269043 s
+
+18:50:53 | INFO: Starting glTF 2.0 export
+18:50:53 | INFO: Extracting primitive: Cube.153
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cube.154
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Megaphone horn
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Two readable printed sides.024
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cylinder.148
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Extracting primitive: Cylinder.150
+18:50:53 | INFO: Primitives created: 1
+18:50:53 | INFO: Finished glTF 2.0 export in 0.031092166900634766 s
+
+18:50:54 | INFO: Starting glTF 2.0 export
+18:50:54 | INFO: Extracting primitive: Cylinder.165
+18:50:54 | INFO: Primitives created: 1
+18:50:54 | INFO: Extracting primitive: Cylinder.164
+18:50:54 | INFO: Primitives created: 1
+18:50:54 | INFO: Extracting primitive: Feather vane.001
+18:50:54 | INFO: Primitives created: 1
+18:50:54 | INFO: Finished glTF 2.0 export in 0.012126922607421875 s
+
+18:50:54 | INFO: Starting glTF 2.0 export
+18:50:54 | INFO: Extracting primitive: Cube.160
+18:50:54 | INFO: Primitives created: 1
+18:50:54 | INFO: Extracting primitive: Cylinder.159
+18:50:54 | INFO: Primitives created: 1
+18:50:54 | INFO: Extracting primitive: Feather vane
+18:50:54 | INFO: Primitives created: 1
+18:50:54 | INFO: Extracting primitive: Cube.161
+18:50:54 | INFO: Primitives created: 1
+18:50:54 | INFO: Extracting primitive: Two readable printed sides.025
+18:50:54 | INFO: Primitives created: 1
+18:50:54 | INFO: Extracting primitive: Cylinder.157
+18:50:54 | INFO: Primitives created: 1
+18:50:54 | INFO: Finished glTF 2.0 export in 0.033943891525268555 s
+
+18:50:55 | INFO: Starting glTF 2.0 export
+18:50:55 | INFO: Extracting primitive: Icosphere.108
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Icosphere.107
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Cube.175
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Finished glTF 2.0 export in 0.012767791748046875 s
+
+18:50:55 | INFO: Starting glTF 2.0 export
+18:50:55 | INFO: Extracting primitive: Cube.165
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Cube.166
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Two readable printed sides.026
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Cylinder.170
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Icosphere.104
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Finished glTF 2.0 export in 0.032095909118652344 s
+
+18:50:55 | INFO: Starting glTF 2.0 export
+18:50:55 | INFO: Extracting primitive: Icosphere.112
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Cauldron lip.003
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Cylinder.185
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Icosphere.113
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Finished glTF 2.0 export in 0.016043901443481445 s
+
+18:50:55 | INFO: Starting glTF 2.0 export
+18:50:55 | INFO: Extracting primitive: Cube.178
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Cube.179
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Cylinder.174
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Icosphere.111
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Two readable printed sides.027
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Extracting primitive: Cylinder.171
+18:50:55 | INFO: Primitives created: 1
+18:50:55 | INFO: Finished glTF 2.0 export in 0.03217029571533203 s
+
+18:50:56 | INFO: Starting glTF 2.0 export
+18:50:56 | INFO: Extracting primitive: Brave shield.001
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Ruby shield inset.001
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Icosphere.115
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Finished glTF 2.0 export in 0.01435542106628418 s
+
+18:50:56 | INFO: Starting glTF 2.0 export
+18:50:56 | INFO: Extracting primitive: Cube.183
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Cube.184
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Two readable printed sides.028
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Cylinder.194
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Ruby shield inset
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Icosphere.114
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Finished glTF 2.0 export in 0.03724980354309082 s
+
+18:50:56 | INFO: Starting glTF 2.0 export
+18:50:56 | INFO: Extracting primitive: Book left page.003
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Cylinder.197
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Icosphere.117
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Finished glTF 2.0 export in 0.02473616600036621 s
+
+18:50:56 | INFO: Starting glTF 2.0 export
+18:50:56 | INFO: Extracting primitive: Book left page.002
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Cube.188
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Cube.189
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Icosphere.116
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Two readable printed sides.029
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Extracting primitive: Cylinder.195
+18:50:56 | INFO: Primitives created: 1
+18:50:56 | INFO: Finished glTF 2.0 export in 0.05858278274536133 s
+
+18:50:59 | INFO: Starting glTF 2.0 export
+18:50:59 | INFO: Extracting primitive: Cylinder.205
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Cone.007
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Cone.004
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Icosphere.159
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Icosphere.158
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Icosphere.153
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Finished glTF 2.0 export in 0.040750980377197266 s
+
+18:50:59 | INFO: Starting glTF 2.0 export
+18:50:59 | INFO: Extracting primitive: Cone.003
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Cube.193
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Cone
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Cube.194
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Icosphere.125
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Icosphere.120
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Two readable printed sides.030
+18:50:59 | INFO: Primitives created: 1
+18:50:59 | INFO: Extracting primitive: Cylinder.198
+18:50:59 | INFO: Primitives created: 1
+18:51:00 | INFO: Finished glTF 2.0 export in 0.22177481651306152 s
+
+18:51:07 | INFO: Starting glTF 2.0 export
+18:51:07 | INFO: Extracting primitive: Cylinder.219
+18:51:07 | INFO: Primitives created: 1
+18:51:07 | INFO: Extracting primitive: Cone.010
+18:51:07 | INFO: Primitives created: 1
+18:51:07 | INFO: Extracting primitive: Icosphere.215
+18:51:07 | INFO: Primitives created: 1
+18:51:07 | INFO: Extracting primitive: Cone.011
+18:51:07 | INFO: Primitives created: 1
+18:51:07 | INFO: Extracting primitive: Icosphere.214
+18:51:07 | INFO: Primitives created: 1
+18:51:07 | INFO: Extracting primitive: Icosphere.209
+18:51:07 | INFO: Primitives created: 1
+18:51:07 | INFO: Finished glTF 2.0 export in 0.13919544219970703 s
+
+18:51:08 | INFO: Starting glTF 2.0 export
+18:51:08 | INFO: Extracting primitive: Cube.198
+18:51:08 | INFO: Primitives created: 1
+18:51:08 | INFO: Extracting primitive: Cone.008
+18:51:08 | INFO: Primitives created: 1
+18:51:08 | INFO: Extracting primitive: Cube.199
+18:51:08 | INFO: Primitives created: 1
+18:51:08 | INFO: Extracting primitive: Cone.009
+18:51:08 | INFO: Primitives created: 1
+18:51:08 | INFO: Extracting primitive: Icosphere.191
+18:51:08 | INFO: Primitives created: 1
+18:51:08 | INFO: Extracting primitive: Icosphere.186
+18:51:08 | INFO: Primitives created: 1
+18:51:08 | INFO: Extracting primitive: Two readable printed sides.031
+18:51:08 | INFO: Primitives created: 1
+18:51:08 | INFO: Extracting primitive: Cylinder.211
+18:51:08 | INFO: Primitives created: 1
+18:51:08 | INFO: Finished glTF 2.0 export in 0.10640358924865723 s
+
+18:51:13 | INFO: Starting glTF 2.0 export
+18:51:13 | INFO: Extracting primitive: Cylinder.232
+18:51:13 | INFO: Primitives created: 1
+18:51:13 | INFO: Extracting primitive: Cone.013
+18:51:13 | INFO: Primitives created: 1
+18:51:13 | INFO: Extracting primitive: Icosphere.253
+18:51:13 | INFO: Primitives created: 1
+18:51:13 | INFO: Extracting primitive: Icosphere.252
+18:51:13 | INFO: Primitives created: 1
+18:51:13 | INFO: Extracting primitive: Icosphere.247
+18:51:13 | INFO: Primitives created: 1
+18:51:13 | INFO: Finished glTF 2.0 export in 0.04391360282897949 s
+
+18:51:14 | INFO: Starting glTF 2.0 export
+18:51:14 | INFO: Extracting primitive: Cube.203
+18:51:14 | INFO: Primitives created: 1
+18:51:14 | INFO: Extracting primitive: Cone.012
+18:51:14 | INFO: Primitives created: 1
+18:51:14 | INFO: Extracting primitive: Cube.204
+18:51:14 | INFO: Primitives created: 1
+18:51:14 | INFO: Extracting primitive: Icosphere.237
+18:51:14 | INFO: Primitives created: 1
+18:51:14 | INFO: Extracting primitive: Icosphere.232
+18:51:14 | INFO: Primitives created: 1
+18:51:14 | INFO: Extracting primitive: Two readable printed sides.032
+18:51:14 | INFO: Primitives created: 1
+18:51:14 | INFO: Extracting primitive: Cylinder.226
+18:51:14 | INFO: Primitives created: 1
+18:51:14 | INFO: Finished glTF 2.0 export in 0.08074641227722168 s
+
+18:51:18 | INFO: Starting glTF 2.0 export
+18:51:18 | INFO: Extracting primitive: Cylinder.246
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Cone.016
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Icosphere.288
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Icosphere.287
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Icosphere.282
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Cone.017
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Finished glTF 2.0 export in 0.05990147590637207 s
+
+18:51:18 | INFO: Starting glTF 2.0 export
+18:51:18 | INFO: Extracting primitive: Cube.220
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Cone.014
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Cube.221
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Icosphere.267
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Icosphere.262
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Cone.015
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Two readable printed sides.033
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Extracting primitive: Cylinder.237
+18:51:18 | INFO: Primitives created: 1
+18:51:18 | INFO: Finished glTF 2.0 export in 0.11534404754638672 s
+
+18:51:24 | INFO: Starting glTF 2.0 export
+18:51:24 | INFO: Extracting primitive: Cylinder.260
+18:51:24 | INFO: Primitives created: 1
+18:51:24 | INFO: Extracting primitive: Cone.019
+18:51:24 | INFO: Primitives created: 1
+18:51:24 | INFO: Extracting primitive: Icosphere.348
+18:51:24 | INFO: Primitives created: 1
+18:51:24 | INFO: Extracting primitive: Icosphere.347
+18:51:24 | INFO: Primitives created: 1
+18:51:24 | INFO: Extracting primitive: Icosphere.342
+18:51:24 | INFO: Primitives created: 1
+18:51:24 | INFO: Extracting primitive: Icosphere.372
+18:51:24 | INFO: Primitives created: 1
+18:51:24 | INFO: Finished glTF 2.0 export in 0.0410459041595459 s
+
+18:51:25 | INFO: Starting glTF 2.0 export
+18:51:25 | INFO: Extracting primitive: Cube.225
+18:51:25 | INFO: Primitives created: 1
+18:51:25 | INFO: Extracting primitive: Cone.018
+18:51:25 | INFO: Primitives created: 1
+18:51:25 | INFO: Extracting primitive: Cube.226
+18:51:25 | INFO: Primitives created: 1
+18:51:25 | INFO: Extracting primitive: Icosphere.307
+18:51:25 | INFO: Primitives created: 1
+18:51:25 | INFO: Extracting primitive: Icosphere.302
+18:51:25 | INFO: Primitives created: 1
+18:51:25 | INFO: Extracting primitive: Two readable printed sides.034
+18:51:25 | INFO: Primitives created: 1
+18:51:25 | INFO: Extracting primitive: Cylinder.254
+18:51:25 | INFO: Primitives created: 1
+18:51:25 | INFO: Extracting primitive: Icosphere.332
+18:51:25 | INFO: Primitives created: 1
+18:51:25 | INFO: Finished glTF 2.0 export in 0.04351019859313965 s
+
+18:51:27 | INFO: Starting glTF 2.0 export
+18:51:27 | INFO: Extracting primitive: Cylinder.280
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Cone.022
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Icosphere.407
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Icosphere.406
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Icosphere.401
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Icosphere.412
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Finished glTF 2.0 export in 0.030814170837402344 s
+
+18:51:27 | INFO: Starting glTF 2.0 export
+18:51:27 | INFO: Extracting primitive: Cube.230
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Cone.020
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Cube.231
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Icosphere.387
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Icosphere.382
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Two readable printed sides.035
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Cylinder.265
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Extracting primitive: Icosphere.393
+18:51:27 | INFO: Primitives created: 1
+18:51:27 | INFO: Finished glTF 2.0 export in 0.07561922073364258 s
+
+18:51:30 | INFO: Starting glTF 2.0 export
+18:51:30 | INFO: Extracting primitive: Icosphere.440
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Extracting primitive: Icosphere.437
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Extracting primitive: Icosphere.434
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Extracting primitive: Icosphere.441
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Extracting primitive: Icosphere.442
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Finished glTF 2.0 export in 0.019149303436279297 s
+
+18:51:30 | INFO: Starting glTF 2.0 export
+18:51:30 | INFO: Extracting primitive: Cube.237
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Extracting primitive: Cube.238
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Extracting primitive: Icosphere.418
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Extracting primitive: Two readable printed sides.036
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Extracting primitive: Icosphere.425
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Extracting primitive: Cylinder.294
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Extracting primitive: Icosphere.426
+18:51:30 | INFO: Primitives created: 1
+18:51:30 | INFO: Finished glTF 2.0 export in 0.03870820999145508 s
+
+18:51:32 | INFO: Starting glTF 2.0 export
+18:51:32 | INFO: Extracting primitive: Cylinder.322
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Extracting primitive: Cone.026
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Extracting primitive: Icosphere.483
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Extracting primitive: Icosphere.482
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Extracting primitive: Icosphere.477
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Finished glTF 2.0 export in 0.021957874298095703 s
+
+18:51:32 | INFO: Starting glTF 2.0 export
+18:51:32 | INFO: Extracting primitive: Cube.242
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Extracting primitive: Cone.024
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Extracting primitive: Cube.243
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Extracting primitive: Icosphere.457
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Extracting primitive: Icosphere.452
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Extracting primitive: Two readable printed sides.037
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Extracting primitive: Cylinder.315
+18:51:32 | INFO: Primitives created: 1
+18:51:32 | INFO: Finished glTF 2.0 export in 0.04184269905090332 s
+
+Info: Saved as "halloween-almanac.blend"
+ALMANAC_EXPORT_COMPLETE 38 cards 38 motifs
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-27",
+  "checks": [
+    "four stalls and at most five background figures",
+    "tour starts automatically",
+    "tour can be paused",
+    "desktop: all passes below 150 draw calls",
+    "desktop: all passes below 150,000 triangles",
+    "welcome button opens the Season I message",
+    "Escape closes the message and restores focus",
+    "the 3D stall button also opens the message",
+    "mouse drag rotates the camera",
+    "scroll zooms the camera",
+    "less motion freezes figures, fog and lantern flicker",
+    "less motion disables automatic orbit",
+    "season: render budget",
+    "cemetery: render budget",
+    "reverse: render budget",
+    "system reduced-motion setting is respected on first load",
+    "layout is identical across loads and viewport sizes",
+    "tablet-viewport: all passes below 150 draw calls",
+    "tablet-viewport: all passes below 150,000 triangles",
+    "welcome message works by touch",
+    "portrait layout has no horizontal overflow",
+    "primary controls remain inside the portrait viewport",
+    "Prototyp/index.html is unchanged",
+    "docs/LOOK.md is unchanged",
+    "no runtime errors, HTTP failures or external requests",
+    "no Math.random in scene placement or atmosphere",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/graveyard/Textures/colormap.png",
+    "texture exists: kenney/town/Textures/colormap.png",
+    "texture exists: kenney/town/Textures/colormap.png",
+    "texture exists: kenney/town/Textures/colormap.png"
+  ],
+  "errors": [],
+  "measurements": {
+    "desktop": {
+      "fps": 70,
+      "calls": 71,
+      "triangles": 95564,
+      "maxCalls": 78,
+      "maxTriangles": 105102,
+      "loadMs": 569,
+      "quality": 1,
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 (0x00002786) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "frames": 681,
+      "sceneTriangles": 95564,
+      "reducedMotion": false,
+      "tour": false,
+      "failures": [],
+      "measuredFps": 69.9,
+      "p95FrameMs": 14.5,
+      "viewport": {
+        "width": 1440,
+        "height": 960
+      }
+    },
+    "tablet-viewport": {
+      "fps": 70,
+      "calls": 71,
+      "triangles": 95564,
+      "maxCalls": 78,
+      "maxTriangles": 105102,
+      "loadMs": 213,
+      "quality": 1,
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 (0x00002786) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "frames": 679,
+      "sceneTriangles": 95564,
+      "reducedMotion": true,
+      "tour": false,
+      "failures": [],
+      "measuredFps": 69.8,
+      "p95FrameMs": 14.5,
+      "viewport": {
+        "width": 1024,
+        "height": 768
+      }
+    }
+  },
+  "screenshots": [
+    "01-overview-desktop.png",
+    "02-season-welcome.png",
+    "03-season-stall.png",
+    "04-cemetery.png",
+    "05-reverse.png",
+    "06-tablet-1024.png",
+    "07-portrait-390.png"
+  ],
+  "concurrentExternalChanges": [
+    {
+      "file": "blender/sources/LICENSES.md",
+      "baseline": "980a4b5296be1c8c6f552e81ab00ec0acf9786e7113fd77e23d36ef70731c194",
+      "actual": "b8f546bfcd246e3f7cb1f89f88a081387ee27d03509ae9d217757ed93587e617",
+      "note": "Observed change outside this prototype. No prototype tool writes to this source file; preserved."
+    }
+  ],
+  "success": true
+}

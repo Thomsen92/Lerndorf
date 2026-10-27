@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "seasonId": "2026-11-halloween",
+  "title": "Spooky English Quiz",
+  "delivery": "private-server-seed-not-a-public-runtime-catalog",
+  "xpPerSolvedQuestion": 10,
+  "completionBonusXp": 50,
+  "totalXp": 150,
+  "voice": "en-GB-SoniaNeural",
+  "rate": "-10%",
+  "questions": [
+    {
+      "id": "odd-characters", "kind": "odd-one-out", "type": "choice",
+      "prompt": "Odd one out: three are spooky characters. Which one is different?",
+      "options": ["ghost", "witch", "bicycle", "vampire"],
+      "solution": "bicycle", "hint": "You can ride one of these."
+    },
+    {
+      "id": "odd-animals", "kind": "odd-one-out", "type": "choice",
+      "prompt": "Odd one out: three are animals. Which one is different?",
+      "options": ["spider", "pumpkin", "bat", "owl"],
+      "solution": "pumpkin", "hint": "Think of the orange Halloween decoration."
+    },
+    {
+      "id": "scarier-than", "kind": "comparative", "type": "choice",
+      "prompt": "The haunted house is ___ than our school.",
+      "options": ["scary", "scariest", "scarier"],
+      "solution": "scarier", "hint": "You are comparing two places. Look for the -er form."
+    },
+    {
+      "id": "biggest-pumpkin", "kind": "superlative", "type": "choice",
+      "prompt": "Of all the pumpkins, this is the ___ one.",
+      "options": ["bigger", "biggest", "big"],
+      "solution": "biggest", "hint": "You are choosing one from the whole group. Look for -est."
+    },
+    {
+      "id": "british-american-sweets", "kind": "british-american", "type": "choice",
+      "prompt": "British English: sweets. What is the usual American English word?",
+      "options": ["biscuits", "chips", "candy"],
+      "solution": "candy", "hint": "It is the sweet food children collect at Halloween."
+    },
+    {
+      "id": "british-american-colour", "kind": "british-american", "type": "choice",
+      "prompt": "Which sentence uses American English spelling?",
+      "options": ["The ghost's favourite colour is green.", "The ghost's favorite color is green.", "The ghost's favourit colur is green."],
+      "solution": "The ghost's favorite color is green.", "hint": "American spelling usually leaves out the u in these two words."
+    },
+    {
+      "id": "listen-trick-or-treat", "kind": "listening-meaning", "type": "listening", "mode": "choice",
+      "prompt": "Listen. Welche deutsche Bedeutung passt?",
+      "speak": "Trick or treat!",
+      "options": ["Süßes, sonst gibt's Saures!", "Pass auf den Verkehr auf!", "Mach bitte die Tür zu!"],
+      "solution": "Süßes, sonst gibt's Saures!", "hint": "Children say this when they knock on doors at Halloween."
+    },
+    {
+      "id": "listen-happy-halloween", "kind": "listening-meaning", "type": "listening", "mode": "choice",
+      "prompt": "Listen. Welche deutsche Bedeutung passt?",
+      "speak": "Happy Halloween!",
+      "options": ["Alles Gute zum Geburtstag!", "Fröhliches Halloween!", "Guten Rutsch ins neue Jahr!"],
+      "solution": "Fröhliches Halloween!", "hint": "It is a greeting for this spooky celebration."
+    },
+    {
+      "id": "listen-dressing-up", "kind": "listening-meaning", "type": "listening", "mode": "choice",
+      "prompt": "Listen. Welche deutsche Bedeutung passt?",
+      "speak": "What are you dressing up as?",
+      "options": ["Wo hast du deine Jacke gekauft?", "Warum ziehst du deine Schuhe aus?", "Als was verkleidest du dich?"],
+      "solution": "Als was verkleidest du dich?", "hint": "The speaker is asking about your costume."
+    },
+    {
+      "id": "listen-sweets", "kind": "listening-meaning", "type": "listening", "mode": "choice",
+      "prompt": "Listen. Welche deutsche Bedeutung passt?",
+      "speak": "Would you like some sweets?",
+      "options": ["Möchtest du ein paar Süßigkeiten?", "Kannst du die Kerzen anzünden?", "Hast du Angst vor Spinnen?"],
+      "solution": "Möchtest du ein paar Süßigkeiten?", "hint": "The speaker is offering you something sweet."
+    }
+  ]
+}
