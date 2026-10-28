@@ -14,6 +14,9 @@ import { itemCard, openItemDetail, setCardThumb, type ItemOrigin } from './itemD
 import { filterItemCatalog } from './itemCatalogFilter';
 import { createOlliePanel } from './olliePanel';
 import type { Sound } from './sound';
+import type { OllieStoryApi } from '../api/ollieStory';
+import type { ProgressDelta } from '../api/progress';
+import { openOllieStory } from '../shopkeeper/storyView';
 import './itemArea.css';
 
 export interface ItemAreaOptions {
@@ -33,6 +36,9 @@ export interface ItemAreaOptions {
   /** Owned by the signed-in player view and discarded on logout. Never persisted here. */
   savedIds?: Set<string>;
   sound?: Sound;
+  story?: OllieStoryApi;
+  onProgress?: (delta: ProgressDelta) => void;
+  onRefreshProgress?: () => void;
   /** Only the visible close button calls this; external close() only disposes. */
   onClose: () => void;
   createPreview?: PreviewFactory;
@@ -95,7 +101,30 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
   head.append(brand, nav, coinsEl, closeBtn);
   const layout = document.createElement('div');
   layout.className = 'item-area-layout';
-  const keeper = createOlliePanel(opts.sound);
+  const keeper = createOlliePanel(
+    opts.sound,
+    opts.story
+      ? (opener) => {
+          if (closed || story?.isOpen || detail?.isOpen) return;
+          story = openOllieStory({
+            api: opts.story!,
+            opener,
+            sound: opts.sound,
+            onCoins,
+            onProgress: (delta) => opts.onProgress?.(delta),
+            onChanged: () => {
+              if (!closed) {
+                void load(false);
+                opts.onRefreshProgress?.();
+              }
+            },
+            onInventory: () => {
+              if (!closed) opts.onOpenInventory();
+            },
+          });
+        }
+      : undefined,
+  );
   const content = document.createElement('div');
   content.className = 'area-content item-area-catalog';
   const eyebrow = document.createElement('p');
@@ -153,6 +182,7 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
   let savedOnly = false;
   const savedIds = opts.savedIds ?? new Set<string>();
   let detail: ModalHandle | null = null;
+  let story: ModalHandle | null = null;
   let loadId = 0;
   const cards = new Map<string, HTMLButtonElement>();
   const session = opts.thumbs ? null : acquireSessionThumbs();
@@ -443,6 +473,8 @@ export function openItemArea(origin: ItemOrigin, opts: ItemAreaOptions): AreaHan
       ++loadId;
       thumbObserver?.disconnect();
       keeper.close();
+      story?.close();
+      story = null;
       season?.dispose();
       session?.release();
       detail?.close();

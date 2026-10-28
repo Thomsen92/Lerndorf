@@ -1,0 +1,205 @@
+.overlay.modal .panel.ollie-story {
+  zoom: 1;
+  width: min(1060px, calc(100vw - 28px));
+  max-width: 1060px;
+  max-height: calc(100dvh - 28px);
+  overflow: auto;
+  background: #f5f3e9;
+  color: #233e48;
+  padding: 0;
+  border: 1px solid #e0dfd5;
+  border-radius: 24px;
+  color-scheme: light;
+}
+.ollie-story .panel-head {
+  padding: 18px 24px;
+  background: #fffdf5;
+  border-bottom: 1px solid #dcded1;
+}
+.ollie-story .panel-head h2 {
+  font-family: 'Comic Neue', cursive;
+  font-size: 25px;
+  color: #286d68;
+}
+.overlay.modal .ollie-story button {
+  min-height: 52px;
+  padding: 12px 18px;
+  border: 1px solid #b6cacc;
+  border-radius: 12px;
+  background: #fff;
+  color: #265750;
+  white-space: normal;
+  font: 600 15px/1.4 system-ui;
+  touch-action: manipulation;
+}
+.ollie-story button:focus-visible {
+  outline: 3px solid #d79d3e;
+  outline-offset: 3px;
+}
+.ollie-story button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.overlay.modal .ollie-story button.primary {
+  background: #286d68;
+  color: #fff;
+}
+.ollie-story .modal-body.ollie-story-layout {
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 0;
+}
+.ollie-story-scene {
+  background: #dfecee;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+.ollie-story-route {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  font-weight: 800;
+  color: #386b72;
+  margin: 0 0 16px;
+}
+.ollie-story-portrait {
+  height: 250px;
+  width: 100%;
+  object-fit: contain;
+  transform-origin: 50% 85%;
+  transform: translateY(var(--ollie-bob, 0px)) rotate(var(--ollie-lean, 0deg)) scaleY(var(--ollie-stretch, 1));
+}
+.ollie-story-portrait[data-speaking='true'] {
+  will-change: transform;
+}
+.ollie-story-line {
+  background: #fffdf8;
+  padding: 20px;
+  border-radius: 16px;
+  font-size: 17px;
+  line-height: 1.75;
+  margin: 16px 0;
+  align-self: stretch;
+  white-space: pre-wrap;
+}
+.ollie-story-audio {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-self: stretch;
+}
+.overlay.modal .ollie-story-audio button {
+  font-size: 12px;
+  flex: 1;
+  padding: 9px;
+  min-height: 48px;
+}
+.ollie-story-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 13px;
+  padding: 30px;
+  min-width: 0;
+}
+.ollie-story-content h3 {
+  font:
+    700 29px/1.25 'Comic Neue',
+    cursive;
+  margin: 0 0 4px;
+}
+.ollie-story-content p {
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+.ollie-story-progress {
+  font-weight: 800;
+  color: #a76c25;
+}
+.overlay.modal .ollie-story-answer {
+  font-size: 21px;
+  text-align: left;
+  min-height: 62px;
+}
+.ollie-story-answer[data-wrong='true'] {
+  text-decoration: line-through;
+  background: #eee5df;
+  color: #8d6354;
+}
+.ollie-story-status {
+  grid-column: 1/-1;
+  margin: 0;
+  padding: 12px 24px;
+  background: #fff5d8;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.ollie-story-status:empty {
+  display: none;
+}
+.ollie-story-gift {
+  width: 100%;
+  height: 230px;
+  display: block;
+  touch-action: none;
+  background: #e4ebe8;
+  border-radius: 16px;
+}
+@media (max-width: 700px) {
+  .overlay.modal .panel.ollie-story {
+    width: calc(100vw - 14px);
+    max-height: calc(100dvh - 14px);
+    border-radius: 16px;
+  }
+  .ollie-story .modal-body.ollie-story-layout {
+    grid-template-columns: 1fr;
+  }
+  .ollie-story .panel-head {
+    padding: 12px 16px;
+  }
+  .ollie-story .panel-head h2 {
+    font-size: 20px;
+  }
+  .ollie-story-scene {
+    padding: 14px;
+  }
+  .ollie-story-portrait {
+    height: 130px;
+  }
+  .ollie-story-route {
+    margin-bottom: 8px;
+    font-size: 10px;
+  }
+  .ollie-story-line {
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 8px 0;
+    padding: 13px;
+  }
+  .ollie-story-content {
+    padding: 18px;
+  }
+  .ollie-story-content h3 {
+    font-size: 24px;
+  }
+  .overlay.modal .ollie-story-answer {
+    min-height: 54px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ollie-story-portrait {
+    transform: none !important;
+  }
+}
+.ollie-story .empire-model-credit {
+  font: 11px/1.6 system-ui;
+  color: #66747a;
+}
+.empire-model-credit a {
+  color: #286d68;
+  text-underline-offset: 2px;
+}

@@ -4,6 +4,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { GLB_ITEMS, MIN_DECO_SIZE, glbAsset, loadGlbItem, normaliseGlb } from '../../src/render/glbItems';
+import { teacherDb } from '../teacherDb';
 
 // The loader is replaced by a stub that returns one 1 x 0.5 x 0.5 m box, so the cache and the
 // placeholder logic can be tested without files.
@@ -88,7 +89,9 @@ describe('glb item registry', () => {
   });
 
   it('turns cars modelled along X before fitting them (review B5)', () => {
-    const size = sizeOf(normaliseGlb(boxScene(4.5, 2.1, 2.1), { file: 'x.glb', kind: 'car', yaw: Math.PI / 2 }));
+    const size = sizeOf(
+      normaliseGlb(boxScene(4.5, 2.1, 2.1), { file: 'x.glb', kind: 'car', yaw: Math.PI / 2 }),
+    );
     expect(size.z).toBeCloseTo(4.5, 1);
     expect(size.x).toBeCloseTo(2.1, 1);
   });
@@ -116,4 +119,19 @@ describe('glb item registry', () => {
     // the placeholder is gone once the model is there
     expect(plotA.children.filter((c) => c instanceof THREE.Mesh)).toHaveLength(0);
   });
+});
+
+describe('item ids of the migrations', () => {
+  it('uses the final migrated model paths, including later souvenir replacements', async () => {
+    const db = await teacherDb();
+    try {
+      const { rows } = await db.query<{ id: string; model: string }>(
+        "select id,model from public.items where model like 'shop/%.glb' or model like 'season1/%.glb'",
+      );
+      expect(rows.length).toBeGreaterThan(50);
+      for (const row of rows) expect(GLB_ITEMS[row.id]?.file, row.id).toBe(row.model);
+    } finally {
+      await db.close();
+    }
+  }, 30000);
 });

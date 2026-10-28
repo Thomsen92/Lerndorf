@@ -1,5 +1,6 @@
 // Approved names/descriptions for the existing shop catalogue.
 export const OLLIE_ITEM_NAMES: Record<string, string> = {
+  reward_ollie_nyc_postcard: 'Ollies Empire State Building',
   shop_evening_lantern: 'Abendlaterne',
   shop_sunday_bench: 'Sonntagsbank',
   shop_pocket_meadow: 'Kleine Blumenwiese',
@@ -16,6 +17,10 @@ export const OLLIE_ITEM_NAMES: Record<string, string> = {
   shop_moss_workshop: 'Mooswerkstatt',
 };
 export const OLLIE_ITEM_EN: Record<string, string> = {
+  'Ollies New-York-Postkarte': 'Ollie’s New York Postcard',
+  'Ollies Empire State Building': 'Ollie’s Empire State Building',
+  'Ollies Reisegeschichte': 'Ollie’s travel story',
+  '50 Münzen · 80 XP · New-York-Souvenir': '50 coins · 80 XP · New York souvenir',
   Abendlaterne: 'Evening Lantern',
   Sonntagsbank: 'Sunday Bench',
   'Kleine Blumenwiese': 'Pocket Meadow',
@@ -32,6 +37,8 @@ export const OLLIE_ITEM_EN: Record<string, string> = {
   Mooswerkstatt: 'Moss Workshop',
 };
 export const OLLIE_DESCRIPTIONS_DE: Record<string, string> = {
+  reward_ollie_nyc_postcard:
+    'Ein kleines Empire State Building für deinen Garten – ein Souvenir von Ollies New-York-Reise.',
   shop_evening_lantern: 'Eine kleine warme Laterne für ruhige Abende in deinem Garten.',
   shop_sunday_bench: 'Eine Gartenbank aus Holz mit Rückenlehne und stabilen grünen Beinen.',
   shop_pocket_meadow: 'Ein Blumenkasten aus Holz voller rosa, gelber und fliederfarbener Blumen.',

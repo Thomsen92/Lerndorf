@@ -93,9 +93,28 @@ it('ignores late audio responses after dispose', async () => {
 it('stops the current recording when the tab is hidden', async () => {
   const f = fixture();
   await f.controller.say('welcome');
-  vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+  Object.defineProperty(document, 'hidden', { configurable: true, value: true });
   document.dispatchEvent(new Event('visibilitychange'));
+  Reflect.deleteProperty(document, 'hidden');
   expect(f.portrait.dataset.speaking).toBe('false');
   expect(f.release).toHaveBeenCalled();
+  f.controller.dispose();
+});
+it('lets a story wait for the recording end and cancels that wait on stop', async () => {
+  const f = fixture();
+  let finished = false;
+  const pending = f.controller.tell('c491a688ea58073852c75dec').then(() => (finished = true));
+  await Promise.resolve();
+  expect(finished).toBe(false);
+  f.ended();
+  f.tick(400);
+  await pending;
+  expect(finished).toBe(true);
+  finished = false;
+  const next = f.controller.tell('df0171db67cc19aa448f437e').then(() => (finished = true));
+  await Promise.resolve();
+  f.controller.stop();
+  await next;
+  expect(finished).toBe(true);
   f.controller.dispose();
 });

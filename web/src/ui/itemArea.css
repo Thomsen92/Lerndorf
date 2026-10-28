@@ -1,4 +1,6 @@
 /* The one shared shop/inventory area. Every rule is local to this surface. */
+.item-area .panel .item-area-story-quest{width:100%;margin-top:10px;background:#f4e4b9;border:1px solid #dac38a;color:#5d4b25;text-align:left}
+.item-area-story-quest small{font-size:11px;line-height:1.5;font-weight:500}
 .item-area .item-area-portrait {
   transform-origin: 50% 85%;
   transform: translateY(var(--ollie-bob, 0px)) rotate(var(--ollie-lean, 0deg)) scaleY(var(--ollie-stretch, 1));

@@ -272,6 +272,7 @@ describe('item area browsing', () => {
 
 describe('item area ownership and lifecycle', () => {
   it('keeps inventory chest controls visible even with no owned item types', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { onOpenInventory: _unused, ...options } = opts();
     const handle = openInventory({ ...options, api: { ...options.api, loadBook: async () => ({ ok: true, value: [] }) }, season: { chests: async () => [{ id: 1, source: 'shop' }] } as never });
     handles.push(handle); await flush();

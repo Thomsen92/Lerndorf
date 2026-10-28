@@ -77,6 +77,7 @@ import { BuildFx, loadPuffTexture } from '../render/buildFx';
 import { createSound } from './sound';
 import { createMarketByte, marketBoardPose, marketStopPose, type MarketByte } from '../mascot/marketByte';
 import { silenceSirByte } from '../mascot/voice';
+import {supabaseOllieStoryApi} from '../api/ollieStory';
 import { acquireSessionThumbs } from '../render/itemThumbs';
 import type { SlotId } from '../world/plotPlan';
 import { sheetViewOffset } from '../render/houseCamera';
@@ -895,6 +896,9 @@ export async function mountVillage(
   };
   let wardrobeItem: string | undefined;
   const itemOptions = (area: 'shop' | 'inventar') => ({
+    story:supabaseOllieStoryApi(supabase),
+    onProgress:(delta:ProgressDelta)=>void worldOnProgress(delta),
+    onRefreshProgress:()=>void progressFlow.refresh(),
     savedIds: savedItems,
     sound,
     onShop: () => { void areas?.select('shop'); },

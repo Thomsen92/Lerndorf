@@ -1,0 +1,144 @@
+{
+  "source_input": "C:\\Users\\Thomas\\Downloads\\new_york_buildings.glb",
+  "source_input_sha256": "cbc15a08c44e85900f9f4d1822f94af8579079922f8b85df9ef8ae56a91725e2",
+  "native_file": "C:\\Users\\Thomas\\Projekte\\Wochenpläne 8r\\Lerndorf\\content\\quests\\empire-source\\ollie-empire-state.blend",
+  "native_sha256": "1159acf92a27f2ad7ca1245536e90a0b889cf72ccb1795997fc10d13b16b2a45",
+  "export": "C:\\Users\\Thomas\\Projekte\\Wochenpläne 8r\\Lerndorf\\web\\public\\assets\\shop\\ollie-empire-state.glb",
+  "export_sha256": "c52d3df68c9c0e60ce496c134688abb1e71021221c7deccfe7653f7c41db18e0",
+  "bytes": 454572,
+  "lod_sha256": "c52d3df68c9c0e60ce496c134688abb1e71021221c7deccfe7653f7c41db18e0",
+  "source": {
+    "dimensions_blender_xyz": [
+      0.27625441551208496,
+      0.2762545347213745,
+      1.7999999523162842
+    ],
+    "minimum": [
+      -0.13812720775604248,
+      -0.13812720775604248,
+      0.0
+    ],
+    "maximum": [
+      0.13812720775604248,
+      0.13812732696533203,
+      1.7999999523162842
+    ],
+    "triangles": 1368,
+    "materials": [
+      "Ollie_Empire_State_Source_Material"
+    ],
+    "meshes": 1,
+    "uv_layers": [
+      1
+    ]
+  },
+  "reimported_export": {
+    "dimensions_blender_xyz": [
+      0.27625441551208496,
+      0.2762545347213745,
+      1.7999999523162842
+    ],
+    "minimum": [
+      -0.13812720775604248,
+      -0.13812720775604248,
+      0.0
+    ],
+    "maximum": [
+      0.13812720775604248,
+      0.13812732696533203,
+      1.7999999523162842
+    ],
+    "triangles": 1368,
+    "materials": [
+      "Ollie_Empire_State_Source_Material.001"
+    ],
+    "meshes": 1,
+    "uv_layers": [
+      1
+    ]
+  },
+  "cameras": {
+    "selected-front": {
+      "location": [
+        3.5999999046325684,
+        -5.399999618530273,
+        3.4200000762939453
+      ],
+      "rotation": [
+        1.2004252672195435,
+        -1.1372884500815417E-07,
+        0.5880026817321777
+      ],
+      "ortho_scale": 2.19599986076355
+    },
+    "selected-opposite": {
+      "location": [
+        -3.5999999046325684,
+        5.399999618530273,
+        3.4200000762939453
+      ],
+      "rotation": [
+        1.200425386428833,
+        1.2353322631497576E-07,
+        -2.5535900592803955
+      ],
+      "ortho_scale": 2.19599986076355
+    },
+    "source-all-buildings": {
+      "location": [
+        39.34147644042969,
+        -68.00901794433594,
+        33.52268981933594
+      ],
+      "rotation": [
+        1.2004255056381226,
+        -3.1347415330174044E-08,
+        0.5880026817321777
+      ],
+      "ortho_scale": 26.912322998046875
+    },
+    "export-front": {
+      "location": [
+        3.5999999046325684,
+        -5.399999618530273,
+        3.4200000762939453
+      ],
+      "rotation": [
+        1.2004252672195435,
+        -1.1372884500815417E-07,
+        0.5880026817321777
+      ],
+      "ortho_scale": 2.19599986076355
+    },
+    "export-opposite": {
+      "location": [
+        -3.5999999046325684,
+        5.399999618530273,
+        3.4200000762939453
+      ],
+      "rotation": [
+        1.200425386428833,
+        1.2353322631497576E-07,
+        -2.5535900592803955
+      ],
+      "ortho_scale": 2.19599986076355
+    }
+  },
+  "images": [
+    {
+      "name": "Image_11.001",
+      "size": [
+        512,
+        512
+      ]
+    }
+  ],
+  "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+  "note": "LOD intentionally identical: source is already 1368 triangles; no destructive decimation. Original source retained hidden in editable blend.",
+  "attribution": {
+    "author": "sumitmangela (https://sketchfab.com/sumitmangela)",
+    "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "source": "https://sketchfab.com/3d-models/new-york-buildings-e7922fe0f7b14ed786f84529f9217dac",
+    "title": "New York Buildings"
+  }
+}

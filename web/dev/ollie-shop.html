@@ -13,6 +13,7 @@
       import { buildItemBook } from '../src/api/items';
       import { openItemArea } from '../src/ui/shopView';
       import { createSound } from '../src/ui/sound';
+      import {ollieStoryFixture} from './ollie-story-fixture';
       const query = new URLSearchParams(location.search);
       setLocale(query.get('lang') === 'de' ? 'de' : 'en');
       // Review fixture only. Production uses supabaseItemApi and the existing buy_item RPC.
@@ -26,6 +27,8 @@
       }));
       let coins = Number(query.get('coins') ?? 500);
       const owned = { shop_evening_lantern: 2 };
+      catalog.push({id:'reward_ollie_nyc_postcard',kind:'deco',nameDe:itemName('reward_ollie_nyc_postcard','Ollies Empire State Building'),price:0,starter:false,shopVisible:false,slot:null});
+      const story=ollieStoryFixture({get:()=>coins,set:c=>coins=c,owned});
       const savedIds = new Set();
       const sound = createSound();
       let handle;
@@ -52,6 +55,7 @@
         handle = openItemArea(origin, {
           api,
           sound,
+          story:story.api,
           savedIds,
           category: null,
           onCategory() {},
@@ -80,6 +84,7 @@
           return coins;
         },
         sound,
+        story,
       };
       window.__ready = true;
     </script>

@@ -114,10 +114,11 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   // CRT televisions (0037): same FBX pack, textured with the MasterMaterial palette.
   shop_tv_crt_07: { file: 'shop/tv-crt-07.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
   shop_tv_crt_09: { file: 'shop/tv-crt-09.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
-  // Game cases, figurines and a little blue engine (0038).
-  shop_gta6_ps5_case: { file: 'shop/gta6-ps5-case.glb', kind: 'deco', fill: true },
-  shop_gta6_phone_case: { file: 'shop/gta6-phone-case.glb', kind: 'deco', fill: true },
-  shop_cute_frog: { file: 'shop/cute-round-frog.glb', kind: 'deco', fill: true },
+  // Game cases, figurines and a little blue engine (0038); ids exactly as in the migration, or the
+  // shop shows the orange placeholder box (teacher, 28.10.2026).
+  shop_game_case: { file: 'shop/gta6-ps5-case.glb', kind: 'deco', fill: true },
+  shop_phone_case: { file: 'shop/gta6-phone-case.glb', kind: 'deco', fill: true },
+  shop_round_frog: { file: 'shop/cute-round-frog.glb', kind: 'deco', fill: true },
   shop_cute_fox: { file: 'shop/cute-fox.glb', kind: 'deco', fill: true },
   shop_blue_engine: { file: 'shop/blue-engine.glb', kind: 'deco', fill: true },
   // Mascot, phone, statue and farm buildings (0039).
@@ -145,6 +146,10 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_lantern_house: { file: 'shop/lantern-house.glb', kind: 'house', lod: false },
   shop_apple_gable_garage: { file: 'shop/apple-gable-garage.glb', kind: 'garage', lod: false },
   shop_moss_workshop: { file: 'shop/moss-workshop.glb', kind: 'garage', lod: false },
+  // Stable reward ID preserves existing ownership; the souvenir is now the supplied Empire State model.
+  reward_ollie_nyc_postcard:{file:'shop/ollie-empire-state.glb',kind:'deco'},
+  // Retain the original own postcard model as an archive asset, without a new catalogue item.
+  archive_ollie_nyc_postcard:{file:'shop/ollie-nyc-postcard.glb',kind:'deco'},
 };
 
 const BASE = `${import.meta.env.BASE_URL}assets/`;

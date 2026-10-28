@@ -10,6 +10,7 @@ import { type ItemPreview, type PreviewFactory } from '../render/itemPreview';
 import { createShopItemPreview } from '../render/shopItemPreview';
 import type { Sound } from './sound';
 import './itemDetail.css';
+import { empireModelCredit } from '../shopkeeper/empireCredit';
 import { THUMB_PLACEHOLDER, type ThumbSource } from '../render/itemThumbs';
 import { slotById, type SlotId, type SlotKind } from '../world/plotPlan';
 import { openModal, type ModalHandle } from './dialog';
@@ -124,6 +125,7 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
   side.className = 'item-detail-side';
   side.append(actions, status);
   modal.body.append(previewBox, side);
+  if (entry.id === 'reward_ollie_nyc_postcard') side.append(empireModelCredit());
   if (entry.description) {
     const description = document.createElement('p');
     description.className = 'item-description';

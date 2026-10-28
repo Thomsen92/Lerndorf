@@ -1,5 +1,16 @@
 # Lerndorf – Umsetzungsplan
 
+### Ollies Reisequest – 28.10.2026
+
+| AP | Status | Ergebnis |
+| --- | --- | --- |
+| Ollie Quest 1 | [x] | Neun zusammenhängende englische Lücken, neu Central Park/Brooklyn Bridge/Times Square; 20 aktive Charlie-Aufnahmen, sprachabhängige Bewegung, direkte Touch-Antworten, Hinweis/Wiederholung/Fortsetzen |
+| Ollie Quest 2 | [x] | RPC-private Fragen und Fortschritt, sichere Gap-IDs, Reihenfolge, atomare einmalige 50 Münzen +80 XP +Empire-State-Souvenir; Upgrade erhält Altabschlüsse und Inventar-ID |
+| Ollie Quest 3 | [x] | Empire State aus gelieferter GLB isoliert/zentriert, 1,80m hoch, 1368 Dreiecke/ein Material, CC-BY-4.0-Credits; alte Modelle erhalten. 1318 Tests, 17 Browserprüfungen, Build |
+| Ollie Quest 4 | [ ] | Nutzerreview und spätere gemeinsame Auslieferung mit Migrationen 0055/0056; keine Live-Datenbank geändert |
+
+Details: [Ollies Reisequest](OLLIE_STORY_QUEST.md). Die neue Quest wurde noch nicht committet/gepusht.
+
 ### Ollies bestehender Shop – 28.10.2026
 
 Ergänzung: **Ollie spricht und wippt** — zwölf lokale ElevenLabs-Aufnahmen

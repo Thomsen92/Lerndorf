@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "input": "C:\\Users\\Thomas\\Projekte\\Wochenpläne 8r\\Lerndorf\\content\\quests\\empire-source\\ollie-empire-state.blend",
+  "input_sha256": "1159acf92a27f2ad7ca1245536e90a0b889cf72ccb1795997fc10d13b16b2a45",
+  "blender_version": "5.2.2 LTS",
+  "scope": {
+    "collection": "Ollie_Empire_State",
+    "view_layer": "ViewLayer",
+    "frame": 1,
+    "evaluation_mode": "VIEWPORT",
+    "basis": "Evaluated active-view-layer mesh instances filtered by object hide_render and show_self; viewport evaluation is not a full render/export prediction"
+  },
+  "units": {
+    "system": "METRIC",
+    "scale_length": 1.0,
+    "dimensions_blender_units": [
+      0.27625441551208496,
+      0.2762545347213745,
+      1.7999999523162842
+    ],
+    "dimensions_meters_at_declared_scale": [
+      0.27625441551208496,
+      0.2762545347213745,
+      1.7999999523162842
+    ]
+  },
+  "counts": {
+    "triangles_with_instances": 1368,
+    "mesh_instances": 1,
+    "distinct_object_names": 1,
+    "assigned_materials": 1,
+    "image_textures": 1
+  },
+  "objects": [
+    {
+      "object": "Ollie_Empire_State",
+      "instance": false,
+      "parent": null,
+      "triangles": 1368,
+      "vertices": 2680,
+      "uv_layers": [
+        "UVMap"
+      ],
+      "materials": [
+        "Ollie_Empire_State_Source_Material"
+      ],
+      "negative_transform": false
+    }
+  ],
+  "textures": [
+    {
+      "image": "Image_11.001",
+      "size": [
+        512,
+        512
+      ],
+      "channels": 4,
+      "source": "FILE",
+      "color_space": "sRGB",
+      "packed": true,
+      "path": null,
+      "missing": false
+    }
+  ],
+  "findings": [],
+  "limits": {
+    "max_triangles": 1500,
+    "max_materials": 1,
+    "max_texture_edge": 1024,
+    "require_uv": true
+  },
+  "technical_limits_passed": true,
+  "artistic_acceptance": "not-assessed",
+  "limitations": [
+    "Active view layer/current frame only; inspect hidden variants and other frames separately",
+    "Viewport-excluded geometry and collection render restrictions require scope review",
+    "No UV distortion, normal-map, rig, collision, shader appearance or performance verdict",
+    "Linked input dependencies are not covered by the primary-file hash"
+  ]
+}

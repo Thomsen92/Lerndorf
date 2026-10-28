@@ -177,3 +177,7 @@
   min-height: 48px;
   padding: 10px 16px;
 }
+.item-detail .empire-model-credit {
+  font: 11px/1.6 system-ui;
+  color: #66747a;
+}

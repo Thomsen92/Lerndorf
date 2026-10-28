@@ -1,0 +1,6 @@
+Ollie's New York Postcard — own Lerndorf geometry, CC0 1.0 Universal.
+Source: web/scripts/assets/build-ollie-souvenir.mjs.
+No third-party images, models or textures. The skyline is a stylised original.
+408 triangles, one vertex-colour material. The far version uses the same already
+small sculpture. Delivered as ollie-nyc-postcard.glb and ollie-nyc-postcard.lod.glb.
+https://creativecommons.org/publicdomain/zero/1.0/

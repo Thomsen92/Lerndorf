@@ -1,0 +1,15 @@
+{
+  "id": "reward_ollie_nyc_postcard",
+  "author": "Lerndorf own geometry",
+  "license": "CC0-1.0",
+  "file": "shop/ollie-nyc-postcard.glb",
+  "triangles": 408,
+  "materials": 1,
+  "bytes": 39868,
+  "sha256": "f902dcc107d8572ed6e3207e9cd35b045063d48a7486ea316ab98dccd7b972bd",
+  "size": [
+    1.2000000476837158,
+    0.9999999991059303,
+    0.36000001430511475
+  ]
+}

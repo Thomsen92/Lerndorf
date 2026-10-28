@@ -910,6 +910,48 @@
             ],
             "triangles": 1838,
             "primitives": 2
+        },
+        {
+            "id": "reward_ollie_nyc_postcard",
+            "author": "Lerndorf own geometry",
+            "license": "CC0-1.0",
+            "file": "ollie-nyc-postcard.glb",
+            "triangles": 408,
+            "materials": 1,
+            "bytes": 39868,
+            "sha256": "f902dcc107d8572ed6e3207e9cd35b045063d48a7486ea316ab98dccd7b972bd",
+            "size": [
+                1.2000000476837158,
+                0.9999999991059303,
+                0.36000001430511475
+            ],
+            "kind": "deco",
+            "name": "Ollie’s New York Postcard",
+            "price": 0,
+            "shopVisible": false,
+            "rewardOnly": true
+        },
+        {
+            "id": "ollie_empire_state_souvenir_model",
+            "author": "sumitmangela (https://sketchfab.com/sumitmangela)",
+            "license": "CC-BY-4.0",
+            "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+            "source": "https://sketchfab.com/3d-models/new-york-buildings-e7922fe0f7b14ed786f84529f9217dac",
+            "sourceTitle": "New York Buildings",
+            "changes": "Empire State isolated, centered, base zero, uniformly scaled to 1.8 m height; other buildings retained hidden in editable source.",
+            "attributionFile": "LICENSE-ollie-empire-state.txt",
+            "file": "ollie-empire-state.glb",
+            "lodFile": "ollie-empire-state.lod.glb",
+            "triangles": 1368,
+            "materials": 1,
+            "bytes": 454572,
+            "sha256": "c52d3df68c9c0e60ce496c134688abb1e71021221c7deccfe7653f7c41db18e0",
+            "size": [0.27625441551208496, 1.7999999523162842, 0.2762545347213745],
+            "kind": "deco",
+            "name": "Ollie’s Empire State Building",
+            "price": 0,
+            "shopVisible": false,
+            "rewardOnly": true
         }
     ],
     "pending": [

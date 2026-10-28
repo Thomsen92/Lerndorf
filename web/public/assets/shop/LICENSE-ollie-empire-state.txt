@@ -1,0 +1,21 @@
+Ollie's Empire State Building souvenir
+
+Adapted from "New York Buildings" by sumitmangela.
+Author: https://sketchfab.com/sumitmangela
+Source: https://sketchfab.com/3d-models/new-york-buildings-e7922fe0f7b14ed786f84529f9217dac
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+http://creativecommons.org/licenses/by/4.0/
+
+The author, title, source and license above were read directly from
+the original user-supplied new_york_buildings.glb asset.extras metadata.
+
+Changes by Lerndorf: isolated the Empire State Building mesh
+(emp_state._final_14 / Object_28, material empire_state); excluded all
+other buildings from the delivery GLBs while retaining them hidden in
+the editable Blender source; centered the model horizontally, placed
+its base at zero and uniformly scaled it to 1.8 m height. Original UVs,
+facade texture, proportions and 1,368-triangle geometry were retained.
+Textures are embedded in the GLBs. The LOD is an identical copy.
+
+Applies to ollie-empire-state.glb and ollie-empire-state.lod.glb.
+No endorsement by the original author is implied.

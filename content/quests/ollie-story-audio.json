@@ -1,0 +1,503 @@
+{
+  "provider": "ElevenLabs",
+  "voiceId": "IKne3meq5aSn9XLyUdCD",
+  "voiceName": "Charlie — Australian male",
+  "modelId": "eleven_multilingual_v2",
+  "settings": {
+    "stability": 0.62,
+    "similarity_boost": 0.75,
+    "style": 0.15,
+    "use_speaker_boost": true,
+    "speed": 0.94
+  },
+  "fingerprint": "4c57ff5866b9604029e5df0b319d9c559a1eb3064b815e18d5c9465e19b7198e",
+  "charactersGenerated": 2477,
+  "clips": [
+    {
+      "key": "intro",
+      "text": "Fancy hearing my story, mate? Australia, New York, and a rather unreliable memory. Help me find six missing words. I have a little souvenir for you.",
+      "language": "en",
+      "file": "c491a688ea58073852c75dec.mp3",
+      "bytes": 177257,
+      "sha256": "0770802217a17053565d00d79ed3a9f3bcbb8e568332bd549f18216da8f26168"
+    },
+    {
+      "key": "wrong",
+      "text": "Not quite, mate. Have another think. I have left you a little clue.",
+      "language": "en",
+      "file": "df0171db67cc19aa448f437e.mp3",
+      "bytes": 65662,
+      "sha256": "b851c7e92b92ccd65f6c0311aeecb6b5b5b259562a2dcd0e393d39ddd443ece0"
+    },
+    {
+      "key": "backpack:question",
+      "text": "I grew up in Australia. One day I packed my ... darn it! What do you call the bag you wear on your back?",
+      "language": "en",
+      "file": "ec3edecc6c62e872cde2bb2f.mp3",
+      "bytes": 114563,
+      "sha256": "16c1ecbef681d0029c636b0b04f09c8cb699581c4b6ce969048276c2b868b576"
+    },
+    {
+      "key": "backpack:reply",
+      "text": "Ah yes, backpack! I'm getting old, mate. Anyway, I was on my way to New York. Absolutely terrified. Mostly of the airport coffee.",
+      "language": "en",
+      "file": "d96fb6be183a408304af90c9.mp3",
+      "bytes": 143821,
+      "sha256": "3ef574a7a40511ddf1bf43d39c8d5927a39ba89cc29753279911e7d5544d5280"
+    },
+    {
+      "key": "kangaroo:question",
+      "text": "Before I left, a ... oh, what's that Australian animal that hops on two big feet? It was watching me pack. Very judgemental.",
+      "language": "en",
+      "file": "5a89495b8d440d6c9e7bcd16.mp3",
+      "bytes": 140895,
+      "sha256": "180d86361464d650c528f0d207a39e96200eba4a08b3a31618eb06befb71a8b7"
+    },
+    {
+      "key": "kangaroo:reply",
+      "text": "A kangaroo! That's the one. It had better legs than me, but no passport. So I went to the airport on my own.",
+      "language": "en",
+      "file": "9b2301f37677926fe67fbe17.mp3",
+      "bytes": 118325,
+      "sha256": "5d072030220b77b6e3b224dd112f2928762eb512d55e898bfa7449d8c0e1cc50"
+    },
+    {
+      "key": "plane:question",
+      "text": "I crossed the Pacific in a ... darn it, the thing with wings! Not a bird. It has seats and tiny bags of peanuts.",
+      "language": "en",
+      "file": "dfa57a8540c95585e7e6956f.mp3",
+      "bytes": 124594,
+      "sha256": "bddf6a0996b526695cd01bedc669fdcf34108dee8e26e80fc76c4628cb77d589"
+    },
+    {
+      "key": "plane:reply",
+      "text": "A plane, of course! Many hours later, New York appeared below us. So many lights! I thought somebody had left every oven on.",
+      "language": "en",
+      "file": "954083c6ba3427726e6b174c.mp3",
+      "bytes": 137133,
+      "sha256": "7dd09bc5a9cbc7e34d2302bfd755fe06fc9d0e591291a2dddcbc055bd50cfd0f"
+    },
+    {
+      "key": "liberty:question",
+      "text": "My first stop was the Statue of ... oh, what was her name? The big green lady holding a torch. Lovely hat. Terrible place to lose your keys.",
+      "language": "en",
+      "file": "4f64757a59a65942acd00775.mp3",
+      "bytes": 161375,
+      "sha256": "54325f30d963c5b220620333602f8ae8d5611f1af745a654076c37565de2c9c8"
+    },
+    {
+      "key": "liberty:reply",
+      "text": "Liberty! That's it. I tried waving. She didn't wave back. Fair enough, her arms must get tired.",
+      "language": "en",
+      "file": "699d6e794601880821397e72.mp3",
+      "bytes": 122087,
+      "sha256": "af88b9825c74ca98c2676b3496a8f2d29b6baf09de717960780ada256fe210f1"
+    },
+    {
+      "key": "empire:question",
+      "text": "Then I visited the ... State Building. Darn it! I remember the lifts, but not the name. That famous skyscraper in Manhattan.",
+      "language": "en",
+      "file": "268929246ec2a48108adeaf6.mp3",
+      "bytes": 156359,
+      "sha256": "2d21acfe45b8d31d48c3080576b95f31795cbcdf1628f1603de66c76e37fc310"
+    },
+    {
+      "key": "empire:reply",
+      "text": "Empire! Up I went. The view was brilliant. My knees were less enthusiastic. I bought you a little souvenir on the way down.",
+      "language": "en",
+      "file": "97f1154133ca61c74418cba7.mp3",
+      "bytes": 142985,
+      "sha256": "ccc738ca73ab3c13e302749b0b48e04175a614268e9b61108dd03bc9e2648de8"
+    },
+    {
+      "key": "remember:question",
+      "text": "I put the souvenir in my ... oh no, not again! That bag with two straps. What did we call it at the start?",
+      "language": "en",
+      "file": "f7b35a92a4f5f4ca1f67ed32.mp3",
+      "bytes": 115399,
+      "sha256": "f77d330a61b93f9ad966be06a5e037cea6903e0891347a47f68350e9d5600c76"
+    },
+    {
+      "key": "remember:reply",
+      "text": "Backpack! You're a lifesaver, mate. Here's your little New York souvenir. And fifty coins and eighty XP for putting up with my memory. Cheers!",
+      "language": "en",
+      "file": "4a4dab26919038a404b49a6b.mp3",
+      "bytes": 156359,
+      "sha256": "9c3b9c9e8f6e89444ec166b2bc2095fd5aedef5335f28c570e39c9391b91959f"
+    },
+    {
+      "key": "intro",
+      "text": "Fancy hearing my story, mate? Australia, New York, and a rather unreliable memory. Help me find nine missing words. I have a little souvenir for you.",
+      "language": "en",
+      "file": "60db88c0e94554336efe43e1.mp3",
+      "bytes": 176421,
+      "sha256": "7f15bd050cea84b5cf1ee4817d2d6a9cf537b77f02b88088dbf8687847f66ad3"
+    },
+    {
+      "key": "central-park:question",
+      "text": "Next I wandered into Central ... darn it! The big green place in Manhattan, with trees and lakes. Lovely spot for a rest.",
+      "language": "en",
+      "file": "b6cc7721d0e0f69a19e74a38.mp3",
+      "bytes": 131700,
+      "sha256": "529d0c4dcbccd1be27192f8f17fe5f9bc0b66cdab9f9750d332ca68844a6207d"
+    },
+    {
+      "key": "central-park:reply",
+      "text": "Park! Central Park. I tried jogging for twelve seconds. Even the squirrels looked disappointed.",
+      "language": "en",
+      "file": "93089d3cdbe10c5cb24500f5.mp3",
+      "bytes": 104532,
+      "sha256": "35eef4fb51104dbd19d386ebc420e4b926b1b1734e31f9cf4cf3dd0d41d7b441"
+    },
+    {
+      "key": "brooklyn-bridge:question",
+      "text": "Then I walked across the Brooklyn ... oh, what do you call the thing over the East River? It connects Manhattan and Brooklyn.",
+      "language": "en",
+      "file": "852800860b312ce58d23577a.mp3",
+      "bytes": 122923,
+      "sha256": "891af45b83656622675a53bfec968cd14e78d9c5800b6e63be6f108649b4c730"
+    },
+    {
+      "key": "brooklyn-bridge:reply",
+      "text": "Bridge! Brooklyn Bridge. I took forty photos. Thirty-nine were of my thumb. The other one was rather good.",
+      "language": "en",
+      "file": "5290c905815c4f5811d541e2.mp3",
+      "bytes": 130446,
+      "sha256": "938d472ffc506772924ee442c3429f22346853762389f3820a3a5536bb44e71b"
+    },
+    {
+      "key": "times-square:question",
+      "text": "After that, I found Times ... darn it! That busy city space with all the bright lights and enormous screens. What a place!",
+      "language": "en",
+      "file": "c3e3b70189863f08ae246843.mp3",
+      "bytes": 134207,
+      "sha256": "2330a01b1b22b9ea6caa8a5bae54257e24e6b7b339f38b796a4cd2707ec42f60"
+    },
+    {
+      "key": "times-square:reply",
+      "text": "Square! Times Square. I nearly bought sunglasses at night. Then I checked that your souvenir was still in my bag.",
+      "language": "en",
+      "file": "03dcedc59d5349417299e6e0.mp3",
+      "bytes": 114145,
+      "sha256": "1bc7736ea9e42eca880a385afdee73b10fbfd940151fbbfe0e43cb3f103b5a91"
+    }
+  ],
+  "attempts": [
+    {
+      "file": "c491a688ea58073852c75dec.mp3",
+      "characters": 148,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:00.393Z"
+    },
+    {
+      "file": "df0171db67cc19aa448f437e.mp3",
+      "characters": 67,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:01.351Z"
+    },
+    {
+      "file": "ec3edecc6c62e872cde2bb2f.mp3",
+      "characters": 104,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:01.811Z"
+    },
+    {
+      "file": "d96fb6be183a408304af90c9.mp3",
+      "characters": 129,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:02.356Z"
+    },
+    {
+      "file": "5a89495b8d440d6c9e7bcd16.mp3",
+      "characters": 124,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:03.005Z"
+    },
+    {
+      "file": "9b2301f37677926fe67fbe17.mp3",
+      "characters": 108,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:03.660Z"
+    },
+    {
+      "file": "dfa57a8540c95585e7e6956f.mp3",
+      "characters": 112,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:04.264Z"
+    },
+    {
+      "file": "954083c6ba3427726e6b174c.mp3",
+      "characters": 124,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:04.901Z"
+    },
+    {
+      "file": "4f64757a59a65942acd00775.mp3",
+      "characters": 140,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:05.582Z"
+    },
+    {
+      "file": "699d6e794601880821397e72.mp3",
+      "characters": 95,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:06.289Z"
+    },
+    {
+      "file": "268929246ec2a48108adeaf6.mp3",
+      "characters": 124,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:06.858Z"
+    },
+    {
+      "file": "97f1154133ca61c74418cba7.mp3",
+      "characters": 123,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:07.549Z"
+    },
+    {
+      "file": "f7b35a92a4f5f4ca1f67ed32.mp3",
+      "characters": 106,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:08.193Z"
+    },
+    {
+      "file": "4a4dab26919038a404b49a6b.mp3",
+      "characters": 142,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T19:45:08.788Z"
+    },
+    {
+      "file": "60db88c0e94554336efe43e1.mp3",
+      "characters": 149,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T20:50:06.762Z"
+    },
+    {
+      "file": "b6cc7721d0e0f69a19e74a38.mp3",
+      "characters": 121,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T20:50:07.668Z"
+    },
+    {
+      "file": "93089d3cdbe10c5cb24500f5.mp3",
+      "characters": 95,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T20:50:08.414Z"
+    },
+    {
+      "file": "852800860b312ce58d23577a.mp3",
+      "characters": 125,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T20:50:08.949Z"
+    },
+    {
+      "file": "5290c905815c4f5811d541e2.mp3",
+      "characters": 106,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T20:50:09.590Z"
+    },
+    {
+      "file": "c3e3b70189863f08ae246843.mp3",
+      "characters": 122,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T20:50:10.198Z"
+    },
+    {
+      "file": "03dcedc59d5349417299e6e0.mp3",
+      "characters": 113,
+      "status": "delivered",
+      "requestedAt": "2026-10-28T20:50:10.811Z"
+    }
+  ],
+  "quotaBefore": {
+    "used": 2818,
+    "limit": 31089,
+    "checkedAt": "2026-10-28T20:50:06.758Z"
+  },
+  "quotaAfter": {
+    "used": 2818,
+    "limit": 31089,
+    "checkedAt": "2026-10-28T20:50:12.736Z"
+  },
+  "browserAudioAudit": {
+    "checkedAt": "2026-10-28T19:51:29.255Z",
+    "browser": "Edge Chromium AudioContext.decodeAudioData",
+    "clips": [
+      {
+        "file": "c491a688ea58073852c75dec.mp3",
+        "duration": 11.00625,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.6395485997200012,
+        "rms": 0.06960763698092319
+      },
+      {
+        "file": "df0171db67cc19aa448f437e.mp3",
+        "duration": 4.0402708333333335,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.6273537874221802,
+        "rms": 0.06760146555037386
+      },
+      {
+        "file": "ec3edecc6c62e872cde2bb2f.mp3",
+        "duration": 7.105291666666667,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.6288683414459229,
+        "rms": 0.07254845542220029
+      },
+      {
+        "file": "d96fb6be183a408304af90c9.mp3",
+        "duration": 8.916458333333333,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.7158161401748657,
+        "rms": 0.0768041984966142
+      },
+      {
+        "file": "5a89495b8d440d6c9e7bcd16.mp3",
+        "duration": 8.7306875,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.5631746053695679,
+        "rms": 0.06889155907106419
+      },
+      {
+        "file": "9b2301f37677926fe67fbe17.mp3",
+        "duration": 7.3375,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.6937888860702515,
+        "rms": 0.07351127194127549
+      },
+      {
+        "file": "dfa57a8540c95585e7e6956f.mp3",
+        "duration": 7.709020833333334,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.5627489686012268,
+        "rms": 0.07161918063167969
+      },
+      {
+        "file": "954083c6ba3427726e6b174c.mp3",
+        "duration": 8.4985,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.6347450017929077,
+        "rms": 0.07705660541981885
+      },
+      {
+        "file": "4f64757a59a65942acd00775.mp3",
+        "duration": 10.031,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.5022984743118286,
+        "rms": 0.06746031687630691
+      },
+      {
+        "file": "699d6e794601880821397e72.mp3",
+        "duration": 7.5696875,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.6117596626281738,
+        "rms": 0.0744266676345339
+      },
+      {
+        "file": "268929246ec2a48108adeaf6.mp3",
+        "duration": 9.7059375,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.6404354572296143,
+        "rms": 0.06441082914049438
+      },
+      {
+        "file": "97f1154133ca61c74418cba7.mp3",
+        "duration": 8.870020833333333,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.5520250797271729,
+        "rms": 0.073628242259646
+      },
+      {
+        "file": "f7b35a92a4f5f4ca1f67ed32.mp3",
+        "duration": 7.151729166666667,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.6042906045913696,
+        "rms": 0.06964872510159897
+      },
+      {
+        "file": "4a4dab26919038a404b49a6b.mp3",
+        "duration": 9.7059375,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.6169626712799072,
+        "rms": 0.07532510223504806
+      }
+    ]
+  },
+  "browserAudioAuditExtension": {
+    "checkedAt": "2026-10-28T20:51:10.143Z",
+    "browser": "Edge Chromium AudioContext.decodeAudioData",
+    "clips": [
+      {
+        "file": "60db88c0e94554336efe43e1.mp3",
+        "duration": 10.9598125,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.5176554322242737,
+        "rms": 0.07267229738182748
+      },
+      {
+        "file": "b6cc7721d0e0f69a19e74a38.mp3",
+        "duration": 8.173416666666666,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.5631123781204224,
+        "rms": 0.06515196731530375
+      },
+      {
+        "file": "93089d3cdbe10c5cb24500f5.mp3",
+        "duration": 6.455145833333333,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.7106190919876099,
+        "rms": 0.06953606614552503
+      },
+      {
+        "file": "852800860b312ce58d23577a.mp3",
+        "duration": 7.616125,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.5535769462585449,
+        "rms": 0.07313436466484709
+      },
+      {
+        "file": "5290c905815c4f5811d541e2.mp3",
+        "duration": 8.080541666666667,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.6284193396568298,
+        "rms": 0.0703541988114438
+      },
+      {
+        "file": "c3e3b70189863f08ae246843.mp3",
+        "duration": 8.312729166666667,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.5253700613975525,
+        "rms": 0.06610135175352941
+      },
+      {
+        "file": "03dcedc59d5349417299e6e0.mp3",
+        "duration": 7.058854166666666,
+        "sampleRate": 48000,
+        "channels": 1,
+        "peak": 0.609869122505188,
+        "rms": 0.06852775391023787
+      }
+    ]
+  }
+}

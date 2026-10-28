@@ -21,6 +21,8 @@ const products: Product[] = existsSync(path) ? JSON.parse(readFileSync(path, 'ut
 // Node has no browser image decoder. Keep the exact binary geometry and node transforms;
 // only strip materials for the bounds test. The export tool separately reloads complete
 // textured GLBs in Chromium and records their bounds in ollie-audit.json.
+// glTF JSON is free-form here; only meshes, materials and images are touched.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function geometryGlb(bytes: Buffer, json: Record<string, any>): ArrayBuffer {
   for (const mesh of json.meshes ?? []) for (const primitive of mesh.primitives) delete primitive.material;
   delete json.materials;

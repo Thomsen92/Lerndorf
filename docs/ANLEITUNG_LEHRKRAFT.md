@@ -348,6 +348,16 @@ Unter **Dorf & Regeln → Weltstimmung** wählen Sie für die gerade ausgewählt
 
 ### Ollies Dorfladen und Inventory
 
+**Ollies Reisegeschichte:** Im Dorfladen öffnet „Ollie’s travel story“ eine
+vertont erzählte Reise von Australien nach New York mit neun Wortlücken.
+Neu sind Central Park, Brooklyn Bridge und Times Square aus dem Buch.
+Der Fortschritt wird je Schüler gespeichert. Nach allen neun Lücken gibt es
+einmalig 50 Münzen, 80 XP und ein kleines aufstellbares Empire State Building im Inventar.
+Erneutes Öffnen zahlt nichts erneut aus. „Listen again“ wiederholt die Aufnahme;
+bei ausgeschaltetem Ton kann gelesen und direkt geantwortet werden.
+Die echte Vergabe benötigt die spätere gemeinsame Auslieferung von Webstand
+und Migrationen 0055/0056. Frühere vollständige Abschlüsse zahlen nichts erneut aus.
+
 Ollies Stand auf dem Marktplatz und **Mein Haus → Shop** öffnen denselben Shop.
 Der Stand bleibt in Normal und Halloween vorhanden. **Dorf & Regeln → Shop**
 sperrt neue Käufe; die **Weltstimmung** schaltet unabhängig davon die Halloween-Optik.
