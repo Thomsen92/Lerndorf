@@ -1,0 +1,14 @@
+CC0 1.0 Universal
+
+The own procedural product geometry exported from Prototyp/shop/models.mjs
+(Sunday Bench, Pocket Meadow, One More Chapter, Little Big Oak, Emotional Support
+Duck and Little Blue Cottage), the own crate around Kenney apples, and the own
+r05 Hauswerkstatt building geometry are dedicated to the public domain under
+CC0 1.0, as documented in the local source prototypes.
+
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Kenney geometry/materials retain Kenney's separate accompanying CC0 license:
+LICENSE-ollie-kenney-town.txt, LICENSE-ollie-kenney-survival.txt and
+LICENSE-ollie-kenney-food.txt. This notice applies only to the fourteen additions
+listed in ollie-audit.json, not to other existing shop models.

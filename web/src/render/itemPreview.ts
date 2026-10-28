@@ -113,6 +113,7 @@ export const PREVIEW_STILL_YAW = STILL_YAW;
 
 export interface ItemPreview {
   show(kind: SlotKind, itemId: string): void;
+  reset?(): void;
   dispose(): void;
 }
 

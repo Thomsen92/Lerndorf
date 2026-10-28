@@ -346,6 +346,25 @@ Unter **Dorf & Regeln → Weltstimmung** wählen Sie für die gerade ausgewählt
 - Der Halloween-Shop, das Ticket und die Begrüßung bleiben auch in der normalen Welt erreichbar. Die Begrüßung erscheint einmal pro Season und Inhalt, unabhängig von der Weltoptik, und lässt sich am Stand oder über das Ticket erneut öffnen.
 - Wenn die Seite „Weltstimmung konnte nicht geladen werden“ zeigt, laden Sie neu. Die übrigen Dorf-Einstellungen bleiben in diesem Fall benutzbar.
 
+### Ollies Dorfladen und Inventory
+
+Ollies Stand auf dem Marktplatz und **Mein Haus → Shop** öffnen denselben Shop.
+Der Stand bleibt in Normal und Halloween vorhanden. **Dorf & Regeln → Shop**
+sperrt neue Käufe; die **Weltstimmung** schaltet unabhängig davon die Halloween-Optik.
+Bereits gekaufte Dinge bleiben im vorhandenen **Inventory / Inventar**.
+
+Die neue Shop-Fläche bietet Suche, Kategorien, eine Merkliste für die laufende
+Anmeldung und eine große drehbare 3D-Ansicht. Der Kauf wird vor der Buchung
+bestätigt. Deko kann mehrfach gekauft werden; Häuser und Garagen nur einmal.
+Im Inventar werden Besitz, aufgestellte und freie Exemplare getrennt angezeigt.
+Bei einer unklaren Kaufantwort zuerst das Inventar prüfen, bevor erneut gekauft wird.
+Der allgemeine Tonschalter gilt auch für Ollie und die Shop-Klänge.
+
+Der Spooky-Stand bleibt der Eingang zu Quiz und LearnPass. Die Season-Truhe
+ist weiterhin Teil desselben Shops; es entsteht keine zweite Verkaufsoberfläche.
+Die 14 neuen Waren erscheinen nach gemeinsamer Veröffentlichung der Webdateien
+und Inhaltsmigration `0054_ollie_shop_items.sql`; lokal wurde keine Live-Datenbank geändert.
+
 ### Schnell Münzen buchen – auch am Tablet
 
 1. **Münzen & Stempel** öffnen.

@@ -21,6 +21,8 @@ export interface GlbItem {
   maxHeight?: number;
   /** Upscale the model so it fills the MAX_SIZE footprint (new shop decorations, 0035). */
   fill?: boolean;
+  /** Already low-poly: use the high template at every distance, without a separate LOD request. */
+  lod?: false;
 }
 
 /**
@@ -128,6 +130,21 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_barn: { file: 'shop/barn.glb', kind: 'deco', fill: true },
   // Stone well (0040), imported from the FBX farm pack.
   shop_well: { file: 'shop/well.glb', kind: 'deco', fill: true },
+  // Approved own/Kenney catalogue (0054). Preserve authored metre scale and silhouettes.
+  shop_evening_lantern: { file: 'shop/evening-lantern.glb', kind: 'deco', lod: false },
+  shop_sunday_bench: { file: 'shop/sunday-bench.glb', kind: 'deco', lod: false },
+  shop_pocket_meadow: { file: 'shop/pocket-meadow.glb', kind: 'deco', lod: false },
+  shop_one_more_chapter: { file: 'shop/one-more-chapter.glb', kind: 'deco', lod: false },
+  shop_little_big_oak: { file: 'shop/little-big-oak.glb', kind: 'deco', lod: false },
+  shop_support_duck: { file: 'shop/support-duck.glb', kind: 'deco', lod: false },
+  shop_rainy_day_barrel: { file: 'shop/rainy-day-barrel.glb', kind: 'deco', lod: false },
+  shop_apple_of_my_eye: { file: 'shop/apple-of-my-eye.glb', kind: 'deco', lod: false },
+  shop_little_blue_cottage: { file: 'shop/little-blue-cottage.glb', kind: 'house', lod: false },
+  shop_apple_gable_cottage: { file: 'shop/apple-gable-cottage.glb', kind: 'house', lod: false },
+  shop_moss_corner_cottage: { file: 'shop/moss-corner-cottage.glb', kind: 'house', lod: false },
+  shop_lantern_house: { file: 'shop/lantern-house.glb', kind: 'house', lod: false },
+  shop_apple_gable_garage: { file: 'shop/apple-gable-garage.glb', kind: 'garage', lod: false },
+  shop_moss_workshop: { file: 'shop/moss-workshop.glb', kind: 'garage', lod: false },
 };
 
 const BASE = `${import.meta.env.BASE_URL}assets/`;
@@ -183,6 +200,7 @@ export function normaliseGlb(scene: THREE.Object3D, spec: GlbItem): THREE.Group 
  * are shared between clones: callers must never dispose them.
  */
 export function loadGlbItem(itemId: string, variant: 'high' | 'lod' = 'high'): Promise<THREE.Group> {
+  if (variant === 'lod' && GLB_ITEMS[itemId]?.lod === false) variant = 'high';
   const cacheKey = `${itemId}:${variant}`;
   let template = cache.get(cacheKey);
   if (!template) {
@@ -227,6 +245,7 @@ export function glbAsset(itemId: string, kind: string): THREE.Group {
       placeholder.geometry.dispose();
       (placeholder.material as THREE.Material).dispose();
       lod.addLevel(model, 0);
+      if (spec?.lod === false) return new THREE.Group();
       return loadGlbItem(itemId, 'lod');
     })
     .then((far) => {

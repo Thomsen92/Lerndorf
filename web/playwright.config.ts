@@ -35,13 +35,13 @@ export default defineConfig({
     {
       name: 'chromium',
       testIgnore:
-        /(daily-quests|tutorial|build-feedback|xp-level|sir-byte|teacher|wardrobe|languages|house-profile|quest-board|halloween-world|collection|spooky-season|season-item-preview)\.spec\.ts/,
+        /(daily-quests|tutorial|build-feedback|xp-level|sir-byte|teacher|wardrobe|languages|house-profile|quest-board|halloween-world|collection|spooky-season|season-item-preview|ollie-shop)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], baseURL: 'http://localhost:4173/' },
     },
     {
       name: 'harness',
       testMatch:
-        /(daily-quests|tutorial|build-feedback|xp-level|sir-byte|teacher|wardrobe|languages|house-profile|quest-board|halloween-world|collection|spooky-season|season-item-preview)\.spec\.ts/,
+        /(daily-quests|tutorial|build-feedback|xp-level|sir-byte|teacher|wardrobe|languages|house-profile|quest-board|halloween-world|collection|spooky-season|season-item-preview|ollie-shop)\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         baseURL: 'http://localhost:5175/',

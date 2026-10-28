@@ -10,7 +10,7 @@ import {
   seasonPictures,
   type SeasonPictures,
 } from './learnpass/rewardArt';
-import { openInside } from './learnpass/insideModal';
+import { openInside, type InsideHandle } from './learnpass/insideModal';
 import { cardById, collectionCatalog } from '../collection/catalog';
 import { SEASON_CHEST_THUMB } from '../render/itemThumbs';
 import { GLB_ITEMS } from '../render/glbItems';
@@ -33,10 +33,17 @@ export interface SeasonChestOptions {
   getCoins: () => number;
   onCoins: (coins: number) => void;
   reducedMotion: boolean;
+  onChanged?: () => void;
 }
 
-export function createSeasonChests(opts: SeasonChestOptions): HTMLElement {
-  const section = document.createElement('section');
+export type SeasonChestElement = HTMLElement & { dispose(): void };
+
+export function createSeasonChests(opts: SeasonChestOptions): SeasonChestElement {
+  const section = document.createElement('section') as SeasonChestElement;
+  let closed = false;
+  let opening = false;
+  let inside: InsideHandle | null = null;
+  let stopReveal: (() => void) | null = null;
   section.className = 'season-chests';
   if (opts.reducedMotion) section.classList.add('reduced-motion');
   const head = document.createElement('h3');
@@ -47,6 +54,7 @@ export function createSeasonChests(opts: SeasonChestOptions): HTMLElement {
   let chests: SeasonChestRow[] = [];
 
   function render(): void {
+    if (closed) return;
     head.innerHTML = '';
     head.append(tr('Season-Truhen'));
     if (chests.length > 0) {
@@ -76,9 +84,10 @@ export function createSeasonChests(opts: SeasonChestOptions): HTMLElement {
     open.className = 'season-chest-open';
     open.textContent = tr('Öffnen');
     open.addEventListener('click', () => {
+      if (closed || opening) return;
       open.disabled = true;
       void openNext().finally(() => {
-        open.disabled = false;
+        if (!closed) open.disabled = false;
       });
     });
     row.append(icon, text, open);
@@ -91,34 +100,51 @@ export function createSeasonChests(opts: SeasonChestOptions): HTMLElement {
   insideLink.className = 'season-chest-inside';
   insideLink.textContent = tr('Was ist drin?');
   insideLink.addEventListener('click', () => {
+    if (closed) return;
+    inside?.close();
     const pictures = seasonPictures();
     const pool = opts.api.state().then((st) => opts.api.pool(st.season.id));
-    openInside(document.body, { pool, pictures, onClose: () => pictures.release() });
+    inside = openInside(document.body, { pool, pictures, onClose: () => pictures.release() });
   });
   section.append(insideLink);
 
   async function openNext(): Promise<void> {
     const chest = chests[0];
-    if (!chest) return;
+    if (!chest || closed || opening) return;
+    opening = true;
     try {
       const result = await opts.api.openChest(chest.id);
+      if (closed) return;
       if (result.coins > 0) opts.onCoins(opts.getCoins() + result.coins);
       chests = chests.filter((c) => c.id !== chest.id);
       render();
-      reveal(result, opts, section);
+      opts.onChanged?.();
+      stopReveal?.();
+      stopReveal = reveal(result, opts, section);
     } catch {
       // The RPC already refused; keep the list so the pupil can try again.
+    } finally {
+      opening = false;
     }
   }
 
   void opts.api
     .chests()
     .then((list) => {
+      if (closed) return;
       chests = list;
       render();
     })
     .catch(() => render());
 
+  section.dispose = () => {
+    if (closed) return;
+    closed = true;
+    inside?.close();
+    inside = null;
+    stopReveal?.();
+    stopReveal = null;
+  };
   render();
   return section;
 }
@@ -127,7 +153,9 @@ export function createSeasonChests(opts: SeasonChestOptions): HTMLElement {
  * Opening a chest (plan §14.5): the 3D chest shakes, then rays and border in the rarity colour, the
  * item picture (160 px), badge, name and what happened, and "Next". Without motion it shows at once.
  */
-function reveal(result: ChestResult, opts: SeasonChestOptions, host: HTMLElement): void {
+function reveal(result: ChestResult, opts: SeasonChestOptions, host: HTMLElement): () => void {
+  let finished = false;
+  let timer: number | undefined;
   const rarity = rarityOf(result.rarity);
   const pictures: SeasonPictures = seasonPictures();
   const overlay = document.createElement('div');
@@ -168,6 +196,7 @@ function reveal(result: ChestResult, opts: SeasonChestOptions, host: HTMLElement
     cardNote.textContent = tr('Neue Sammelkarte!');
     void collectionCatalog()
       .then((catalog) => {
+        if (finished) return;
         const definition = cardById(catalog, result.card!.id);
         if (definition) cardNote.textContent = `${tr('Sammelkarte')}: ${definition.name}`;
       })
@@ -183,6 +212,9 @@ function reveal(result: ChestResult, opts: SeasonChestOptions, host: HTMLElement
   ok.className = 'season-reveal-ok';
   ok.textContent = tr('Weiter');
   const finish = (): void => {
+    if (finished) return;
+    finished = true;
+    if (timer !== undefined) window.clearTimeout(timer);
     overlay.remove();
     pictures.release();
   };
@@ -196,6 +228,7 @@ function reveal(result: ChestResult, opts: SeasonChestOptions, host: HTMLElement
   host.append(overlay);
 
   const show = (): void => {
+    if (finished) return;
     card.classList.add('revealed');
     pic.replaceChildren(modelPicture(pictures, result.item_id, GLB_ITEMS[result.item_id]?.kind ?? 'deco'));
     ok.focus();
@@ -204,6 +237,7 @@ function reveal(result: ChestResult, opts: SeasonChestOptions, host: HTMLElement
     show();
   } else {
     pic.classList.add('shake');
-    window.setTimeout(show, 1000);
+    timer = window.setTimeout(show, 1000);
   }
+  return finish;
 }

@@ -1,0 +1,112 @@
+{
+  "provider": "ElevenLabs",
+  "voiceId": "IKne3meq5aSn9XLyUdCD",
+  "voiceName": "Charlie — Australian male",
+  "modelId": "eleven_multilingual_v2",
+  "settings": {
+    "stability": 0.62,
+    "similarity_boost": 0.75,
+    "style": 0.15,
+    "use_speaker_boost": true,
+    "speed": 0.94
+  },
+  "fingerprint": "4c57ff5866b9604029e5df0b319d9c559a1eb3064b815e18d5c9465e19b7198e",
+  "clips": [
+    {
+      "id": "welcome",
+      "language": "en",
+      "text": "G’day, mate! I’m Ollie. Have a look around — looking is still free.",
+      "file": "en-welcome.mp3",
+      "bytes": 74439,
+      "sha256": "6e090d18241282e82d1b5a1a2ec88cfec7cf57496ae764741b4d18393752c02f"
+    },
+    {
+      "id": "recommend",
+      "language": "en",
+      "text": "Pick something that feels like you. Tap its heart to save it for later.",
+      "file": "en-recommend.mp3",
+      "bytes": 74439,
+      "sha256": "98f053093b7b17ea11a4b08fa1bf8fedc3e9ef0f555e9bd8a76bc7ca35559320"
+    },
+    {
+      "id": "coins",
+      "language": "en",
+      "text": "Practise your English to earn coins in the village. Then pop back for something lovely. No real money needed, mate.",
+      "file": "en-coins.mp3",
+      "bytes": 99935,
+      "sha256": "7907c8e55842c7f31e646ba75c5886387ad92e3ebc3c8d9fc61a564c9f7c5a7b"
+    },
+    {
+      "id": "about",
+      "language": "en",
+      "text": "I came for a visit. Then someone needed a bench, so I stayed. Now I have a whole shop.",
+      "file": "en-about.mp3",
+      "bytes": 82798,
+      "sha256": "30d155779fd4aea8fa212c9f5e61b02911027f34925288167baaf594b1bac360"
+    },
+    {
+      "id": "bought",
+      "language": "en",
+      "text": "Good choice, mate. Your place is getting more you by the minute.",
+      "file": "en-bought.mp3",
+      "bytes": 52287,
+      "sha256": "8420c2b279463472ec2bcd5e2e4a4fd2ff94cd6e0d6d6c7618ff19725562baf7"
+    },
+    {
+      "id": "farewell",
+      "language": "en",
+      "text": "Cheers, mate. Have a good browse. I’ll be here, pretending to tidy up.",
+      "file": "en-farewell.mp3",
+      "bytes": 69424,
+      "sha256": "5922771ec7f1e08e3f4ddbbf97a7313e81f36a36e09a6f353a6f8204e9b13187"
+    },
+    {
+      "id": "welcome",
+      "language": "de",
+      "text": "G’day! Ich bin Ollie. Schau dich in Ruhe um — Stöbern kostet nichts.",
+      "file": "de-welcome.mp3",
+      "bytes": 79873,
+      "sha256": "94d7c4be5afc55f666aaa90c9e44ab2bf04c36dedd89fa65d28c3ecf3033dd03"
+    },
+    {
+      "id": "recommend",
+      "language": "de",
+      "text": "Such dir etwas aus, das zu deinem Dorf passt. Mit dem Herz kannst du es dir für später merken.",
+      "file": "de-recommend.mp3",
+      "bytes": 99099,
+      "sha256": "3e98e5d97bda3840ff9bc0cff3225e0fadf20a993b21fccc388efa5834639dc8"
+    },
+    {
+      "id": "coins",
+      "language": "de",
+      "text": "Übe Englisch im Dorf, um Münzen zu verdienen. Dann komm für etwas Schönes zurück. Echtes Geld brauchst du hier nicht.",
+      "file": "de-coins.mp3",
+      "bytes": 106622,
+      "sha256": "0f15082df76d70b510f8de0ab7624ac060d4e8827819290e010ce4d6bf417084"
+    },
+    {
+      "id": "about",
+      "language": "de",
+      "text": "Ich kam zu Besuch. Dann brauchte jemand eine Bank, also blieb ich. Jetzt habe ich einen ganzen Laden.",
+      "file": "de-about.mp3",
+      "bytes": 106622,
+      "sha256": "ff730592af6a90a7905363439065c32deebd16b326476c9025342d45fb24cf18"
+    },
+    {
+      "id": "bought",
+      "language": "de",
+      "text": "Gute Wahl! Dein Dorf wird immer mehr zu deinem Zuhause.",
+      "file": "de-bought.mp3",
+      "bytes": 59811,
+      "sha256": "118a6d8772642cab2ef20275114c10ec719ad88351baea54a2887f32be82348e"
+    },
+    {
+      "id": "farewell",
+      "language": "de",
+      "text": "Cheers! Viel Spaß beim Stöbern. Ich bin hier und tue so, als würde ich aufräumen.",
+      "file": "de-farewell.mp3",
+      "bytes": 84470,
+      "sha256": "c40f565a338c397c141f79d6901e9fcacee8c2961f05e71699a31ba27a0e969b"
+    }
+  ]
+}

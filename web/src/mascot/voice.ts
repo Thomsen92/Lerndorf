@@ -34,6 +34,8 @@ if (typeof document !== 'undefined') {
 export function createVoicePlayer(opts: {
   sound: Pick<Sound, 'enabled'>;
   base?: string;
+  /** Local recordings for another NPC; default preserves every Sir Byte path. */
+  clipDirectory?: string;
   createContext?: () => AudioContext | null;
   fetchFn?: typeof fetch;
   autoUnlock?: boolean;
@@ -91,7 +93,7 @@ export function createVoicePlayer(opts: {
       let buffer = buffers.get(file);
       if (!buffer) {
         const response = await (opts.fetchFn ?? fetch)(
-          `${opts.base ?? import.meta.env.BASE_URL}assets/sir-byte/voice/${file}.mp3`,
+          `${opts.base ?? import.meta.env.BASE_URL}${opts.clipDirectory ?? 'assets/sir-byte/voice'}/${file}.mp3`,
         );
         if (!response.ok) return null;
         buffer = await context.decodeAudioData(await response.arrayBuffer());

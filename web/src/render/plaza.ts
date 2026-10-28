@@ -10,6 +10,7 @@ import type { Layout } from '../world/layout';
 import { PLAZA_RADIUS } from '../world/constants';
 import { pavingTexture } from './textures';
 import { bakeStatic } from './merge';
+import { createMarketShop } from './marketShop';
 
 const STONE = '#a7a3a0';
 const WOOD = '#8a5a36';
@@ -278,6 +279,7 @@ function stall(
   const z = layout.plaza.z + Math.sin(angle) * radius;
   const g = new THREE.Group();
   g.position.set(x, layout.plazaHeight, z);
+  g.name = 'decorMarketStall';
   g.rotation.y = Math.atan2(layout.plaza.x - x, layout.plaza.z - z);
   const placeholder = bakeStatic(placeholderStall(stripe, colours));
   g.add(placeholder);
@@ -357,6 +359,12 @@ const HALLOWEEN_STALLS = (layout: Layout): Array<[number, string]> => [
 /** The whole plaza as one group. The caller adds it to the village. */
 export function buildPlaza(layout: Layout): THREE.Group {
   const root = new THREE.Group();
+  const shop = createMarketShop(layout);
+  const replacedStall = Number(shop.root.userData.placement.replacesStall);
+  root.add(shop.root);
+  root.userData.updateMarketShop = shop.update;
+  root.userData.disposeMarketShop = shop.dispose;
+  root.userData.marketShopReady = shop.ready;
   const normalSeason = new THREE.Group();
   normalSeason.name = 'normalSeasonPlaza';
   normalSeason.userData.bakeStatic = false;
@@ -370,7 +378,7 @@ export function buildPlaza(layout: Layout): THREE.Group {
       halloweenStalls = new THREE.Group();
       halloweenStalls.name = 'halloweenStalls';
       halloweenStalls.userData.bakeStatic = false;
-      for (const [angle, stripe] of HALLOWEEN_STALLS(layout))
+      for (const [angle, stripe] of HALLOWEEN_STALLS(layout).filter((_, i) => i !== replacedStall))
         halloweenStalls.add(stall(layout, angle, 5.0, stripe, ['#f2994a', '#e2703a', '#f2994a'], 'pumpkins'));
       root.add(halloweenStalls);
     }
@@ -449,7 +457,7 @@ export function buildPlaza(layout: Layout): THREE.Group {
     [layout.map.boardAngle + 2.6, '#3f8f88', ['#bb6bd9', '#f2a7d0', '#56ccf2'], 'bread'],
     [layout.map.boardAngle + 3.8, '#d08a3c', ['#f2994a', '#6fcf97', '#f2994a'], 'pumpkins'],
   ];
-  for (const [angle, stripe, colours, goods] of stalls) {
+  for (const [angle, stripe, colours, goods] of stalls.filter((_, i) => i !== replacedStall)) {
     normalSeason.add(stall(layout, angle, 5.0, stripe, colours, goods));
   }
   for (const angle of layout.map.benchAngles) root.add(bench(layout, angle));

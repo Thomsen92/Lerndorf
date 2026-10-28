@@ -10,8 +10,20 @@ export type SoundName =
   | 'wrong'
   | 'blip'
   | 'typing'
-  | 'victory';
+  | 'victory'
+  | 'shopClick' | 'shopOpen' | 'shopSave' | 'shopPage' | 'shopConfirm'
+  | 'shopCancel' | 'shopCoin' | 'shopHover' | 'ollieBlip' | 'ollieTyping';
 export const SOUND_FILES: Record<SoundName, string> = {
+  shopClick: 'assets/audio/ollie-ui/sfx_clicks_pops_01_soft_click.ogg',
+  shopOpen: 'assets/audio/ollie-ui/sfx_clicks_pops_12_pop_medium.ogg',
+  shopSave: 'assets/audio/ollie-ui/sfx_bubble_pluck_13_pluck_kalimba.ogg',
+  shopPage: 'assets/audio/ollie-ui/sfx_page_paper_01_page_flip.ogg',
+  shopConfirm: 'assets/audio/ollie-ui/sfx_confirm_cancel_01_confirm_up_two.ogg',
+  shopCancel: 'assets/audio/ollie-ui/sfx_confirm_cancel_09_cancel_down_two.ogg',
+  shopCoin: 'assets/audio/ollie-ui/sfx_coin_pickup_01_coin_soft.ogg',
+  shopHover: 'assets/audio/ollie-ui/sfx_hover_soft_tick_01_tick_soft.ogg',
+  ollieBlip: 'assets/audio/ollie-ui/sfx_bubble_pluck_02_bubble_medium.ogg',
+  ollieTyping: 'assets/audio/ollie-ui/sfx_typing_blips_02_blip_mid.ogg',
   xp: 'assets/kenney/fx/xp.mp3',
   // supplied by the teacher (28.10.2026), the Kenney sounds stay in the repo as fallback
   levelup: 'assets/audio/sfx/level-up.mp3',
@@ -32,6 +44,9 @@ export const SOUND_FILES: Record<SoundName, string> = {
 /** Sounds that pause the background music while they play (a fanfare over a loop sounds messy). */
 const DUCK: ReadonlySet<SoundName> = new Set(['victory']);
 const VOLUME: Partial<Record<SoundName, number>> = {
+  shopClick: .12, shopOpen: .12, shopSave: .10, shopPage: .10,
+  shopConfirm: .10, shopCancel: .08, shopCoin: .14, shopHover: .035,
+  ollieBlip: .12, ollieTyping: .035,
   blip: 0.3,
   typing: 0.22,
   correct: 0.4,

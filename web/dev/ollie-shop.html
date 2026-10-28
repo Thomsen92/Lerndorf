@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Ollie — production shop review</title>
+  </head>
+  <body>
+    <script type="module">
+      import '../src/style.css';
+      import contract from '../../content/shop/ollie-items.json';
+      import { setLocale, itemName } from '../src/i18n';
+      import { buildItemBook } from '../src/api/items';
+      import { openItemArea } from '../src/ui/shopView';
+      import { createSound } from '../src/ui/sound';
+      const query = new URLSearchParams(location.search);
+      setLocale(query.get('lang') === 'de' ? 'de' : 'en');
+      // Review fixture only. Production uses supabaseItemApi and the existing buy_item RPC.
+      const catalog = contract.items.map((i) => ({
+        ...i,
+        nameDe: itemName(i.id, i.nameDe),
+        description: i.descriptionEn,
+        starter: false,
+        shopVisible: true,
+        slot: null,
+      }));
+      let coins = Number(query.get('coins') ?? 500);
+      const owned = { shop_evening_lantern: 2 };
+      const savedIds = new Set();
+      const sound = createSound();
+      let handle;
+      const buyCalls = [];
+      const api = {
+        async loadBook() {
+          return { ok: true, value: buildItemBook(catalog, owned, {}) };
+        },
+        async buy(id) {
+          buyCalls.push(id);
+          if (query.has('slow')) await new Promise((resolve) => setTimeout(resolve, 300));
+          const item = catalog.find((i) => i.id === id);
+          if (query.has('uncertain'))
+            return { ok: false, code: 'NETWORK_UNCERTAIN', message: 'Purchase response uncertain.' };
+          if (query.has('closed') || !item || coins < item.price || (item.kind !== 'deco' && owned[id]))
+            return { ok: false, code: 'BLOCKED', message: 'Purchase unavailable.' };
+          coins -= item.price;
+          owned[id] = (owned[id] ?? 0) + 1;
+          return { ok: true, value: { coins, qty: owned[id] } };
+        },
+      };
+      function open(origin = 'shop') {
+        handle?.close();
+        handle = openItemArea(origin, {
+          api,
+          sound,
+          savedIds,
+          category: null,
+          onCategory() {},
+          getCoins: () => coins,
+          onCoins: (c) => (coins = c),
+          shopOpen: !query.has('closed'),
+          buildOpen: !query.has('buildClosed'),
+          onBuild: (id) => (window.__lastBuild = id),
+          onShowSlot() {},
+          onShop: () => open('shop'),
+          onOpenInventory: () => open('inventar'),
+          onClose: () => {
+            handle.close();
+            document.body.dataset.closed = 'true';
+          },
+        });
+      }
+      document.addEventListener('pointerdown', () => sound.unlock(), { once: true });
+      open();
+      window.__ollie = {
+        open,
+        api,
+        owned,
+        buyCalls,
+        get coins() {
+          return coins;
+        },
+        sound,
+      };
+      window.__ready = true;
+    </script>
+  </body>
+</html>

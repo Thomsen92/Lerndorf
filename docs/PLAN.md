@@ -1,5 +1,26 @@
 # Lerndorf – Umsetzungsplan
 
+### Ollies bestehender Shop – 28.10.2026
+
+Ergänzung: **Ollie spricht und wippt** — zwölf lokale ElevenLabs-Aufnahmen
+(Charlie, australisch; sechs Dialoge je en/de), Bobbing nach Audiosignal am
+vorhandenen Porträt, Musikabsenkung und Abbruch bei Mute/Tabwechsel/Schließen.
+Reduzierte Bewegung bleibt still. Nutzerfreigabe ersetzt die frühere
+Zurückstellung der Sprachgenerierung; API-Schlüssel nur im lokalen Generierungsskript.
+
+| AP | Status | Ergebnis |
+| --- | --- | --- |
+| Ollie 1 | [x] | 14 freigegebene Waren als echte GLBs; zweisprachiger Inhaltsvertrag; Inhaltsmigration 0054 in vorhandene `items`, keine neuen Kategorien/Tabellen/RPCs |
+| Ollie 2 | [x] | Genau ein Shop: responsive Shop/Inventory-Fläche, Suche/Kategorien/Merkliste, große Orbit-Vorschau, Bestätigung mit Restguthaben, reale Mengen und vorhandene Inventaraktionen |
+| Ollie 3 | [x] | Dauerhafter anklickbarer Ollie-Stand in Normal/Halloween, bestehende Shop-Einstiege, australischer Textdialog, globale Cozy-Sounds, reduzierte Bewegung und Teardown |
+| Ollie 4 | [x] | Isolierter Shop-Commit: 1.261 Tests, 15 Browserprüfungen, Typecheck/Build/Migrationsprüfung; 72 Galeriebilder, 300 Layouts, 10 UI-Zyklen/20 Vorschauen ohne verbleibende Shop-WebGL-Kontexte |
+| Ollie 5 | [ ] | Nutzerreview und echte 30-fps-Abnahme auf dem ältesten Schul-Tablet; bestehende globale Geometrie-/Draw-Call-Ziele sind weiterhin überschritten |
+
+Details und Auslieferung: [Ollie-Integration](OLLIE_SHOP_INTEGRATION.md).
+Produktionscode lokal integriert; Commit am 28.10.2026 freigegeben.
+**Kein Push, keine Live-Migration**.
+Weitere gleichzeitig bearbeitete Änderungen im Checkout wurden erhalten.
+
 ### Spielsprache – 26.10.2026
 
 | AP | Status | Ergebnis |

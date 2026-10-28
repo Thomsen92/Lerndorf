@@ -201,6 +201,7 @@ export async function mountVillage(
   let disposeCameraControls = () => {};
   let disposeHouseCards = () => {};
   let disposeBoardCue = () => {};
+  let disposeMarketShop = () => {};
   let disposeCrowd = () => {};
   let worldAppearance: WorldAppearance | null = null;
   let worldThemes: WorldThemeController | null = null;
@@ -234,6 +235,7 @@ export async function mountVillage(
     disposeCameraControls();
     disposeHouseCards();
     disposeBoardCue();
+    disposeMarketShop();
     renderer?.setAnimationLoop(null);
     window.removeEventListener('resize', resize);
     for (const ev of activity) window.removeEventListener(ev, onActivity);
@@ -383,6 +385,7 @@ export async function mountVillage(
       titleLabel: m.titleLabel,
     }));
   const village = buildVillage(layout, labels, ownPlot);
+  disposeMarketShop = () => village.userData.disposeMarketShop?.();
   scene.add(village);
   village.userData.externalHouseCards = true;
   village.traverse((object) => {
@@ -739,6 +742,12 @@ export async function mountVillage(
       seasonHub?.open();
       return;
     }
+    if (hit?.object.userData.kind === 'marketShop') {
+      shopReturnArea = 'dorf';
+      silenceSirByte();
+      void areas?.select('shop');
+      return;
+    }
     // the task board: tap the board in the market
     if (hit && hit.object.userData.kind === 'board') {
       void areas?.select('aufgaben');
@@ -775,7 +784,7 @@ export async function mountVillage(
       onProgress: (delta) => void worldOnProgress(delta),
       reducedMotion,
       thumbs: thumbs.source,
-      onShop: () => void areas?.select('shop'),
+      onShop: () => { shopReturnArea = 'haus'; void areas?.select('shop'); },
       onSheet: applySheetOffset,
       onFx: (event) => {
         if (!running) return;
@@ -874,9 +883,21 @@ export async function mountVillage(
   };
 
   const categories: Partial<Record<'shop' | 'inventar', ItemKind | null>> = {};
+  // One wishlist for this signed-in pupil only; all shop/inventory entry points share it.
+  const savedItems = new Set<string>();
+  let shopReturnArea: 'dorf' | 'haus' | 'kleiderschrank' = 'haus';
+  const refreshInventoryBalance = async (): Promise<void> => {
+    // A timed-out purchase may already have succeeded. Read the authoritative balance first.
+    try {
+      const { data } = await supabase.from('profiles').select('coins').eq('id', profile.id).single();
+      if (running && data && typeof data.coins === 'number') onCoins(data.coins);
+    } catch { /* Inventory still opens and reloads its own authoritative item book. */ }
+  };
   let wardrobeItem: string | undefined;
-  let shopFromWardrobe = false;
   const itemOptions = (area: 'shop' | 'inventar') => ({
+    savedIds: savedItems,
+    sound,
+    onShop: () => { void areas?.select('shop'); },
     api: supabaseItemApi(supabase, profile.id),
     season: seasonApi(supabase),
     getCoins: () => coinsNow,
@@ -889,16 +910,13 @@ export async function mountVillage(
       wardrobeItem = itemId;
       void areas?.select('kleiderschrank');
     },
-    onCategory: (k: ItemKind) => {
+    onCategory: (k: ItemKind | null) => {
       categories[area] = k;
     },
     onBuild: (itemId: string) => void areas?.open('bauen', () => enterBuild({ itemId })),
     onShowSlot: (slotId: EnterOptions['slotId']) => void areas?.open('bauen', () => enterBuild({ slotId })),
     onClose: () => {
-      if (area === 'shop' && shopFromWardrobe) {
-        shopFromWardrobe = false;
-        void areas?.select('kleiderschrank');
-      } else void areas?.select('haus');
+      void areas?.select(shopReturnArea);
     },
   });
 
@@ -945,8 +963,8 @@ export async function mountVillage(
         const waiting = season ? season.chests.pass + season.chests.streak + season.chests.shop : 0;
         return openHouseMenu({
           onBuild: () => void areas?.select('bauen'),
-          onShop: () => void areas?.select('shop'),
-          onInventory: () => void areas?.select('inventar'),
+          onShop: () => { shopReturnArea = 'haus'; void areas?.select('shop'); },
+          onInventory: () => { shopReturnArea = 'haus'; void areas?.select('inventar'); },
           inventoryBadge: waiting,
           onWardrobe: () => void areas?.select('kleiderschrank'),
           onSettings: openSettings,
@@ -955,7 +973,11 @@ export async function mountVillage(
       },
       shop: async () =>
         openShop({ ...itemOptions('shop'), onOpenInventory: () => void areas?.select('inventar') }),
-      inventar: async () => openInventory(itemOptions('inventar')),
+      inventar: async () => {
+        // Run inside the controller's navigation ticket: leaving during the request cancels this opener.
+        await refreshInventoryBalance();
+        return running ? openInventory(itemOptions('inventar')) : null;
+      },
       bauen: () => enterBuild(),
       kleiderschrank: async () => {
         if (!home || inTutorial) return null;
@@ -967,7 +989,7 @@ export async function mountVillage(
           initialItem,
           onClose: () => void areas?.select('haus'),
           onShop: () => {
-            shopFromWardrobe = true;
+            shopReturnArea = 'kleiderschrank';
             categories.shop = 'avatar';
             void areas?.select('shop');
           },
@@ -1261,6 +1283,7 @@ export async function mountVillage(
     }
     crowd.update(dt);
     worldAppearance?.update(dt, now / 1000, reducedMotion());
+    village.userData.updateMarketShop?.(dt, now / 1000, reducedMotion());
     seasonHub?.maybeAutoOpen();
     (village.userData.animate as ((t: number) => void) | undefined)?.(performance.now() / 1000);
     (village.userData.labelUpdate as ((c: THREE.Camera) => void) | undefined)?.(camera);

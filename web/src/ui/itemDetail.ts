@@ -1,11 +1,15 @@
-import { html, tr, msg } from '../i18n';
+import { html, tr, msg, getLocale } from '../i18n';
+import { OLLIE_DESCRIPTIONS_DE } from '../i18n/ollieItemText';
 /**
  * Item cards and the detail dialog shared by shop and inventory.
  * The card is a single button; the dialog shows a 3D preview, the purchase flow (own confirmation step,
  * one RPC at a time) and the inventory actions. While a purchase runs the dialog cannot be closed.
  */
 import { KIND_LABEL, purchaseState, type ItemApi, type ItemEntry } from '../api/items';
-import { createItemPreview, type ItemPreview, type PreviewFactory } from '../render/itemPreview';
+import { type ItemPreview, type PreviewFactory } from '../render/itemPreview';
+import { createShopItemPreview } from '../render/shopItemPreview';
+import type { Sound } from './sound';
+import './itemDetail.css';
 import { THUMB_PLACEHOLDER, type ThumbSource } from '../render/itemThumbs';
 import { slotById, type SlotId, type SlotKind } from '../world/plotPlan';
 import { openModal, type ModalHandle } from './dialog';
@@ -79,13 +83,14 @@ export interface DetailOptions {
   reducedMotion?: boolean;
   /** Season items can be sold here (RPC sell_item). */
   season?: SeasonApi;
+  sound?: Sound;
 }
 
-type Mode = 'detail' | 'confirm' | 'bought';
+type Mode = 'detail' | 'confirm' | 'bought' | 'uncertain';
 
 export function openItemDetail(opts: DetailOptions): ModalHandle {
   const { entry, origin } = opts;
-  const factory = opts.createPreview ?? createItemPreview;
+  const factory = opts.createPreview ?? createShopItemPreview;
   const reducedMotion =
     opts.reducedMotion ??
     (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -98,12 +103,15 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
   const modal = openModal({
     title: entry.nameDe,
     opener: opts.opener,
+    wide: true,
     canClose: () => !busy,
     onClose: () => {
       preview?.dispose();
       preview = null;
     },
   });
+  modal.body.classList.add('item-detail-layout');
+  modal.body.closest('.panel')?.classList.add('item-detail');
 
   const previewBox = document.createElement('div');
   previewBox.className = 'item-preview';
@@ -112,12 +120,16 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
   const status = document.createElement('p');
   status.setAttribute('role', 'status');
   status.className = 'status';
-  modal.body.append(previewBox, actions, status);
+  const side = document.createElement('div');
+  side.className = 'item-detail-side';
+  side.append(actions, status);
+  modal.body.append(previewBox, side);
   if (entry.description) {
     const description = document.createElement('p');
     description.className = 'item-description';
-    description.textContent = entry.description;
-    modal.body.insertBefore(description, actions);
+    description.textContent =
+      getLocale() === 'de' ? (OLLIE_DESCRIPTIONS_DE[entry.id] ?? entry.description) : entry.description;
+    side.insertBefore(description, actions);
   }
 
   const button = (label: string, onClick: () => void, cls = '', disabled = false): HTMLButtonElement => {
@@ -153,11 +165,13 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
     for (const b of actions.querySelectorAll('button')) b.disabled = true;
     try {
       const res = await opts.season.sell(entry.id, 1);
+      if (!modal.isOpen) return;
       opts.onCoins(opts.getCoins() + res.coins);
       setStatus(msg`Verkauft für ${res.coins} Münzen.`);
       opts.onChanged();
       modal.close();
     } catch {
+      if (!modal.isOpen) return;
       setStatus(tr('Verkaufen fehlgeschlagen.'), true);
       busy = false;
       renderActions();
@@ -186,6 +200,7 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       return;
     }
     const showError = (): void => {
+      if (!modal.isOpen) return;
       preview?.dispose();
       preview = null;
       previewBox.replaceChildren();
@@ -202,7 +217,12 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
     canvas.className = 'item-preview-canvas';
     canvas.setAttribute('aria-label', `Vorschau: ${entry.nameDe}`);
     canvas.setAttribute('role', 'img');
+    canvas.tabIndex = 0;
     previewBox.appendChild(canvas);
+    const help = document.createElement('p');
+    help.className = 'item-preview-help';
+    help.textContent = tr('Mit dem Finger drehen, mit zwei Fingern zoomen.');
+    previewBox.append(help);
     let p: ItemPreview | null = null;
     try {
       p = factory(canvas, { reducedMotion, onError: showError });
@@ -214,6 +234,11 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       return;
     }
     preview = p;
+    if (p.reset) {
+      const reset = button(tr('Ansicht zurücksetzen'), () => p?.reset?.());
+      reset.className = 'item-preview-reset';
+      previewBox.append(reset);
+    }
     try {
       p.show(entry.kind as SlotKind, entry.id);
     } catch {
@@ -230,14 +255,26 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       t.textContent = msg`Für ${entry.price} Münzen „${entry.nameDe}“ kaufen?`;
       actions.append(
         t,
+        note(msg`Danach übrig: ${coins - entry.price} Münzen.`),
         button(tr('Abbrechen'), () => {
           if (busy) return;
           mode = 'detail';
+          opts.sound?.play('shopCancel');
           setStatus('');
           renderActions();
           focusIn(actionButton());
         }),
         button(tr('Ja, kaufen'), () => void doBuy(), 'primary'),
+      );
+      return;
+    }
+    if (mode === 'uncertain') {
+      actions.append(
+        note(tr('Die Kaufantwort ist unklar. Prüfe zuerst dein Inventar, bevor du erneut kaufst.')),
+        button(tr('Zum Inventar'), () => {
+          modal.close();
+          opts.onOpenInventory();
+        }),
       );
       return;
     }
@@ -282,6 +319,7 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
           msg`Kaufen für ${entry.price} Münzen`,
           () => {
             mode = 'confirm';
+            opts.sound?.play('shopClick');
             setStatus('');
             renderActions();
             focusIn(actionButton(tr('Ja, kaufen')));
@@ -356,14 +394,23 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
       res = await opts.api.buy(entry.id);
     } catch (err) {
       console.error('buy failed', err);
-      res = { ok: false, message: tr('Das hat nicht geklappt. Versuch es nochmal.') };
+      res = {
+        ok: false,
+        message: tr('Die Kaufantwort ist unklar. Prüfe zuerst dein Inventar, bevor du erneut kaufst.'),
+        code: 'NETWORK_UNCERTAIN',
+      };
     }
     busy = false;
+    if (!modal.isOpen) return;
     if (res.ok) {
       mode = 'bought';
+      opts.sound?.play('shopCoin');
       setStatus(msg`„${entry.nameDe}“ gekauft. Du hast jetzt ${res.value.coins} Münzen.`);
+      if (entry.kind === 'deco') {
+        status.textContent += ` ${msg`Besitz insgesamt: ${res.value.qty}.`}`;
+      }
     } else {
-      mode = 'confirm';
+      mode = res.code === 'NETWORK_UNCERTAIN' ? 'uncertain' : 'confirm';
       setStatus(res.message, true);
     }
     if (modal.isOpen) {

@@ -1,0 +1,12 @@
+Ollie shopkeeper and portrait — original Lerndorf procedural geometry.
+Source: Prototyp/shop/models.mjs:createOllie().
+The source project provides this own geometry and its GLB export under CC0 1.0.
+The portrait is a local Blender render of that same geometry.
+CC0 1.0 Universal: https://creativecommons.org/publicdomain/zero/1.0/
+
+The stand, lantern, barrel and counter goods use existing Kenney CC0 runtime
+assets listed in credits.json; they are not duplicated in this directory.
+Kenney: https://kenney.nl/
+
+The recordings in voice/ are separate synthetic ElevenLabs audio and are not
+covered by this geometry's CC0 dedication. See voice/README.md and manifest.json.

@@ -7,7 +7,6 @@ import { setLocale } from '../../src/i18n';
 
 beforeEach(() => setLocale('en'));
 
-
 function state(left: number, running = true): SeasonState {
   return {
     season: {
@@ -81,7 +80,10 @@ describe('season shop tile', () => {
   });
 
   it('explains an ended season', async () => {
-    const api = { state: vi.fn().mockResolvedValue(state(2, false)), buyChest: vi.fn() } as unknown as SeasonApi;
+    const api = {
+      state: vi.fn().mockResolvedValue(state(2, false)),
+      buyChest: vi.fn(),
+    } as unknown as SeasonApi;
     const tile = createSeasonShopTile({ api, getCoins: () => 240, onCoins: vi.fn() });
     document.body.append(tile);
     await settle();
@@ -89,4 +91,32 @@ describe('season shop tile', () => {
     expect(tile.querySelector('.season-shop-meta')?.textContent).toContain('not running');
     tile.remove();
   });
+});
+
+it('blocks teacher-closed shop purchases without hiding the chest tile', async () => {
+  const api = { state: vi.fn().mockResolvedValue(state(2)), buyChest: vi.fn() } as unknown as SeasonApi;
+  const tile = createSeasonShopTile({ api, shopOpen: false, getCoins: () => 240, onCoins: vi.fn() });
+  await settle();
+  tile.querySelector<HTMLButtonElement>('.season-shop-buy')?.click();
+  expect(api.buyChest).not.toHaveBeenCalled();
+  expect(tile.textContent).toContain('closed');
+  tile.dispose();
+});
+it('disposes pending season purchase callbacks and late loads', async () => {
+  let finish!: (value: { left: number }) => void;
+  const api = {
+    state: vi.fn().mockResolvedValue(state(2)),
+    buyChest: () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  } as unknown as SeasonApi;
+  const onCoins = vi.fn();
+  const tile = createSeasonShopTile({ api, getCoins: () => 240, onCoins });
+  await settle();
+  tile.querySelector<HTMLButtonElement>('.season-shop-buy')?.click();
+  tile.dispose();
+  finish({ left: 1 });
+  await settle();
+  expect(onCoins).not.toHaveBeenCalled();
 });

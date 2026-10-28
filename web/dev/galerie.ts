@@ -294,6 +294,7 @@ void Promise.all([
   grassReady(),
   kenneyReady().then(() => new Promise((r) => setTimeout(r, 0))),
   Promise.all([loadCharacter('boy'), loadCharacter('girl')]),
+  village.userData.marketShopReady,
 ]).then(async ([sky]) => {
   await appearance?.ready();
   if (params.has('wardrobe'))

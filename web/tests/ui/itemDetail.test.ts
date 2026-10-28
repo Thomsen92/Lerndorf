@@ -131,6 +131,7 @@ describe('shop flow', () => {
     const { calls } = open({ entry: deco }, { buy });
     btn('Kaufen für 120 Münzen')!.click();
     expect(text()).toContain('Für 120 Münzen „Katzenschild“ kaufen?');
+    expect(text()).toContain('Danach übrig: 30 Münzen.');
     expect(btn('Abbrechen')).toBeDefined();
     const yes = btn('Ja, kaufen')!;
     expect(document.activeElement).toBe(yes);
@@ -141,7 +142,7 @@ describe('shop flow', () => {
     expect(calls.onCoins).toHaveBeenCalledWith(30);
     expect(calls.onChanged).toHaveBeenCalled();
     expect(document.querySelector('[role="status"]')?.textContent).toBe(
-      '„Katzenschild“ gekauft. Du hast jetzt 30 Münzen.',
+      '„Katzenschild“ gekauft. Du hast jetzt 30 Münzen. Besitz insgesamt: 1.',
     );
     expect(btn('Zum Inventar')).toBeDefined();
     expect(document.activeElement).toBe(btn('Zum Inventar'));

@@ -49,6 +49,8 @@ export async function loadCatalog(supabase: SupabaseClient): Promise<Outcome<Cat
       price: r.price,
       starter: r.starter,
       shopVisible: r.shop_visible ?? true,
+      season: r.season ?? null,
+      description: r.description ?? null,
     })),
   };
 }
@@ -66,7 +68,25 @@ export async function buyItem(
   supabase: SupabaseClient,
   itemId: string,
 ): Promise<Outcome<{ coins: number; qty: number }>> {
-  const { data, error } = await supabase.rpc('buy_item', { p_item_id: itemId });
-  if (error) return fail(explain(error.message));
-  return { ok: true, value: data as { coins: number; qty: number } };
+  try {
+    const { data, error } = await supabase.rpc('buy_item', { p_item_id: itemId });
+    if (error) {
+      // buy_item has no request ID. A transport failure can arrive after a successful booking.
+      const uncertain = !error.code || /fetch|network|timeout|timed out|abort/i.test(error.message);
+      return {
+        ok: false,
+        message: uncertain
+          ? tr('Die Kaufantwort ist unklar. Prüfe zuerst dein Inventar, bevor du erneut kaufst.')
+          : explain(error.message),
+        code: uncertain ? 'NETWORK_UNCERTAIN' : error.code,
+      };
+    }
+    return { ok: true, value: data as { coins: number; qty: number } };
+  } catch {
+    return {
+      ok: false,
+      message: tr('Die Kaufantwort ist unklar. Prüfe zuerst dein Inventar, bevor du erneut kaufst.'),
+      code: 'NETWORK_UNCERTAIN',
+    };
+  }
 }

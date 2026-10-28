@@ -10,7 +10,7 @@ it('toggles only the fountain and replaceable stalls after baking, preserving th
   const plaza = bakeStatic(buildPlaza(buildLayout(11, 4)));
   const normal = plaza.getObjectByName('normalSeasonPlaza')!;
   const board = plaza.getObjectByName('questBoard')!;
-  expect(normal.children.length).toBe(6);
+  expect(normal.children.length).toBe(5);
   expect(board.children.length).toBeGreaterThan(10);
   plaza.userData.setSeasonTheme('halloween');
   expect(normal.visible).toBe(false);
@@ -18,13 +18,13 @@ it('toggles only the fountain and replaceable stalls after baking, preserving th
   expect(board.children.every((o) => o.userData.kind === 'board')).toBe(true);
   const stalls = plaza.getObjectByName('halloweenStalls')!;
   expect(stalls.visible).toBe(true);
-  expect(stalls.children).toHaveLength(3);
+  expect(stalls.children).toHaveLength(2);
   plaza.userData.setSeasonTheme('normal');
   expect(normal.visible).toBe(true);
   expect(stalls.visible).toBe(false);
   plaza.userData.setSeasonTheme('halloween');
   expect(plaza.getObjectByName('halloweenStalls')).toBe(stalls);
-  expect(stalls.children).toHaveLength(3);
+  expect(stalls.children).toHaveLength(2);
 });
 
 it('builds no Halloween stalls while the plaza stays normal', () => {

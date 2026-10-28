@@ -82,23 +82,27 @@ describe('shop', () => {
     expect(document.querySelector('main')?.hasAttribute('inert')).toBe(false);
   });
 
-  it('has a category bar starting on houses, hides starters and switches category', async () => {
+  it('starts on all items, hides starters and switches category', async () => {
     const { o } = await shop();
     const bar = Array.from(document.querySelectorAll<HTMLButtonElement>('.category-bar button'));
     expect(bar.map((b) => b.textContent)).toEqual([
+      'Alle Gegenstände',
       'Häuser',
       'Garagen',
       'Autos',
       'Garten-Deko',
       'Für deinen Avatar',
     ]);
-    expect(btn('Häuser')?.getAttribute('aria-pressed')).toBe('true');
-    expect(cardIds()).toEqual(['house_big']);
+    expect(btn('Alle Gegenstände')?.getAttribute('aria-pressed')).toBe('true');
+    expect(cardIds()).toEqual(['house_big', 'deco_cat', 'deco_tree', 'hat']);
     btn('Garten-Deko')?.click();
     expect(cardIds()).toEqual(['deco_cat', 'deco_tree']);
     expect(o.onCategory).toHaveBeenCalledWith('deco');
     expect(btn('Garten-Deko')?.getAttribute('aria-pressed')).toBe('true');
     expect(btn('Häuser')?.getAttribute('aria-pressed')).toBe('false');
+    btn('Alle Gegenstände')?.click();
+    expect(o.onCategory).toHaveBeenLastCalledWith(null);
+    expect(cardIds()).toEqual(['house_big', 'deco_cat', 'deco_tree', 'hat']);
   });
 
   it('starts on the given category', async () => {
@@ -131,7 +135,7 @@ describe('shop', () => {
     btn('Nochmal versuchen')?.click();
     await flush();
     expect(loadBook).toHaveBeenCalledTimes(2);
-    expect(cardIds()).toEqual(['house_big']);
+    expect(cardIds()).toEqual(['house_big', 'deco_cat', 'deco_tree', 'hat']);
     btn('Schließen')?.click();
     expect(o.onClose).toHaveBeenCalledTimes(1);
   });
@@ -179,17 +183,21 @@ describe('inventory', () => {
   it('lists owned items including starters, with categories only for owned kinds', async () => {
     await inv();
     const kinds = Array.from(document.querySelectorAll('.category-bar button')).map((b) => b.textContent);
-    expect(kinds).toEqual(['Häuser', 'Garten-Deko']);
-    expect(cardIds()).toEqual(['house_start']);
+    expect(kinds).toEqual(['Alle Gegenstände', 'Häuser', 'Garten-Deko']);
+    expect(cardIds()).toEqual(['house_start', 'deco_cat']);
     btn('Garten-Deko')?.click();
     expect(cardIds()).toEqual(['deco_cat']);
-    expect(document.getElementById(area().getAttribute('aria-labelledby') ?? '')?.textContent).toBe('Inventar');
+    expect(document.getElementById(area().getAttribute('aria-labelledby') ?? '')?.textContent).toBe(
+      'Inventar',
+    );
   });
 
   it('shows the empty text when nothing is owned', async () => {
     await inv(async () => ({ ok: true, value: [mk('house_big', 'house')] }));
-    expect(area().textContent).toContain('Du hast noch keine eigenen Sachen. Im Shop kannst du welche kaufen.');
-    expect(document.querySelector('.category-bar')).toBeNull();
+    expect(area().textContent).toContain(
+      'Du hast noch keine eigenen Sachen. Im Shop kannst du welche kaufen.',
+    );
+    expect(document.querySelector<HTMLElement>('.category-bar')?.hidden).toBe(true);
   });
 });
 
@@ -199,7 +207,10 @@ describe('item area thumbnails', () => {
     handles.push(openShop(opts({ category: 'deco', thumbs })));
     await flush();
     await flush();
-    expect(thumbs.mock.calls.map((c) => (c as unknown as [ItemEntry])[0].id).sort()).toEqual(['deco_cat', 'deco_tree']);
+    expect(thumbs.mock.calls.map((c) => (c as unknown as [ItemEntry])[0].id).sort()).toEqual([
+      'deco_cat',
+      'deco_tree',
+    ]);
     expect(area().querySelectorAll('img.item-thumb').length).toBe(2);
     btn('Garten-Deko')?.click();
     await flush();
@@ -211,5 +222,76 @@ describe('item area thumbnails', () => {
     await flush();
     await flush();
     expect(area().querySelectorAll('span.item-thumb').length).toBe(2);
+  });
+});
+
+describe('item area browsing', () => {
+  it('combines search and saved filters without buying, using the supplied session list', async () => {
+    const savedIds = new Set(['deco_cat']);
+    const buy = vi.fn();
+    await shop({ savedIds, category: 'deco' }, { buy });
+    const search = area().querySelector<HTMLInputElement>('input[type="search"]')!;
+    search.value = 'tree';
+    search.dispatchEvent(new Event('input'));
+    expect(cardIds()).toEqual(['deco_tree']);
+    area().querySelector<HTMLButtonElement>('[data-save="deco_tree"]')!.click();
+    expect(savedIds.has('deco_tree')).toBe(true);
+    area().querySelector<HTMLButtonElement>('[data-filter="saved"]')!.click();
+    expect(cardIds()).toEqual(['deco_tree']);
+    expect(buy).not.toHaveBeenCalled();
+  });
+  it('navigates to the existing inventory and shop through callbacks', async () => {
+    const onOpenInventory = vi.fn();
+    await shop({ onOpenInventory });
+    area().querySelector<HTMLButtonElement>('[data-nav="inventar"]')!.click();
+    expect(onOpenInventory).toHaveBeenCalledOnce();
+    handles.forEach((h) => h.close());
+    const onShop = vi.fn();
+    handles.push(openInventory({ ...opts(), onShop }));
+    await flush();
+    area().querySelector<HTMLButtonElement>('[data-nav="shop"]')!.click();
+    expect(onShop).toHaveBeenCalledOnce();
+  });
+  it('keeps season content after load, category switches and purchase reloads', async () => {
+    const { h } = await shop({
+      season: { state: async () => ({ season: { state: 'running' }, shop: { left: 2 } }) } as never,
+    });
+    const season = area().querySelector('.season-shop');
+    expect(season).not.toBeNull();
+    btn('Garten-Deko')!.click();
+    expect(area().querySelector('.season-shop')).toBe(season);
+    (document.querySelector('[data-item="deco_tree"]') as HTMLElement).click();
+    btn('Kaufen für 30 Münzen')?.click();
+    btn('Ja, kaufen')?.click();
+    await flush();
+    await flush();
+    expect(area().querySelector('.season-shop')).toBe(season);
+    h.close();
+  });
+});
+
+describe('item area ownership and lifecycle', () => {
+  it('keeps inventory chest controls visible even with no owned item types', async () => {
+    const { onOpenInventory: _unused, ...options } = opts();
+    const handle = openInventory({ ...options, api: { ...options.api, loadBook: async () => ({ ok: true, value: [] }) }, season: { chests: async () => [{ id: 1, source: 'shop' }] } as never });
+    handles.push(handle); await flush();
+    expect(area().querySelector('.season-chest-open')).not.toBeNull();
+    expect(area().textContent).toContain('Du hast noch keine eigenen Sachen.');
+    expect(area().querySelector('.item-area-owned-count')?.textContent).toBe('0');
+  });
+  it('shows authoritative inventory quantities including available copies', async () => {
+    handles.push(openInventory({ ...opts(), category: 'deco', api: { loadBook: async () => ({ ok: true, value: [mk('bench', 'deco', { owned: 3, free: 1, placedIn: ['deco_1', 'deco_2'] })] }), buy: vi.fn() } }));
+    await flush(); expect(area().querySelector('.item-count')?.textContent).toBe('Besitz: 3 · aufgestellt: 2 · frei: 1');
+    expect(area().querySelector('.item-price')).toBeNull();
+  });
+  it('does not remount a closed area after a late book or thumbnail response', async () => {
+    let finish!: (result: { ok: true; value: ItemEntry[] }) => void;
+    const handle = openShop(opts({}, { loadBook: () => new Promise(resolve => { finish = resolve; }) }));
+    handle.close(); finish({ ok: true, value: book }); await flush();
+    expect(document.querySelector('.item-area')).toBeNull();
+    let thumb!: (url: string) => void;
+    const second = openShop(opts({ category: 'house', thumbs: () => new Promise(resolve => { thumb = resolve; }) }));
+    await flush(); second.close(); thumb('late.png'); await flush();
+    expect(document.querySelector('.item-area')).toBeNull(); expect(document.querySelector('img[src="late.png"]')).toBeNull();
   });
 });

@@ -1,0 +1,31 @@
+{
+  "license": "CC0-1.0",
+  "licenseScope": "Own shopkeeper geometry and portrait only. The voice/ recordings have separate ElevenLabs terms; see voice/README.md and voice/manifest.json.",
+  "author": "Lerndorf own procedural geometry",
+  "source": "Prototyp/shop/models.mjs:createOllie",
+  "sourceLicense": "Prototyp/shop/LICENSES.md",
+  "model": {
+    "file": "ollie-shopkeeper.glb",
+    "triangles": 628,
+    "materials": 6,
+    "sha256": "1048adfe9dfe51617a32350d223feb9966e33ef7cf35d5a9ca5e23e34875359c"
+  },
+  "portrait": {
+    "file": "ollie-portrait.png",
+    "source": "ollie-shopkeeper.glb",
+    "method": "Offline Blender 5.2 Cycles render; transparent RGBA, 768 x 768; no image generation service"
+  },
+  "runtimeScenery": {
+    "author": "Kenney",
+    "url": "https://kenney.nl/",
+    "license": "CC0-1.0",
+    "files": [
+      "assets/kenney/town/stall-green.glb",
+      "assets/kenney/town/lantern.glb",
+      "assets/kenney/survival/barrel.glb",
+      "assets/kenney/food/apple.glb",
+      "assets/kenney/food/loaf-round.glb"
+    ],
+    "note": "Existing runtime assets reused through shared Kenney cache; no duplicate asset copies"
+  }
+}

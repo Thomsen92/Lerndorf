@@ -1,0 +1,24 @@
+{
+  "voiceId": "IKne3meq5aSn9XLyUdCD",
+  "voiceName": "Charlie — Australian male",
+  "modelId": "eleven_multilingual_v2",
+  "settings": {"stability":0.62,"similarity_boost":0.75,"style":0.15,"use_speaker_boost":true,"speed":0.94},
+  "lines": {
+    "en": {
+      "welcome":"G’day, mate! I’m Ollie. Have a look around — looking is still free.",
+      "recommend":"Pick something that feels like you. Tap its heart to save it for later.",
+      "coins":"Practise your English to earn coins in the village. Then pop back for something lovely. No real money needed, mate.",
+      "about":"I came for a visit. Then someone needed a bench, so I stayed. Now I have a whole shop.",
+      "bought":"Good choice, mate. Your place is getting more you by the minute.",
+      "farewell":"Cheers, mate. Have a good browse. I’ll be here, pretending to tidy up."
+    },
+    "de": {
+      "welcome":"G’day! Ich bin Ollie. Schau dich in Ruhe um — Stöbern kostet nichts.",
+      "recommend":"Such dir etwas aus, das zu deinem Dorf passt. Mit dem Herz kannst du es dir für später merken.",
+      "coins":"Übe Englisch im Dorf, um Münzen zu verdienen. Dann komm für etwas Schönes zurück. Echtes Geld brauchst du hier nicht.",
+      "about":"Ich kam zu Besuch. Dann brauchte jemand eine Bank, also blieb ich. Jetzt habe ich einen ganzen Laden.",
+      "bought":"Gute Wahl! Dein Dorf wird immer mehr zu deinem Zuhause.",
+      "farewell":"Cheers! Viel Spaß beim Stöbern. Ich bin hier und tue so, als würde ich aufräumen."
+    }
+  }
+}

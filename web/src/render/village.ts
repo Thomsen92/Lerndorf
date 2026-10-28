@@ -548,6 +548,10 @@ export function buildVillage(
   // plaza: paving, fountain, quest board, stalls, benches (render/plaza.ts)
   const plaza = buildPlaza(layout);
   root.add(plaza);
+  // The existing view loop supplies reduced motion; no independent Ollie animation loop.
+  root.userData.updateMarketShop = plaza.userData.updateMarketShop;
+  root.userData.disposeMarketShop = plaza.userData.disposeMarketShop;
+  root.userData.marketShopReady = plaza.userData.marketShopReady;
 
   for (const b of layout.bridges) root.add(buildBridge(b, MAT.wood));
 

@@ -504,6 +504,412 @@
             "triangles": 12208,
             "bytes": 1191928,
             "dims": "16,13 × 13,54 × 16,13 m"
+        },
+        {
+            "id": "shop_evening_lantern",
+            "file": "evening-lantern.glb",
+            "name": "Evening Lantern",
+            "kind": "deco",
+            "price": 40,
+            "source": "shop/lantern",
+            "revision": "approved-prototype",
+            "license": "CC0-1.0",
+            "bytes": 32604,
+            "sha256": "ab86574919e2bcbecc2599561aa178743d72f83c0fc48f9ee755bbf0f5ed84a3",
+            "size": {
+                "w": 0.21644848585128784,
+                "h": 1.555999994277954,
+                "d": 0.22431999444961548
+            },
+            "min": [
+                -0.10822424292564392,
+                0,
+                -0.11215999722480774
+            ],
+            "max": [
+                0.10822424292564392,
+                1.555999994277954,
+                0.11215999722480774
+            ],
+            "triangles": 158,
+            "primitives": 1
+        },
+        {
+            "id": "shop_sunday_bench",
+            "file": "sunday-bench.glb",
+            "name": "Sunday Bench",
+            "kind": "deco",
+            "price": 55,
+            "source": "shop/bench",
+            "revision": "approved-prototype",
+            "license": "CC0-1.0",
+            "bytes": 18024,
+            "sha256": "c37ab9599a01c84a4b4e88ee787c7585621ff9b2b5f28593720f3db6d89645ea",
+            "size": {
+                "w": 1.899999976158142,
+                "h": 1.2100000493228436,
+                "d": 0.6499999761581421
+            },
+            "min": [
+                -0.949999988079071,
+                -0.024999987334012985,
+                -0.304999977350235
+            ],
+            "max": [
+                0.949999988079071,
+                1.1850000619888306,
+                0.3449999988079071
+            ],
+            "triangles": 156,
+            "primitives": 1
+        },
+        {
+            "id": "shop_pocket_meadow",
+            "file": "pocket-meadow.glb",
+            "name": "Pocket Meadow",
+            "kind": "deco",
+            "price": 25,
+            "source": "shop/flowers",
+            "revision": "approved-prototype",
+            "license": "CC0-1.0",
+            "bytes": 112208,
+            "sha256": "d4c5c8ce3e1ca1ce706a21a4e171f5d0300034bba4b405d8d463913d3095de30",
+            "size": {
+                "w": 1.350000023841858,
+                "h": 0.885292325168848,
+                "d": 0.5799999833106995
+            },
+            "min": [
+                -0.675000011920929,
+                0.02500000223517418,
+                -0.28999999165534973
+            ],
+            "max": [
+                0.675000011920929,
+                0.9102923274040222,
+                0.28999999165534973
+            ],
+            "triangles": 1028,
+            "primitives": 1
+        },
+        {
+            "id": "shop_one_more_chapter",
+            "file": "one-more-chapter.glb",
+            "name": "One More Chapter",
+            "kind": "deco",
+            "price": 65,
+            "source": "shop/reading",
+            "revision": "approved-prototype",
+            "license": "CC0-1.0",
+            "bytes": 33584,
+            "sha256": "bae3dd3a44a3fafd6f8e8e82343b8f26314d638936f85ed12a7071b080bb9457",
+            "size": {
+                "w": 1.4600000381469727,
+                "h": 1.7000000616535544,
+                "d": 0.5024999976158142
+            },
+            "min": [
+                -0.7300000190734863,
+                0.009999976493418217,
+                -0.2574999928474426
+            ],
+            "max": [
+                0.7300000190734863,
+                1.7100000381469727,
+                0.24500000476837158
+            ],
+            "triangles": 300,
+            "primitives": 1
+        },
+        {
+            "id": "shop_little_big_oak",
+            "file": "little-big-oak.glb",
+            "name": "Little Big Oak",
+            "kind": "deco",
+            "price": 45,
+            "source": "shop/oak",
+            "revision": "approved-prototype",
+            "license": "CC0-1.0",
+            "bytes": 22344,
+            "sha256": "08b1114dc50997b087a2a3da9009284fc7bf0e02a8afb09e9105f2811f217784",
+            "size": {
+                "w": 1.8752614259719849,
+                "h": 2.5499999802559614,
+                "d": 1.6399999856948853
+            },
+            "min": [
+                -0.9903904795646667,
+                -0.029999999329447746,
+                -0.8199999928474426
+            ],
+            "max": [
+                0.8848709464073181,
+                2.5199999809265137,
+                0.8199999928474426
+            ],
+            "triangles": 196,
+            "primitives": 1
+        },
+        {
+            "id": "shop_support_duck",
+            "file": "support-duck.glb",
+            "name": "Emotional Support Duck",
+            "kind": "deco",
+            "price": 20,
+            "source": "shop/duck",
+            "revision": "approved-prototype",
+            "license": "CC0-1.0",
+            "bytes": 34444,
+            "sha256": "1575f1d9a3103dfdf04e16f005434b8846e344c47208c5c0e9e2cc4a06e5ec14",
+            "size": {
+                "w": 1.470195233821869,
+                "h": 1.0624999962747097,
+                "d": 0.7649999856948853
+            },
+            "min": [
+                -0.7051952481269836,
+                0.05750000849366188,
+                -0.3824999928474426
+            ],
+            "max": [
+                0.7649999856948853,
+                1.1200000047683716,
+                0.3824999928474426
+            ],
+            "triangles": 308,
+            "primitives": 1
+        },
+        {
+            "id": "shop_rainy_day_barrel",
+            "file": "rainy-day-barrel.glb",
+            "name": "Rainy-Day Barrel",
+            "kind": "deco",
+            "price": 35,
+            "source": "shop/barrel",
+            "revision": "approved-prototype",
+            "license": "CC0-1.0",
+            "bytes": 56132,
+            "sha256": "7e01703ec278dabf8af2b84316ece75c5918ab0e8b04e11de3a219cd61aef192",
+            "size": {
+                "w": 0.8040999829769134,
+                "h": 1.1696000397205353,
+                "d": 0.8040999829769134
+            },
+            "min": [
+                -0.4020499914884567,
+                0,
+                -0.4020499914884567
+            ],
+            "max": [
+                0.4020499914884567,
+                1.1696000397205353,
+                0.4020499914884567
+            ],
+            "triangles": 412,
+            "primitives": 1
+        },
+        {
+            "id": "shop_apple_of_my_eye",
+            "file": "apple-of-my-eye.glb",
+            "name": "The Apple of My Eye",
+            "kind": "deco",
+            "price": 10,
+            "source": "shop/apples",
+            "revision": "approved-prototype",
+            "license": "CC0-1.0",
+            "bytes": 46996,
+            "sha256": "95f08a20f690971ec721f047c0d2b81e37dfca36d5c2004bb755b25fcae26aa7",
+            "size": {
+                "w": 1.100000023841858,
+                "h": 0.6665068263560534,
+                "d": 0.6800000071525574
+            },
+            "min": [
+                -0.550000011920929,
+                0.02500000409781933,
+                -0.3400000035762787
+            ],
+            "max": [
+                0.550000011920929,
+                0.6915068304538727,
+                0.3400000035762787
+            ],
+            "triangles": 828,
+            "primitives": 7
+        },
+        {
+            "id": "shop_little_blue_cottage",
+            "file": "little-blue-cottage.glb",
+            "name": "Little Blue Cottage",
+            "kind": "house",
+            "price": 140,
+            "source": "shop/cottage",
+            "revision": "approved-prototype",
+            "license": "CC0-1.0",
+            "bytes": 18856,
+            "sha256": "9f16bd28165e8d6329305f9e218c85eba56a8701532401d039fc8159a763f735",
+            "size": {
+                "w": 2,
+                "h": 2.110000125132501,
+                "d": 1.9150000214576721
+            },
+            "min": [
+                -1,
+                0.009999998845160007,
+                -0.8149999976158142
+            ],
+            "max": [
+                1,
+                2.120000123977661,
+                1.100000023841858
+            ],
+            "triangles": 164,
+            "primitives": 1
+        },
+        {
+            "id": "shop_apple_gable_cottage",
+            "file": "apple-gable-cottage.glb",
+            "name": "Apple Gable Cottage",
+            "kind": "house",
+            "price": 100,
+            "source": "hauswerkstatt/apfelgiebel",
+            "revision": "r05",
+            "license": "CC0-1.0",
+            "bytes": 310392,
+            "sha256": "b39ff5a5361b3ebca31a23bb62fd86aaa39c0bcefda1d67a8e5f78441a9e492a",
+            "size": {
+                "w": 5.28000020980835,
+                "h": 4.099999904632568,
+                "d": 3.5549999475479126
+            },
+            "min": [
+                -2.640000104904175,
+                0,
+                -1.6749999523162842
+            ],
+            "max": [
+                2.640000104904175,
+                4.099999904632568,
+                1.8799999952316284
+            ],
+            "triangles": 3129,
+            "primitives": 2
+        },
+        {
+            "id": "shop_moss_corner_cottage",
+            "file": "moss-corner-cottage.glb",
+            "name": "Moss Corner Cottage",
+            "kind": "house",
+            "price": 125,
+            "source": "hauswerkstatt/mooswinkel",
+            "revision": "r05",
+            "license": "CC0-1.0",
+            "bytes": 271000,
+            "sha256": "9d8f782e203b587360821469c0fcfedb2d28cb2a162e254ce648da6ed9c86936",
+            "size": {
+                "w": 5.599999904632568,
+                "h": 3.740000009536743,
+                "d": 3.7249518632888794
+            },
+            "min": [
+                -2.799999952316284,
+                0,
+                -1.7400000095367432
+            ],
+            "max": [
+                2.799999952316284,
+                3.740000009536743,
+                1.9849518537521362
+            ],
+            "triangles": 2785,
+            "primitives": 2
+        },
+        {
+            "id": "shop_lantern_house",
+            "file": "lantern-house.glb",
+            "name": "Lantern House",
+            "kind": "house",
+            "price": 150,
+            "source": "hauswerkstatt/laternenhaus",
+            "revision": "r05",
+            "license": "CC0-1.0",
+            "bytes": 381920,
+            "sha256": "3c5a5bb0849e8a6670c0df8a5387fcb458ad53cc68e72440fb7c282be1fd1b45",
+            "size": {
+                "w": 4.360000133514404,
+                "h": 5.389999866485596,
+                "d": 3.690000057220459
+            },
+            "min": [
+                -2.180000066757202,
+                0,
+                -1.75
+            ],
+            "max": [
+                2.180000066757202,
+                5.389999866485596,
+                1.940000057220459
+            ],
+            "triangles": 3819,
+            "primitives": 2
+        },
+        {
+            "id": "shop_apple_gable_garage",
+            "file": "apple-gable-garage.glb",
+            "name": "Apple Gable Garage",
+            "kind": "garage",
+            "price": 75,
+            "source": "hauswerkstatt/apfelgarage",
+            "revision": "r05",
+            "license": "CC0-1.0",
+            "bytes": 172080,
+            "sha256": "bf9fc9e0dcd9e8d137f5b77ebf3999bef0fa8fff064670b22d77c9dd8c407c63",
+            "size": {
+                "w": 2.940000057220459,
+                "h": 3.240000009536743,
+                "d": 3.740000009536743
+            },
+            "min": [
+                -1.4700000286102295,
+                0,
+                -1.8700000047683716
+            ],
+            "max": [
+                1.4700000286102295,
+                3.240000009536743,
+                1.8700000047683716
+            ],
+            "triangles": 1868,
+            "primitives": 2
+        },
+        {
+            "id": "shop_moss_workshop",
+            "file": "moss-workshop.glb",
+            "name": "Moss Workshop",
+            "kind": "garage",
+            "price": 100,
+            "source": "hauswerkstatt/mooswerkstatt",
+            "revision": "r05",
+            "license": "CC0-1.0",
+            "bytes": 169456,
+            "sha256": "1fd690c57cf5c0b812fd3f88698950ca3c9a34adb264c3c5c6cc262e0595cf4c",
+            "size": {
+                "w": 2.940000057220459,
+                "h": 3.0399999618530273,
+                "d": 3.740000009536743
+            },
+            "min": [
+                -1.4700000286102295,
+                0,
+                -1.8700000047683716
+            ],
+            "max": [
+                1.4700000286102295,
+                3.0399999618530273,
+                1.8700000047683716
+            ],
+            "triangles": 1838,
+            "primitives": 2
         }
     ],
     "pending": [

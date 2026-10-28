@@ -123,6 +123,7 @@ export function createReadOnlyScene(
     crowd.updateLabels(camera);
     byte.update(dt, camera, matchMedia('(prefers-reduced-motion: reduce)').matches);
     appearance.update(dt, now / 1000, matchMedia('(prefers-reduced-motion: reduce)').matches);
+    village.userData.updateMarketShop?.(dt, now / 1000, matchMedia('(prefers-reduced-motion: reduce)').matches);
     controls.update();
     rig.follow(controls.target);
     (village.userData.animate as ((t: number) => void) | undefined)?.(now / 1000);
@@ -141,6 +142,7 @@ export function createReadOnlyScene(
     dispose() {
       disposed = true;
       appearance.dispose();
+      village.userData.disposeMarketShop?.();
       gl.setAnimationLoop(null);
       controls.dispose();
       crowd.dispose();

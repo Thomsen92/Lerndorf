@@ -1,3 +1,4 @@
+import { OLLIE_ITEM_NAMES } from './ollieItemText';
 /** Stable database IDs map to presentation labels only. */
 export const ITEM_NAMES: Record<string, string> = {
   hair_01: 'Kurzhaar',
@@ -108,4 +109,5 @@ export const ITEM_NAMES: Record<string, string> = {
   shop_president_car: 'Präsidentenwagen',
   shop_trump: 'Trump-Statue',
   shop_white_house: 'Weißes Haus',
+  ...OLLIE_ITEM_NAMES,
 };
