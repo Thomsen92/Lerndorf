@@ -10,7 +10,10 @@
   border-radius: 14px;
   background: #2a1f33;
   color: #fff1d7;
-  font: 700 16px/1.35 'Comic Neue', 'Comic Sans MS', cursive;
+  font:
+    700 16px/1.35 'Comic Neue',
+    'Comic Sans MS',
+    cursive;
   text-align: center;
   box-shadow: 0 8px 28px #00000088;
   cursor: pointer;

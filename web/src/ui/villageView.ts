@@ -39,7 +39,10 @@ import { loadClassSlots, type SlotMap } from '../api/build';
 import { Crowd } from '../render/crowd';
 import { createDoubleTap } from '../avatars/doubleTap';
 import { setupScene } from '../render/scene';
-import { worldThemeApi } from '../api/worldTheme';
+import { worldThemeApi, type WorldThemeState } from '../api/worldTheme';
+import { collectionApi } from '../api/collection';
+import { collectionCatalog } from '../collection/catalog';
+import { openCollection } from '../collection/collectionView';
 import { createWorldThemeController, type WorldThemeController } from '../season/worldThemeController';
 import { createWorldAppearance, isWorldObjectVisible, type WorldAppearance } from '../season/worldAppearance';
 import { createSeasonHub } from '../season/seasonHub';
@@ -198,6 +201,7 @@ export async function mountVillage(
   let worldAppearance: WorldAppearance | null = null;
   let worldThemes: WorldThemeController | null = null;
   let seasonHub: ReturnType<typeof createSeasonHub> | null = null;
+  let worldThemeState: WorldThemeState | null = null;
   const stop = (): void => {
     tutorialAbort.abort();
     worldThemes?.dispose();
@@ -550,12 +554,30 @@ export async function mountVillage(
       }),
     );
   };
+  // The almanach is a separate, personal view; it never grants or changes anything.
+  const openCollectionAlmanach = async (): Promise<void> => {
+    try {
+      const [catalog, season] = await Promise.all([collectionCatalog(), seasonApi(supabase).state()]);
+      if (!running) return;
+      openCollection({
+        api: collectionApi(supabase),
+        seasonId: season.season.id,
+        catalog,
+        reducedMotion: reducedMotion(),
+      });
+    } catch {
+      showNotice(tr('Die Sammlung konnte nicht geladen werden.'));
+    }
+  };
   worldAppearance = createWorldAppearance({ scene, village, layout, rig, renderer: gl });
   worldThemes = createWorldThemeController({
     classId: profile.classId,
     read: () => worldThemeApi(supabase).state(),
     apply: (state) => {
+      worldThemeState = state;
       worldAppearance?.setTheme(state.effectiveTheme);
+      seasonHub?.setState(state);
+      seasonHub?.maybeAutoOpen();
       renderOnce?.();
     },
   });
@@ -568,7 +590,15 @@ export async function mountVillage(
     track: (handle) => {
       modals.track(handle);
     },
+    onAcknowledge: (seasonId) => {
+      void worldThemeApi(supabase)
+        .acknowledgeWelcome(seasonId)
+        .catch(() => {
+          // The dialog stays usable; the server retries on the next entry.
+        });
+    },
   });
+  seasonHub.setState(worldThemeState);
   seasonHub.setVisible(!inTutorial);
   const applyControls = (area: NavArea): void => {
     cameraTools.hidden = inTutorial || area !== 'dorf';
@@ -881,6 +911,7 @@ export async function mountVillage(
           onSettings: openSettings,
           onQuests: () => void areas?.select('aufgaben'),
           season: { api: seasonApi(supabase), onOpen: openSeasonPass },
+          collection: { open: () => void openCollectionAlmanach() },
           onClose: () => void areas?.select('dorf'),
           sound,
           reducedMotion: reducedMotion(),
@@ -1212,6 +1243,7 @@ export async function mountVillage(
     }
     crowd.update(dt);
     worldAppearance?.update(dt, now / 1000, reducedMotion());
+    seasonHub?.maybeAutoOpen();
     (village.userData.animate as ((t: number) => void) | undefined)?.(performance.now() / 1000);
     (village.userData.labelUpdate as ((c: THREE.Camera) => void) | undefined)?.(camera);
     crowd.updateLabels(camera);

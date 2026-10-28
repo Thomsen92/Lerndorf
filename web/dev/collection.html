@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Collection · lokale Abnahme</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <div id="app"></div>
+    <p id="stats" role="status">Lade den Almanach …</p>
+    <script type="module">
+      import '../src/style.css';
+      import { loadCollectionCatalog } from '../src/collection/catalog.ts';
+      import { openCollection } from '../src/collection/collectionView.ts';
+
+      const catalog = await loadCollectionCatalog();
+      const owned = new Set([
+        'night-light',
+        'bat-cat',
+        'pumpkin-comparisons',
+        'actions-words',
+        'highlight-halloween-card',
+      ]);
+      const api = {
+        async my() {
+          return {
+            seasonId: '2026-11-halloween',
+            cards: [...owned].map((cardId) => ({
+              cardId,
+              quantity: 1,
+              firstAcquiredAt: '2026-10-28T10:00:00Z',
+            })),
+          };
+        },
+        async teacherRead() {
+          return this.my();
+        },
+      };
+      const view = openCollection({
+        api,
+        seasonId: '2026-11-halloween',
+        catalog,
+        reducedMotion: false,
+      });
+      const open = () =>
+        openCollection({
+          api,
+          seasonId: '2026-11-halloween',
+          catalog,
+          reducedMotion: false,
+        });
+      document.getElementById('stats').textContent =
+        `${catalog.cards.length} Karten · ${catalog.contentVersion.slice(0, 12)} · lokal`;
+      window.collectionDev = { catalog, view, owned, open };
+    </script>
+  </body>
+</html>

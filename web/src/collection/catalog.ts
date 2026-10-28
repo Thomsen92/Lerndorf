@@ -120,7 +120,8 @@ function card(value: unknown, index: number): CardDefinition {
     flavour: optionalText(raw.flavour, `${where}.flavour`),
     satire: raw.satire as boolean | undefined,
     effectMode: raw.effectMode === 'flavour-only' ? 'flavour-only' : undefined,
-    acquisition: raw.acquisition === undefined ? undefined : acquisition(raw.acquisition, `${where}.acquisition`),
+    acquisition:
+      raw.acquisition === undefined ? undefined : acquisition(raw.acquisition, `${where}.acquisition`),
     source: raw.source === undefined ? undefined : excerpt(raw.source, `${where}.source`),
     reference: raw.reference === undefined ? undefined : reference(raw.reference, `${where}.reference`),
     assetRoles: raw.assetRoles === undefined ? undefined : stringList(raw.assetRoles, `${where}.assetRoles`),
@@ -168,8 +169,7 @@ function reference(value: unknown, where: string): CardDefinition['reference'] {
     publisher: text(raw.publisher, `${where}.publisher`),
     page: text(raw.page, `${where}.page`),
     note: text(raw.note, `${where}.note`),
-    sourceImage:
-      raw.sourceImage === undefined ? undefined : asset(raw.sourceImage, `${where}.sourceImage`),
+    sourceImage: raw.sourceImage === undefined ? undefined : asset(raw.sourceImage, `${where}.sourceImage`),
     author: optionalText(raw.author, `${where}.author`),
   };
 }
@@ -391,10 +391,7 @@ function passCardRewards(
   });
 }
 
-function checkPassAllocation(
-  rewards: CollectionCatalog['passCardRewards'],
-  cards: CardDefinition[],
-): void {
+function checkPassAllocation(rewards: CollectionCatalog['passCardRewards'], cards: CardDefinition[]): void {
   const total = rewards.reduce((sum, entry) => sum + entry.cardIds.length, 0);
   if (total !== PASS_CARD_COUNT) fail(`the pass must grant exactly ${PASS_CARD_COUNT} cards, found ${total}`);
   if (rewards.length !== 24) fail(`expected 24 coin tiers, found ${rewards.length}`);
@@ -402,10 +399,7 @@ function checkPassAllocation(
     fail('every normal and rare card must be assigned to the pass exactly once');
 }
 
-function checkChestPolicy(
-  policy: CollectionCatalog['acquisitionPolicy'],
-  cards: CardDefinition[],
-): void {
+function checkChestPolicy(policy: CollectionCatalog['acquisitionPolicy'], cards: CardDefinition[]): void {
   const chestCards = cards.filter((definition) => definition.acquisition?.source === 'season-chest');
   if (policy.chest.cardIds.length !== chestCards.length)
     fail('chest policy and card definitions disagree about the chest pool');
@@ -463,4 +457,16 @@ export async function loadCollectionCatalog(
 
 export function cardById(catalog: CollectionCatalog, id: string): CardDefinition | undefined {
   return catalog.cards.find((card) => card.id === id);
+}
+
+let cached: Promise<CollectionCatalog> | null = null;
+
+/** One shared catalogue request for all views; the file is small, models stay lazy. */
+export function collectionCatalog(): Promise<CollectionCatalog> {
+  cached ??= loadCollectionCatalog();
+  return cached;
+}
+
+export function resetCollectionCatalogCache(): void {
+  cached = null;
 }

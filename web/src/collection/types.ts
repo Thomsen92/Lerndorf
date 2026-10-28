@@ -3,14 +3,7 @@
 
 export type CardRarity = 'normal' | 'rare' | 'epic' | 'legendary';
 export type CardKind =
-  | 'grammar'
-  | 'vocabulary'
-  | 'proverb'
-  | 'rhyme'
-  | 'simile'
-  | 'tongue-twister'
-  | 'poem'
-  | 'humour';
+  'grammar' | 'vocabulary' | 'proverb' | 'rhyme' | 'simile' | 'tongue-twister' | 'poem' | 'humour';
 
 export interface CardSource {
   type: 'original-excerpt';

@@ -12,9 +12,7 @@ import {
 import type { CollectionCatalog } from '../../src/collection/types';
 
 const publicDir = new URL('../../public/assets/collection/', import.meta.url);
-const rawCatalog = JSON.parse(
-  readFileSync(new URL('catalog.json', publicDir), 'utf8'),
-) as CollectionCatalog;
+const rawCatalog = JSON.parse(readFileSync(new URL('catalog.json', publicDir), 'utf8')) as CollectionCatalog;
 const manifest = JSON.parse(readFileSync(new URL('import-manifest.json', publicDir), 'utf8')) as {
   contentVersion: string;
   files: Array<{ path: string; sha256: string; bytes: number }>;
