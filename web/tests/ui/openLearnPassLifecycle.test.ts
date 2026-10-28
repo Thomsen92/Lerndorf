@@ -1,0 +1,58 @@
+// @vitest-environment happy-dom
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { SeasonApi, SeasonState } from '../../src/api/season';
+const mocks = vi.hoisted(() => ({ release: vi.fn(), destroy: vi.fn() }));
+vi.mock('../../src/ui/learnpass/rewardArt', () => ({ seasonPictures: () => ({ release: mocks.release }) }));
+vi.mock('../../src/ui/learnpass/learnpassView', () => ({
+  renderLearnPass: () => ({ el: document.createElement('section'), update: vi.fn(), destroy: mocks.destroy }),
+}));
+import { openLearnPass } from '../../src/ui/learnpass/openLearnPass';
+import { createModalTracker } from '../../src/ui/areas';
+describe('LearnPass entered through the season hub', () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+    vi.clearAllMocks();
+  });
+  const options = (state: () => Promise<SeasonState>) => ({
+    api: { state } as SeasonApi,
+    getCoins: () => 0,
+    onCoins: vi.fn(),
+    reducedMotion: true,
+    onOpenInventory: vi.fn(),
+  });
+  it('logout closes a pending pass and a late state never remounts it', async () => {
+    let resolve!: (s: SeasonState) => void;
+    const tracker = createModalTracker();
+    const pass = tracker.track(
+      openLearnPass(
+        options(
+          () =>
+            new Promise((r) => {
+              resolve = r;
+            }),
+        ),
+      ),
+    );
+    expect(tracker.anyOpen).toBe(true);
+    tracker.closeAll();
+    expect(pass.isOpen).toBe(false);
+    resolve({ season: { id: 'test' } } as SeasonState);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(document.body.children).toHaveLength(0);
+    expect(mocks.release).toHaveBeenCalledOnce();
+  });
+  it('removes a load error when the tracked pass is closed', async () => {
+    const pass = openLearnPass(
+      options(async () => {
+        throw Error('offline');
+      }),
+    );
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(document.querySelector('.learnpass-error')).not.toBe(null);
+    pass.close();
+    expect(document.querySelector('.learnpass-error')).toBe(null);
+    expect(pass.isOpen).toBe(false);
+  });
+});

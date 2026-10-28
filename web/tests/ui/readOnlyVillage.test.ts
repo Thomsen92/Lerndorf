@@ -2,7 +2,7 @@
 import { it, expect, vi } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 vi.mock('../../src/ui/readOnlyScene', () => ({
-  createReadOnlyScene: () => ({ dispose: vi.fn(), setPaused: vi.fn() }),
+  createReadOnlyScene: () => ({ dispose: vi.fn(), setPaused: vi.fn(),setWorldTheme:vi.fn() }),
 }));
 import { mountVillage } from '../../src/ui/villageView';
 it('uses exclusively teacher read RPCs and exposes no pupil writes or profile controls', async () => {
@@ -10,7 +10,7 @@ it('uses exclusively teacher read RPCs and exposes no pupil writes or profile co
     data:
       name === 'teacher_village_members'
         ? [{ id: 'a', nickname: 'anna', plot_index: 0, avatar: { character: 'girl' } }]
-        : [],
+        :name==='teacher_world_theme_state'?{classId:'8a',theme:'halloween',revision:1,changedAt:null}:[],
     error: null,
   }));
   const writes = { insert: vi.fn(), update: vi.fn(), delete: vi.fn() };
@@ -39,8 +39,9 @@ it('uses exclusively teacher read RPCs and exposes no pupil writes or profile co
   await new Promise((r) => setTimeout(r, 0));
   expect(document.querySelectorAll('input,select,textarea')).toHaveLength(0);
   expect(
-    rpc.mock.calls.every(([name]) => ['teacher_village_members', 'teacher_pupil_quests'].includes(name)),
+    rpc.mock.calls.every(([name]) => ['teacher_village_members', 'teacher_pupil_quests','teacher_world_theme_state'].includes(name)),
   ).toBe(true);
+  expect(rpc).toHaveBeenCalledWith('teacher_world_theme_state',{p_class:'8a'});
   for (const spy of Object.values(writes)) expect(spy).not.toHaveBeenCalled();
   [...root.querySelectorAll('button')].find((b) => b.textContent === 'Zurück zum Lehrerbereich')!.click();
   expect(onExit).toHaveBeenCalled();

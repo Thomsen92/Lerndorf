@@ -9,6 +9,7 @@ import { instancedModel, kenneyModel, type KenneyModel } from './kenney';
 import type { Layout } from '../world/layout';
 import { PLAZA_RADIUS } from '../world/constants';
 import { pavingTexture } from './textures';
+import { bakeStatic } from './merge';
 
 const STONE = '#a7a3a0';
 const WOOD = '#8a5a36';
@@ -278,7 +279,7 @@ function stall(
   const g = new THREE.Group();
   g.position.set(x, layout.plazaHeight, z);
   g.rotation.y = Math.atan2(layout.plaza.x - x, layout.plaza.z - z);
-  const placeholder = placeholderStall(stripe, colours);
+  const placeholder = bakeStatic(placeholderStall(stripe, colours));
   g.add(placeholder);
   const what = GOODS[goods];
   void Promise.all([kenneyModel('town', 'stall-green'), kenneyModel('food', what.name)]).then(
@@ -349,6 +350,13 @@ function tub(layout: Layout, angle: number): THREE.Group {
 /** The whole plaza as one group. The caller adds it to the village. */
 export function buildPlaza(layout: Layout): THREE.Group {
   const root = new THREE.Group();
+  const normalSeason = new THREE.Group();
+  normalSeason.name = 'normalSeasonPlaza';
+  normalSeason.userData.bakeStatic = false;
+  root.add(normalSeason);
+  root.userData.setSeasonTheme = (theme: 'normal' | 'halloween'): void => {
+    normalSeason.visible = theme === 'normal';
+  };
   const y = layout.plazaHeight;
 
   // paving disc with a soft edge, and thin rings every 1.8 m from r = 2.4 (LOOK §5)
@@ -377,7 +385,7 @@ export function buildPlaza(layout: Layout): THREE.Group {
     outer = o;
   });
   f.position.set(layout.plaza.x, 0, layout.plaza.z);
-  root.add(f);
+  normalSeason.add(f);
   const jetMat = new THREE.MeshStandardMaterial({
     color: '#8fd3f0',
     emissive: '#2a6f9a',
@@ -386,13 +394,14 @@ export function buildPlaza(layout: Layout): THREE.Group {
   });
   const jet = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.12, 1, 6), jetMat);
   jet.position.set(layout.plaza.x, inner + 0.5, layout.plaza.z);
-  root.add(jet);
+  normalSeason.add(jet);
   const DROPS = 18;
   const dropMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.07, 5, 4), jetMat, DROPS);
   dropMesh.frustumCulled = false;
-  root.add(dropMesh);
+  normalSeason.add(dropMesh);
   const m = new THREE.Matrix4();
   root.userData.animate = (t: number): void => {
+    if (!normalSeason.visible) return;
     // the jet pulses in height; the droplets rise from its top, arc outwards and fall into the
     // outer basin
     const pulse = 0.85 + 0.15 * Math.sin(t * 4);
@@ -422,7 +431,7 @@ export function buildPlaza(layout: Layout): THREE.Group {
     [layout.map.boardAngle + 3.8, '#d08a3c', ['#f2994a', '#6fcf97', '#f2994a'], 'pumpkins'],
   ];
   for (const [angle, stripe, colours, goods] of stalls) {
-    root.add(stall(layout, angle, 5.0, stripe, colours, goods));
+    normalSeason.add(stall(layout, angle, 5.0, stripe, colours, goods));
   }
   for (const angle of layout.map.benchAngles) root.add(bench(layout, angle));
   root.add(tub(layout, layout.map.benchAngles[0] + 0.7));

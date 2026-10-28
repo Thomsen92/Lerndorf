@@ -69,14 +69,14 @@ export function createAreaController(opts: {
 
 /** Modals opened from the village glue (settings menu, ledger). Lets logout close them properly. */
 export interface ModalTracker {
-  track(handle: ModalHandle): ModalHandle;
+  track<T extends Pick<ModalHandle, 'close' | 'isOpen'>>(handle: T): T;
   readonly anyOpen: boolean;
   /** Closes every tracked modal (runs their close(), which lifts `inert`) and removes a leftover `inert`. */
   closeAll(): void;
 }
 
 export function createModalTracker(): ModalTracker {
-  const open = new Set<ModalHandle>();
+  const open = new Set<Pick<ModalHandle, 'close' | 'isOpen'>>();
   return {
     track(handle) {
       open.add(handle);
