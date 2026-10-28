@@ -15,7 +15,8 @@
     "galerie": "node scripts/galerie.ts",
     "import:collection": "node scripts/import-halloween-prototype.ts",
     "migrations:check": "node scripts/check-migrations.ts",
-    "migrations:lock": "node scripts/check-migrations.ts --update-lock"
+    "migrations:lock": "node scripts/check-migrations.ts --update-lock",
+    "import:starter": "node scripts/import-season-starter.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

@@ -92,4 +92,31 @@ describe('independent season ticket and welcome', () => {
     expect(host.children).toHaveLength(0);
     expect(host.hasAttribute('inert')).toBe(false);
   });
+  it('starts the Spooky English Quiz after closing the welcome while the season runs', () => {
+    const host = document.createElement('div');
+    document.body.append(host);
+    const openQuiz = vi.fn(() => expect(document.querySelector('[role=dialog]')).toBe(null));
+    const hub = createSeasonHub({ host, openLearnPass: vi.fn(), openQuiz, canOpen: () => true });
+    hub.setState(state());
+    hub.open();
+    const quiz = document.querySelector<HTMLButtonElement>('[data-open-quiz]')!;
+    expect(quiz.disabled).toBe(false);
+    expect(quiz.textContent).toBe('Spooky English Quiz');
+    quiz.click();
+    expect(openQuiz).toHaveBeenCalledOnce();
+    hub.dispose();
+  });
+
+  it('keeps the quiz locked before the season starts', () => {
+    const host = document.createElement('div');
+    document.body.append(host);
+    const openQuiz = vi.fn();
+    const hub = createSeasonHub({ host, openLearnPass: vi.fn(), openQuiz, canOpen: () => true });
+    hub.setState(state({ seasonState: 'upcoming' }));
+    hub.open();
+    const quiz = document.querySelector<HTMLButtonElement>('[data-open-quiz]')!;
+    expect(quiz.disabled).toBe(true);
+    expect(quiz.textContent).toMatch(/Season-Start/);
+    hub.dispose();
+  });
 });

@@ -234,4 +234,50 @@ describe('pass and chest card rewards', () => {
     );
     await db.exec('reset role;');
   });
+  it('weights the chest card draw per rarity, not per remaining card', async () => {
+    await db.exec(
+      `reset role; update public.season_chest_card_config
+         set enabled = true, hit_rate = 1, epic_weight = 1, legendary_weight = 1
+       where season = '${SEASON}'; select setseed(0.42);`,
+    );
+    const players = Array.from(
+      { length: 40 },
+      (_, i) => `00000000-0000-0000-0000-0000000009${String(i).padStart(2, '0')}`,
+    );
+    for (const [i, id] of players.entries()) {
+      await db.query('insert into auth.users values($1)', [id]);
+      await db.query("insert into public.profiles(id,nickname,class_id,plot_index) values($1,$2,'8a',$3)", [
+        id,
+        `weight${i}`,
+        100 + i,
+      ]);
+    }
+    let legendary = 0;
+    for (const id of players) {
+      await db.exec('reset role;');
+      const chestId = await newChest(id);
+      await actor(id);
+      const result = await open(chestId);
+      expect(result.cardStatus).toBe('awarded');
+      if ((result.card as { rarity: string }).rarity === 'legendary') legendary += 1;
+    }
+    // Equal rarity weights mean about half legendary. Weighting per card (1 of 15) would give about 3.
+    expect(legendary).toBeGreaterThanOrEqual(10);
+    expect(legendary).toBeLessThanOrEqual(30);
+    await db.exec('reset role;');
+  });
+
+  it('locks the player before drawing a chest card and only reports a card it really granted', async () => {
+    await db.exec('reset role;');
+    const def = (
+      await db.query<{ d: string }>(
+        "select pg_get_functiondef('public.open_season_chest(bigint)'::regprocedure) d",
+      )
+    ).rows[0].d.replace(/\s+/g, ' ');
+    const lock = def.search(/from (public\.)?profiles where id = v_uid for update/);
+    const draw = def.indexOf('order by random()');
+    expect(lock).toBeGreaterThan(-1);
+    expect(draw).toBeGreaterThan(lock);
+    expect(def).toMatch(/v_grant ->> 'granted'/);
+  });
 });

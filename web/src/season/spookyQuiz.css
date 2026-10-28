@@ -1,0 +1,304 @@
+/*
+ * Spooky English Quiz: a moonlit night. Pumpkin orange leads, candle yellow guides, the answers are
+ * small gravestones (the one bold element). Creepster only for the title and the result; questions
+ * and answers stay in the readable game font. Tap targets ≥ 52 px, no horizontal scroll.
+ */
+@font-face {
+  font-family: 'Creepster';
+  src: url('/fonts/Creepster-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.overlay.spooky-overlay {
+  background: rgba(14, 7, 22, 0.86);
+}
+.overlay.modal .panel.spooky-panel {
+  --night: #1a0f24;
+  --dusk: #2a1838;
+  --pumpkin: #f08a24;
+  --candle: #ffd58a;
+  --ghost: #ece6f6;
+  --moss: #8fd16a;
+  --blood: #e0575a;
+  border: 1px solid #4a2f63;
+  color: var(--ghost);
+  background:
+    radial-gradient(
+      circle at 88% -6%,
+      rgba(255, 213, 138, 0.22) 0 70px,
+      rgba(255, 213, 138, 0.06) 140px,
+      transparent 260px
+    ),
+    linear-gradient(180deg, var(--dusk), var(--night) 60%);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+}
+.spooky-panel .panel-head h2 {
+  font-family: 'Creepster', 'Comic Neue', cursive;
+  font-weight: 400;
+  font-size: 34px;
+  letter-spacing: 0.03em;
+  color: var(--pumpkin);
+  text-shadow: 0 0 14px rgba(240, 138, 36, 0.35);
+}
+.spooky-panel .panel-head button {
+  border-color: #5d5470;
+  background: #251a30;
+  color: var(--ghost);
+}
+
+.spooky-quiz {
+  display: grid;
+  gap: 12px;
+  max-height: 78dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
+}
+.spooky-content {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* progress: ten pumpkins */
+.spooky-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+}
+.spooky-pumpkins {
+  display: flex;
+  gap: 3px;
+}
+.spooky-pumpkin svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+.spooky-pumpkin .body {
+  fill: #3b2b47;
+}
+.spooky-pumpkin .face {
+  fill: #1a0f24;
+}
+.spooky-pumpkin .stem {
+  fill: #4f6b3a;
+}
+.spooky-pumpkin.current .body {
+  fill: #7a4419;
+}
+.spooky-pumpkin.lit .body {
+  fill: var(--pumpkin);
+}
+.spooky-pumpkin.lit .face {
+  fill: var(--candle);
+}
+.spooky-pumpkin.lit svg {
+  filter: drop-shadow(0 0 5px rgba(255, 179, 71, 0.7));
+}
+.spooky-pumpkin.just-lit svg {
+  animation: spooky-light 0.6s ease-out;
+}
+@keyframes spooky-light {
+  from {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.3);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+.spooky-counter {
+  margin: 0;
+  color: var(--candle);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.spooky-prompt {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.35;
+  color: var(--ghost);
+}
+
+/* the answers: gravestones standing on dark ground */
+.spooky-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px 12px;
+  padding-top: 4px;
+}
+.spooky-quiz button {
+  min-height: 52px;
+  font-size: 18px;
+  white-space: normal;
+}
+.spooky-quiz .spooky-option {
+  min-height: 92px;
+  padding: 26px 14px 14px;
+  border: 2px solid #5d5470;
+  border-radius: 80px 80px 10px 10px / 52px 52px 10px 10px;
+  background: linear-gradient(180deg, #4a4257, #2c2636);
+  box-shadow:
+    inset 0 -6px 0 rgba(0, 0, 0, 0.25),
+    0 6px 0 #140b1c;
+  color: var(--ghost);
+  font-size: 17px;
+  line-height: 1.3;
+  text-align: center;
+  cursor: pointer;
+}
+.spooky-quiz .spooky-option:hover:not(:disabled) {
+  border-color: var(--pumpkin);
+}
+.spooky-quiz .spooky-option.correct {
+  border-color: var(--moss);
+  background: linear-gradient(180deg, #3f6b35, #22401d);
+  box-shadow:
+    0 0 16px rgba(143, 209, 106, 0.35),
+    0 6px 0 #140b1c;
+}
+.spooky-quiz .spooky-option.wrong {
+  border-color: var(--blood);
+  background: linear-gradient(180deg, #4d2029, #2b1218);
+  color: #f3c9cb;
+}
+.spooky-quiz .spooky-option:disabled {
+  cursor: default;
+}
+/* the answered stones keep full strength: the result must be easy to read */
+.spooky-quiz .spooky-option.correct:disabled {
+  opacity: 1;
+  color: #eaffdf;
+}
+.spooky-quiz .spooky-option.wrong:disabled {
+  opacity: 0.9;
+}
+.spooky-quiz .spooky-option:disabled:not(.correct):not(.wrong) {
+  opacity: 0.55;
+}
+
+.spooky-listen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.spooky-quiz .spooky-play,
+.spooky-quiz .spooky-text {
+  padding: 10px 22px;
+  border: 2px solid var(--candle);
+  border-radius: 999px;
+  background: #2a1838;
+  color: var(--candle);
+  font-weight: 700;
+}
+.spooky-listen button[hidden] {
+  display: none;
+}
+.spooky-spoken {
+  margin: 0;
+  font-style: italic;
+  color: var(--candle);
+}
+
+.spooky-status {
+  min-height: 1.5em;
+  margin: 0;
+  font-weight: 700;
+}
+.spooky-status.ok {
+  color: var(--moss);
+}
+.spooky-status.hint {
+  color: var(--candle);
+}
+.spooky-status.error {
+  color: #ff9a9a;
+}
+
+.spooky-panel .spooky-quiz button.spooky-next,
+.spooky-panel .spooky-quiz button.spooky-pass {
+  border: 0;
+  border-radius: 12px;
+  background: var(--pumpkin);
+  color: #2a1405;
+  font-weight: 800;
+  text-align: center;
+}
+.spooky-quiz .spooky-back {
+  border: 2px solid #5d5470;
+  border-radius: 12px;
+  background: #251a30;
+  color: var(--ghost);
+  text-align: center;
+}
+
+/* Sir Byte joins the night: his stage under the moon, his words on old parchment */
+.spooky-panel .byte-stage {
+  border-color: #4a2f63;
+  background: radial-gradient(ellipse at 50% 35%, #3d2856, #1d1229 78%);
+}
+.spooky-panel .byte-bubble {
+  border-color: var(--pumpkin);
+  background: #f8e8c4;
+  color: #3a2410;
+}
+.spooky-panel .byte-bubble::before {
+  border-color: var(--pumpkin);
+  background: #f8e8c4;
+}
+.spooky-panel .byte-label {
+  color: #a4501a;
+}
+
+/* result */
+.spooky-title {
+  margin: 0;
+  font-family: 'Creepster', 'Comic Neue', cursive;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1.1;
+  color: var(--pumpkin);
+  text-shadow: 0 0 18px rgba(240, 138, 36, 0.4);
+}
+.spooky-summary {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--candle);
+}
+.spooky-intro {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.spooky-quiz button:focus-visible {
+  outline: 3px solid var(--candle);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .spooky-panel .panel-head h2 {
+    font-size: 28px;
+  }
+  .spooky-options {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 10px;
+  }
+  .spooky-quiz .spooky-option {
+    min-height: 84px;
+    font-size: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spooky-pumpkin.just-lit svg {
+    animation: none;
+  }
+}

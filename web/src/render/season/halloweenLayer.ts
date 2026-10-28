@@ -55,9 +55,6 @@ export function createHalloweenLayer(layout: Layout): HalloweenLayer {
     stone = mat('#85839a'),
     iron = mat('#444451'),
     orange = mat('#d7833d');
-  const cream = mat('#e5dac2'),
-    purple = mat('#75618b'),
-    teal = mat('#537a77');
   const warm = new THREE.MeshBasicMaterial({ color: '#ffc56b', toneMapped: false });
   materials.add(warm);
   const batches = new Map<THREE.Material, THREE.BufferGeometry[]>();
@@ -198,40 +195,18 @@ export function createHalloweenLayer(layout: Layout): HalloweenLayer {
     rot: Math.PI / 2 - front,
   });
 
-  // Three striped seasonal stalls retain the production square and leave the fourth sector for r14.
-  for (const [i, delta] of [1.4, 2.6, 3.8].entries()) {
+  // The market keeps its Kenney stalls (plaza.ts shows them in season colours with pumpkins);
+  // this layer only hangs two lampions at the front posts of each stall (same places, r = 5).
+  for (const delta of [1.4, 2.6, 3.8]) {
     const angle = layout.map.boardAngle + delta,
-      x = layout.plaza.x + Math.cos(angle) * 5.6,
-      z = layout.plaza.z + Math.sin(angle) * 5.6;
-    const ry = Math.atan2(layout.plaza.x - x, layout.plaza.z - z),
-      y = layout.plazaHeight + 0.1;
-    const at = (lx: number, ly: number, lz: number): THREE.Vector3 =>
-      new THREE.Vector3(lx, ly, lz)
+      x = layout.plaza.x + Math.cos(angle) * 5.0,
+      z = layout.plaza.z + Math.sin(angle) * 5.0;
+    const ry = Math.atan2(layout.plaza.x - x, layout.plaza.z - z);
+    for (const lx of [-1.0, 1.0]) {
+      const p = new THREE.Vector3(lx, 1.85, 0.72)
         .applyAxisAngle(new THREE.Vector3(0, 1, 0), ry)
-        .add(new THREE.Vector3(x, y, z));
-    const put = (
-      lx: number,
-      ly: number,
-      lz: number,
-      w: number,
-      h: number,
-      d: number,
-      m: THREE.Material,
-    ): void => {
-      const p = at(lx, ly, lz);
-      box(p.x, p.y, p.z, w, h, d, m, ry);
-    };
-    put(0, 0.55, 0, 2.25, 1, 0.95, wood);
-    for (const lx of [-1.05, 1.05]) for (const lz of [-0.45, 0.45]) put(lx, 1.25, lz, 0.09, 2.5, 0.09, wood);
-    for (let stripe = 0; stripe < 8; stripe++)
-      put(-1.225 + stripe * 0.35, 2.48, 0, 0.35, 0.13, 1.65, stripe % 2 ? cream : [purple, teal, orange][i]);
-    for (let k = 0; k < 5; k++) {
-      const p = at(-0.8 + k * 0.4, 1.08, 0.12);
-      pumpkins.push({ ...p, h: 0.32, rot: ry });
-    }
-    for (const lx of [-1.05, 1.05]) {
-      const p = at(lx, 2.1, 0.6);
-      lampPositions.push({ ...p, h: 1, rot: 0 });
+        .add(new THREE.Vector3(x, layout.plazaHeight + 0.1, z));
+      lampPositions.push({ x: p.x, y: p.y, z: p.z, h: 1, rot: 0 });
     }
   }
   // Cheap, recognisable fallback pumpkins are available even offline.

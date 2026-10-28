@@ -101,25 +101,35 @@
         if (!window.galerie?.ready) return;
         clearInterval(wait);
         const stats = document.getElementById('stats');
+        // Buttons always mirror the theme that is really shown (also for ?theme=normal).
+        function syncButtons() {
+          const active = window.galerie.theme();
+          document
+            .querySelectorAll('[data-theme]')
+            .forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.theme === active)));
+        }
+        // Count after the next drawn frame, otherwise the numbers lag one view behind.
+        const nextFrame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
         function report() {
           const s = window.galerie.appearanceCost();
           stats.textContent = `${window.galerie.theme()} · ${s.calls} Draw Calls · ${s.triangles.toLocaleString('de-DE')} Dreiecke · Ziehen zum Drehen / Pinch zum Zoomen`;
         }
         document.querySelectorAll('[data-theme]').forEach((b) =>
           b.addEventListener('click', async () => {
-            document
-              .querySelectorAll('[data-theme]')
-              .forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
             await window.galerie.setTheme(b.dataset.theme);
+            syncButtons();
+            await nextFrame();
             report();
           }),
         );
         document.querySelectorAll('[data-view]').forEach((b) =>
-          b.addEventListener('click', () => {
+          b.addEventListener('click', async () => {
             window.galerie.setView(b.dataset.view);
+            await nextFrame();
             report();
           }),
         );
+        syncButtons();
         report();
       }, 100);
     </script>

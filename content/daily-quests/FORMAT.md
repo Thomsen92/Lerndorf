@@ -55,7 +55,7 @@ Versuche sind unbegrenzt. Münzen gibt es nur, wenn die richtige Antwort **inner
 
 ### gap (Lückentext)
 
-Der `prompt` enthält `___` (drei Unterstriche). `solution` ist eine Liste erlaubter Antworten (1 bis 10). Optional: `bank` mit 2 bis 6 verschiedenen, nicht leeren Wörtern. Die Wortbank wird als Auswahl weitergegeben; `solution` bleibt getrennt und privat. Ohne `bank` bleibt Texteingabe möglich.
+Der `prompt` enthält `___` (drei Unterstriche). `solution` ist eine Liste erlaubter Antworten (1 bis 10). **Pflicht (seit 28.10.2026): `bank`** mit 2 bis 6 verschiedenen, nicht leeren Wörtern; mindestens eines davon muss eine richtige Lösung sein. Die Schüler tippen auf dem Tablet nur ein Wort der Wortbank an, sie tippen keinen Text mehr. `solution` bleibt getrennt und privat. Ohne `bank` lehnt der Import die Woche ab. (Schon importierte alte Lücken ohne Wortbank zeigen weiter ein Textfeld.)
 
 ```json
 {
@@ -104,7 +104,7 @@ Der `prompt` enthält `___` (drei Unterstriche). `solution` ist eine Liste erlau
 `speak` ist der Text, der vorgelesen wird (höchstens 400 Zeichen). `mode` ist `choice` oder `gap` (nicht `match`, nicht `order`).
 
 - `mode: "choice"`: wie bei choice mit `options` und `solution` (Text).
-- `mode: "gap"`: wie bei gap, der `prompt` enthält `___`, `solution` ist eine Liste; optional dieselbe `bank` mit 2–6 verschiedenen Wörtern.
+- `mode: "gap"`: wie bei gap, der `prompt` enthält `___`, `solution` ist eine Liste; ebenso Pflicht: `bank` mit 2–6 verschiedenen Wörtern, eines davon richtig.
 
 ```json
 {

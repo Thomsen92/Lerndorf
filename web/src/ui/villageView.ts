@@ -46,6 +46,8 @@ import { openCollection } from '../collection/collectionView';
 import { createWorldThemeController, type WorldThemeController } from '../season/worldThemeController';
 import { createWorldAppearance, isWorldObjectVisible, type WorldAppearance } from '../season/worldAppearance';
 import { createSeasonHub } from '../season/seasonHub';
+import { openSpookyQuiz } from '../season/spookyQuizView';
+import { seasonStarterApi } from '../api/seasonStarter';
 import { supabaseItemApi, type ItemKind } from '../api/items';
 import {
   HOUSE_AREAS,
@@ -175,6 +177,8 @@ export async function mountVillage(
   let areas: AreaController | null = null;
   let buildMode: BuildMode | null = null;
   const sound = createSound();
+  // background loop everywhere in the village; it starts with the first tap (browser rule)
+  sound.setMusic('village');
   let marketByte: MarketByte | null = null;
   const unlockSound = (): void => sound.unlock();
   window.addEventListener('pointerdown', unlockSound);
@@ -585,6 +589,19 @@ export async function mountVillage(
   seasonHub = createSeasonHub({
     host: root,
     openLearnPass: openSeasonPass,
+    openQuiz: () => {
+      const seasonId = worldThemeState?.seasonId;
+      if (!seasonId || !running) return;
+      openSpookyQuiz({
+        api: seasonStarterApi(supabase),
+        seasonId,
+        opener: seasonHub?.el ?? null,
+        openLearnPass: openSeasonPass,
+        // XP badge, level-up and pass refresh run through the same flow as daily quests
+        onProgress: (delta) => void worldOnProgress(delta),
+        track: (handle) => modals.track(handle),
+      });
+    },
     canOpen: () =>
       running && !inTutorial && !modals.anyOpen && !flight && (areas?.current ?? 'dorf') === 'dorf',
     track: (handle) => {
@@ -845,6 +862,7 @@ export async function mountVillage(
             if (!on) silenceSirByte();
           },
         },
+        music: { on: sound.musicOn, onChange: (on) => sound.setMusicOn(on) },
         onQuality: (q) => {
           choice = q;
           applyQuality();

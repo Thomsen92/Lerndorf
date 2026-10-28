@@ -230,8 +230,12 @@ declare
   v_choice text;
   v_i int;
   v_card_rarity text;
+  v_grant jsonb;
 begin
   if v_uid is null then raise exception 'not logged in' using errcode = '42501'; end if;
+  -- Lock order shared with every card grant: player row first, then the chest. Two chests of the
+  -- same player opened at once are serialized here, so the second draw already sees the first card.
+  perform 1 from profiles where id = v_uid for update;
   select * into v_chest from season_chests where id = p_id and player_id = v_uid for update;
   if not found then raise exception 'chest not found' using errcode = 'P0002'; end if;
   if v_chest.opened_at is not null then
@@ -283,10 +287,11 @@ begin
       select array_agg(rarity order by rarity), array_agg(weight order by rarity)
         into v_rarities, v_weights
         from (
+          -- One weight per rarity (not per remaining card); empty rarities drop out below.
           select d.rarity,
-                 count(*)::numeric * case d.rarity
+                 max(case d.rarity
                    when 'legendary' then coalesce(v_cfg.legendary_weight, 0)
-                   else coalesce(v_cfg.epic_weight, 0) end as weight
+                   else coalesce(v_cfg.epic_weight, 0) end) as weight
           from season_card_definitions d
           where d.season_id = v_chest.season and d.active
             and d.rarity in ('epic', 'legendary')
@@ -318,10 +323,16 @@ begin
         if v_card_id is null then
           v_status := 'complete';
         else
-          perform public.grant_season_card(
+          v_grant := public.grant_season_card(
             v_uid, v_chest.season, v_card_id, 'season_chest', p_id::text
           );
-          v_status := 'awarded';
+          if coalesce((v_grant ->> 'granted')::boolean, false) then
+            v_status := 'awarded';
+          else
+            -- Never report a card the player did not newly receive from this chest.
+            v_card_id := null;
+            v_status := 'complete';
+          end if;
         end if;
       end if;
     end if;

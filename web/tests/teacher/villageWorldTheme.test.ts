@@ -170,3 +170,18 @@ it('does not draw a late load after navigation', async () => {
   await page.mount(host, ctx);
   expect(host.textContent).toBe('New class');
 });
+
+it('names the season once and refreshes the requested world after a save', async () => {
+  const { host, rpc, ctx } = setup();
+  await page.mount(host, ctx);
+  expect(host.textContent).toContain('Saison: Season I – Halloween.');
+  expect(host.textContent).not.toContain('Season Season');
+  const summary = () => host.querySelector('#worldThemeSummary')?.textContent ?? '';
+  expect(summary()).toContain('Angefordert: Normal · Revision 0. Normal ist aktiv.');
+  rpc.mockResolvedValueOnce({ data: halloween, error: null });
+  host.querySelector<HTMLSelectElement>('[name=worldTheme]')!.value = 'halloween';
+  submit(host);
+  await tick();
+  expect(summary()).toContain('Angefordert: Halloween · Revision 1. Halloween ist aktiv.');
+  expect(summary()).not.toContain('Normal');
+});

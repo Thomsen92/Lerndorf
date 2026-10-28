@@ -70,7 +70,7 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
       opts.onOpenInventory();
     },
     onOpenInside(): void {
-      if (view) openInside(view.el, { pool: pool(), pictures });
+      if (view) openInside(view.el, { pool: pool(), pictures, reducedMotion: opts.reducedMotion });
     },
     onPickItem(): void {
       if (!view) return;

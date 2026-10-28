@@ -153,8 +153,10 @@ Gezeigt wird der **Pool**, nie das nächste Ergebnis. So bleibt die Spannung, ab
 | Seltenheit | Gegenstände |
 |---|---|
 | Normal (8) | Süßigkeiteneimer, Fledermaus, Grablicht, Kleiner Geist, Grabstein, Kürbislaterne, Besen, Halloween-Schild |
-| Rare (13) | Süßigkeitenhaufen, Friedhofsecke, Zaun mit Laterne, Hexe (Statue), Kürbismädchen, Hexe (Figur), Mumie, Skelett, Zombie, Hexenkatze, Hexenkessel, Kürbiskatze, Geisterkatze |
-| Epic (5) | Kürbisfeld, Spuk-Uhrturm, Dodge Pickup (Auto), Monsterpflanze, Kürbisbaum |
+| Rare (12) | Süßigkeitenhaufen, Friedhofsecke, Zaun mit Laterne, Kürbisfeld, Hexe (Figur), Mumie, Skelett, Zombie, Hexenkatze, Hexenkessel, Kürbiskatze, Geisterkatze |
+| Epic (6) | Hexe (Statue), Kürbismädchen, Spuk-Uhrturm, Dodge Pickup (Auto), Monsterpflanze, Kürbisbaum |
+
+*Geändert 28.10.2026 durch die Lehrkraft (Migration 0052): Hexe (Statue) und Kürbismädchen Rare → Epic, Kürbisfeld Epic → Rare.*
 | Legendary (2) | **Horror-Haus** – ersetzt das eigene Haus · **Warlock** (2,95 m Statue) |
 
 Die früher vorgeschlagenen schweren Originale (Vampir, Vogelscheuche, Horrorpuppe, Schwarzer Fuchs, Skelettkatze, Kürbis-Auto, Halloween-Auto, Devilish Hot Rod, Kürbis-Zauberer) sind **nicht** im Pool, bis sie optimiert sind. Die Kenney-Graveyard-Teile kommen als 12 Pass-Szenen (§6), nicht in die Truhen.

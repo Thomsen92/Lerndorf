@@ -1,7 +1,7 @@
 import { tr } from '../i18n';
 import * as THREE from 'three';
 import { configurePreviewRenderer } from '../render/itemPreview';
-import { readSoundSetting, type Sound } from '../ui/sound';
+import { activeSound, readSoundSetting, type Sound } from '../ui/sound';
 import { createMascot } from './sirByte';
 import { createVoicePlayer } from './voice';
 import { createByteBubble } from './bubble';
@@ -37,6 +37,9 @@ export function createCompanion(
     },
   });
   const mascot = createMascot({ voice, quality: 'low' });
+  // Sir Byte keeps a pupil company only in quiz windows (daily quests, tutorial, Spooky English Quiz):
+  // while he is there the thinking loop replaces the village music.
+  const releaseMusic = activeSound()?.pushMusic('quiz') ?? null;
   const scene = new THREE.Scene();
   scene.add(mascot.root, new THREE.HemisphereLight('#d7ecff', '#6e788d', 2.5));
   const light = new THREE.DirectionalLight('#fff0d8', 3.5);
@@ -132,6 +135,7 @@ export function createCompanion(
     },
     react,
     async answer(key: string, correct: boolean, allDone = false) {
+      activeSound()?.play(correct ? 'correct' : 'wrong');
       const count = correct ? 0 : (mistakes.get(key) ?? 0) + 1;
       mistakes.set(key, count);
       const requested = revision + 1;
@@ -185,6 +189,7 @@ export function createCompanion(
       disposed = true;
       revision++;
       window.cancelAnimationFrame(frame);
+      releaseMusic?.();
       bubble.dispose();
       mascot.dispose();
       renderer?.dispose();

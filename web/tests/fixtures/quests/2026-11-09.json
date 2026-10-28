@@ -26,6 +26,11 @@
           "reward": 10,
           "solution": [
             "went"
+          ],
+          "bank": [
+            "go",
+            "went",
+            "gone"
           ]
         },
         {
@@ -111,6 +116,11 @@
           "mode": "gap",
           "solution": [
             "the station"
+          ],
+          "bank": [
+            "the bus stop",
+            "the station",
+            "the park"
           ]
         },
         {
@@ -121,6 +131,11 @@
           "reward": 10,
           "solution": [
             "reads"
+          ],
+          "bank": [
+            "read",
+            "reads",
+            "reading"
           ]
         },
         {
@@ -209,6 +224,11 @@
           "reward": 5,
           "solution": [
             "play"
+          ],
+          "bank": [
+            "plays",
+            "play",
+            "playing"
           ]
         },
         {
@@ -273,6 +293,11 @@
           "mode": "gap",
           "solution": [
             "rock"
+          ],
+          "bank": [
+            "pop",
+            "rock",
+            "classical"
           ]
         },
         {
@@ -283,6 +308,11 @@
           "reward": 15,
           "solution": [
             "are"
+          ],
+          "bank": [
+            "is",
+            "are",
+            "be"
           ]
         }
       ]

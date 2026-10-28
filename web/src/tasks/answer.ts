@@ -14,11 +14,21 @@ export function answerMode(type: QuestType, data: Record<string, unknown>): Task
   return mode === 'gap' || mode === 'match' || mode === 'order' ? mode : 'choice';
 }
 
+/**
+ * What the pupil has tapped so far. The optional fields only steer the one-tap forms:
+ * `wrong` greys out tiles that were already answered wrongly, `active`/`activeRight` is the word
+ * waiting for its partner, `used` the bank positions already placed (a sentence may repeat a word).
+ */
 export type AnswerState =
-  | { type: 'choice'; picked: string | null }
-  | { type: 'gap'; text: string }
-  | { type: 'match'; picks: Record<string, string | null> }
-  | { type: 'order'; sequence: string[] };
+  | { type: 'choice'; picked: string | null; wrong?: string[] }
+  | { type: 'gap'; text: string; wrong?: string[] }
+  | {
+      type: 'match';
+      picks: Record<string, string | null>;
+      active?: string | null;
+      activeRight?: string | null;
+    }
+  | { type: 'order'; sequence: string[]; used?: number[] };
 
 /** Words the pupil can choose for each answer form, read from the task data. */
 export function stringList(data: Record<string, unknown>, key: string): string[] {

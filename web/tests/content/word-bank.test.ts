@@ -7,7 +7,7 @@ function week() {
   ) as Extract<WeekPackage, { days: unknown }>;
 }
 it.each(['gap', 'listening'] as const)(
-  'passes an optional word bank through for %s, keeping the solution private',
+  'passes the word bank through for %s, keeping the solution private',
   (type) => {
     const pkg = week(),
       q = pkg.days[0].quests[1];
@@ -35,8 +35,17 @@ it.each(
   Object.assign(pkg.days[0].quests[1], { bank });
   expect(validatePackage(pkg).join()).toContain('days[0].quests[1].bank');
 });
-it('keeps legacy gaps without word banks unchanged', () => {
+it('requires a word bank for every gap since 28.10.2026 (one tap on tablets)', () => {
   const pkg = week();
   expect(validatePackage(pkg)).toEqual([]);
-  expect(packageToRows(pkg).quests[1].data).toEqual({});
+  expect(packageToRows(pkg).quests[1].data).toEqual({ bank: ['go', 'went', 'gone'] });
+  delete (pkg.days[0].quests[1] as { bank?: string[] }).bank;
+  expect(validatePackage(pkg).join()).toContain('days[0].quests[1].bank: 2 bis 6 verschiedene Wörter');
+});
+it('rejects a word bank without a correct answer to tap', () => {
+  const pkg = week();
+  Object.assign(pkg.days[0].quests[1], { bank: ['go', 'gone', 'goes'] });
+  expect(validatePackage(pkg)).toContain('days[0].quests[1].bank: muss eine richtige Lösung enthalten');
+  Object.assign(pkg.days[0].quests[1], { bank: ['go', ' Went '] });
+  expect(validatePackage(pkg)).toEqual([]);
 });

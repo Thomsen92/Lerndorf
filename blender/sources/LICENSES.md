@@ -95,3 +95,21 @@ Die goldene Tafelkontur und der Hinweis-Button sind eigene Geometrie/UI. Der Sir
 - Kürbisse, Grabstein und Gruselfiguren verwenden vorhandene Kenney-Graveyard-Assets (CC0), siehe bestehende Kenney-Quellen in dieser Datei und `web/public/assets/kenney/graveyard/LICENSE.txt`. Aufgelistete tatsächlich verwendete Modelle: pumpkin-carved, gravestone-round, character-zombie, character-skeleton, character-vampire, character-keeper.
 - `web/public/assets/halloween/halloween-shop-event.glb` ist das vom Nutzer ausdrücklich zur Verwendung beauftragte Ensemble aus seinen drei gelieferten GLBs (Halloween-Shop, nur die größte Halloween-Katze und Candy Cauldron davor). Keine CC0-Angabe für diese Fremdmodelle bekannt; keine eigene CC0-Erklärung für deren Geometrie/Texturen. Quellen, SHA-256-Hashes und Ableitung unter `Prototyp/marktplatz/sources/season-starter/LICENSES.md`, Runtime-Metadaten in `web/public/assets/halloween/credits.json`.
 - Die Originale und der benchte eigene Stand bleiben im Prototyp erhalten. Runtime-Maps des Event-Shops maximal 1.024 px; 19.818 Dreiecke, drei Material-Primitives. Kein automatischer Loot-/Shop-Katalogeintrag durch die Weltdekoration.
+
+## Musik und Klänge (28.10.2026)
+
+| Datei | Herkunft | Lizenz | Verwendung |
+| --- | --- | --- | --- |
+| `web/public/assets/audio/music/mischief-managed-loop.mp3` | vom Auftraggeber geliefert („Mischief_Managed_loop.mp3“) | Nutzung durch den Auftraggeber freigegeben; Quelle/Lizenz beim Auftraggeber, **vor Veröffentlichung bestätigen** | Hintergrundmusik im Dorf |
+| `web/public/assets/audio/music/quiz-thinking-loop.mp3` | vom Auftraggeber geliefert | wie oben | Musik in Quizfenstern |
+| `web/public/assets/audio/sfx/success.mp3`, `error.mp3` | vom Auftraggeber geliefert | wie oben | richtige/falsche Antwort |
+| `web/public/assets/audio/sfx/dialog-blip.mp3` | vom Auftraggeber geliefert („Dialog_blip-131856“, vermutlich Pixabay) | wie oben | neue Sprechblase |
+| `web/public/assets/audio/sfx/dialog-typing.mp3` | vom Auftraggeber geliefert | wie oben | Tippgeräusch bei Zeilen ohne Aufnahme |
+| `web/public/assets/audio/sfx/chest-open.mp3`, `level-up.mp3` | vom Auftraggeber geliefert („LockChime_2.wav“, „LockChime_1.wav“), in MP3 umgewandelt | wie oben | Truhe öffnen, Level-up (die Kenney-Klänge bleiben im Repo) |
+| `web/public/assets/audio/sfx/victory-fanfare.mp3` | eigene Komposition, synthetisch erzeugt mit `web/scripts/audio/make-victory-fanfare.py` (keine Samples) | CC0 | großes „Success!“ am Ende der Daily Quests und des Spooky English Quiz |
+
+## Schrift „Creepster“ (28.10.2026)
+
+| Datei | Herkunft | Lizenz | Verwendung |
+| --- | --- | --- | --- |
+| `web/public/fonts/Creepster-Regular.woff2` | Font Diner, Inc. (über Fontsource 5.3.0, Teilmenge latin) | SIL Open Font License 1.1, Text in `web/public/fonts/Creepster-OFL.txt` | Titel und Ergebnis im Spooky English Quiz; lokal ausgeliefert, kein Abruf bei Google |

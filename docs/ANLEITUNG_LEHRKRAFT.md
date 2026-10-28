@@ -237,7 +237,7 @@ Migrationen 0019, 0020 und 0021 sind bereits online (am 26.10.2026 geprüft). Da
 
 ## Daily Quests einspielen
 
-Seit Oktober 2026 gibt es statt der Wochenaufgaben **Daily Quests**: jeden Tag (auch am Wochenende) 3 kurze Englisch-Aufgaben. Die Schüler öffnen sie mit dem Knopf **Aufgaben** oder durch Antippen der Tafel am Marktplatz. Was von gestern noch offen ist, steht darunter unter „Nachholen von gestern“ und bringt die halben Münzen. Versuche sind unbegrenzt, Münzen gibt es aber nur, wenn die richtige Antwort unter den ersten 3 Versuchen ist.
+Seit Oktober 2026 gibt es statt der Wochenaufgaben **Daily Quests**: jeden Tag (auch am Wochenende) 3 kurze Englisch-Aufgaben. Die Schüler öffnen sie mit dem Knopf **Aufgaben** oder durch Antippen der Tafel am Marktplatz. Was von gestern noch offen ist, steht darunter unter „Nachholen von gestern“ und bringt die halben Münzen. Versuche sind unbegrenzt. Wer im 1. oder 2. Versuch richtig liegt, bekommt die vollen Münzen, danach gibt es die Hälfte (aufgerundet). Alles wird auf dem Tablet nur angetippt: Antwort-Kacheln, bei Lücken eine Wortbank, beim Zuordnen erst ein Wort und dann sein Partner, beim Satzbau die Wörter der Reihe nach. Ein „Prüfen“-Knopf ist nicht nötig. Wenn du neue Wochen schreibst: Jede Lücke braucht jetzt eine `bank` mit 2–6 Wörtern (siehe `content/daily-quests/FORMAT.md`).
 
 ### Wer schreibt die Quests?
 
@@ -426,11 +426,17 @@ Eine Saison ist ein Zeitraum von etwa sechs Wochen mit 40 Stufen. In Season I (2
 
 ### Was die Schüler tun
 
-1. **Quests lösen** – jede Buchung im Saisonfenster zählt als Season-XP.
-2. **Stufen abholen** – erreichte Stufen leuchten orange; „Abholen“ gibt Münzen, Truhen, Titel, Rahmen oder eine Gartenszene.
-3. **Truhen öffnen** – im Inventar unter „Season-Truhen“. Pass-Truhen kommen auf Stufe 5, 10, 15, …, 40; die **Truhen-Serie** gibt zusätzlich eine Truhe an jedem dritten Tag in Folge mit gelöster Quest; im Shop gibt es **zwei Truhen pro Woche für je 50 Münzen**.
-4. **Stufe 40** – Truhe, Titel „Halloween Legend“, 25 Münzen und eine **freie Wahl** aus den 28 Truhen-Gegenständen. Wer den Gegenstand schon besitzt, bekommt stattdessen seinen Verkaufswert in Münzen.
-5. **Doppelte verkaufen** – im Inventar bei den Season-Gegenständen. Nur unplatzierte Exemplare, Werte: 15 / 40 / 100 / 250 Münzen je Seltenheit.
+1. **Spooky English Quiz** – am Halloween-Stand oder über das „Season I“-Ticket im Dorf: zehn Klickfragen (Odd one out, Steigerung, BE/AE, vier Hörfragen). Je erste richtige Antwort 10 XP, nach allen zehn 50 XP Bonus – zusammen **genau 150 XP = Stufe 5**, einmal pro Saison, ohne Stempel. Falsche Antworten geben einen Tipp und kosten nichts.
+2. **Quests lösen** – jede Buchung im Saisonfenster zählt als Season-XP.
+3. **Stufen abholen** – erreichte Stufen leuchten orange; „Abholen“ gibt Münzen, Truhen, Titel, Rahmen oder eine Gartenszene.
+4. **Truhen öffnen** – im Inventar unter „Season-Truhen“. Pass-Truhen kommen auf Stufe 5, 10, 15, …, 40; die **Truhen-Serie** gibt zusätzlich eine Truhe an jedem dritten Tag in Folge mit gelöster Quest; im Shop gibt es **zwei Truhen pro Woche für je 50 Münzen**.
+5. **Stufe 40** – Truhe, Titel „Halloween Legend“, 25 Münzen und eine **freie Wahl** aus den 28 Truhen-Gegenständen. Wer den Gegenstand schon besitzt, bekommt stattdessen seinen Verkaufswert in Münzen.
+6. **Was ist drin?** – in der Truhen-Übersicht jeden Gegenstand antippen: Er erscheint groß in 3D zum Drehen und Zoomen. Das ist nur eine Vorschau, es wird nichts geöffnet oder gekauft.
+7. **Doppelte verkaufen** – im Inventar bei den Season-Gegenständen. Nur unplatzierte Exemplare, Werte: 15 / 40 / 100 / 250 Münzen je Seltenheit.
+
+### Musik und Klänge
+
+Im Dorf läuft leise Hintergrundmusik, in den Quizfenstern eine ruhigere Denk-Musik. Richtige und falsche Antworten haben einen eigenen Klang, Sir Byte „blippt“ bei jeder neuen Sprechblase. Unter **Einstellungen** lassen sich **Musik** und **Töne** getrennt ausschalten; das merkt sich jedes Gerät.
 
 ### Saison steuern (Lehrerbereich)
 
@@ -473,13 +479,15 @@ Profil öffnen und unten auf **Sammelkarten** tippen. Zuerst erscheint der Alman
 
 ### Neue Datenbank-Migrationen
 
-Für diese Funktion kommen drei neue Migrationen dazu:
+Für diese Funktionen kommen fünf neue Migrationen dazu:
 
 | Migration | Inhalt |
 | --- | --- |
 | `0034_class_world_theme.sql` | Weltstimmung je Klasse und Welcome-Quittung |
 | `0049_collection_cards.sql` | Kartendefinitionen, Besitz, serverseitige Vergabe |
 | `0050_collection_chest_rewards.sql` | feste Passkarten, Truhen-Kartenbonus (aus), Nachbuchung |
+| `0051_season_starter.sql` | Spooky English Quiz: zehn Fragen, Fortschritt, 150 XP einmal pro Saison |
+| `0052_season_item_rarities.sql` | Kürbismädchen und Hexen-Statue werden Episch, das Kürbisfeld Selten |
 
 Sie werden – wie alle Migrationen – beim Merge nach `main` automatisch eingespielt. Vorher nichts von Hand in Supabase ausführen. Nach der Live-Prüfung friert der technische Lauf die Migrationen mit `npm run migrations:lock` ein. Der Branch `codex/halloween-collection` ist bewusst **noch nicht gepusht**.
 

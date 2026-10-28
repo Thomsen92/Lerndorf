@@ -64,6 +64,8 @@ export default {
         if (!ctx.alive()) return;
         savedTheme = result;
         themeChoice.value = result.requestedTheme;
+        const summary = root.querySelector<HTMLElement>('#worldThemeSummary');
+        if (summary) summary.textContent = themeSummary(result);
         themeStatus.className = 'hint';
         themeStatus.textContent = themeMessage(result);
         status(themeStatus.textContent);
@@ -146,15 +148,8 @@ export default {
 
 function worldThemeSection(classId: string, state: WorldThemeState | null): string {
   const season = state?.seasonLabel
-    ? `Season ${esc(state.seasonLabel)}${state.seasonState === 'upcoming' ? ' (geplant)' : ''}`
+    ? `${esc(state.seasonLabel)}${state.seasonState === 'upcoming' ? ' (geplant)' : ''}`
     : 'keine Saison';
-  const effective = state
-    ? state.effectiveTheme === 'halloween'
-      ? 'Halloween ist aktiv.'
-      : state.requestedTheme === 'halloween'
-        ? 'Halloween ist vorgemerkt und wirkt, sobald die Season läuft.'
-        : 'Normal ist aktiv.'
-    : '';
   return `<section aria-labelledby="worldThemeTitle"><h2 id="worldThemeTitle">Weltstimmung</h2>
     <p class="hint">Ändert nur die Dorfstimmung dieser Klasse. LearnPass und Saisonzeitraum werden hier nicht verändert. Saison: ${season}.</p>
     ${
@@ -165,11 +160,22 @@ function worldThemeSection(classId: string, state: WorldThemeState | null): stri
         <option value="halloween" ${state.requestedTheme === 'halloween' ? 'selected' : ''}>Season I – Halloween</option>
       </select></label><button type="submit">Weltstimmung speichern</button>
     </form>
-    <p class="hint">Angefordert: ${state.requestedTheme === 'halloween' ? 'Halloween' : 'Normal'} · Revision ${state.revision}. ${effective}</p>
+    <p id="worldThemeSummary" class="hint">${themeSummary(state)}</p>
     <p id="worldThemeStatus" class="hint" role="status" aria-live="polite"></p>`
         : '<p class="error" role="status">Weltstimmung konnte nicht geladen werden.</p><button type="button" data-world-theme-retry>Erneut laden</button>'
     }
     </section>`;
+}
+
+/** Requested and effective world; redrawn after every save so it never contradicts the status line. */
+function themeSummary(state: WorldThemeState): string {
+  const effective =
+    state.effectiveTheme === 'halloween'
+      ? 'Halloween ist aktiv.'
+      : state.requestedTheme === 'halloween'
+        ? 'Halloween ist vorgemerkt und wirkt, sobald die Season läuft.'
+        : 'Normal ist aktiv.';
+  return `Angefordert: ${state.requestedTheme === 'halloween' ? 'Halloween' : 'Normal'} · Revision ${state.revision}. ${effective}`;
 }
 
 function themeMessage(state: WorldThemeState): string {

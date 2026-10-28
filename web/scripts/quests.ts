@@ -62,8 +62,15 @@ function validateTypeFields(q: Record<string, unknown>, type: QuestType, where: 
     }
   };
   const gapFields = () => {
-    if (q.bank !== undefined && (!isStrList(q.bank, 2, 6) || new Set(q.bank).size !== q.bank.length)) {
-      errors.push(`${where}.bank: 2 bis 6 verschiedene Wörter`);
+    // since 28.10.2026 every gap is answered with one tap on its word bank (tablets, no typing)
+    if (!isStrList(q.bank, 2, 6) || new Set(q.bank).size !== q.bank.length) {
+      errors.push(`${where}.bank: 2 bis 6 verschiedene Wörter (Pflicht, zum Antippen)`);
+    } else if (isStrList(q.solution, 1, 10)) {
+      const norm = (t: string) => t.trim().toLowerCase().replace(/\s+/g, ' ');
+      const solutions = new Set(q.solution.map(norm));
+      if (!q.bank.some((w) => solutions.has(norm(w)))) {
+        errors.push(`${where}.bank: muss eine richtige Lösung enthalten`);
+      }
     }
     if (!isStrList(q.solution, 1, 10)) errors.push(`${where}.solution: Liste mit mindestens einer Lösung`);
     if (typeof q.prompt === 'string' && !q.prompt.includes(GAP)) {

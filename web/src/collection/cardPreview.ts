@@ -36,6 +36,8 @@ export function openCardPreview(opts: CardPreviewOptions): CardPreviewHandle {
     onClose: () => release(),
   });
   modal.body.classList.add('card-preview');
+  // The preview opens above the card detail: a darker backdrop keeps the detail's text from showing through.
+  modal.body.closest('.overlay')?.classList.add('card-preview-overlay');
   const stage = document.createElement('div');
   stage.className = 'card-preview-stage';
   const canvas = document.createElement('canvas');

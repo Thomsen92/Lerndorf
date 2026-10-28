@@ -347,6 +347,13 @@ function tub(layout: Layout, angle: number): THREE.Group {
   return g;
 }
 
+/** Same places as the normal stalls; awnings in night purple, pumpkin orange and moss green. */
+const HALLOWEEN_STALLS = (layout: Layout): Array<[number, string]> => [
+  [layout.map.boardAngle + 1.4, '#5b3d8c'],
+  [layout.map.boardAngle + 2.6, '#c8641e'],
+  [layout.map.boardAngle + 3.8, '#4f6b3a'],
+];
+
 /** The whole plaza as one group. The caller adds it to the village. */
 export function buildPlaza(layout: Layout): THREE.Group {
   const root = new THREE.Group();
@@ -354,8 +361,20 @@ export function buildPlaza(layout: Layout): THREE.Group {
   normalSeason.name = 'normalSeasonPlaza';
   normalSeason.userData.bakeStatic = false;
   root.add(normalSeason);
+  // Halloween keeps the Kenney stalls of the normal plaza (teacher, 28.10.2026), only in season
+  // colours and with pumpkins on every counter. Built on the first switch, then just shown/hidden.
+  let halloweenStalls: THREE.Group | null = null;
   root.userData.setSeasonTheme = (theme: 'normal' | 'halloween'): void => {
     normalSeason.visible = theme === 'normal';
+    if (theme === 'halloween' && !halloweenStalls) {
+      halloweenStalls = new THREE.Group();
+      halloweenStalls.name = 'halloweenStalls';
+      halloweenStalls.userData.bakeStatic = false;
+      for (const [angle, stripe] of HALLOWEEN_STALLS(layout))
+        halloweenStalls.add(stall(layout, angle, 5.0, stripe, ['#f2994a', '#e2703a', '#f2994a'], 'pumpkins'));
+      root.add(halloweenStalls);
+    }
+    if (halloweenStalls) halloweenStalls.visible = theme === 'halloween';
   };
   const y = layout.plazaHeight;
 

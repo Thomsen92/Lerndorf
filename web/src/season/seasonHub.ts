@@ -8,6 +8,8 @@ import './seasonHub.css';
 export interface SeasonHubOptions {
   host: HTMLElement;
   openLearnPass: () => void;
+  /** Opens the Spooky English Quiz (package S3); without it the button stays locked. */
+  openQuiz?: () => void;
   canOpen: () => boolean;
   track?: (modal: ModalHandle) => void;
   /** Called once per shown welcome; the server stores the seen flag (plan package 7). */
@@ -87,8 +89,15 @@ export function createSeasonHub(opts: SeasonHubOptions): SeasonHub {
     const quiz = document.createElement('button');
     quiz.type = 'button';
     quiz.className = 'season-world-quiz';
-    quiz.disabled = true;
-    quiz.textContent = tr('Spooky English Quiz · bald verfügbar');
+    quiz.dataset.openQuiz = '';
+    const upcoming = state?.seasonState === 'upcoming';
+    quiz.disabled = !opts.openQuiz || upcoming || !state?.seasonId;
+    quiz.textContent = upcoming ? tr('Spooky English Quiz · ab Season-Start') : tr('Spooky English Quiz');
+    quiz.addEventListener('click', () => {
+      // close first: no stacked dialogs; the quiz returns focus to the ticket
+      modal?.close();
+      opts.openQuiz?.();
+    });
     const pass = document.createElement('button');
     pass.type = 'button';
     pass.className = 'primary';
@@ -104,7 +113,7 @@ export function createSeasonHub(opts: SeasonHubOptions): SeasonHub {
     back.addEventListener('click', () => modal?.close());
     const actions = document.createElement('div');
     actions.className = 'season-world-actions';
-    actions.append(pass, quiz, back);
+    actions.append(quiz, pass, back);
     modal.body.append(art, intro, season, actions);
     if (state?.seasonState === 'running' && state.seasonId) pendingAck = state.seasonId;
   }

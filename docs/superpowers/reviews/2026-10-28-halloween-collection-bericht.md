@@ -48,3 +48,23 @@ Pakete 4–5 (Welt-Rendering) waren als uncommittete Vorarbeit vorhanden und wur
 - Schritt-für-Schritt: `docs/ANLEITUNG_LEHRKRAFT.md` → „Weltstimmung: Normal oder Halloween“, „Sammelkarten: The Midnight Collection“, „Neue Datenbank-Migrationen“.
 - Technische Regeln: `docs/SPEC.md` §13.2 und §14a.
 - Nach Merge nach `main` spielt die CI die Migrationen automatisch ein; danach `npm run migrations:lock`.
+
+## Nachkorrektur 28.10.2026 (Review)
+
+- **Truhen-Karten:** `open_season_chest` (Migration 0050, noch nicht eingespielt) sperrt jetzt zuerst den Spieler und erst danach die Truhe. Zwei gleichzeitig geöffnete Truhen können so nicht mehr dieselbe Karte ziehen. `awarded` wird nur gemeldet, wenn die Vergabe wirklich neu war.
+- **Gewichte je Seltenheit:** Epic- und Legendary-Gewicht werden nicht mehr mit der Zahl der verbleibenden Karten multipliziert.
+- **Lehrerseite:** Die Zeile „Angefordert … Revision …“ aktualisiert sich nach dem Speichern; „Season Season I“ korrigiert.
+- **Kartenvorschau:** Deckender Hintergrund, die Kartendetails scheinen nicht mehr unter der 3D-Ansicht hervor.
+- **Vorschauseite `dev/season-world.html`:** Knöpfe zeigen die tatsächlich aktive Stimmung, Zählwerte erst nach dem nächsten Bild.
+- Nachweise: `npm test` 192 Dateien / 1149 Tests grün (3 neue Tests), Typecheck, ESLint, Prettier, `migrations:check` grün; Playwright `collection` und `halloween-world` 3/3 grün; Screenshots angesehen.
+
+## Nachtrag 28.10.2026: Spooky English Quiz und „What's in it?“ in 3D (Claude)
+
+- **Quiz (S2/S3):** Migration `0051_season_starter.sql` (noch nicht eingespielt), Import `npm run import:starter`, API `web/src/api/seasonStarter.ts`, Ansicht `web/src/season/spookyQuizView.ts`, Hub-Button aktiv bei laufender Season, vier MP3s unter `web/public/assets/listening/`. Harness `web/dev/spooky-quiz.html`.
+- **3D-Ansicht:** `web/src/ui/item3dPreview.ts`, `web/src/render/itemOrbitView.ts`, antippbare Liste in `insideModal.ts`.
+- **Nachweise:** `npm test` 197 Dateien / 1185 Tests grün (u. a. 8 SQL-, 3 API-, 11 Quiz-, 5 Seed-, 7 3D-Tests), Typecheck, ESLint (`src tests`), Build, `migrations:check`; Playwright `spooky-season` 2/2, `season-item-preview` 1/1, `collection` und `halloween-world` weiter grün, Smoke 2/2; Bundle ohne Lösungen/Tipps geprüft; Screenshots angesehen.
+- **Offen:** Hörclips auf einem echten Schul-iPad und Tablet-Bedienung am Gerät prüfen; Desktop-Chromium ersetzt das nicht. Die Halloween-Weltebene (Pakete 4–5) stammt laut Lehrkraft aus der GPT-Vorarbeit.
+
+## Nachtrag 28.10.2026 nachmittags: Wünsche der Lehrkraft (Claude)
+
+Seltenheiten (Migration 0052, noch nicht eingespielt), Sir Byte im Spooky Quiz, neues Ticket ohne Kürbis, Kenney-Stände im Halloween-Markt, Musik/Klänge (siehe SPEC §13.3a/b). Nachweise: `npm test` 198 Dateien / 1196 Tests, Typecheck, ESLint, Build, `migrations:check`; Playwright `spooky-season`, `season-item-preview`, `collection`, `halloween-world`, `daily-quests` grün; Screenshots Markt (Halloween 249 / Normal 218 Draw Calls), Quiz mit Sir Byte (Tablet/Handy), Ticket angesehen. Offen: Klang auf dem Schul-iPad hören; Lizenz der Audiodateien bestätigen.

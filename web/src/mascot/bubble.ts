@@ -1,5 +1,6 @@
 import { tr } from '../i18n';
 import type { Say } from './sirByte';
+import { activeSound, type Sound } from '../ui/sound';
 import './mascot.css';
 type AvoidRect = { left: number; top: number; right: number; bottom: number };
 /** Place above the head, shifting upward past pupil speech and fixed controls. */
@@ -30,7 +31,25 @@ export function placeByteBubble(
   }
   return { left, top };
 }
-export function createByteBubble(host: HTMLElement) {
+/** How long the typing sound runs under an unvoiced line: the mouth animation's length (sirByte). */
+export const typingSeconds = (text: string): number => Math.min(5, 1 + text.length * 0.045);
+
+/**
+ * Speech bubble of Sir Byte. Every new line pops with a blip; a line without a recording plays
+ * the typing sound while Sir Byte "talks" (teacher's sound set, 28.10.2026).
+ */
+export function createByteBubble(
+  host: HTMLElement,
+  opts: { sound?: () => Pick<Sound, 'play' | 'playFor'> | null } = {},
+) {
+  const sfx = opts.sound ?? activeSound;
+  let stopTyping: (() => void) | null = null;
+  const speak = (line: string, voiced: boolean, fresh: boolean): void => {
+    const sound = sfx();
+    if (!sound) return;
+    if (fresh) sound.play('blip');
+    if (!voiced) stopTyping = sound.playFor('typing', typingSeconds(line));
+  };
   const el = document.createElement('aside');
   el.className = 'byte-bubble';
   const label = document.createElement('span');
@@ -47,6 +66,8 @@ export function createByteBubble(host: HTMLElement) {
     resolveAsk: (() => void) | null = null;
   const hide = (): void => {
     clearTimeout(timer);
+    stopTyping?.();
+    stopTyping = null;
     el.hidden = true;
     el.querySelector('button')?.remove();
     resolveAsk?.();
@@ -55,16 +76,21 @@ export function createByteBubble(host: HTMLElement) {
   return {
     el,
     show(say: Say, sticky = false) {
+      // the same line again (text first, then the recording) is no new line: no second blip
+      const fresh = el.hidden || text.textContent !== say.text;
       hide();
       if (!say.text) return;
       text.textContent = say.text;
       el.hidden = false;
+      speak(say.text, say.voiced, fresh);
       if (!sticky) timer = window.setTimeout(hide, say.seconds * 1000);
     },
     ask(value: string): Promise<void> {
+      const fresh = el.hidden || text.textContent !== value;
       hide();
       text.textContent = value;
       el.hidden = false;
+      speak(value, false, fresh);
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'primary tutorial-action';
