@@ -25,7 +25,7 @@
                       "triangles":  5672,
                       "name":  "Kürbisfeld",
                       "bytes":  396572,
-                      "rarity":  "epic",
+                      "rarity":  "rare",
                       "file":  "pumpkin-patch.glb"
                   },
                   {
@@ -57,7 +57,7 @@
                       "triangles":  9681,
                       "name":  "Hexe (Statue)",
                       "bytes":  173952,
-                      "rarity":  "rare",
+                      "rarity":  "epic",
                       "file":  "witch.glb"
                   },
                   {
@@ -65,7 +65,7 @@
                       "triangles":  18328,
                       "name":  "Kürbismädchen",
                       "bytes":  418304,
-                      "rarity":  "rare",
+                      "rarity":  "epic",
                       "file":  "pumpkin-girl.glb"
                   },
                   {

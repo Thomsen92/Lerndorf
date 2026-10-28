@@ -36,7 +36,8 @@ import {
 } from './messages';
 import { openQuiz, type QuizApi } from './quizView';
 import type { TutorialGuide } from '../../mascot/marketByte';
-import type { Sound } from '../sound';
+import { activeSound, type Sound } from '../sound';
+import { typingSeconds } from '../../mascot/bubble';
 
 /** The RPCs the flow needs; the default talks to Supabase, tests pass fakes. */
 export interface TutorialApi extends QuizApi {
@@ -180,6 +181,10 @@ function createUi(signal: AbortSignal | undefined, village: () => TutorialVillag
       const el = createBubble(text, mood);
       el.classList.add('tutorial-bubble');
       document.body.appendChild(el);
+      // the figure's own line has no recording: blip, then the typing sound while it "speaks"
+      const sfx = activeSound();
+      sfx?.play('blip');
+      const stopTyping = sfx?.playFor('typing', typingSeconds(text));
       let frame = 0;
       const place = (): void => {
         const at = village()?.figureScreen() ?? null;
@@ -193,6 +198,7 @@ function createUi(signal: AbortSignal | undefined, village: () => TutorialVillag
       loop();
       return own(() => {
         if (frame) window.cancelAnimationFrame?.(frame);
+        stopTyping?.();
         el.remove();
       });
     },

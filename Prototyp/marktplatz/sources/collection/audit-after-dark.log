@@ -1,0 +1,517 @@
+18:52:12 | INFO: Data are loaded, start creating Blender stuff
+18:52:12 | INFO: Blender create Mesh node Cube.006
+18:52:12 | INFO: Blender create Mesh node Cube.001
+18:52:12 | INFO: Blender create Mesh node Cube.002
+18:52:12 | INFO: Blender create Mesh node Two readable printed sides
+18:52:12 | INFO: Blender create Mesh node Cylinder
+18:52:12 | INFO: glTF import finished in 0.02s
+C:\Users\Thomas\Projekte\Wochenpläne 8r\Lerndorf\Prototyp\marktplatz\sources\collection\audit-cards.py:24: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  if mat.use_nodes:
+18:52:12 | INFO: Data are loaded, start creating Blender stuff
+18:52:12 | INFO: Blender create Mesh node Cube.012
+18:52:12 | INFO: Blender create Mesh node Cube.013
+18:52:12 | INFO: Blender create Mesh node Two readable printed sides.001
+18:52:12 | INFO: Blender create Mesh node Icosphere
+18:52:12 | INFO: Blender create Mesh node Cylinder.002
+18:52:13 | INFO: Blender create Mesh node Cylinder.001
+18:52:13 | INFO: glTF import finished in 0.02s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.017
+18:52:13 | INFO: Blender create Mesh node Cube.018
+18:52:13 | INFO: Blender create Mesh node Ghost silhouette
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.002
+18:52:13 | INFO: Blender create Mesh node Cylinder.004
+18:52:13 | INFO: glTF import finished in 0.01s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.022
+18:52:13 | INFO: Blender create Mesh node Cube.023
+18:52:13 | INFO: Blender create Mesh node Cylinder.008
+18:52:13 | INFO: Blender create Mesh node Icosphere.013
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.003
+18:52:13 | INFO: Blender create Mesh node Cylinder.005
+18:52:13 | INFO: glTF import finished in 0.02s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.027
+18:52:13 | INFO: Blender create Mesh node Cube.028
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.004
+18:52:13 | INFO: Blender create Mesh node Cylinder.028
+18:52:13 | INFO: glTF import finished in 0.01s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.032
+18:52:13 | INFO: Blender create Mesh node Cube.033
+18:52:13 | INFO: Blender create Mesh node Open book left
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.005
+18:52:13 | INFO: Blender create Mesh node Cylinder.077
+18:52:13 | INFO: Blender create Mesh node Icosphere.016
+18:52:13 | INFO: glTF import finished in 0.01s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.037
+18:52:13 | INFO: Blender create Mesh node Cube.038
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.006
+18:52:13 | INFO: Blender create Mesh node Cylinder.078
+18:52:13 | INFO: Blender create Mesh node Icosphere.018
+18:52:13 | INFO: glTF import finished in 0.02s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.042
+18:52:13 | INFO: Blender create Mesh node Icosphere.020
+18:52:13 | INFO: Blender create Mesh node Cube.043
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.007
+18:52:13 | INFO: Blender create Mesh node Cylinder.079
+18:52:13 | INFO: Blender create Mesh node Cylinder.080
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.047
+18:52:13 | INFO: Blender create Mesh node Cube.048
+18:52:13 | INFO: Blender create Mesh node Open book left.002
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.008
+18:52:13 | INFO: Blender create Mesh node Cylinder.088
+18:52:13 | INFO: Blender create Mesh node Icosphere.028
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.052
+18:52:13 | INFO: Blender create Mesh node Icosphere.030
+18:52:13 | INFO: Blender create Mesh node Cube.053
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.009
+18:52:13 | INFO: Blender create Mesh node Cylinder.089
+18:52:13 | INFO: Blender create Mesh node Cylinder.090
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.057
+18:52:13 | INFO: Blender create Mesh node Cube.058
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.010
+18:52:13 | INFO: Blender create Mesh node Cylinder.098
+18:52:13 | INFO: glTF import finished in 0.02s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.068
+18:52:13 | INFO: Blender create Mesh node Cube.062
+18:52:13 | INFO: Blender create Mesh node Cube.063
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.011
+18:52:13 | INFO: Blender create Mesh node Cylinder.105
+18:52:13 | INFO: Blender create Mesh node Walking boot
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.075
+18:52:13 | INFO: Blender create Mesh node Cube.076
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.012
+18:52:13 | INFO: Blender create Mesh node Cylinder.106
+18:52:13 | INFO: Blender create Mesh node Speech bubble
+18:52:13 | INFO: glTF import finished in 0.02s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.080
+18:52:13 | INFO: Blender create Mesh node Cube.081
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.013
+18:52:13 | INFO: Blender create Mesh node Cylinder.107
+18:52:13 | INFO: Blender create Mesh node Icosphere.044
+18:52:13 | INFO: Blender create Mesh node Cylinder.108
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.087
+18:52:13 | INFO: Blender create Mesh node Icosphere.046
+18:52:13 | INFO: Blender create Mesh node Cube.088
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.014
+18:52:13 | INFO: Blender create Mesh node Cylinder.120
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.092
+18:52:13 | INFO: Blender create Mesh node Cube.093
+18:52:13 | INFO: Blender create Mesh node Icosphere.056
+18:52:13 | INFO: Blender create Mesh node Icosphere.059
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.015
+18:52:13 | INFO: Blender create Mesh node Cylinder.125
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.097
+18:52:13 | INFO: Blender create Mesh node Cube.098
+18:52:13 | INFO: Blender create Mesh node Cylinder.129
+18:52:13 | INFO: Blender create Mesh node Torus.026
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.016
+18:52:13 | INFO: Blender create Mesh node Cylinder.128
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.102
+18:52:13 | INFO: Blender create Mesh node Cube.103
+18:52:13 | INFO: Blender create Mesh node Friendship heart
+18:52:13 | INFO: Blender create Mesh node Cylinder.132
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.017
+18:52:13 | INFO: Blender create Mesh node Cylinder.131
+18:52:13 | INFO: glTF import finished in 0.02s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.107
+18:52:13 | INFO: Blender create Mesh node Cube.108
+18:52:13 | INFO: Blender create Mesh node Cube.112
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.018
+18:52:13 | INFO: Blender create Mesh node Cylinder.134
+18:52:13 | INFO: glTF import finished in 0.02s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.116
+18:52:13 | INFO: Blender create Mesh node Cube.117
+18:52:13 | INFO: Blender create Mesh node Icosphere.070
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.019
+18:52:13 | INFO: Blender create Mesh node Cylinder.135
+18:52:13 | INFO: Blender create Mesh node Icosphere.071
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.121
+18:52:13 | INFO: Blender create Mesh node Cube.122
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.020
+18:52:13 | INFO: Blender create Mesh node Icosphere.084
+18:52:13 | INFO: Blender create Mesh node Cylinder.140
+18:52:13 | INFO: Blender create Mesh node Umbrella canopy
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.126
+18:52:13 | INFO: Blender create Mesh node Cube.127
+18:52:13 | INFO: Blender create Mesh node Icosphere.088
+18:52:13 | INFO: Blender create Mesh node Mouse face
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.021
+18:52:13 | INFO: Blender create Mesh node Cylinder.143
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.131
+18:52:13 | INFO: Blender create Mesh node Icosphere.098
+18:52:13 | INFO: Blender create Mesh node Cube.132
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.022
+18:52:13 | INFO: Blender create Mesh node Cylinder.144
+18:52:13 | INFO: Blender create Mesh node Cylinder.145
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:13 | INFO: Data are loaded, start creating Blender stuff
+18:52:13 | INFO: Blender create Mesh node Cube.142
+18:52:13 | INFO: Blender create Mesh node Cube.141
+18:52:13 | INFO: Blender create Mesh node Cube.136
+18:52:13 | INFO: Blender create Mesh node Cube.137
+18:52:13 | INFO: Blender create Mesh node Two readable printed sides.023
+18:52:13 | INFO: Blender create Mesh node Cylinder.147
+18:52:13 | INFO: glTF import finished in 0.03s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.153
+18:52:14 | INFO: Blender create Mesh node Cube.154
+18:52:14 | INFO: Blender create Mesh node Megaphone horn
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.024
+18:52:14 | INFO: Blender create Mesh node Cylinder.148
+18:52:14 | INFO: Blender create Mesh node Cylinder.150
+18:52:14 | INFO: glTF import finished in 0.03s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.160
+18:52:14 | INFO: Blender create Mesh node Cylinder.159
+18:52:14 | INFO: Blender create Mesh node Feather vane
+18:52:14 | INFO: Blender create Mesh node Cube.161
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.025
+18:52:14 | INFO: Blender create Mesh node Cylinder.157
+18:52:14 | INFO: glTF import finished in 0.03s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.165
+18:52:14 | INFO: Blender create Mesh node Cube.166
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.026
+18:52:14 | INFO: Blender create Mesh node Cylinder.170
+18:52:14 | INFO: Blender create Mesh node Icosphere.104
+18:52:14 | INFO: glTF import finished in 0.04s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.178
+18:52:14 | INFO: Blender create Mesh node Cube.179
+18:52:14 | INFO: Blender create Mesh node Cylinder.174
+18:52:14 | INFO: Blender create Mesh node Icosphere.111
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.027
+18:52:14 | INFO: Blender create Mesh node Cylinder.171
+18:52:14 | INFO: glTF import finished in 0.06s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.183
+18:52:14 | INFO: Blender create Mesh node Cube.184
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.028
+18:52:14 | INFO: Blender create Mesh node Cylinder.194
+18:52:14 | INFO: Blender create Mesh node Ruby shield inset
+18:52:14 | INFO: Blender create Mesh node Icosphere.114
+18:52:14 | INFO: glTF import finished in 0.04s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Book left page.002
+18:52:14 | INFO: Blender create Mesh node Cube.188
+18:52:14 | INFO: Blender create Mesh node Cube.189
+18:52:14 | INFO: Blender create Mesh node Icosphere.116
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.029
+18:52:14 | INFO: Blender create Mesh node Cylinder.195
+18:52:14 | INFO: glTF import finished in 0.04s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cone.003
+18:52:14 | INFO: Blender create Mesh node Cube.193
+18:52:14 | INFO: Blender create Mesh node Cone
+18:52:14 | INFO: Blender create Mesh node Cube.194
+18:52:14 | INFO: Blender create Mesh node Icosphere.125
+18:52:14 | INFO: Blender create Mesh node Icosphere.120
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.030
+18:52:14 | INFO: Blender create Mesh node Cylinder.198
+18:52:14 | INFO: glTF import finished in 0.05s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.198
+18:52:14 | INFO: Blender create Mesh node Cone.008
+18:52:14 | INFO: Blender create Mesh node Cube.199
+18:52:14 | INFO: Blender create Mesh node Cone.009
+18:52:14 | INFO: Blender create Mesh node Icosphere.191
+18:52:14 | INFO: Blender create Mesh node Icosphere.186
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.031
+18:52:14 | INFO: Blender create Mesh node Cylinder.211
+18:52:14 | INFO: glTF import finished in 0.04s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.203
+18:52:14 | INFO: Blender create Mesh node Cone.012
+18:52:14 | INFO: Blender create Mesh node Cube.204
+18:52:14 | INFO: Blender create Mesh node Icosphere.237
+18:52:14 | INFO: Blender create Mesh node Icosphere.232
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.032
+18:52:14 | INFO: Blender create Mesh node Cylinder.226
+18:52:14 | INFO: glTF import finished in 0.05s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.220
+18:52:14 | INFO: Blender create Mesh node Cone.014
+18:52:14 | INFO: Blender create Mesh node Cube.221
+18:52:14 | INFO: Blender create Mesh node Icosphere.267
+18:52:14 | INFO: Blender create Mesh node Icosphere.262
+18:52:14 | INFO: Blender create Mesh node Cone.015
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.033
+18:52:14 | INFO: Blender create Mesh node Cylinder.237
+18:52:14 | INFO: glTF import finished in 0.04s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.225
+18:52:14 | INFO: Blender create Mesh node Cone.018
+18:52:14 | INFO: Blender create Mesh node Cube.226
+18:52:14 | INFO: Blender create Mesh node Icosphere.307
+18:52:14 | INFO: Blender create Mesh node Icosphere.302
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.034
+18:52:14 | INFO: Blender create Mesh node Cylinder.254
+18:52:14 | INFO: Blender create Mesh node Icosphere.332
+18:52:14 | INFO: glTF import finished in 0.03s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.230
+18:52:14 | INFO: Blender create Mesh node Cone.020
+18:52:14 | INFO: Blender create Mesh node Cube.231
+18:52:14 | INFO: Blender create Mesh node Icosphere.387
+18:52:14 | INFO: Blender create Mesh node Icosphere.382
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.035
+18:52:14 | INFO: Blender create Mesh node Cylinder.265
+18:52:14 | INFO: Blender create Mesh node Icosphere.393
+18:52:14 | INFO: glTF import finished in 0.03s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.237
+18:52:14 | INFO: Blender create Mesh node Cube.238
+18:52:14 | INFO: Blender create Mesh node Icosphere.418
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.036
+18:52:14 | INFO: Blender create Mesh node Icosphere.425
+18:52:14 | INFO: Blender create Mesh node Cylinder.294
+18:52:14 | INFO: Blender create Mesh node Icosphere.426
+18:52:14 | INFO: glTF import finished in 0.03s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.242
+18:52:14 | INFO: Blender create Mesh node Cone.024
+18:52:14 | INFO: Blender create Mesh node Cube.243
+18:52:14 | INFO: Blender create Mesh node Icosphere.457
+18:52:14 | INFO: Blender create Mesh node Icosphere.452
+18:52:14 | INFO: Blender create Mesh node Two readable printed sides.037
+18:52:14 | INFO: Blender create Mesh node Cylinder.315
+18:52:14 | INFO: glTF import finished in 0.04s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cube.009
+18:52:14 | INFO: Blender create Mesh node Torus.002
+18:52:14 | INFO: glTF import finished in 0.01s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Carved eye.002
+18:52:14 | INFO: Blender create Mesh node Icosphere.003
+18:52:14 | INFO: Blender create Mesh node Cylinder.003
+18:52:14 | INFO: glTF import finished in 0.01s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Icosphere.009
+18:52:14 | INFO: Blender create Mesh node Ghost silhouette.001
+18:52:14 | INFO: glTF import finished in 0.01s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Icosphere.014
+18:52:14 | INFO: Blender create Mesh node Cauldron lip.001
+18:52:14 | INFO: Blender create Mesh node Cylinder.019
+18:52:14 | INFO: Blender create Mesh node Icosphere.015
+18:52:14 | INFO: glTF import finished in 0.01s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Cylinder.053
+18:52:14 | INFO: glTF import finished in 0.01s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Bat wing.002
+18:52:14 | INFO: Blender create Mesh node Open book left.001
+18:52:14 | INFO: Blender create Mesh node Icosphere.017
+18:52:14 | INFO: glTF import finished in 0.01s
+18:52:14 | INFO: Data are loaded, start creating Blender stuff
+18:52:14 | INFO: Blender create Mesh node Icosphere.019
+18:52:14 | INFO: Blender create Mesh node Star of light.001
+18:52:15 | INFO: glTF import finished in 0.00s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.025
+18:52:15 | INFO: Blender create Mesh node Icosphere.024
+18:52:15 | INFO: Blender create Mesh node Cylinder.084
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Bat wing.006
+18:52:15 | INFO: Blender create Mesh node Open book left.003
+18:52:15 | INFO: Blender create Mesh node Icosphere.029
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.035
+18:52:15 | INFO: Blender create Mesh node Icosphere.034
+18:52:15 | INFO: Blender create Mesh node Cylinder.094
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Torus.014
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cube.072
+18:52:15 | INFO: Blender create Mesh node Cube.071
+18:52:15 | INFO: Blender create Mesh node Walking boot.001
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Speech bubble.001
+18:52:15 | INFO: Blender create Mesh node Icosphere.041
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Torus.019
+18:52:15 | INFO: Blender create Mesh node Icosphere.045
+18:52:15 | INFO: Blender create Mesh node Cylinder.114
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.051
+18:52:15 | INFO: Blender create Mesh node Cylinder.123
+18:52:15 | INFO: Blender create Mesh node Torus.022
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cylinder.127
+18:52:15 | INFO: Blender create Mesh node Icosphere.063
+18:52:15 | INFO: Blender create Mesh node Icosphere.062
+18:52:15 | INFO: Blender create Mesh node Icosphere.065
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cylinder.130
+18:52:15 | INFO: Blender create Mesh node Torus.028
+18:52:15 | INFO: Blender create Mesh node Torus.029
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Friendship heart.001
+18:52:15 | INFO: Blender create Mesh node Cylinder.133
+18:52:15 | INFO: glTF import finished in 0.00s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.069
+18:52:15 | INFO: Blender create Mesh node Cube.114
+18:52:15 | INFO: Blender create Mesh node Torus.034
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.077
+18:52:15 | INFO: Blender create Mesh node Cylinder.138
+18:52:15 | INFO: Blender create Mesh node Icosphere.083
+18:52:15 | INFO: Blender create Mesh node Icosphere.078
+18:52:15 | INFO: glTF import finished in 0.02s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.086
+18:52:15 | INFO: Blender create Mesh node Umbrella canopy.001
+18:52:15 | INFO: Blender create Mesh node Cylinder.142
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.093
+18:52:15 | INFO: Blender create Mesh node Icosphere.095
+18:52:15 | INFO: Blender create Mesh node Mouse face.001
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.101
+18:52:15 | INFO: Blender create Mesh node Cylinder.146
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cube.150
+18:52:15 | INFO: Blender create Mesh node Cube.148
+18:52:15 | INFO: Blender create Mesh node Cube.147
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Megaphone horn.001
+18:52:15 | INFO: Blender create Mesh node Cube.159
+18:52:15 | INFO: Blender create Mesh node Cylinder.154
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cylinder.165
+18:52:15 | INFO: Blender create Mesh node Cylinder.164
+18:52:15 | INFO: Blender create Mesh node Feather vane.001
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.108
+18:52:15 | INFO: Blender create Mesh node Icosphere.107
+18:52:15 | INFO: Blender create Mesh node Cube.175
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.112
+18:52:15 | INFO: Blender create Mesh node Cauldron lip.003
+18:52:15 | INFO: Blender create Mesh node Cylinder.185
+18:52:15 | INFO: Blender create Mesh node Icosphere.113
+18:52:15 | INFO: glTF import finished in 0.02s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Brave shield.001
+18:52:15 | INFO: Blender create Mesh node Ruby shield inset.001
+18:52:15 | INFO: Blender create Mesh node Icosphere.115
+18:52:15 | INFO: glTF import finished in 0.02s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Book left page.003
+18:52:15 | INFO: Blender create Mesh node Cylinder.197
+18:52:15 | INFO: Blender create Mesh node Icosphere.117
+18:52:15 | INFO: glTF import finished in 0.01s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cylinder.205
+18:52:15 | INFO: Blender create Mesh node Cone.007
+18:52:15 | INFO: Blender create Mesh node Cone.004
+18:52:15 | INFO: Blender create Mesh node Icosphere.159
+18:52:15 | INFO: Blender create Mesh node Icosphere.158
+18:52:15 | INFO: Blender create Mesh node Icosphere.153
+18:52:15 | INFO: glTF import finished in 0.02s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cylinder.219
+18:52:15 | INFO: Blender create Mesh node Cone.010
+18:52:15 | INFO: Blender create Mesh node Icosphere.215
+18:52:15 | INFO: Blender create Mesh node Cone.011
+18:52:15 | INFO: Blender create Mesh node Icosphere.214
+18:52:15 | INFO: Blender create Mesh node Icosphere.209
+18:52:15 | INFO: glTF import finished in 0.02s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cylinder.232
+18:52:15 | INFO: Blender create Mesh node Cone.013
+18:52:15 | INFO: Blender create Mesh node Icosphere.253
+18:52:15 | INFO: Blender create Mesh node Icosphere.252
+18:52:15 | INFO: Blender create Mesh node Icosphere.247
+18:52:15 | INFO: glTF import finished in 0.02s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cylinder.246
+18:52:15 | INFO: Blender create Mesh node Cone.016
+18:52:15 | INFO: Blender create Mesh node Icosphere.288
+18:52:15 | INFO: Blender create Mesh node Icosphere.287
+18:52:15 | INFO: Blender create Mesh node Icosphere.282
+18:52:15 | INFO: Blender create Mesh node Cone.017
+18:52:15 | INFO: glTF import finished in 0.02s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cylinder.260
+18:52:15 | INFO: Blender create Mesh node Cone.019
+18:52:15 | INFO: Blender create Mesh node Icosphere.348
+18:52:15 | INFO: Blender create Mesh node Icosphere.347
+18:52:15 | INFO: Blender create Mesh node Icosphere.342
+18:52:15 | INFO: Blender create Mesh node Icosphere.372
+18:52:15 | INFO: glTF import finished in 0.02s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cylinder.280
+18:52:15 | INFO: Blender create Mesh node Cone.022
+18:52:15 | INFO: Blender create Mesh node Icosphere.407
+18:52:15 | INFO: Blender create Mesh node Icosphere.406
+18:52:15 | INFO: Blender create Mesh node Icosphere.401
+18:52:15 | INFO: Blender create Mesh node Icosphere.412
+18:52:15 | INFO: glTF import finished in 0.02s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Icosphere.440
+18:52:15 | INFO: Blender create Mesh node Icosphere.437
+18:52:15 | INFO: Blender create Mesh node Icosphere.434
+18:52:15 | INFO: Blender create Mesh node Icosphere.441
+18:52:15 | INFO: Blender create Mesh node Icosphere.442
+18:52:15 | INFO: glTF import finished in 0.02s
+18:52:15 | INFO: Data are loaded, start creating Blender stuff
+18:52:15 | INFO: Blender create Mesh node Cylinder.322
+18:52:15 | INFO: Blender create Mesh node Cone.026
+18:52:15 | INFO: Blender create Mesh node Icosphere.483
+18:52:15 | INFO: Blender create Mesh node Icosphere.482
+18:52:15 | INFO: Blender create Mesh node Icosphere.477
+18:52:15 | INFO: glTF import finished in 0.02s
+EXPORT_AUDIT_PASSED 38 cards 38 motifs
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

@@ -113,6 +113,12 @@ export function openItemDetail(opts: DetailOptions): ModalHandle {
   status.setAttribute('role', 'status');
   status.className = 'status';
   modal.body.append(previewBox, actions, status);
+  if (entry.description) {
+    const description = document.createElement('p');
+    description.className = 'item-description';
+    description.textContent = entry.description;
+    modal.body.insertBefore(description, actions);
+  }
 
   const button = (label: string, onClick: () => void, cls = '', disabled = false): HTMLButtonElement => {
     const b = document.createElement('button');

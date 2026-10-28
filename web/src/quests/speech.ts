@@ -32,10 +32,14 @@ export async function loadVoices(synth: SpeechSynthesis, timeoutMs = 1500): Prom
   });
 }
 
-/** Speaks `text` in English. Returns false when nothing could be spoken. */
+/**
+ * Speaks `text` in English. Returns false when nothing could be spoken. `onEnd` runs once when the
+ * voice has finished or was stopped (the area turns the music back up then).
+ */
 export async function speakEnglish(
   text: string,
   synth: SpeechSynthesis | undefined = globalThis.speechSynthesis,
+  onEnd?: () => void,
 ): Promise<boolean> {
   if (!synth) return false;
   try {
@@ -46,6 +50,10 @@ export async function speakEnglish(
     utterance.voice = voice;
     utterance.lang = normaliseLang(voice.lang);
     utterance.rate = 0.9;
+    if (onEnd) {
+      utterance.onend = () => onEnd();
+      utterance.onerror = () => onEnd();
+    }
     synth.speak(utterance);
     return true;
   } catch {

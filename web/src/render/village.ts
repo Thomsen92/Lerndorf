@@ -604,6 +604,13 @@ export function buildVillage(
     mat.envMap = sky;
     mat.needsUpdate = true;
   };
+  const riverMaterial = river.userData.material as THREE.MeshStandardMaterial;
+  const normalRiver = riverMaterial.color.clone();
+  root.userData.setTheme = (theme: 'normal' | 'halloween'): void => {
+    (plaza.userData.setSeasonTheme as (theme: 'normal' | 'halloween') => void)(theme);
+    riverMaterial.color.copy(normalRiver);
+    if (theme === 'halloween') riverMaterial.color.multiply(new THREE.Color('#a695b1'));
+  };
   root.userData.animate = (t: number): void => {
     // ripples drift downstream and pulse a little (LOOK §4: slow, about 0.9 rad/s)
     const ripples = river.userData.ripples as THREE.Texture;

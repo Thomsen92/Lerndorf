@@ -1,0 +1,31 @@
+{
+  "revision": "r14-production-overlay",
+  "copiedAssets": [
+    {
+      "file": "halloween-shop-event.glb",
+      "source": "Prototyp/marktplatz/assets/season-starter/halloween-shop-event.glb",
+      "provenance": "User-supplied Halloween shop, exactly one retained large cat, and candy cauldron; explicitly authorized for production use by the user on 2026-10-27.",
+      "license": "User-supplied commission assets; no external license or CC0 claim is known.",
+      "triangles": 19818,
+      "materials": 3,
+      "textureMaximum": 1024,
+      "sourceAudit": "Prototyp/marktplatz/assets/season-starter/model-audit.json",
+      "sourceLicenseRecord": "Prototyp/marktplatz/sources/season-starter/LICENSES.md",
+      "sourceHashes": {
+        "shop": "5a7cc805e5236cf71f44eefbf2320c15a4f0989b948671a48e7575810aed6841",
+        "cat": "cecee5c953cef238d04989662c6affe9463d7291fff392e1324ecd75165b1f49",
+        "cauldron": "10ed34fac4d587888cbe3eae4472639a80da6e249d5b66b240c7142248238ad1"
+      },
+      "doNotDuplicate": "This ensemble already includes the selected large cat and cauldron. Do not add the separate alternatives or old custom stand."
+    }
+  ],
+  "reusedExistingAssets": {
+    "directory": "assets/kenney/graveyard/",
+    "files": ["pumpkin-carved.glb", "gravestone-round.glb", "character-zombie.glb", "character-skeleton.glb", "character-vampire.glb", "character-keeper.glb"],
+    "author": "Kenney",
+    "license": "CC0",
+    "source": "https://kenney.nl/assets/graveyard-kit",
+    "licenseRecord": "blender/sources/LICENSES.md"
+  },
+  "procedural": "Seasonal stalls, dead trees, lampions, moon, low mist and fountain basin are owned runtime geometry. Fountain flow and articulated Kenney character approach are adapted from the approved read-only Prototyp/marktplatz reference. No prototype floor, example plot, alternate world or unused asset collection is copied."
+}

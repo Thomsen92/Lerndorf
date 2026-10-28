@@ -12,9 +12,14 @@ const VIEWS = ['overview', 'topdown', 'marketplace', 'plot', 'bridge', 'horizon'
 const PORT = 5174;
 // Vite serves everything below the base path of the app (SPEC §17)
 const BASE = `http://localhost:${PORT}/dev/galerie.html`;
+// Optional alternate appearance uses the same map/view matrix as the normal gallery.
+const theme = process.env.GALLERY_THEME;
+if (theme && theme !== 'normal' && theme !== 'halloween')
+  throw Error('GALLERY_THEME must be normal or halloween');
 
 const date = new Date().toISOString().slice(0, 10);
-const outDirPath = process.env.GALLERY_OUTPUT_DIR ?? fileURLToPath(new URL(`../../Konzept/Galerie/${date}/`, import.meta.url));
+const outDirPath =
+  process.env.GALLERY_OUTPUT_DIR ?? fileURLToPath(new URL(`../../Konzept/Galerie/${date}/`, import.meta.url));
 mkdirSync(outDirPath, { recursive: true });
 
 async function waitFor(url: string, timeoutMs: number): Promise<void> {
@@ -47,7 +52,7 @@ try {
   for (const map of MAPS) {
     for (const seed of SEEDS) {
       for (const view of VIEWS) {
-        await page.goto(`${BASE}?map=${map}&seed=${seed}&view=${view}`);
+        await page.goto(`${BASE}?map=${map}&seed=${seed}&view=${view}${theme ? `&theme=${theme}` : ''}`);
         await page.waitForFunction(
           () => (window as unknown as { galerie?: { ready: boolean } }).galerie?.ready === true,
           null,

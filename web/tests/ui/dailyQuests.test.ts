@@ -48,8 +48,15 @@ const result = (over: Partial<QuestAnswerResult> = {}): QuestAnswerResult => ({
 });
 
 let handles: AreaHandle[] = [];
+const play = vi.fn();
 const open = (onClose = vi.fn(), onCoins = vi.fn()) => {
-  const h = openDailyQuests({ supabase: {} as SupabaseClient, coins: 5, onCoins, onClose });
+  const h = openDailyQuests({
+    supabase: {} as SupabaseClient,
+    coins: 5,
+    onCoins,
+    onClose,
+    sound: { enabled: false, play },
+  });
   handles.push(h);
   return { h, onClose, onCoins };
 };
@@ -77,6 +84,8 @@ beforeEach(() => {
   document.body.innerHTML = '';
   loadDailyQuests.mockReset().mockResolvedValue({ ok: true, value: [] });
   submitQuestAnswer.mockReset();
+  play.mockReset();
+  document.querySelectorAll('.celebration').forEach((el) => el.remove());
   speakEnglish.mockReset().mockResolvedValue(true);
   loadVoices.mockReset().mockResolvedValue([]);
 });
@@ -162,7 +171,7 @@ describe('daily quest area', () => {
   it('shows the rule line under the title', async () => {
     open();
     await flush();
-    expect(text()).toContain('Münzen gibt es bei den ersten 3 Versuchen.');
+    expect(text()).toContain('1. und 2. Versuch: volle Münzen. Danach die Hälfte.');
   });
 
   it('shows today and catch-up sections with labels and badge', async () => {
@@ -191,6 +200,10 @@ describe('daily quest area', () => {
     expect(card('t3').textContent).toContain('gelöst ✓');
     expect(card('t3').querySelector('[data-open]')).toBeNull();
     expect(card('y1').textContent).toContain('Nachholen · halbe Münzen');
+    // today's progress, and the catch-up label keeps its own class (not the round nav badge)
+    expect(document.querySelector('.quest-progress-text')?.textContent).toMatch(/^\d \/ \d geschafft$/);
+    expect(card('y1').querySelector('.quest-catchup')).not.toBeNull();
+    expect(card('y1').querySelector('.quest-badge')).toBeNull();
     expect(card('y1').textContent).toContain('5 Münzen');
     expect(card('t1').textContent).not.toContain('Nachholen');
     expect(text()).not.toMatch(/Versuch \d|von 3/);
@@ -390,12 +403,50 @@ describe('daily quest area', () => {
     open();
     await flush();
     await openCard('q1');
-    expect(card('q1').querySelectorAll('input[type=radio]').length).toBe(2);
+    expect(card('q1').querySelectorAll('button[data-pick]').length).toBe(2);
     expect(card('q1').textContent).not.toContain('The girl is going');
     button('▶ Anhören')?.click();
     await flush();
-    expect(speakEnglish).toHaveBeenCalledWith('The girl is going to the station.');
+    expect(speakEnglish).toHaveBeenCalledWith(
+      'The girl is going to the station.',
+      undefined,
+      expect.any(Function),
+    );
     expect(card('q1').textContent).not.toContain('Dein Gerät kann nicht vorlesen.');
+  });
+
+  it('listening: turns the music down until the voice has finished', async () => {
+    const quiet = vi.fn();
+    const release = vi.fn();
+    quiet.mockReturnValue(release);
+    let onEnd: (() => void) | undefined;
+    speakEnglish.mockImplementation((_t: string, _s: unknown, end?: () => void) => {
+      onEnd = end;
+      return Promise.resolve(true);
+    });
+    loadDailyQuests.mockResolvedValue({
+      ok: true,
+      value: [
+        quest({ type: 'listening', data: { speak: 'Hello there.', mode: 'choice', options: ['a', 'b'] } }),
+      ],
+    });
+    handles.push(
+      openDailyQuests({
+        supabase: {} as SupabaseClient,
+        coins: 5,
+        onCoins: vi.fn(),
+        onClose: vi.fn(),
+        sound: { enabled: true, play, quiet },
+      }),
+    );
+    await flush();
+    await openCard('q1');
+    button('▶ Anhören')?.click();
+    await flush();
+    expect(quiet).toHaveBeenCalledTimes(1);
+    expect(release).not.toHaveBeenCalled();
+    onEnd?.();
+    expect(release).toHaveBeenCalledTimes(1);
   });
 
   it('listening: falls back to the text when the device cannot speak', async () => {
@@ -441,5 +492,100 @@ describe('daily quest area', () => {
     await flush();
     expect(onCoins).toHaveBeenCalledWith(33);
     expect(region()).toBeNull();
+  });
+  it('one tap on a choice tile sends the answer, without a check button', async () => {
+    loadDailyQuests.mockResolvedValue({
+      ok: true,
+      value: [quest({ type: 'choice', prompt: 'Fahrkarte?', data: { options: ['card', 'ticket'] } })],
+    });
+    submitQuestAnswer.mockResolvedValue({ ok: true, value: result() });
+    open();
+    await flush();
+    await openCard('q1');
+    expect(button('Prüfen')).toBeUndefined();
+    expect(card('q1').querySelector('select, input[type=radio], input[type=checkbox]')).toBeNull();
+    card('q1').querySelector<HTMLButtonElement>('[data-pick="ticket"]')?.click();
+    await flush();
+    expect(submitQuestAnswer).toHaveBeenCalledWith(expect.anything(), 'q1', 'ticket');
+    expect(card('q1').textContent).toContain('Richtig! +10 Münzen');
+  });
+
+  it('a wrong tile is greyed out, the hint shows and the coin label follows the server', async () => {
+    loadDailyQuests.mockResolvedValue({
+      ok: true,
+      value: [quest({ type: 'gap', data: { bank: ['went', 'go', 'gone'] } })],
+    });
+    submitQuestAnswer.mockResolvedValue({
+      ok: true,
+      value: result({ correct: false, reward: 0, rewardLeft: 5, hint: 'Past of go.' }),
+    });
+    open();
+    await flush();
+    expect(await openCard('q1')).toBeNull();
+    card('q1').querySelector<HTMLButtonElement>('[data-pick="go"]')?.click();
+    await flush();
+    const go = card('q1').querySelector<HTMLButtonElement>('[data-pick="go"]') as HTMLButtonElement;
+    expect(go.disabled).toBe(true);
+    expect(card('q1').querySelector<HTMLButtonElement>('[data-pick="went"]')?.disabled).toBe(false);
+    expect(card('q1').textContent).toContain('Leider falsch. Tipp: Past of go.');
+    expect(card('q1').querySelector('.quest-reward')?.textContent).toBe('5 Münzen');
+  });
+
+  it('tiles cannot be tapped twice while an answer is on its way', async () => {
+    loadDailyQuests.mockResolvedValue({
+      ok: true,
+      value: [quest({ type: 'choice', data: { options: ['card', 'ticket'] } })],
+    });
+    let resolve: (v: unknown) => void = () => undefined;
+    submitQuestAnswer.mockReturnValue(new Promise((r) => (resolve = r)));
+    open();
+    await flush();
+    await openCard('q1');
+    card('q1').querySelector<HTMLButtonElement>('[data-pick="card"]')?.click();
+    card('q1').querySelector<HTMLButtonElement>('[data-pick="ticket"]')?.click();
+    expect(submitQuestAnswer).toHaveBeenCalledTimes(1);
+    expect(card('q1').querySelector<HTMLButtonElement>('[data-pick="ticket"]')?.disabled).toBe(true);
+    resolve({ ok: true, value: result({ correct: false, rewardLeft: 10 }) });
+    await flush();
+    expect(card('q1').querySelector<HTMLButtonElement>('[data-pick="ticket"]')?.disabled).toBe(false);
+  });
+
+  it('order: placing the last word sends the sentence', async () => {
+    loadDailyQuests.mockResolvedValue({
+      ok: true,
+      value: [quest({ type: 'order', data: { words: ['subway', 'We', 'took', 'the'] } })],
+    });
+    submitQuestAnswer.mockResolvedValue({ ok: true, value: result() });
+    open();
+    await flush();
+    await openCard('q1');
+    for (const i of [1, 2, 3, 0]) card('q1').querySelector<HTMLButtonElement>(`[data-word="${i}"]`)?.click();
+    await flush();
+    expect(submitQuestAnswer).toHaveBeenCalledWith(expect.anything(), 'q1', ['We', 'took', 'the', 'subway']);
+  });
+
+  it('pops up „Geschafft!“ with the victory fanfare when the last quest of today is solved, not for catch-up', async () => {
+    loadDailyQuests.mockResolvedValue({
+      ok: true,
+      value: [
+        quest({ key: 'a', type: 'choice', data: { options: ['x', 'y'] }, solved: true, rewardLeft: 0 }),
+        quest({ key: 'b', type: 'choice', data: { options: ['x', 'y'] } }),
+        quest({ key: 'old', catchUp: true, type: 'choice', data: { options: ['x', 'y'] } }),
+      ],
+    });
+    submitQuestAnswer.mockResolvedValue({ ok: true, value: result() });
+    open();
+    await flush();
+    await openCard('old');
+    card('old').querySelector<HTMLButtonElement>('[data-pick="x"]')?.click();
+    await flush();
+    expect(play).not.toHaveBeenCalledWith('victory');
+    expect(document.querySelector('.celebration')).toBeNull();
+    await openCard('b');
+    card('b').querySelector<HTMLButtonElement>('[data-pick="x"]')?.click();
+    await flush();
+    expect(play).toHaveBeenCalledWith('victory');
+    expect(play).toHaveBeenCalledTimes(1);
+    expect(document.querySelector('.celebration .celebration-title')?.textContent).toBe('Geschafft!');
   });
 });

@@ -1,0 +1,41 @@
+{
+  "seasonId": "2026-11-halloween",
+  "questions": 10,
+  "totalXp": 150,
+  "privateSeed": "sources/season-starter/quiz.private.json",
+  "audioSource": "edge-tts",
+  "clips": [
+    {
+      "questionId": "listen-trick-or-treat",
+      "text": "Trick or treat!",
+      "voice": "en-GB-SoniaNeural",
+      "rate": "-10%",
+      "path": "assets/listening/a85b2ba2.mp3",
+      "bytes": 11232
+    },
+    {
+      "questionId": "listen-happy-halloween",
+      "text": "Happy Halloween!",
+      "voice": "en-GB-SoniaNeural",
+      "rate": "-10%",
+      "path": "assets/listening/9388e983.mp3",
+      "bytes": 11232
+    },
+    {
+      "questionId": "listen-dressing-up",
+      "text": "What are you dressing up as?",
+      "voice": "en-GB-SoniaNeural",
+      "rate": "-10%",
+      "path": "assets/listening/81c46a4b.mp3",
+      "bytes": 13824
+    },
+    {
+      "questionId": "listen-sweets",
+      "text": "Would you like some sweets?",
+      "voice": "en-GB-SoniaNeural",
+      "rate": "-10%",
+      "path": "assets/listening/76258e74.mp3",
+      "bytes": 13104
+    }
+  ]
+}

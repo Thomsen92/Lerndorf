@@ -19,6 +19,8 @@ export function openAccountMenu(opts: {
   coins: number;
   quality: QualityChoice;
   sound?: { on: boolean; onChange: (on: boolean) => void };
+  /** Background music, separate from the effects (teacher's request 28.10.2026). */
+  music?: { on: boolean; onChange: (on: boolean) => void };
   onQuality: (q: QualityChoice) => void;
   /** opens the figure choice (boy or girl); omitted: no button */
   onCharacter?: () => void;
@@ -126,22 +128,28 @@ export function openAccountMenu(opts: {
   logout.addEventListener('click', () => opts.onLogout());
 
   modal.body.append(who, group, ...(opts.onCharacter ? [figure] : []), logout);
-  if (opts.sound) {
-    const setting = opts.sound;
+  const toggles: HTMLButtonElement[] = [];
+  const addToggle = (
+    setting: { on: boolean; onChange: (on: boolean) => void },
+    label: (on: boolean) => string,
+  ): void => {
     let on = setting.on;
     const toggle = document.createElement('button');
     toggle.type = 'button';
-    const refreshSound = (): void => {
-      toggle.textContent = on ? tr('Töne: an') : tr('Töne: aus');
+    const refresh = (): void => {
+      toggle.textContent = label(on);
       toggle.setAttribute('aria-pressed', String(on));
     };
     toggle.addEventListener('click', () => {
       on = !on;
-      refreshSound();
+      refresh();
       setting.onChange(on);
     });
-    refreshSound();
-    group.after(toggle);
-  }
+    refresh();
+    toggles.push(toggle);
+  };
+  if (opts.sound) addToggle(opts.sound, (on) => (on ? tr('Töne: an') : tr('Töne: aus')));
+  if (opts.music) addToggle(opts.music, (on) => (on ? tr('Musik: an') : tr('Musik: aus')));
+  group.after(...toggles);
   return modal;
 }

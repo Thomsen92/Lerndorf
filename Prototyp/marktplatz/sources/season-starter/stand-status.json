@@ -1,0 +1,19 @@
+{
+  "revision": "r14",
+  "stage": "asset-delivered-integration-pending",
+  "modeling": "complete",
+  "activeModel": "halloween-shop-event.glb",
+  "catReference": "only-largest-cat-island; supplied originals preserved",
+  "benchedCustomStand": "assets/season-starter/bench/custom-stand-r1/",
+  "sourceVerification": "packed-blend-and-reproducible-builder",
+  "exportVerification": "reimported-identical-dimensions-and-triangle-count",
+  "applicationVerification": "standalone-three-0.170-preview-load-and-interaction-tests-passed",
+  "artisticApproval": "reserved-for-user-and-Claude",
+  "repairs": [
+    {"issue":"Blender material join invalidated old object handles", "resolution":"Query live scene objects for each material batch"},
+    {"issue":"JPEG exporter temporary path blocked by sandbox", "resolution":"Use task-local temporary directory; successful final export"},
+    {"issue":"Center of open stand missed thin mesh raycast targets", "resolution":"Whole-stand bounding hit region; actual click and drag tests pass"}
+  ],
+  "remaining": ["Production placement on normal market", "Connect welcome only to actual LearnPass and quiz", "Production quiz RPC and XP ledger integration", "DeepSeek: clickable What's in it items with large 3D preview"],
+  "evidence": ["assets/season-starter/model-audit.json", "assets/season-starter/browser-audit.json", "assets/season-starter/stand-preview.png"]
+}

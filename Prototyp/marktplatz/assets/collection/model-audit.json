@@ -1,0 +1,788 @@
+{
+  "models": [
+    {
+      "id": "lantern-verbs",
+      "triangles": 1492,
+      "materials": 5,
+      "bytes": 821140,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.0062699997797608376,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "pumpkin-comparisons",
+      "triangles": 1264,
+      "materials": 6,
+      "bytes": 826696,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007645001169294119,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "ghost-questions",
+      "triangles": 1288,
+      "materials": 5,
+      "bytes": 826004,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.00617000088095665,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "witch-recipe",
+      "triangles": 1436,
+      "materials": 6,
+      "bytes": 840920,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.0069700004532933235,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "haunted-prepositions",
+      "triangles": 1628,
+      "materials": 4,
+      "bytes": 829136,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.005570000037550926,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "blood-moon-story",
+      "triangles": 1100,
+      "materials": 6,
+      "bytes": 826560,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007569999899715185,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "night-light",
+      "triangles": 1072,
+      "materials": 5,
+      "bytes": 804636,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.00797000015154481,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "bat-cat",
+      "triangles": 1404,
+      "materials": 6,
+      "bytes": 848524,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.009818063583225012,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "moon-spoon",
+      "triangles": 1100,
+      "materials": 6,
+      "bytes": 835224,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007569999899715185,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "book-look",
+      "triangles": 1404,
+      "materials": 6,
+      "bytes": 839064,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.009818063583225012,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "adjective-key",
+      "triangles": 1328,
+      "materials": 4,
+      "bytes": 818980,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.0057700015604496,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "past-footsteps",
+      "triangles": 1416,
+      "materials": 6,
+      "bytes": 820584,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007319999858736992,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "talking-pumpkin",
+      "triangles": 1220,
+      "materials": 5,
+      "bytes": 807532,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007170000579208136,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "time-for-tea",
+      "triangles": 1600,
+      "materials": 6,
+      "bytes": 831864,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007069999817758799,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "better-late",
+      "triangles": 1700,
+      "materials": 5,
+      "bytes": 873892,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007170001044869423,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "two-heads",
+      "triangles": 1488,
+      "materials": 6,
+      "bytes": 859040,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007870001252740622,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "practice-perfect",
+      "triangles": 1856,
+      "materials": 6,
+      "bytes": 870664,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.006120000965893269,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "friend-in-need",
+      "triangles": 1020,
+      "materials": 6,
+      "bytes": 807504,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007470000069588423,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "hidden-key",
+      "triangles": 1540,
+      "materials": 5,
+      "bytes": 827868,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007270000874996185,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "slow-steady",
+      "triangles": 1572,
+      "materials": 6,
+      "bytes": 873436,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.008069999981671572,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "rain-train",
+      "triangles": 1512,
+      "materials": 6,
+      "bytes": 856832,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.005969999823719263,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "quiet-mouse",
+      "triangles": 1372,
+      "materials": 6,
+      "bytes": 843204,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.00797000015154481,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "silver-lining",
+      "triangles": 1224,
+      "materials": 6,
+      "bytes": 824412,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007069999817758799,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "book-cover",
+      "triangles": 1604,
+      "materials": 6,
+      "bytes": 840460,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.007470000069588423,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "actions-words",
+      "triangles": 1188,
+      "materials": 6,
+      "bytes": 826560,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.00646999990567565,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "birds-feather",
+      "triangles": 1144,
+      "materials": 6,
+      "bytes": 826592,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.006620001047849655,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "sleepy-skeletons",
+      "triangles": 1628,
+      "materials": 5,
+      "bytes": 863432,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.008270000573247671,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "echo-verse",
+      "triangles": 1436,
+      "materials": 6,
+      "bytes": 850380,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.0069700004532933235,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "fortune-brave",
+      "triangles": 1076,
+      "materials": 6,
+      "bytes": 834768,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.00866999989375472,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    },
+    {
+      "id": "knowledge-power",
+      "triangles": 1376,
+      "materials": 6,
+      "bytes": 842488,
+      "sourceSizeXYZ": [
+        0.07199999690055847,
+        0.008870000019669533,
+        0.1080000028014183
+      ],
+      "texture": [
+        1024,
+        768
+      ]
+    }
+  ],
+  "motifs": [
+    {
+      "id": "lantern-verbs",
+      "triangles": 536,
+      "materials": 2,
+      "bytes": 37040,
+      "sourceSizeXYZ": [
+        0.019999999552965164,
+        0.002700002631172538,
+        0.022850001230835915
+      ]
+    },
+    {
+      "id": "pumpkin-comparisons",
+      "triangles": 308,
+      "materials": 3,
+      "bytes": 31848,
+      "sourceSizeXYZ": [
+        0.022314809262752533,
+        0.005274999886751175,
+        0.022502011619508266
+      ]
+    },
+    {
+      "id": "ghost-questions",
+      "triangles": 332,
+      "materials": 2,
+      "bytes": 30832,
+      "sourceSizeXYZ": [
+        0.019999999552965164,
+        0.0025999998906627297,
+        0.023999999277293682
+      ]
+    },
+    {
+      "id": "witch-recipe",
+      "triangles": 480,
+      "materials": 4,
+      "bytes": 40676,
+      "sourceSizeXYZ": [
+        0.024000000208616257,
+        0.004199999384582043,
+        0.030210833996534348
+      ]
+    },
+    {
+      "id": "haunted-prepositions",
+      "triangles": 672,
+      "materials": 1,
+      "bytes": 42312,
+      "sourceSizeXYZ": [
+        0.02419999986886978,
+        0.0022000070894137025,
+        0.02309470158070326
+      ]
+    },
+    {
+      "id": "blood-moon-story",
+      "triangles": 144,
+      "materials": 3,
+      "bytes": 14660,
+      "sourceSizeXYZ": [
+        0.03799999877810478,
+        0.005399999674409628,
+        0.026999999769032
+      ]
+    },
+    {
+      "id": "night-light",
+      "triangles": 116,
+      "materials": 2,
+      "bytes": 12192,
+      "sourceSizeXYZ": [
+        0.026629582047462463,
+        0.00430000014603138,
+        0.025326237082481384
+      ]
+    },
+    {
+      "id": "bat-cat",
+      "triangles": 448,
+      "materials": 3,
+      "bytes": 44340,
+      "sourceSizeXYZ": [
+        0.028117814101278782,
+        0.007748062955215573,
+        0.022000000812113285
+      ]
+    },
+    {
+      "id": "moon-spoon",
+      "triangles": 144,
+      "materials": 3,
+      "bytes": 14640,
+      "sourceSizeXYZ": [
+        0.03799999877810478,
+        0.005399999674409628,
+        0.026999999769032
+      ]
+    },
+    {
+      "id": "book-look",
+      "triangles": 448,
+      "materials": 3,
+      "bytes": 44344,
+      "sourceSizeXYZ": [
+        0.028117814101278782,
+        0.007748062955215573,
+        0.022000000812113285
+      ]
+    },
+    {
+      "id": "adjective-key",
+      "triangles": 372,
+      "materials": 1,
+      "bytes": 23728,
+      "sourceSizeXYZ": [
+        0.027665686793625355,
+        0.00200000440236181,
+        0.022834802977740765
+      ]
+    },
+    {
+      "id": "past-footsteps",
+      "triangles": 460,
+      "materials": 3,
+      "bytes": 33592,
+      "sourceSizeXYZ": [
+        0.02500000037252903,
+        0.003649999969638884,
+        0.024899999611079693
+      ]
+    },
+    {
+      "id": "talking-pumpkin",
+      "triangles": 264,
+      "materials": 2,
+      "bytes": 27972,
+      "sourceSizeXYZ": [
+        0.02800000086426735,
+        0.0034000000450760126,
+        0.023000000976026058
+      ]
+    },
+    {
+      "id": "time-for-tea",
+      "triangles": 644,
+      "materials": 3,
+      "bytes": 46892,
+      "sourceSizeXYZ": [
+        0.0277999984100461,
+        0.004399999510496855,
+        0.028020178899168968
+      ]
+    },
+    {
+      "id": "better-late",
+      "triangles": 744,
+      "materials": 3,
+      "bytes": 65044,
+      "sourceSizeXYZ": [
+        0.026200000196695328,
+        0.003800000878982246,
+        0.026200000196695328
+      ]
+    },
+    {
+      "id": "two-heads",
+      "triangles": 532,
+      "materials": 4,
+      "bytes": 57116,
+      "sourceSizeXYZ": [
+        0.024412695318460464,
+        0.0051999997813254595,
+        0.02700000163167715
+      ]
+    },
+    {
+      "id": "practice-perfect",
+      "triangles": 900,
+      "materials": 3,
+      "bytes": 57800,
+      "sourceSizeXYZ": [
+        0.029100479558110237,
+        0.0020129182375967503,
+        0.029221885837614536
+      ]
+    },
+    {
+      "id": "friend-in-need",
+      "triangles": 64,
+      "materials": 2,
+      "bytes": 5760,
+      "sourceSizeXYZ": [
+        0.02800000086426735,
+        0.003999999957159162,
+        0.02599999960511923
+      ]
+    },
+    {
+      "id": "hidden-key",
+      "triangles": 584,
+      "materials": 3,
+      "bytes": 44108,
+      "sourceSizeXYZ": [
+        0.020999999716877937,
+        0.003999999957159162,
+        0.02350000012665987
+      ]
+    },
+    {
+      "id": "slow-steady",
+      "triangles": 616,
+      "materials": 4,
+      "bytes": 65284,
+      "sourceSizeXYZ": [
+        0.026314809918403625,
+        0.006399999372661114,
+        0.018000000156462193
+      ]
+    },
+    {
+      "id": "rain-train",
+      "triangles": 556,
+      "materials": 3,
+      "bytes": 42200,
+      "sourceSizeXYZ": [
+        0.02800000086426735,
+        0.001999999862164259,
+        0.02759999968111515
+      ]
+    },
+    {
+      "id": "quiet-mouse",
+      "triangles": 416,
+      "materials": 3,
+      "bytes": 45052,
+      "sourceSizeXYZ": [
+        0.02251057792454958,
+        0.004699999699369073,
+        0.023000000044703484
+      ]
+    },
+    {
+      "id": "silver-lining",
+      "triangles": 268,
+      "materials": 2,
+      "bytes": 28648,
+      "sourceSizeXYZ": [
+        0.02941269427537918,
+        0.004399999510496855,
+        0.01800000062212348
+      ]
+    },
+    {
+      "id": "book-cover",
+      "triangles": 648,
+      "materials": 3,
+      "bytes": 48220,
+      "sourceSizeXYZ": [
+        0.02199999988079071,
+        0.004900000058114529,
+        0.02800000086426735
+      ]
+    },
+    {
+      "id": "actions-words",
+      "triangles": 232,
+      "materials": 3,
+      "bytes": 18496,
+      "sourceSizeXYZ": [
+        0.029000001959502697,
+        0.003400000394321978,
+        0.028868365101516247
+      ]
+    },
+    {
+      "id": "birds-feather",
+      "triangles": 188,
+      "materials": 3,
+      "bytes": 14852,
+      "sourceSizeXYZ": [
+        0.02935222815722227,
+        0.002600000938400626,
+        0.030575952492654324
+      ]
+    },
+    {
+      "id": "sleepy-skeletons",
+      "triangles": 672,
+      "materials": 3,
+      "bytes": 58344,
+      "sourceSizeXYZ": [
+        0.019021157175302505,
+        0.006199999712407589,
+        0.023499999195337296
+      ]
+    },
+    {
+      "id": "echo-verse",
+      "triangles": 480,
+      "materials": 4,
+      "bytes": 40668,
+      "sourceSizeXYZ": [
+        0.024000000208616257,
+        0.004199999384582043,
+        0.030210833996534348
+      ]
+    },
+    {
+      "id": "fortune-brave",
+      "triangles": 120,
+      "materials": 3,
+      "bytes": 13136,
+      "sourceSizeXYZ": [
+        0.024000000208616257,
+        0.005100000184029341,
+        0.03099999949336052
+      ]
+    },
+    {
+      "id": "knowledge-power",
+      "triangles": 420,
+      "materials": 3,
+      "bytes": 31796,
+      "sourceSizeXYZ": [
+        0.02199999988079071,
+        0.006799999624490738,
+        0.030950001440942287
+      ]
+    }
+  ],
+  "visualStatus": "User review pending",
+  "source": "sources/collection/halloween-almanac.blend"
+}

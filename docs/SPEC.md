@@ -306,7 +306,8 @@ Münzstände anderer Schüler sind für Schüler **nicht** sichtbar. Die alten T
 | --- | --- | --- | --- | --- |
 | `my_daily_quests()` | Schüler (Lehrkonto wird abgelehnt: `only pupils`) | angemeldet, Rolle `student` | – | Liste: heutige Quests und gestrige ungelöste (Nachholen) mit `key, day, catch_up, type, prompt, data, reward, reward_left, solved, attempts`; **ohne** Tipp und Lösung |
 | `submit_quest_answer(p_key text, p_answer jsonb)` | Schüler | Rolle `student`; Quest aktiv und Tag = heute oder gestern (sonst `quest not available`); Ergebniszeile gesperrt (`for update`) | `attempts+1`; bei richtig `solved_at`; Buchung `quest` nur wenn `attempts ≤ quest_paid_attempts()`, höchstens einmal | `{correct, already_solved, coins, reward, reward_left, hint}` – `hint` nur bei falsch; nie die Lösung |
-| `quest_paid_attempts()` | intern | – | – | 3 (Anzahl bezahlter Versuche, D11; nur hier ändern) |
+| `quest_paid_attempts()` | intern | – | – | 3 (alte Regel bis 0052; seit 0053 nicht mehr benutzt) |
+| `quest_full_attempts()`, `quest_reward_for(nominal, versuch)` | intern | – | – | 2 volle Versuche, danach die Hälfte aufgerundet (D11, Migration 0053; nur hier ändern) |
 | `quest_today()` | intern | – | – | heutiges Datum in Europe/Berlin |
 | `quest_status()` | Lehrkraft | Rolle | – | `{today, covered_until, today_missing, tomorrow_missing, imports[]}` |
 | `teacher_quest_preview(p_from date, p_days int)` | Lehrkraft | Rolle; 1–14 Tage | – | aktive Quests der Tage mit Tipp **und Lösung** |
@@ -389,7 +390,7 @@ Seit 21.10.2026 ersetzen die **Daily Quests** die alten Wochenaufgaben. Produktr
 | D8 | „Paket fehlt“ erkennen | live im Lehrer-Bereich aus den Daten (`quest_status()`), nicht im Workflow (der läuft nur beim Push) |
 | D9 | Mischen bei `order`/`match` | gesätes Mischen, das nie die Lösungsreihenfolge ergibt |
 | D10 | Stimme | Vorproduzierte MP3-Dateien: Edge-TTS 7.3, `en-GB-SoniaNeural`, `-10%`; gemeinsames `listeningPath(data.speak)`; bei Wiedergabefehler sichtbarer Hörtext |
-| D11 | Versuche und Raten | **Entscheidung der Lehrkraft 21.10.2026:** Versuche unbegrenzt, Münzen nur, wenn die richtige Antwort unter den ersten **3** Versuchen dieses Schülers für diese Quest ist (heute und Nachholen zählen zusammen, die richtige Antwort zählt mit). Danach gilt die Quest als gelöst mit `reward_paid = 0`, ohne Buchung. Die Zahl steht nur in `public.quest_paid_attempts()`; wer sie ändert, muss auch die Zeile „Münzen gibt es bei den ersten 3 Versuchen.“ in `web/src/ui/dailyQuestsView.ts` anpassen. `my_daily_quests` und `submit_quest_answer` liefern zusätzlich `reward_left` (was eine richtige Antwort jetzt noch bringt) |
+| D11 | Versuche und Raten | **Geändert von der Lehrkraft am 28.10.2026 (Migration 0053):** Versuche unbegrenzt. Eine richtige Antwort im 1. oder 2. Versuch bringt die vollen Münzen (Nachholen: die halben), ab dem 3. Versuch die Hälfte davon, aufgerundet (10 → 5, 5 → 3; Nachholen 10 → 5 → 3). Es gibt also immer Münzen. Zahlen nur in `public.quest_full_attempts()`/`quest_reward_for()`; Zeile im Spiel: „1. und 2. Versuch: volle Münzen. Danach die Hälfte.“ (`web/src/ui/dailyQuestsView.ts`). Alle Antworten sind Antippen (keine Auswahllisten, keine Kästchen, kein Tippen), siehe §12. *Frühere Regel:* **Entscheidung der Lehrkraft 21.10.2026:** Versuche unbegrenzt, Münzen nur, wenn die richtige Antwort unter den ersten **3** Versuchen dieses Schülers für diese Quest ist (heute und Nachholen zählen zusammen, die richtige Antwort zählt mit). Danach gilt die Quest als gelöst mit `reward_paid = 0`, ohne Buchung. Die Zahl steht nur in `public.quest_paid_attempts()`; wer sie ändert, muss auch die Zeile „Münzen gibt es bei den ersten 3 Versuchen.“ in `web/src/ui/dailyQuestsView.ts` anpassen. `my_daily_quests` und `submit_quest_answer` liefern zusätzlich `reward_left` (was eine richtige Antwort jetzt noch bringt) |
 
 Weitere Festlegungen aus der Umsetzung (PLAN, Fortschrittsnotizen 21.10.2026): Lehrkonten können keine Quests lösen (`my_daily_quests` lehnt ab, im Dorf erscheint „Nur Schülerkonten können Quests lösen.“); die Lösungstabelle ist auch für die Lehrkraft nicht direkt lesbar, nur über `teacher_quest_preview`; ein fehlerhafter Re-Import einer schon eingespielten Woche (auch einer Ferienwoche) zählt weiter als abgedeckt.
 
@@ -549,7 +550,7 @@ Zukünftige Quest-Versuche erhalten einen Zeitstempel, auch wenn sie falsch sind
 
 ### 13.1 Season I – LearnPass (Migrationen 0028–0032)
 
-Eine Saison läuft in einem festen Fenster (Europe/Berlin); Season I: **28.10.–06.12.2026**. Schüler öffnen den LearnPass über die Profilkarte. Markt und Welt bleiben unverändert (LOOK §3); der Halloween-Marktplatz ist ein getrennter Auftrag (Lehrkraft 27.10.2026).
+Eine Saison läuft in einem festen Fenster (Europe/Berlin); Season I: **28.10.–06.12.2026**. Schüler öffnen den LearnPass über die Profilkarte. Die Dorfstimmung kann die Lehrkraft je Klasse auf Halloween schalten (§13.2); das ändert keine Season-Daten und keine Belohnung.
 
 - **XP und Stufen:** Summe `xp_ledger.delta` im Fenster; 40 Stufen bis 3.000 XP (30/60/90/120 XP je Zehnerblock).
 - **Belohnungen:** 5 Münzen auf Stufe 1–20 und 25 Münzen je Meilenstein; Pass-Truhen auf 5, 10, …, 40; 12 Garten-Szenen auf den Deko-Stufen; 4 Titel und 4 Rahmen; Stufe 40 mit Truhe, Titel, 25 Münzen und freier Wahl aus dem Truhen-Pool.
@@ -569,6 +570,41 @@ Eine Saison läuft in einem festen Fenster (Europe/Berlin); Season I: **28.10.�
 
 Datumsänderungen wirken sofort: Abgeholte Stufen bleiben, XP vor dem neuen Start zählen nicht mehr. Die Sonntagsregel prüft nur `teacher_set_season_dates`; „Jetzt beenden“ darf früher enden. Details für die Lehrkraft: [Anleitung für die Lehrkraft](ANLEITUNG_LEHRKRAFT.md#season-i--halloween-learnpass).
 
+### 13.2 Weltstimmung je Klasse und Season-Welcome (Migration 0034)
+
+Die Lehrkraft wählt unter **Dorf & Regeln → Weltstimmung** je Klasse `normal` oder `halloween`. Die Einstellung ist reine Optik und ändert weder Season-Zeitraum noch XP, Münzen, Besitz oder Platzierungen.
+
+- **Daten:** `class_world_theme(class_id, theme, season_id, revision, changed_at, changed_by)`; `season_welcome_seen(player_id, class_id, season_id, content_version, seen_at)` mit RLS und ohne Client-Schreibrechte.
+- **Wirksamkeit:** Halloween wirkt nur, solange die zugehörige Season im Berliner Kalenderfenster läuft. Außerhalb bleibt die Welt normal; die Lehrkraft sieht „vorgemerkt“. Die Anzeige leitet den Zustand aus `season_today()`/`season_state_of()` ab, nie aus Browserzeit.
+- **RPCs:** `world_theme_state()` (eigene Klasse aus Auth), `teacher_world_theme_state(class)`, `teacher_set_world_theme(class, theme, season)`, `ack_season_welcome(season)`.
+- **Welcome:** einmal pro Schüler und Season-Inhaltsversion (`seasons.welcome_version`, derzeit `r14`), unabhängig von der Weltoptik. Es erklärt nur Quiz, 150 XP und LearnPass; Sammelkarten kommen darin nicht vor. Schließen quittiert serverseitig; ein neuer Inhalt öffnet erneut. Der Stand und das Ticket öffnen es jederzeit manuell.
+- **Synchronisierung:** sichtbare Clients fragen alle 30 Sekunden und beim Zurückkehren in den Tab. Fehler behalten die letzte gültige Szene. 8a und 8b bleiben getrennt.
+- **Rückweg:** Normal stellt Himmel, Licht, Nebel und Platz wieder her; die Halloween-Ebene wird vollständig freigegeben. Kein zweiter Renderer und keine zweite Animationsschleife.
+
+### 13.3 Spooky English Quiz (Migration 0051)
+
+Zehn Klickfragen je Season im Welcome-Hub (Stand/Ticket → „Spooky English Quiz“). Keine Münzen, keine Truhen; die Tier-5-Belohnung kommt über den normalen Pass-Claim.
+
+- **Inhalt:** privater Seed `Prototyp/marktplatz/sources/season-starter/quiz.private.json`; `npm run import:starter` validiert ihn (10 Fragen, Lösung genau eine Option, Hörfragen mit `speak`) und schreibt den Seed-Block in `0051_season_starter.sql`. Lösungen und Tipps erreichen nur die Datenbank, nie `web/public` oder das Bundle (Test prüft das). Nach dem Einspielen werden Fragen nicht still getauscht, sondern über eine neue Migration ergänzt.
+- **Daten:** `season_starter_questions(season_id, id, position, kind, type, prompt, data, solution, hint, content_version)`, `season_starter_results(player_id, season_id, question_id, attempts, solved_at)`; RLS, keine Client-Rechte.
+- **RPCs:** `my_season_starter(season)` liefert Fragen ohne Lösung/Tipp plus Fortschritt; `submit_season_starter_answer(season, question, answer)` sperrt zuerst die Profilzeile, prüft mit `quest_answer_matches`, bucht über `grant_xp` 10 XP (`quest`, Referenz `season-starter:<season>:<frage>`) und beim zehnten Treffer 50 XP (`…:complete`). Wiederholungen liefern Delta 0. Nur eine laufende Season bucht; Lehrkräfte und Anonyme werden abgewiesen. Antwort enthält `seasonXp`, `reachedTier` und den `progress`-Delta für XP-Badge und Level-up.
+- **Oberfläche:** eine Frage je Ansicht, Antworten als große Buttons (≥ 52 px), ein Tap sendet sofort, Sperre während der Anfrage, Tipp bei Fehler, Netzfehler ohne Scheinerfolg. Hörfragen spielen die lokale MP3 (`listeningPath`, en-GB-SoniaNeural, −10 %) nur nach Tap; bei Audiofehler „Show English text“. Abschluss „150 XP earned · Tier 5 reached“ nur mit Serverzahlen.
+
+### 13.3a Sir Byte und Ton im Quiz
+
+Im Spooky English Quiz steht Sir Byte wie bei den Daily Quests neben den Fragen (Handy: darüber): Begrüßung, „denkt nach“ während der Prüfung, Lob oder Mutmacher, Schlusssatz. Zeilen ohne Aufnahme laufen mit Tippgeräusch.
+
+**Gestaltung (28.10.2026):** Mondnacht in Nachtviolett mit Kürbisorange und Kerzengelb; Titel und Ergebnis in der lokal ausgelieferten Schrift „Creepster“ (OFL), Fragen und Antworten in der gut lesbaren Spielschrift. Antworten sind Grabsteine (≥ 84 px hoch, zwei Spalten), richtige werden moosgrün, falsche blutrot. Zehn Kürbisse zeigen den Fortschritt (gelöst leuchtet, aktuell glimmt) neben dem Satz „Frage n von 10“; einzige Animation ist das Aufleuchten, bei reduzierter Bewegung ohne. Sir Bytes Bühne und Sprechblase passen sich an (Pergament).
+
+### 13.3b Musik und Klänge
+
+- **Musik:** Im Dorf läuft eine Hintergrund-Loop (`assets/audio/music/mischief-managed-loop.mp3`), in jedem Quizfenster (Daily Quests, Tutorial-Quiz, Spooky Quiz – überall, wo Sir Byte begleitet) stattdessen die Denk-Loop (`quiz-thinking-loop.mp3`). Start erst nach der ersten Berührung (Browserregel), Pause bei verdecktem Tab, über die Spiel-AudioContext-Lautstärke gedämpft. Eigener Schalter „Musik“ in den Einstellungen (`lerndorf.music`); „Töne aus“ schaltet auch die Musik ab.
+- **Klänge (28.10.2026):** Truhe öffnen `chest-open.mp3`, Level-up `level-up.mp3`, alle heutigen Daily Quests geschafft und Spooky English Quiz fertig: großes „Success!“/„Geschafft!“ mit Konfetti (`ui/celebration.ts`, 4,6 s, mit „Bewegung reduzieren“ nur das Wort) zusammen mit `victory-fanfare.mp3` (eigene Fanfare, 3,7 s, erzeugt mit `web/scripts/audio/make-victory-fanfare.py`; Musik pausiert dabei). Die Quiz-Schleife ist leiser (0,1), und solange ein Hörtext läuft, ist die Musik nur noch ein Viertel so laut (`sound.quiet()`). Richtige Antwort `success.mp3`, falsche `error.mp3` (jede Sir-Byte-Antwort in allen Quizfenstern); jede neue Sprechblasenzeile von Sir Byte und die Sprechblase der eigenen Figur im Tutorial mit `dialog-blip.mp3`; Zeilen ohne Aufnahme zusätzlich `dialog-typing.mp3` für die Sprechdauer. Umgebungsrufe der anderen Figuren bleiben stumm.
+
+### 13.4 „What's in it?“ – 3D-Ansicht der Truhengegenstände
+
+Die Inhaltsübersicht der Season-Truhe (LearnPass, Inventar, Shop) zeigt jeden Gegenstand als Button „View … in 3D“. Antippen öffnet im selben Dialog eine große Ansicht des echten Modells (dieselbe Quelle wie die Vorschaubilder): Ziehen dreht, Pinch/Mausrad zoomt, „Reset view“ stellt den Start wieder her. Modelle laden erst bei Auswahl; je Öffnen eine eigene Ansicht, späte Antworten älterer Ansichten werden verworfen. Erstes Escape schließt nur die Ansicht, Fokus und Scrollposition kehren zum Gegenstand zurück. Geteilte GLB-/Szenenmodelle des Dorfs werden nie freigegeben. Die Ansicht ist keine Ziehung, kein Kauf und ändert keinen Besitz.
+
 ## 14. Wirtschaft (Standardwerte; je Instanz in `classes` änderbar, Preise in `items`)
 
 | Größe | Standard |
@@ -576,7 +612,7 @@ Datumsänderungen wirken sofort: Abgeholte Stufen bleiben, XP vor dem neuen Star
 | Stempel (vollständiger Wochenplan) | 100 Münzen |
 | Daily Quest | 1–20 Münzen je Quest, Richtwert 5 / 10 / 15 (leicht/mittel/schwer); 3 Quests pro Tag |
 | Nachholen am Folgetag | halbe Belohnung, aufgerundet |
-| Versuche je Quest | unbegrenzt; Münzen nur bei richtiger Antwort in den ersten 3 Versuchen (`quest_paid_attempts()`) |
+| Versuche je Quest | unbegrenzt; 1. und 2. Versuch volle Münzen, danach die Hälfte (aufgerundet) (`quest_reward_for()`, seit 28.10.2026) |
 | Tageslimit Daily Quests | keins (höchstens 3 Quests heute und 3 zum Nachholen) |
 | Alte Wochenaufgaben (Geschichte) | Tageslimit 60 Münzen, 3 Versuche pro Aufgabe und Tag (`classes`) |
 | Deko | 20–250 Münzen |
@@ -585,6 +621,18 @@ Datumsänderungen wirken sofort: Abgeholte Stufen bleiben, XP vor dem neuen Star
 | Truhe | 20 + 5 × Level Münzen; große Truhe ×3; Serverwurf 70 % einfach / 25 % doppelt / 5 % dreifach; einmalige Buchung |
 
 Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3–6 Wochen. **[OFFEN]** Beträge mit der Lehrkraft final abstimmen.
+
+## 14a. Sammelkarten-Collection (Migrationen 0049–0050)
+
+Die Halloween-Collection ist getrennt von den 28 Dorfgegenständen, ihren Preisen und den Truhenchancen 55/30/12/3.
+
+- **Inhalt:** 50 aktive Karten (18 normal, 17 rare, 14 epic, genau eine legendary `highlight-halloween-card`), 8 archivierte Figuren (`benched`, werden nie verlost). 35 Karten liegen fest auf den 24 Münzfeldern des LearnPass, 15 (14 epic + die eine legendary) im Truppenpool.
+- **Laufzeitkatalog:** `npm run import:collection` kopiert nur die benötigten Dateien aus `Prototyp/marktplatz/assets/collection` nach `web/public/assets/collection`, validiert den Katalog und schreibt `catalog.json` mit `contentVersion`. Keine `.blend`-Dateien, keine Prototyp-URLs.
+- **Besitz (0049):** `season_card_definitions`, `player_season_cards` (höchstens ein Datensatz, `quantity = 1`), `season_card_grants` (idempotent je Quelle/Referenz). `grant_season_card` ist ausschließlich serverseitig ausführbar; normale/rare Karten nur über den LearnPass, epic/legendary nur über Truhen. `my_season_cards(season)` liest nur den eigenen Besitz, `teacher_player_cards` die Lehrkraft.
+- **Vergabe (0050):** `season_book_tier` vergibt die festen Passkarten in derselben Transaktion wie Münzen/Truhen und trägt bereits abgeholte Felder idempotent nach. `open_season_chest` bleibt beim Dorfgegenstand unverändert und kann zusätzlich eine noch nicht besessene epic-/legendary-Karte vergeben. Alle Karten eines Pools besessen → `cardStatus = 'complete'`, kein Ersatz. Vor dieser Migration geöffnete Truhen bleiben `legacy` und ziehen nicht rückwirkend.
+- **Noch offen:** Trefferhäufigkeit und Seltenheitsgewichte der Truhenkarten (`season_chest_card_config`) sind absichtlich leer; der Bonus ist deaktiviert, bis die Lehrkraft sie festlegt.
+- **Ziehung der Truhenkarten:** `epic_weight` und `legendary_weight` gelten **je Seltenheit**, nicht je verbleibender Karte; Seltenheiten ohne unbesessene Karte fallen heraus, die übrigen Gewichte werden normalisiert. `open_season_chest` sperrt zuerst die Profilzeile, dann die Truhe (gleiche Sperrreihenfolge wie `grant_season_card`), und meldet `awarded` nur, wenn die Karte tatsächlich neu vergeben wurde (Korrektur 28.10.2026).
+- **Ansicht:** Profil → Sammelkarten öffnet den Almanach (Umschlag, Suche, Seltenheitsfilter, Classroom-Curses-Filter, Detail mit Quellen, 3D-Vorschau mit Umdrehen/Reset). Die Vorschau vergibt nichts, lädt höchstens vier Modelle im LRU, hält genau ein aktives Modell und gibt Renderer, Steuerung und Texturen beim Schließen frei. Achievements bleiben ein sichtbarer Platzhalter.
 
 ## 15. Assets und Blender-Pipeline
 

@@ -1,0 +1,85 @@
+/* "What's in it?" 3D view: nearly the whole dialog on a tablet, big reachable buttons. */
+.item3d {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  min-height: min(76vh, 760px);
+  margin-top: 12px;
+}
+.item3d-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+.item3d-head h3 {
+  flex: 1 1 10rem;
+  min-width: 0;
+  margin: 0;
+  font:
+    700 26px 'Comic Neue',
+    'Comic Sans MS',
+    cursive;
+  overflow-wrap: break-word;
+}
+.item3d-rarity {
+  padding: 4px 12px;
+  border: 1px solid var(--r);
+  border-radius: 999px;
+  color: var(--r);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.item3d button {
+  min-width: 48px;
+  min-height: 48px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid #3d2c52;
+  background: #120b1ccc;
+  color: #f6e9d2;
+  font:
+    700 16px system-ui,
+    sans-serif;
+  cursor: pointer;
+}
+.item3d-stage {
+  position: relative;
+  min-height: 320px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 40%, #3a2a52, #140d1f);
+  touch-action: none;
+}
+.item3d-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+}
+.item3d-status {
+  position: absolute;
+  inset: auto 12px 12px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #120912cc;
+  font-weight: 700;
+}
+.item3d-status.error {
+  border: 1px solid #ff8f8f;
+}
+.item3d-retry {
+  justify-self: start;
+}
+.item3d-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+.item3d-help {
+  margin: 0;
+  color: #b6a5c6;
+}

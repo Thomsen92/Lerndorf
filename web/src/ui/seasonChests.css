@@ -97,7 +97,11 @@
 .season-reveal-card.revealed {
   border-color: var(--r);
   background:
-    repeating-conic-gradient(from 0deg at 50% 32%, color-mix(in srgb, var(--r) 30%, transparent) 0 8deg, transparent 8deg 16deg),
+    repeating-conic-gradient(
+      from 0deg at 50% 32%,
+      color-mix(in srgb, var(--r) 30%, transparent) 0 8deg,
+      transparent 8deg 16deg
+    ),
     radial-gradient(circle at 50% 32%, color-mix(in srgb, var(--r) 50%, transparent), #120b1c 65%);
 }
 .season-reveal-pic {
@@ -140,18 +144,34 @@
   border-radius: 999px;
   background: var(--r);
   color: #120912;
-  font: 700 13px system-ui, sans-serif;
+  font:
+    700 13px system-ui,
+    sans-serif;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 .season-reveal-name {
   display: block;
   margin: 8px 0 2px;
-  font: 700 24px 'Comic Neue', 'Comic Sans MS', cursive;
+  font:
+    700 24px 'Comic Neue',
+    'Comic Sans MS',
+    cursive;
 }
 .season-reveal-note {
   margin: 0 0 12px;
   color: #b6a5c6;
+}
+.season-reveal-card-note {
+  margin: 0 0 12px;
+  padding: 6px 10px;
+  border: 1px solid #8f6bb0;
+  border-radius: 8px;
+  color: #f3d9ff;
+  font-weight: 700;
+}
+.season-reveal-card-note[hidden] {
+  display: none;
 }
 .season-reveal .season-reveal-ok {
   min-height: 48px;

@@ -1,0 +1,325 @@
+{
+  "date": "2026-10-27",
+  "season": [
+    {
+      "file": "warlock.glb",
+      "name": "Warlock",
+      "kind": "deco",
+      "rarity": "legendary",
+      "triangles": 15966,
+      "bytes": 595568
+    },
+    {
+      "kind": "deco",
+      "triangles": 1796,
+      "name": "Süßigkeitenhaufen",
+      "bytes": 191116,
+      "rarity": "rare",
+      "file": "candy-pile.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 5672,
+      "name": "Kürbisfeld",
+      "bytes": 396572,
+      "rarity": "epic",
+      "file": "pumpkin-patch.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 1752,
+      "name": "Friedhofsecke",
+      "bytes": 163628,
+      "rarity": "rare",
+      "file": "graveyard-corner.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 984,
+      "name": "Zaun mit Laterne",
+      "bytes": 149764,
+      "rarity": "rare",
+      "file": "fence-lamp.glb"
+    },
+    {
+      "file": "house-horror.glb",
+      "name": "Horror-Haus",
+      "kind": "house",
+      "rarity": "legendary",
+      "triangles": 37912,
+      "bytes": 854632
+    },
+    {
+      "kind": "deco",
+      "triangles": 9681,
+      "name": "Hexe (Statue)",
+      "bytes": 173952,
+      "rarity": "rare",
+      "file": "witch.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 18328,
+      "name": "Kürbismädchen",
+      "bytes": 418304,
+      "rarity": "rare",
+      "file": "pumpkin-girl.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 13441,
+      "name": "Spuk-Uhrturm",
+      "bytes": 271988,
+      "rarity": "epic",
+      "file": "clock-tower.glb"
+    },
+    {
+      "kind": "car",
+      "triangles": 12782,
+      "name": "Dodge Pickup",
+      "bytes": 940084,
+      "rarity": "epic",
+      "file": "dodge-pickup.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 3999,
+      "name": "Süßigkeiteneimer",
+      "bytes": 196804,
+      "rarity": "normal",
+      "file": "kit-candy-bucket.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 2999,
+      "name": "Fledermaus",
+      "bytes": 169576,
+      "rarity": "normal",
+      "file": "kit-bat.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 2000,
+      "name": "Grablicht",
+      "bytes": 132496,
+      "rarity": "normal",
+      "file": "kit-candle.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 3499,
+      "name": "Kleiner Geist",
+      "bytes": 138528,
+      "rarity": "normal",
+      "file": "kit-ghost.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 2330,
+      "name": "Grabstein",
+      "bytes": 151740,
+      "rarity": "normal",
+      "file": "kit-gravestone.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 3000,
+      "name": "Kürbislaterne",
+      "bytes": 177252,
+      "rarity": "normal",
+      "file": "kit-jack-o-lantern.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 1744,
+      "name": "Besen",
+      "bytes": 156636,
+      "rarity": "normal",
+      "file": "kit-broom.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 4999,
+      "name": "Halloween-Schild",
+      "bytes": 202776,
+      "rarity": "normal",
+      "file": "kit-sign.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 7000,
+      "name": "Hexe (Figur)",
+      "bytes": 247160,
+      "rarity": "rare",
+      "file": "kit-witch.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 6999,
+      "name": "Mumie",
+      "bytes": 206628,
+      "rarity": "rare",
+      "file": "kit-mummy.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 7000,
+      "name": "Skelett",
+      "bytes": 205808,
+      "rarity": "rare",
+      "file": "kit-skeleton.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 7000,
+      "name": "Zombie",
+      "bytes": 197272,
+      "rarity": "rare",
+      "file": "kit-zombie.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 6000,
+      "name": "Hexenkatze",
+      "bytes": 212660,
+      "rarity": "rare",
+      "file": "kit-witch-cat.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 3451,
+      "name": "Hexenkessel",
+      "bytes": 170144,
+      "rarity": "rare",
+      "file": "kit-cauldron.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 8999,
+      "name": "Monsterpflanze",
+      "bytes": 251124,
+      "rarity": "epic",
+      "file": "kit-monster-plant.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 4184,
+      "name": "Kürbisbaum",
+      "bytes": 425452,
+      "rarity": "epic",
+      "file": "jack-o-lantern-tree.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 3199,
+      "name": "Kürbiskatze",
+      "bytes": 271352,
+      "rarity": "rare",
+      "file": "spooky-pumpkin-cat.glb"
+    },
+    {
+      "kind": "deco",
+      "triangles": 46786,
+      "name": "Geisterkatze",
+      "bytes": 302424,
+      "rarity": "rare",
+      "file": "ghost-kitty.glb"
+    }
+  ],
+  "kenney": {
+    "forests": [
+      "tree-high.glb",
+      "tree.glb"
+    ],
+    "survival": [
+      "barrel.glb",
+      "floor-old.glb",
+      "metal-panel-screws.glb",
+      "metal-panel.glb",
+      "resource-planks.glb",
+      "rock-a.glb",
+      "rock-b.glb",
+      "rock-c.glb",
+      "structure-metal-wall.glb",
+      "tree-autumn-tall.glb",
+      "tree-tall.glb"
+    ],
+    "town": [
+      "chimney.glb",
+      "fence-broken.glb",
+      "fence-gate.glb",
+      "fountain-round-detail.glb",
+      "lantern.glb",
+      "pillar-wood.glb",
+      "planks-half.glb",
+      "planks.glb",
+      "rock-large.glb",
+      "rock-small.glb",
+      "rock-wide.glb",
+      "roof-gable.glb",
+      "roof-point.glb",
+      "stairs-wood.glb",
+      "stall-green.glb",
+      "tree-high-crooked.glb",
+      "tree-high-round.glb",
+      "tree-high.glb",
+      "wall-broken.glb",
+      "wall-wood-broken.glb",
+      "wall-wood-corner.glb",
+      "wall-wood-doorway-square.glb",
+      "wall-wood-half.glb",
+      "wall-wood-side.glb",
+      "wall-wood-window-shutters.glb",
+      "wall-wood.glb"
+    ],
+    "food": [
+      "apple.glb",
+      "loaf-round.glb",
+      "pumpkin.glb"
+    ],
+    "nature": [
+      "flower_purpleA.glb",
+      "flower_purpleB.glb",
+      "flower_purpleC.glb",
+      "flower_redA.glb",
+      "flower_redB.glb",
+      "flower_redC.glb",
+      "flower_yellowA.glb",
+      "flower_yellowB.glb",
+      "flower_yellowC.glb",
+      "path_stone.glb",
+      "stone_smallFlatA.glb",
+      "stone_smallFlatB.glb",
+      "stone_smallFlatC.glb"
+    ],
+    "graveyard": [
+      "candle-multiple.glb",
+      "debris-wood.glb",
+      "debris.glb",
+      "detail-bowl.glb",
+      "fence-damaged.glb",
+      "gravestone-round.glb",
+      "lantern-candle.glb",
+      "pumpkin-carved.glb",
+      "pumpkin.glb"
+    ]
+  },
+  "additionalKenneyCharacters": {
+    "source": "Kenny/Graveyard/Models/GLB format",
+    "used": [
+      "character-zombie.glb",
+      "character-skeleton.glb",
+      "character-vampire.glb",
+      "character-keeper.glb"
+    ],
+    "alsoAvailable": [
+      "character-ghost.glb"
+    ]
+  },
+  "additionalKenneyGraveyardProps": {
+    "source": "Kenny/Graveyard/Models/GLB format",
+    "used": [
+      "candle.glb"
+    ]
+  }
+}

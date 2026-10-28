@@ -19,6 +19,8 @@ export interface GlbItem {
   yaw?: number;
   /** Height cap in metres for models whose file size is wrong (plan §6.2), below MAX_SIZE. */
   maxHeight?: number;
+  /** Upscale the model so it fills the MAX_SIZE footprint (new shop decorations, 0035). */
+  fill?: boolean;
 }
 
 /**
@@ -59,11 +61,73 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   // 6 shop items (season 0031)
   shop_cabin: { file: 'shop/cabin.glb', kind: 'house' },
   shop_white_house: { file: 'shop/white-house.glb', kind: 'house' },
+  shop_family_house: { file: 'shop/family-house.glb', kind: 'house' },
+  shop_low_poly_house: { file: 'shop/low-poly-house.glb', kind: 'house' },
+  shop_neuschwanstein: { file: 'shop/neuschwanstein.glb', kind: 'house', fill: true },
+  // Six more houses (0047).
+  shop_panel_house: { file: 'shop/panel-house.glb', kind: 'house', fill: true },
+  shop_forest_cabin: { file: 'shop/forest-cabin.glb', kind: 'house', fill: true },
+  shop_classroom: { file: 'shop/classroom.glb', kind: 'house', fill: true },
+  shop_house_3: { file: 'shop/house-3.glb', kind: 'house', fill: true },
+  shop_home_1: { file: 'shop/home-1.glb', kind: 'house', fill: true },
+  shop_home_2: { file: 'shop/home-2.glb', kind: 'house', fill: true },
+  // Landmarks and village church (0048).
+  shop_burj_khalifa: { file: 'shop/burj-khalifa.glb', kind: 'house', fill: true },
+  shop_empire_state: { file: 'shop/empire-state.glb', kind: 'house', fill: true },
+  shop_church: { file: 'shop/church.glb', kind: 'house', fill: true },
   shop_president_car: { file: 'shop/president-car.glb', kind: 'car' },
   shop_trump: { file: 'shop/trump-statue.glb', kind: 'deco' },
   // Both cars are modelled along X; a quarter turn puts the length on Z like all cars (plan §6.2).
-  shop_toyoyo: { file: 'shop/toyoyo-highlight.glb', kind: 'car', yaw: Math.PI / 2 },
-  shop_beatall: { file: 'shop/beatall.glb', kind: 'car', yaw: Math.PI / 2 },
+  shop_toyoyo: { file: 'shop/toyoyo-highlight.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
+  shop_beatall: { file: 'shop/beatall.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
+  // Three more cars from the same pack (0041), textured with their .fbm maps.
+  shop_delorean: { file: 'shop/delorean.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
+  shop_landyroamer: { file: 'shop/landyroamer.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
+  shop_tristar: { file: 'shop/tristar.glb', kind: 'car', yaw: Math.PI / 2, fill: true },
+  // Low-poly car pack with colour variants (0042); these are modelled along Z already.
+  shop_car5: { file: 'shop/car5.glb', kind: 'car', fill: true },
+  shop_car5_green: { file: 'shop/car5-green.glb', kind: 'car', fill: true },
+  shop_car5_grey: { file: 'shop/car5-grey.glb', kind: 'car', fill: true },
+  shop_car5_police: { file: 'shop/car5-police.glb', kind: 'car', fill: true },
+  shop_car5_police_la: { file: 'shop/car5-police-la.glb', kind: 'car', fill: true },
+  shop_car8: { file: 'shop/car8.glb', kind: 'car', fill: true },
+  shop_car8_grey: { file: 'shop/car8-grey.glb', kind: 'car', fill: true },
+  shop_car8_mail: { file: 'shop/car8-mail.glb', kind: 'car', fill: true },
+  shop_car8_purple: { file: 'shop/car8-purple.glb', kind: 'car', fill: true },
+  // Sedans and estate car (0043).
+  shop_car2: { file: 'shop/car2.glb', kind: 'car', fill: true },
+  shop_car2_black: { file: 'shop/car2-black.glb', kind: 'car', fill: true },
+  shop_car2_red: { file: 'shop/car2-red.glb', kind: 'car', fill: true },
+  shop_car6: { file: 'shop/car6.glb', kind: 'car', fill: true },
+  // Roadside fast-food sign (0044).
+  shop_fast_food_sign: { file: 'shop/fast-food-sign.glb', kind: 'deco', fill: true },
+  // Halloween decorations (0035): both fill the 3 x 3 pedestal when normalised.
+  shop_candy_cauldron: { file: 'shop/candy-cauldron.glb', kind: 'deco', fill: true },
+  shop_chibi_trick_or_treater: { file: 'shop/chibi-trick-or-treater.glb', kind: 'deco', fill: true },
+  // Retro monitor decorations (0036): imported from FBX, they fill the 3 x 3 pedestal too.
+  shop_monitor_01: { file: 'shop/monitor-01.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  shop_monitor_02: { file: 'shop/monitor-02.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  shop_monitor_05: { file: 'shop/monitor-05.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  shop_monitor_06: { file: 'shop/monitor-06.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  // CRT televisions (0037): same FBX pack, textured with the MasterMaterial palette.
+  shop_tv_crt_07: { file: 'shop/tv-crt-07.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  shop_tv_crt_09: { file: 'shop/tv-crt-09.glb', kind: 'deco', fill: true, yaw: -Math.PI / 2 },
+  // Game cases, figurines and a little blue engine (0038).
+  shop_gta6_ps5_case: { file: 'shop/gta6-ps5-case.glb', kind: 'deco', fill: true },
+  shop_gta6_phone_case: { file: 'shop/gta6-phone-case.glb', kind: 'deco', fill: true },
+  shop_cute_frog: { file: 'shop/cute-round-frog.glb', kind: 'deco', fill: true },
+  shop_cute_fox: { file: 'shop/cute-fox.glb', kind: 'deco', fill: true },
+  shop_blue_engine: { file: 'shop/blue-engine.glb', kind: 'deco', fill: true },
+  // Mascot, phone, statue and farm buildings (0039).
+  shop_mascot: { file: 'shop/mascot.glb', kind: 'deco', fill: true },
+  shop_smartphone: { file: 'shop/smartphone.glb', kind: 'deco', fill: true },
+  shop_moai: { file: 'shop/moai.glb', kind: 'deco', fill: true },
+  shop_water_tower: { file: 'shop/water-tower.glb', kind: 'deco', fill: true },
+  shop_chicken_coop: { file: 'shop/chicken-coop.glb', kind: 'deco', fill: true },
+  shop_windmill: { file: 'shop/windmill.glb', kind: 'deco', fill: true },
+  shop_barn: { file: 'shop/barn.glb', kind: 'deco', fill: true },
+  // Stone well (0040), imported from the FBX farm pack.
+  shop_well: { file: 'shop/well.glb', kind: 'deco', fill: true },
 };
 
 const BASE = `${import.meta.env.BASE_URL}assets/`;
@@ -94,9 +158,10 @@ export function normaliseGlb(scene: THREE.Object3D, spec: GlbItem): THREE.Group 
   const height = Math.min(max.h, spec.maxHeight ?? max.h);
   const fit = Math.min(max.w / safe(size.x), max.d / safe(size.z), height / safe(size.y));
   // Never larger than modelled: a grave candle stays a candle. A broken unit (203 m cat) still shrinks.
-  let scale = Math.min(1, fit);
+  // Items marked `fill` are the exception: they grow until the footprint (or height) fills MAX_SIZE.
+  let scale = spec.fill ? fit : Math.min(1, fit);
   const longest = Math.max(size.x, size.y, size.z);
-  if (spec.kind === 'deco' && longest * scale < MIN_DECO_SIZE) {
+  if (!spec.fill && spec.kind === 'deco' && longest * scale < MIN_DECO_SIZE) {
     scale = Math.min(MIN_DECO_SIZE / safe(longest), fit);
   }
   turned.scale.setScalar(scale);

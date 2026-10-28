@@ -15,6 +15,7 @@ const SHADOW_HALF = 58;
 
 export interface SceneRig {
   sun: THREE.DirectionalLight;
+  setTheme(theme: 'normal' | 'halloween'): void;
   /** Moves the shadow box with the camera target, so shadows stay sharp on the larger map. */
   follow(target: THREE.Vector3): void;
   /** Resolves with the sky panorama once it is on screen (null if it failed: the plain colour stays). */
@@ -24,7 +25,10 @@ export interface SceneRig {
 export function setupScene(scene: THREE.Scene): SceneRig {
   scene.background = new THREE.Color(SKY_HORIZON);
   scene.fog = new THREE.Fog(SKY_HORIZON, MAP_SIZE * 0.42, MAP_SIZE * 1.05);
-  scene.add(new THREE.HemisphereLight('#a9b8e8', '#3a5a3a', 1.15));
+  const hemisphere = new THREE.HemisphereLight('#a9b8e8', '#3a5a3a', 1.15);
+  scene.add(hemisphere);
+  let theme: 'normal' | 'halloween' = 'normal';
+  let normalSky: THREE.Texture | null = null;
 
   const sun = new THREE.DirectionalLight('#ffd2a1', 1.6);
   const sunOffset = new THREE.Vector3(-40, 55, 25);
@@ -50,8 +54,11 @@ export function setupScene(scene: THREE.Scene): SceneRig {
       (tex) => {
         tex.mapping = THREE.EquirectangularReflectionMapping;
         tex.colorSpace = THREE.SRGBColorSpace;
-        scene.background = tex;
-        scene.backgroundIntensity = 0.95;
+        normalSky = tex;
+        if (theme === 'normal') {
+          scene.background = tex;
+          scene.backgroundIntensity = 0.95;
+        }
         resolve(tex);
       },
       undefined,
@@ -63,6 +70,24 @@ export function setupScene(scene: THREE.Scene): SceneRig {
   return {
     sun,
     skyReady,
+    setTheme(next): void {
+      theme = next;
+      const halloween = next === 'halloween';
+      scene.background = halloween ? new THREE.Color('#493847') : (normalSky ?? new THREE.Color(SKY_HORIZON));
+      scene.backgroundIntensity = halloween ? 1 : 0.95;
+      scene.fog = new THREE.Fog(
+        halloween ? '#493847' : SKY_HORIZON,
+        MAP_SIZE * (halloween ? 0.25 : 0.42),
+        MAP_SIZE * (halloween ? 0.76 : 1.05),
+      );
+      hemisphere.color.set(halloween ? '#b9a1b5' : '#a9b8e8');
+      hemisphere.groundColor.set(halloween ? '#423946' : '#3a5a3a');
+      hemisphere.intensity = halloween ? 0.95 : 1.15;
+      sun.color.set(halloween ? '#e3a0a0' : '#ffd2a1');
+      sun.intensity = halloween ? 1.25 : 1.6;
+      sunOffset.set(...((halloween ? [-32, 32, 15] : [-40, 55, 25]) as [number, number, number]));
+      sun.position.copy(sun.target.position).add(sunOffset);
+    },
     follow(target: THREE.Vector3): void {
       // snap to 4 m steps so the shadow edges do not shimmer while the camera glides
       snapped.set(Math.round(target.x / 4) * 4, 0, Math.round(target.z / 4) * 4);

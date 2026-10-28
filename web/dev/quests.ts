@@ -4,6 +4,7 @@
 // data, so the pupil area (?view=pupil) and the teacher panel (?view=teacher) render offline.
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { openDailyQuests } from '../src/ui/dailyQuestsView';
+import { createSound } from '../src/ui/sound';
 import { renderQuestPanel } from '../src/teacher/questsView';
 
 const QUESTS = [
@@ -36,13 +37,25 @@ const QUESTS = [
     attempts: 0,
   },
   {
+    key: '2026-11-09-mon-3',
+    day: '2026-11-09',
+    catch_up: false,
+    type: 'match',
+    prompt: 'Match the words.',
+    data: { left: ['bridge', 'subway', 'block'], right: ['U-Bahn', 'Häuserblock', 'Brücke'] },
+    reward: 10,
+    reward_left: 10,
+    solved: false,
+    attempts: 0,
+  },
+  {
     key: '2026-11-08-sun-1',
     day: '2026-11-08',
     catch_up: true,
     type: 'gap',
     prompt: 'Yesterday we ___ to Brooklyn.',
-    data: {},
-    reward: 5,
+    data: { bank: ['go', 'went', 'gone'] },
+    reward: 10,
     reward_left: 5,
     solved: false,
     attempts: 0,
@@ -55,11 +68,79 @@ const QUESTS = [
     prompt: 'Put the words in the right order.',
     data: { words: ['subway', 'the', 'took', 'We'] },
     reward: 8,
-    reward_left: 0,
+    reward_left: 2,
     solved: false,
     attempts: 3,
   },
 ];
+
+/** What the fake server accepts (the real one checks in the database, never in the browser). */
+const SOLUTIONS: Record<string, { solution: unknown; hint: string }> = {
+  '2026-11-09-mon-1': { solution: 'ticket', hint: 'It is a small paper for the bus.' },
+  '2026-11-09-mon-2': { solution: 'Empire State Building', hint: 'Listen for a very tall building.' },
+  '2026-11-09-mon-3': {
+    solution: [
+      ['bridge', 'Brücke'],
+      ['subway', 'U-Bahn'],
+      ['block', 'Häuserblock'],
+    ],
+    hint: 'Look at the first letters.',
+  },
+  '2026-11-08-sun-1': { solution: 'went', hint: 'Think of the past of go.' },
+  '2026-11-08-sun-2': { solution: ['We', 'took', 'the', 'subway'], hint: 'Start with who did it.' },
+};
+
+/** Same order of pairs does not matter for match; everything else must be equal. */
+function matches(answer: unknown, solution: unknown): boolean {
+  if (Array.isArray(solution) && Array.isArray(solution[0])) {
+    const key = (pairs: unknown) =>
+      JSON.stringify(((pairs as string[][]) ?? []).map((p) => p.join('→')).sort());
+    return key(answer) === key(solution);
+  }
+  return JSON.stringify(answer) === JSON.stringify(solution);
+}
+
+let coins = 42;
+/** Coin rule D11 (migration 0053): tries 1 and 2 in full, later half (rounded up); catch-up half. */
+function rewardFor(q: (typeof QUESTS)[number], attempt: number): number {
+  const nominal = q.catch_up ? Math.ceil(q.reward / 2) : q.reward;
+  return attempt <= 2 ? nominal : Math.ceil(nominal / 2);
+}
+
+function submit(args: { p_key: string; p_answer: unknown }) {
+  const q = QUESTS.find((x) => x.key === args.p_key);
+  const s = SOLUTIONS[args.p_key];
+  if (!q || !s) return { data: null, error: { message: 'quest not open' } };
+  if (q.solved) {
+    return {
+      data: { correct: true, already_solved: true, coins, reward: 0, reward_left: 0, hint: null },
+      error: null,
+    };
+  }
+  q.attempts += 1;
+  if (matches(args.p_answer, s.solution)) {
+    const reward = rewardFor(q, q.attempts);
+    coins += reward;
+    q.solved = true;
+    q.reward_left = 0;
+    return {
+      data: { correct: true, already_solved: false, coins, reward, reward_left: 0, hint: null },
+      error: null,
+    };
+  }
+  q.reward_left = rewardFor(q, q.attempts + 1);
+  return {
+    data: {
+      correct: false,
+      already_solved: false,
+      coins,
+      reward: 0,
+      reward_left: q.reward_left,
+      hint: s.hint,
+    },
+    error: null,
+  };
+}
 
 const STATUS = {
   today: '2026-11-09',
@@ -67,8 +148,22 @@ const STATUS = {
   today_missing: false,
   tomorrow_missing: false,
   imports: [
-    { week: '2026-11-09', ok: true, holiday: false, errors: [], quest_count: 21, imported_at: '2026-11-06T18:00:00Z' },
-    { week: '2026-12-21', ok: true, holiday: true, errors: [], quest_count: 0, imported_at: '2026-11-06T18:00:00Z' },
+    {
+      week: '2026-11-09',
+      ok: true,
+      holiday: false,
+      errors: [],
+      quest_count: 21,
+      imported_at: '2026-11-06T18:00:00Z',
+    },
+    {
+      week: '2026-12-21',
+      ok: true,
+      holiday: true,
+      errors: [],
+      quest_count: 0,
+      imported_at: '2026-11-06T18:00:00Z',
+    },
     {
       week: '2026-11-16',
       ok: false,
@@ -131,21 +226,19 @@ const PREVIEW = [
 ];
 
 const RESULTS: Record<string, unknown> = {
-  my_daily_quests: QUESTS,
-  submit_quest_answer: {
-    correct: false,
-    already_solved: false,
-    coins: 42,
-    reward: 0,
-    reward_left: 10,
-    hint: 'Listen for a very tall building.',
-  },
   quest_status: STATUS,
   teacher_quest_preview: PREVIEW,
 };
 
 const fake = {
-  rpc: (fn: string) => Promise.resolve({ data: structuredClone(RESULTS[fn] ?? null), error: null }),
+  rpc: (fn: string, args: Record<string, unknown> = {}) => {
+    // a little delay, like a real network, so the busy state can be seen
+    const wait = new Promise((r) => setTimeout(r, 200));
+    if (fn === 'submit_quest_answer')
+      return wait.then(() => submit(args as { p_key: string; p_answer: unknown }));
+    if (fn === 'my_daily_quests') return Promise.resolve({ data: structuredClone(QUESTS), error: null });
+    return Promise.resolve({ data: structuredClone(RESULTS[fn] ?? null), error: null });
+  },
 } as unknown as SupabaseClient;
 
 const view = new URLSearchParams(location.search).get('view') ?? 'pupil';
@@ -162,6 +255,10 @@ if (view === 'teacher') {
     document.body.dataset.ready = 'true';
   });
 } else {
-  openDailyQuests({ supabase: fake, coins: 42, onCoins: () => undefined, onClose: () => undefined });
+  // the game's sound, so answer sounds and the quiz loop can be heard here too (after the first tap)
+  const sound = createSound();
+  sound.setMusic('village');
+  for (const event of ['pointerdown', 'keydown']) window.addEventListener(event, () => sound.unlock());
+  openDailyQuests({ supabase: fake, coins, onCoins: () => undefined, onClose: () => undefined, sound });
   document.body.dataset.ready = 'true';
 }

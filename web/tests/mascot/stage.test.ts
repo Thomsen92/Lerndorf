@@ -2,6 +2,7 @@
 import { expect, it, vi } from 'vitest';
 import type * as THREE from 'three';
 import { createCompanion } from '../../src/mascot/mascotStage';
+import { createSound } from '../../src/ui/sound';
 it('varies consecutive successful answers instead of repeating Splendid', async () => {
   const byte = createCompanion({ createRenderer: () => null });
   try {
@@ -52,4 +53,44 @@ it('keeps English feedback usable without WebGL and counts mistakes per question
   expect(byte.el.textContent).toContain('Nearly. Have another go!');
   byte.dispose();
   expect(document.querySelector('.byte-stage')).toBeNull();
+});
+
+it('plays the answer sounds and the quiz loop only while Sir Byte keeps the quiz company', async () => {
+  const made: Array<{ src: string; paused: boolean }> = [];
+  const createAudio = (src: string) => {
+    const el = {
+      src,
+      paused: true,
+      loop: false,
+      currentTime: 0,
+      play: () => {
+        el.paused = false;
+        return Promise.resolve();
+      },
+      pause: () => {
+        el.paused = true;
+      },
+      removeAttribute: () => undefined,
+    };
+    made.push(el);
+    return el as unknown as HTMLAudioElement;
+  };
+  const doc = { hidden: false, addEventListener: () => undefined, removeEventListener: () => undefined };
+  const sound = createSound({ createContext: () => null, store: null, createAudio, doc });
+  const play = vi.spyOn(sound, 'play');
+  sound.setMusic('village');
+  sound.unlock();
+  const village = made[0];
+  expect(village.paused).toBe(false);
+  const byte = createCompanion({ createRenderer: () => null });
+  const quiz = made.find((m) => m.src.includes('quiz-thinking-loop'))!;
+  expect(quiz.paused).toBe(false);
+  expect(village.paused).toBe(true);
+  await byte.answer('a', false);
+  await byte.answer('a', true);
+  expect(play.mock.calls.map((c) => c[0]).filter((n) => n !== 'blip')).toEqual(['wrong', 'correct']);
+  byte.dispose();
+  expect(quiz.paused).toBe(true);
+  expect(village.paused).toBe(false);
+  sound.dispose();
 });

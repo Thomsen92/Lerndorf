@@ -4,6 +4,7 @@
  */
 import { tr } from '../../i18n';
 import type { PoolItem, SeasonApi } from '../../api/season';
+import { announceCardGrants } from '../../collection/cardNotice';
 import { itemName } from '../seasonChests';
 import { renderLearnPass, type LearnPassHandle } from './learnpassView';
 import { openInside } from './insideModal';
@@ -22,11 +23,13 @@ export interface OpenLearnPassOptions {
 
 export interface LearnPassOverlay {
   close(): void;
+  readonly isOpen: boolean;
 }
 
 export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
   let view: LearnPassHandle | null = null;
   let closed = false;
+  let errorBox: HTMLElement | null = null;
   let seasonId = '';
   let poolJob: Promise<PoolItem[]> | null = null;
   const pictures = seasonPictures();
@@ -38,6 +41,8 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
     view?.destroy();
     view = null;
     pictures.release();
+    errorBox?.remove();
+    errorBox = null;
   }
 
   const actions = {
@@ -48,6 +53,10 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
       const result = await opts.api.claim(tier);
       const coins = result.rewards.coins ?? 0;
       if (coins > 0) opts.onCoins(opts.getCoins() + coins);
+      const cards = (result.rewards.cards ?? [])
+        .filter((card) => card.granted)
+        .map((card) => card.id);
+      if (cards.length) announceCardGrants(cards);
       await refresh();
       return coins;
     },
@@ -61,7 +70,7 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
       opts.onOpenInventory();
     },
     onOpenInside(): void {
-      if (view) openInside(view.el, { pool: pool(), pictures });
+      if (view) openInside(view.el, { pool: pool(), pictures, reducedMotion: opts.reducedMotion });
     },
     onPickItem(): void {
       if (!view) return;
@@ -84,7 +93,11 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
     if (closed) return;
     seasonId = state.season.id;
     if (!view) {
-      view = renderLearnPass(state, actions, { reducedMotion: opts.reducedMotion, pictures, portrait: opts.portrait });
+      view = renderLearnPass(state, actions, {
+        reducedMotion: opts.reducedMotion,
+        pictures,
+        portrait: opts.portrait,
+      });
       document.body.append(view.el);
     } else {
       view.update(state);
@@ -94,6 +107,8 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
   function fail(): void {
     if (closed) return;
     const box = document.createElement('div');
+    errorBox?.remove();
+    errorBox = box;
     box.className = 'learnpass-error';
     box.setAttribute('role', 'alert');
     const p = document.createElement('p');
@@ -111,5 +126,10 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
   }
 
   void refresh().catch(fail);
-  return { close };
+  return {
+    close,
+    get isOpen() {
+      return !closed;
+    },
+  };
 }

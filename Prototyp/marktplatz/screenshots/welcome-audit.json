@@ -1,0 +1,17 @@
+{
+  "checks": [
+    "persistent banner mentions Season I and Seasonal Boxes",
+    "welcome panel opens",
+    "season and boxes are explained",
+    "collection link is local and present",
+    "box availability is marked as preview",
+    "tour pauses while the panel is open",
+    "Escape closes and returns focus",
+    "welcome fits portrait width",
+    "market return button closes the panel",
+    "no runtime or resource errors"
+  ],
+  "errors": [],
+  "visualReview": "Claude/user acceptance pending; no screenshots",
+  "success": true
+}

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Houses – preview</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #14101c; overflow: hidden; }
+      canvas { display: block; width: 100%; height: 100%; }
+      #hud { position: fixed; left: 16px; top: 12px; color: #f3e6d0; font: 14px system-ui, sans-serif; }
+      .label { position: fixed; bottom: 24px; color: #ffd16d; font: 700 13px system-ui, sans-serif; text-shadow: 0 2px 4px #000; }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <div id="hud">Houses – Low Poly House and Neuschwanstein Castle</div>
+    <div class="label" style="left: 18%">Low Poly House</div>
+    <div class="label" style="left: 66%">Neuschwanstein Castle</div>
+    <script type="module">
+      import * as THREE from 'three';
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+      import { loadGlbItem } from '../src/render/glbItems';
+
+      const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x1a1020);
+      const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 120);
+      camera.position.set(0, 7.5, 18);
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.target.set(0, 2, 0);
+      controls.enableDamping = true;
+
+      scene.add(new THREE.HemisphereLight(0xc9b8ff, 0x20182a, 1.5));
+      const sun = new THREE.DirectionalLight(0xffe0b0, 2.2);
+      sun.position.set(6, 12, 9);
+      sun.castShadow = true;
+      scene.add(sun);
+
+      const ground = new THREE.Mesh(
+        new THREE.CircleGeometry(22, 48),
+        new THREE.MeshStandardMaterial({ color: 0x2a2434, roughness: 1 }),
+      );
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
+
+      const pad = new THREE.MeshStandardMaterial({ color: 0x3a4a3a, roughness: 1 });
+      const sizes = [];
+      const items = [
+        ['shop_low_poly_house', -4.2],
+        ['shop_neuschwanstein', 4.2],
+      ];
+      for (const [id, x] of items) {
+        const base = new THREE.Mesh(new THREE.BoxGeometry(6.2, 0.2, 5.0), pad);
+        base.position.set(x, 0.1, 0);
+        base.receiveShadow = true;
+        scene.add(base);
+        const model = await loadGlbItem(id);
+        model.position.set(x, 0.2, 0);
+        scene.add(model);
+        const box = new THREE.Box3().setFromObject(model);
+        const size = box.getSize(new THREE.Vector3());
+        sizes.push({ id, size: size.toArray().map((n) => +n.toFixed(2)), minY: +box.min.y.toFixed(2) });
+      }
+      window.__sizes = sizes;
+      window.__ready = true;
+
+      renderer.setAnimationLoop(() => {
+        controls.update();
+        renderer.render(scene, camera);
+      });
+      addEventListener('resize', () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      });
+    </script>
+  </body>
+</html>

@@ -11,6 +11,8 @@ import { Crowd } from '../render/crowd';
 import { setBoardNote } from '../render/plaza';
 import { createMarketByte } from '../mascot/marketByte';
 import type { ReadOnlyView } from './readOnlyVillage';
+import { createWorldAppearance, isWorldObjectVisible } from '../season/worldAppearance';
+import type { WorldTheme } from '../api/worldTheme';
 export function createReadOnlyScene(
   host: HTMLElement,
   members: Member[],
@@ -45,6 +47,7 @@ export function createReadOnlyScene(
     view.plotIndex,
   );
   scene.add(village);
+  const appearance = createWorldAppearance({ scene, village, layout, rig, renderer: gl });
   setBoardNote(village, notice);
   const crowd = new Crowd(
     scene,
@@ -105,7 +108,7 @@ export function createReadOnlyScene(
       (-(e.clientY - rect.top) / rect.height) * 2 + 1,
     );
     ray.setFromCamera(pointer, camera);
-    const hit = ray.intersectObjects(scene.children, true)[0];
+    const hit = ray.intersectObjects(scene.children, true).find((h) => isWorldObjectVisible(h.object));
     if (hit?.object.userData.kind === 'board') onQuests();
     if (hit?.object.userData.kind === 'byte') void byte.tap();
   };
@@ -119,6 +122,7 @@ export function createReadOnlyScene(
     crowd.update(dt);
     crowd.updateLabels(camera);
     byte.update(dt, camera, matchMedia('(prefers-reduced-motion: reduce)').matches);
+    appearance.update(dt, now / 1000, matchMedia('(prefers-reduced-motion: reduce)').matches);
     controls.update();
     rig.follow(controls.target);
     (village.userData.animate as ((t: number) => void) | undefined)?.(now / 1000);
@@ -126,6 +130,9 @@ export function createReadOnlyScene(
     gl.render(scene, camera);
   });
   return {
+    setWorldTheme(theme: WorldTheme) {
+      appearance.setTheme(theme);
+    },
     setPaused(on: boolean) {
       paused = on;
       controls.enabled = !on;
@@ -133,6 +140,7 @@ export function createReadOnlyScene(
     },
     dispose() {
       disposed = true;
+      appearance.dispose();
       gl.setAnimationLoop(null);
       controls.dispose();
       crowd.dispose();

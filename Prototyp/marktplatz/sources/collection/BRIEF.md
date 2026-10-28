@@ -1,0 +1,15 @@
+# Season I · The Midnight Collection
+
+Aktuelle Erweiterung r04: siehe `TEXTBOOK-PLAN.md` und `TEXTBOOK-PROMPT.md`. Mittlerweile 38 Karten/Motive, belegte Originalverse und acht Halloween-Adaptionen der vom Nutzer bereitgestellten Buchvorlagen. Der folgende Text dokumentiert den ursprünglichen Sechs-Karten-Auftrag; das ursprüngliche Verbot fremder Bildausschnitte wurde durch die ausdrücklich gelieferten Referenzen und „tob dich aus“ für diese Erweiterung präzisiert. Das generierte Ensemble ist ein separates Konzeptbild. Visuelles Review weiterhin durch den Nutzer.
+
+Auftrag: neue Halloween-Profilrahmen, Titel und sammelbare 3D-Karten mit Englischbezug. Designs vom Nutzer ausdrücklich delegiert („erstelle und überlege dir“). Einsatz: eigenständige Lerndorf-Stilprobe; keine Spielintegration, Konten oder Freischaltungen. Visuelles Review laut bestehender Nutzeranweisung durch den Nutzer; Ergebnisse sind Designentwürfe.
+
+Umfang: vier transparente SVG-Rahmen, sechs SVG-Titelplaketten, sechs GLB-Karten mit Vorder-/Rückseite, Texturatlas und editierbarer Blender-Quelle. Eine eigene Sammlungsseite erlaubt Drehen, Umdrehen und Vergrößern. Alle Kartenseiten und Kanten sind sichtbar; keine versteckten Innenräume oder beweglichen Mechanismen. Material- und Exportprüfung getrennt von der visuellen Nutzerabnahme.
+
+Art direction: dunkles Indigo/Burgunder, Kürbisorange, warmes Messing, gebrochenes Silber, gedämpfte Akzentfarben; erkennbare facettierte Silhouetten im Stil von docs/LOOK.md. Rahmen greifen Lampions, Grabstein/Lesebuch, Kürbiskrone und Blutmond auf. Karten sehen wie kleine verzauberte Lehrbücher aus: metallischer Rand, eingelassener Druck, lesbare englische Beispiele und ein erhabenes Motiv. Keine Horror-Gewalt, keine fremden Bildausschnitte. Keine Imagegen-Konzeptphase erforderlich: eigene Vektorgestaltung und direkt delegierter Modellbau.
+
+Kartenthemen: Lantern of Verbs; Pumpkin Comparisons; Ghost of Questions; The Witch's Recipe; Haunted Prepositions; Blood Moon Story. Bezug zu Englisch 8a/8b durch kurze Beispiele zu Verben, Adjektiven, Fragesätzen, Mengen, Ortsangaben und Verlaufsform. Sammel- und Freischaltideen sind Vorschläge, keine bestehende Spiellogik.
+
+Technikziel je Karte: höchstens 4.000 Dreiecke, ein 1024 × 768 Texturatlas, höchstens acht Materialien. Kartengröße ungefähr 72 × 108 × 3 mm; Relief liegt bewusst auf der Vorderseite, Kartenboden und Rand bleiben verbunden. Beide Druckseiten korrekt orientiert, glTF Y-up / Front +Z. Keine fremden Fonts als Dateien; vorhandenes Comic Neue bleibt lokal in der Webseite, SVG-Druck benutzt freigegebene Systemfonts beim Rasterisieren.
+
+Produktion: Blender MCP nicht verfügbar; Blender 5.2 über einen isolierten Hintergrundprozess. Originalszene und übriges Repository bleiben unangetastet. Quellen/GLBs werden nur in diesem Unterordner erstellt. Prüfbudget: ein Prototyp und bei technischen Exportfehlern bis zu zwei gezielte Reparaturen; keine eigene visuelle Freigabe behaupten. Originaldateien unter Assets/Season I/Cards enthalten derzeit keine nutzbare Vorlage.

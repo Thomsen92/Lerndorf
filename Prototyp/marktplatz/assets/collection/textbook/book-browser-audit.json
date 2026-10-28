@@ -1,0 +1,38 @@
+{
+  "checks": [
+    "almanac contains 50 active cards",
+    "no benched figure appears in the picker",
+    "book renders within the budget",
+    "book has height, width and physical spine thickness",
+    "book links to almanac and Legendary collectible",
+    "no figure model was loaded",
+    "book actually rotates with the mouse",
+    "back view works",
+    "back cover meme and both source images are available",
+    "cover view works",
+    "keyboard rotation works",
+    "full edited cover is available",
+    "book preview fits portrait width",
+    "book does not spin automatically",
+    "no errors or missing resources",
+    "all runtime requests stay local",
+    "native/export audit confirms full cover UVs and embedded texture",
+    "meme texture is embedded on a readable back face",
+    "direct back-cover preview opens the meme side"
+  ],
+  "errors": [],
+  "visualReview": "User review pending; no screenshots",
+  "book": {
+    "calls": 5,
+    "triangles": 868,
+    "errors": [],
+    "size": [
+      0.20000000298023224,
+      0.2752104699611664,
+      0.017023999243974686
+    ],
+    "textures": []
+  },
+  "stillMotionDistance": 0,
+  "success": true
+}

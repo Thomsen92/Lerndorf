@@ -6,6 +6,11 @@ import { createReadOnlyScene } from './readOnlyScene';
 import { openReadOnlyQuests } from './readOnlyQuests';
 import type { AreaHandle } from './areas';
 import { esc } from './esc';
+import { worldThemeApi } from '../api/worldTheme';
+import {
+  createWorldThemeController,
+  type WorldThemeController,
+} from '../season/worldThemeController';
 export interface ReadOnlyView {
   pupilId: string;
   nickname: string;
@@ -23,6 +28,7 @@ export async function mountReadOnlyVillage(
   let area: AreaHandle | null = null,
     scene: ReturnType<typeof createReadOnlyScene> | null = null,
     disposed = false;
+  let worldThemes: WorldThemeController | null = null;
   const showQuests = () => {
     area?.close();
     scene?.setPaused(true);
@@ -42,7 +48,7 @@ export async function mountReadOnlyVillage(
       loadClassSlots(s),
       loadClassNotice(s, view.classId),
     ]);
-    if (!disposed)
+    if (!disposed) {
       scene = createReadOnlyScene(
         root.querySelector('.stage')!,
         members,
@@ -52,6 +58,13 @@ export async function mountReadOnlyVillage(
         showQuests,
         note?.text ?? null,
       );
+      worldThemes = createWorldThemeController({
+        classId: view.classId,
+        read: () => worldThemeApi(s).teacherState(view.classId),
+        apply: (state) => scene?.setWorldTheme(state.effectiveTheme),
+      });
+      void worldThemes.refresh();
+    }
   } catch (err) {
     if (!disposed)
       root.querySelector('.read-only-error')!.textContent =
@@ -60,6 +73,7 @@ export async function mountReadOnlyVillage(
   return {
     dispose() {
       disposed = true;
+      worldThemes?.dispose();
       area?.close();
       scene?.dispose();
       root.replaceChildren();

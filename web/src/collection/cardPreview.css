@@ -1,0 +1,111 @@
+/* Stacked above the card detail: hide the detail panel underneath instead of letting it peek out. */
+.overlay.card-preview-overlay {
+  background: #08080f;
+}
+.card-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(220px, 0.9fr);
+  grid-template-rows: minmax(320px, 1fr) auto;
+  gap: 14px;
+  min-height: min(72vh, 640px);
+}
+.card-preview-stage {
+  position: relative;
+  grid-row: 1;
+  grid-column: 1;
+  min-height: 320px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #241a2e;
+  touch-action: none;
+}
+.card-preview-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.card-preview-status {
+  position: absolute;
+  inset: auto 12px 12px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #120912cc;
+  color: #fff1d7;
+  font-weight: 700;
+}
+.card-preview-status.error {
+  border: 1px solid #ff8f8f;
+}
+.card-preview-side {
+  grid-row: 1;
+  grid-column: 2;
+  overflow: auto;
+  padding-right: 4px;
+}
+.card-preview-meta {
+  margin: 0 0 6px;
+  color: #d6a34f;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.card-preview-key {
+  display: block;
+  font-size: 20px;
+  line-height: 1.3;
+}
+.card-preview-text,
+.card-preview-tip {
+  margin: 10px 0 0;
+  line-height: 1.45;
+}
+.card-preview-tip {
+  color: #cbb8da;
+}
+.card-preview-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.card-preview-button {
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid #d6a34f;
+  border-radius: 12px;
+  background: #3a2b47;
+  color: #fff1d7;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.card-preview-button:focus-visible {
+  outline: 3px solid #ffd16d;
+  outline-offset: 3px;
+}
+.card-preview-print {
+  display: block;
+  max-width: 100%;
+  max-height: 72vh;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+@media (max-width: 760px) {
+  .card-preview {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(280px, 46vh) auto auto;
+    min-height: 0;
+  }
+  .card-preview-stage {
+    grid-column: 1;
+    min-height: 280px;
+  }
+  .card-preview-side {
+    grid-column: 1;
+    grid-row: 2;
+    max-height: 30vh;
+  }
+  .card-preview-actions {
+    grid-row: 3;
+  }
+}

@@ -5,7 +5,7 @@
       "date": "2026-10-26",
       "quests": [
         { "id": "mon-1", "type": "choice", "prompt": "What is 'Kirsche' in English?", "hint": "It is a small red fruit.", "reward": 5, "options": ["cherry", "cheese", "chicken", "cookie"], "solution": "cherry" },
-        { "id": "mon-2", "type": "gap", "prompt": "For breakfast I had an ___ and some toast.", "hint": "A chicken gives us this food.", "reward": 10, "solution": ["egg"] },
+        { "id": "mon-2", "type": "gap", "prompt": "For breakfast I had an ___ and some toast.", "hint": "A chicken gives us this food.", "reward": 10, "solution": ["egg"], "bank": ["banana", "egg", "sausage", "pancake"] },
         { "id": "mon-3", "type": "listening", "prompt": "Listen. What did Sam drink?", "hint": "Listen to the last sentence again.", "reward": 10, "speak": "Hi, I'm Sam. Yesterday after school I hung out with my friends at the diner. I had hash browns and a fizzy drink.", "mode": "choice", "options": ["a fizzy drink", "apple juice", "a milkshake", "water"], "solution": "a fizzy drink" }
       ]
     },
@@ -13,7 +13,7 @@
       "date": "2026-10-27",
       "quests": [
         { "id": "tue-1", "type": "match", "prompt": "Match the words.", "hint": "Look at your new words from this week.", "reward": 10, "pairs": [["oil", "Öl"], ["wide", "breit"], ["voluntary", "freiwillig"], ["dessert", "Nachtisch"]] },
-        { "id": "tue-2", "type": "gap", "prompt": "A cook is a person ___ makes food in a restaurant.", "hint": "Is a cook a person or a thing?", "reward": 10, "solution": ["who", "that"] },
+        { "id": "tue-2", "type": "gap", "prompt": "A cook is a person ___ makes food in a restaurant.", "hint": "Is a cook a person or a thing?", "reward": 10, "solution": ["who", "that"], "bank": ["which", "who", "where", "what"] },
         { "id": "tue-3", "type": "order", "prompt": "Put the words in order.", "hint": "The word 'which' comes right after a noun.", "reward": 15, "solution": ["pasta", "is", "food", "which", "comes", "from", "Italy"] }
       ]
     },
@@ -21,15 +21,15 @@
       "date": "2026-10-28",
       "quests": [
         { "id": "wed-1", "type": "choice", "prompt": "Which word is correct? 'Our team ___ the game yesterday.'", "hint": "Yesterday means past. This verb is irregular.", "reward": 5, "options": ["win", "won", "winned", "wins"], "solution": "won" },
-        { "id": "wed-2", "type": "gap", "prompt": "A cherry pie is ___ than an apple. (sweet)", "hint": "It is a short adjective.", "reward": 10, "solution": ["sweeter"] },
-        { "id": "wed-3", "type": "listening", "prompt": "Listen. The cherry pie costs ___ dollars.", "hint": "Listen for the number after 'costs'.", "reward": 10, "speak": "Welcome to Sally's Diner! Today our cherry pie costs three dollars. The hash browns cost two dollars.", "mode": "gap", "solution": ["three", "3"] }
+        { "id": "wed-2", "type": "gap", "prompt": "A cherry pie is ___ than an apple. (sweet)", "hint": "It is a short adjective.", "reward": 10, "solution": ["sweeter"], "bank": ["sweet", "more sweet", "sweeter", "sweetest"] },
+        { "id": "wed-3", "type": "listening", "prompt": "Listen. The cherry pie costs ___ dollars.", "hint": "Listen for the number after 'costs'.", "reward": 10, "speak": "Welcome to Sally's Diner! Today our cherry pie costs three dollars. The hash browns cost two dollars.", "mode": "gap", "solution": ["three", "3"], "bank": ["two", "three", "five", "ten"] }
       ]
     },
     {
       "date": "2026-10-29",
       "quests": [
         { "id": "thu-1", "type": "choice", "prompt": "Which text type often starts with 'Dear Sir or Madam'?", "hint": "This text is very polite and not for friends.", "reward": 10, "options": ["a formal letter", "a chat message", "a blog post", "a text message"], "solution": "a formal letter" },
-        { "id": "thu-2", "type": "gap", "prompt": "I ___ (feel) very tired after the long day yesterday.", "hint": "Yesterday means past. The verb is irregular.", "reward": 10, "solution": ["felt"] },
+        { "id": "thu-2", "type": "gap", "prompt": "I ___ (feel) very tired after the long day yesterday.", "hint": "Yesterday means past. The verb is irregular.", "reward": 10, "solution": ["felt"], "bank": ["feel", "feels", "felt", "have felt"] },
         { "id": "thu-3", "type": "listening", "prompt": "Listen. Where is the diner?", "hint": "Listen to the sentence with 'which'.", "reward": 10, "speak": "The girl who works at the diner is my sister. The diner which is next to the park sells the best pie in town.", "mode": "choice", "options": ["next to the park", "next to the school", "next to the station"], "solution": "next to the park" }
       ]
     },
@@ -44,9 +44,9 @@
     {
       "date": "2026-10-31",
       "quests": [
-        { "id": "sat-1", "type": "listening", "prompt": "Listen. For dessert they had cherry ___.", "hint": "It is a sweet food. Listen to the end.", "reward": 10, "speak": "Last weekend I hung out with my cousin. We fried some eggs and ate pasta. For dessert we had cherry pie.", "mode": "gap", "solution": ["pie"] },
+        { "id": "sat-1", "type": "listening", "prompt": "Listen. For dessert they had cherry ___.", "hint": "It is a sweet food. Listen to the end.", "reward": 10, "speak": "Last weekend I hung out with my cousin. We fried some eggs and ate pasta. For dessert we had cherry pie.", "mode": "gap", "solution": ["pie"], "bank": ["cake", "pie", "ice cream", "pancakes"] },
         { "id": "sat-2", "type": "choice", "prompt": "Which word is correct? 'This is the man ___ sells hash browns.'", "hint": "Is a man a person or a thing?", "reward": 5, "options": ["who", "which", "where"], "solution": "who" },
-        { "id": "sat-3", "type": "gap", "prompt": "The hash browns are the ___ food in this diner. (good)", "hint": "Good is irregular: good, better, ...", "reward": 10, "solution": ["best"] }
+        { "id": "sat-3", "type": "gap", "prompt": "The hash browns are the ___ food in this diner. (good)", "hint": "Good is irregular: good, better, ...", "reward": 10, "solution": ["best"], "bank": ["good", "better", "most good", "best"] }
       ]
     },
     {
@@ -54,7 +54,7 @@
       "quests": [
         { "id": "sun-1", "type": "order", "prompt": "Put the words in order.", "hint": "Compare two things with 'than'.", "reward": 15, "solution": ["the", "river", "is", "wider", "than", "the", "street"] },
         { "id": "sun-2", "type": "listening", "prompt": "Listen. What did Alex get?", "hint": "Listen to the sentence with 'yesterday'.", "reward": 10, "speak": "Hi, this is Alex. I love New York! Yesterday I got a new phone and I felt really happy. Now I can write my blog every day.", "mode": "choice", "options": ["a new phone", "a new bike", "a new book"], "solution": "a new phone" },
-        { "id": "sun-3", "type": "gap", "prompt": "Our class ___ (get) a prize last week.", "hint": "Last week means past. This verb is irregular.", "reward": 10, "solution": ["got"] }
+        { "id": "sun-3", "type": "gap", "prompt": "Our class ___ (get) a prize last week.", "hint": "Last week means past. This verb is irregular.", "reward": 10, "solution": ["got"], "bank": ["get", "gets", "has got", "got"] }
       ]
     }
   ]

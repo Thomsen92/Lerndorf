@@ -8,6 +8,7 @@ import { tr, msg } from '../../i18n';
 import type { PoolItem } from '../../api/season';
 import { itemName } from '../seasonChests';
 import { RARITY, modelPicture, type Rarity, type SeasonPictures } from './rewardArt';
+import { openItem3dPreview, type Item3dPreviewHandle, type Item3dViewFactory } from '../item3dPreview';
 import './insideModal.css';
 
 /** Chances per rarity (plan E16), highest rarity first as in the dialog. */
@@ -27,6 +28,9 @@ export interface InsideOptions {
   pool: Promise<PoolItem[]> | PoolItem[];
   pictures?: SeasonPictures | null;
   onClose?(): void;
+  reducedMotion?: boolean;
+  /** Test seam for the 3D view; the app uses WebGL. */
+  createView?: Item3dViewFactory;
 }
 
 export function openInside(host: HTMLElement, opts: InsideOptions): InsideHandle {
@@ -50,7 +54,9 @@ export function openInside(host: HTMLElement, opts: InsideOptions): InsideHandle
 
   const intro = document.createElement('p');
   intro.className = 'inside-intro';
-  intro.textContent = tr('Jede Truhe enthält genau einen Gegenstand. Pass-, Serien- und Shop-Truhen haben dieselben Chancen.');
+  intro.textContent = tr(
+    'Jede Truhe enthält genau einen Gegenstand. Pass-, Serien- und Shop-Truhen haben dieselben Chancen.',
+  );
 
   const bands = document.createElement('div');
   bands.className = 'inside-bands';
@@ -73,14 +79,20 @@ export function openInside(host: HTMLElement, opts: InsideOptions): InsideHandle
         const grid = document.createElement('div');
         grid.className = 'inside-items';
         for (const item of items) {
-          const fig = document.createElement('figure');
-          const box = document.createElement('div');
+          // picture and name are one big button: tap opens the large 3D view (no hover, no tiny link)
+          const tile = document.createElement('button');
+          tile.type = 'button';
+          tile.className = 'inside-item';
+          tile.setAttribute('aria-label', msg`${itemName(item.id)} in 3D ansehen`);
+          const box = document.createElement('span');
           box.className = 'inside-box';
           box.append(modelPicture(opts.pictures ?? null, item.id, item.kind));
-          const cap = document.createElement('figcaption');
+          const cap = document.createElement('span');
+          cap.className = 'inside-name';
           cap.textContent = itemName(item.id);
-          fig.append(box, cap);
-          grid.append(fig);
+          tile.append(box, cap);
+          tile.addEventListener('click', () => showItem(item, tile));
+          grid.append(tile);
         }
         band.append(grid);
         bands.append(band);
@@ -91,8 +103,31 @@ export function openInside(host: HTMLElement, opts: InsideOptions): InsideHandle
       bands.textContent = tr('Die Gegenstände konnten nicht geladen werden.');
     });
 
+  // One 3D view at a time inside the same dialog; the list keeps its scroll position underneath.
+  let detail: Item3dPreviewHandle | null = null;
+  function showItem(item: PoolItem, tile: HTMLButtonElement): void {
+    detail?.close();
+    const scroll = dialog.scrollTop;
+    intro.hidden = true;
+    bands.hidden = true;
+    detail = openItem3dPreview(dialog, {
+      item,
+      reducedMotion: opts.reducedMotion,
+      createView: opts.createView,
+      onClose: () => {
+        detail = null;
+        if (!overlay.isConnected) return;
+        intro.hidden = false;
+        bands.hidden = false;
+        dialog.scrollTop = scroll;
+        tile.focus();
+      },
+    });
+  }
+
   function closeFn(): void {
     if (!overlay.isConnected) return;
+    detail?.close();
     overlay.remove();
     document.removeEventListener('keydown', onKey, true);
     opts.onClose?.();
@@ -101,7 +136,9 @@ export function openInside(host: HTMLElement, opts: InsideOptions): InsideHandle
     if (event.key === 'Escape') {
       event.preventDefault();
       event.stopPropagation();
-      closeFn();
+      // the first Escape closes only the 3D view, the next one the list
+      if (detail) detail.close();
+      else closeFn();
     }
   }
   document.addEventListener('keydown', onKey, true);

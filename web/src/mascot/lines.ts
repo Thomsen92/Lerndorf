@@ -23,6 +23,8 @@ export const LINES = {
   allDone: "That's all for today. See you tomorrow!",
   allDoneMarket: 'You did all your quests today. Splendid!',
   catchUp: "You can still do yesterday's quests.",
+  spooky: 'Welcome to the Spooky English Quiz! Tap the right answer. No rush.',
+  spookyDone: 'Spooktacular! Now collect your rewards in your LearnPass.',
 } as const;
 export type LineKey = keyof typeof LINES;
 /** Recordings of single lines, as file names without folder and extension. */

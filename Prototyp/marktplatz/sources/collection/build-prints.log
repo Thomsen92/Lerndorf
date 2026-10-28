@@ -1,0 +1,295 @@
+C:\Users\Thomas\Projekte\Wochenpläne 8r\Lerndorf\Prototyp\marktplatz\sources\collection\build-prints.py:13: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  material=bpy.data.materials.new(name);material.use_nodes=True;tree=material.node_tree
+C:\Users\Thomas\Projekte\Wochenpläne 8r\Lerndorf\Prototyp\marktplatz\sources\collection\build-prints.py:26: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  paper=bpy.data.materials.new(item['id']+'_paper');edge=(.66,.40,.12,1) if item['rarity']=='legendary' else (.8,.74,.61,1);paper.diffuse_color=edge;paper.use_nodes=True;paper.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value=edge
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+22:02:07 | INFO: Starting glTF 2.0 export
+22:02:07 | INFO: Extracting primitive: Full printed face.001
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Extracting primitive: Full printed face
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Extracting primitive: Cube.001
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Finished glTF 2.0 export in 0.05578303337097168 s
+C:\Users\Thomas\Projekte\Wochenpläne 8r\Lerndorf\Prototyp\marktplatz\sources\collection\build-prints.py:13: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  material=bpy.data.materials.new(name);material.use_nodes=True;tree=material.node_tree
+C:\Users\Thomas\Projekte\Wochenpläne 8r\Lerndorf\Prototyp\marktplatz\sources\collection\build-prints.py:26: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  paper=bpy.data.materials.new(item['id']+'_paper');edge=(.66,.40,.12,1) if item['rarity']=='legendary' else (.8,.74,.61,1);paper.diffuse_color=edge;paper.use_nodes=True;paper.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value=edge
+
+22:02:07 | INFO: Starting glTF 2.0 export
+22:02:07 | INFO: Extracting primitive: Full printed face.003
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Extracting primitive: Full printed face.002
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Extracting primitive: Cube.002
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Finished glTF 2.0 export in 0.011840105056762695 s
+
+22:02:07 | INFO: Starting glTF 2.0 export
+22:02:07 | INFO: Extracting primitive: Full printed face.005
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Extracting primitive: Full printed face.004
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Extracting primitive: Cube.003
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Finished glTF 2.0 export in 0.010371208190917969 s
+
+22:02:07 | INFO: Starting glTF 2.0 export
+22:02:07 | INFO: Extracting primitive: Full printed face.007
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Extracting primitive: Full printed face.006
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Extracting primitive: Cube.004
+22:02:07 | INFO: Primitives created: 1
+22:02:07 | INFO: Finished glTF 2.0 export in 0.010864973068237305 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.009
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.008
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.005
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.011028289794921875 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.011
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.010
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.006
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.012060165405273438 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.013
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.012
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.007
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.01299595832824707 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.015
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.014
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.008
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.011725902557373047 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.017
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.016
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.009
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.011473655700683594 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.019
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.018
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.010
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.017098188400268555 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.021
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.020
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.011
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.011280298233032227 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.023
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.022
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.012
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.03446149826049805 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.025
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.024
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.013
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.01804828643798828 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.027
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.026
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.014
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.016646862030029297 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.029
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.028
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.015
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.016802072525024414 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.031
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.030
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.016
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.016613483428955078 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.033
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.032
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.017
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.02143073081970215 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.035
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.034
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.018
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.017381906509399414 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.037
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.036
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.019
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.017542123794555664 s
+
+22:02:08 | INFO: Starting glTF 2.0 export
+22:02:08 | INFO: Extracting primitive: Full printed face.039
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Full printed face.038
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Extracting primitive: Cube.020
+22:02:08 | INFO: Primitives created: 1
+22:02:08 | INFO: Finished glTF 2.0 export in 0.026671648025512695 s
+
+Info: Saved as "textbook-prints.blend"
+22:02:08 | INFO: Data are loaded, start creating Blender stuff
+22:02:08 | INFO: Blender create Mesh node Full printed face.001
+22:02:08 | INFO: Blender create Mesh node Full printed face
+22:02:08 | INFO: Blender create Mesh node Cube.001
+22:02:08 | INFO: glTF import finished in 0.01s
+22:02:08 | INFO: Data are loaded, start creating Blender stuff
+22:02:08 | INFO: Blender create Mesh node Full printed face.003
+22:02:08 | INFO: Blender create Mesh node Full printed face.002
+22:02:08 | INFO: Blender create Mesh node Cube.002
+22:02:08 | INFO: glTF import finished in 0.01s
+22:02:08 | INFO: Data are loaded, start creating Blender stuff
+22:02:08 | INFO: Blender create Mesh node Full printed face.005
+22:02:08 | INFO: Blender create Mesh node Full printed face.004
+22:02:08 | INFO: Blender create Mesh node Cube.003
+22:02:08 | INFO: glTF import finished in 0.01s
+22:02:08 | INFO: Data are loaded, start creating Blender stuff
+22:02:08 | INFO: Blender create Mesh node Full printed face.007
+22:02:08 | INFO: Blender create Mesh node Full printed face.006
+22:02:08 | INFO: Blender create Mesh node Cube.004
+22:02:08 | INFO: glTF import finished in 0.01s
+22:02:08 | INFO: Data are loaded, start creating Blender stuff
+22:02:08 | INFO: Blender create Mesh node Full printed face.009
+22:02:08 | INFO: Blender create Mesh node Full printed face.008
+22:02:08 | INFO: Blender create Mesh node Cube.005
+22:02:08 | INFO: glTF import finished in 0.01s
+22:02:08 | INFO: Data are loaded, start creating Blender stuff
+22:02:08 | INFO: Blender create Mesh node Full printed face.011
+22:02:08 | INFO: Blender create Mesh node Full printed face.010
+22:02:08 | INFO: Blender create Mesh node Cube.006
+22:02:08 | INFO: glTF import finished in 0.01s
+22:02:08 | INFO: Data are loaded, start creating Blender stuff
+22:02:08 | INFO: Blender create Mesh node Full printed face.013
+22:02:08 | INFO: Blender create Mesh node Full printed face.012
+22:02:08 | INFO: Blender create Mesh node Cube.007
+22:02:08 | INFO: glTF import finished in 0.01s
+22:02:08 | INFO: Data are loaded, start creating Blender stuff
+22:02:08 | INFO: Blender create Mesh node Full printed face.015
+22:02:08 | INFO: Blender create Mesh node Full printed face.014
+22:02:08 | INFO: Blender create Mesh node Cube.008
+22:02:08 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.017
+22:02:09 | INFO: Blender create Mesh node Full printed face.016
+22:02:09 | INFO: Blender create Mesh node Cube.009
+22:02:09 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.019
+22:02:09 | INFO: Blender create Mesh node Full printed face.018
+22:02:09 | INFO: Blender create Mesh node Cube.010
+22:02:09 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.021
+22:02:09 | INFO: Blender create Mesh node Full printed face.020
+22:02:09 | INFO: Blender create Mesh node Cube.011
+22:02:09 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.023
+22:02:09 | INFO: Blender create Mesh node Full printed face.022
+22:02:09 | INFO: Blender create Mesh node Cube.012
+22:02:09 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.025
+22:02:09 | INFO: Blender create Mesh node Full printed face.024
+22:02:09 | INFO: Blender create Mesh node Cube.013
+22:02:09 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.027
+22:02:09 | INFO: Blender create Mesh node Full printed face.026
+22:02:09 | INFO: Blender create Mesh node Cube.014
+22:02:09 | INFO: glTF import finished in 0.00s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.029
+22:02:09 | INFO: Blender create Mesh node Full printed face.028
+22:02:09 | INFO: Blender create Mesh node Cube.015
+22:02:09 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.031
+22:02:09 | INFO: Blender create Mesh node Full printed face.030
+22:02:09 | INFO: Blender create Mesh node Cube.016
+22:02:09 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.033
+22:02:09 | INFO: Blender create Mesh node Full printed face.032
+22:02:09 | INFO: Blender create Mesh node Cube.017
+22:02:09 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.035
+22:02:09 | INFO: Blender create Mesh node Full printed face.034
+22:02:09 | INFO: Blender create Mesh node Cube.018
+22:02:09 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.037
+22:02:09 | INFO: Blender create Mesh node Full printed face.036
+22:02:09 | INFO: Blender create Mesh node Cube.019
+22:02:09 | INFO: glTF import finished in 0.01s
+22:02:09 | INFO: Data are loaded, start creating Blender stuff
+22:02:09 | INFO: Blender create Mesh node Full printed face.039
+22:02:09 | INFO: Blender create Mesh node Full printed face.038
+22:02:09 | INFO: Blender create Mesh node Cube.020
+22:02:09 | INFO: glTF import finished in 0.01s
+PRINT_EXPORT_AUDIT_PASSED 20 printed surfaces
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+
+Blender quit

@@ -237,7 +237,7 @@ Migrationen 0019, 0020 und 0021 sind bereits online (am 26.10.2026 geprüft). Da
 
 ## Daily Quests einspielen
 
-Seit Oktober 2026 gibt es statt der Wochenaufgaben **Daily Quests**: jeden Tag (auch am Wochenende) 3 kurze Englisch-Aufgaben. Die Schüler öffnen sie mit dem Knopf **Aufgaben** oder durch Antippen der Tafel am Marktplatz. Was von gestern noch offen ist, steht darunter unter „Nachholen von gestern“ und bringt die halben Münzen. Versuche sind unbegrenzt, Münzen gibt es aber nur, wenn die richtige Antwort unter den ersten 3 Versuchen ist.
+Seit Oktober 2026 gibt es statt der Wochenaufgaben **Daily Quests**: jeden Tag (auch am Wochenende) 3 kurze Englisch-Aufgaben. Die Schüler öffnen sie mit dem Knopf **Aufgaben** oder durch Antippen der Tafel am Marktplatz. Was von gestern noch offen ist, steht darunter unter „Nachholen von gestern“ und bringt die halben Münzen. Versuche sind unbegrenzt. Wer im 1. oder 2. Versuch richtig liegt, bekommt die vollen Münzen, danach gibt es die Hälfte (aufgerundet). Alles wird auf dem Tablet nur angetippt: Antwort-Kacheln, bei Lücken eine Wortbank, beim Zuordnen erst ein Wort und dann sein Partner, beim Satzbau die Wörter der Reihe nach. Ein „Prüfen“-Knopf ist nicht nötig. Wenn du neue Wochen schreibst: Jede Lücke braucht jetzt eine `bank` mit 2–6 Wörtern (siehe `content/daily-quests/FORMAT.md`).
 
 ### Wer schreibt die Quests?
 
@@ -334,7 +334,17 @@ Oben wählen Sie **Klasse 8a** oder **Klasse 8b**. Die Adresse merkt sich die Kl
 - **Münzen & Stempel:** kleine Belohnungen, Korrekturen und Wochenplan-Stempel.
 - **Daily Quests:** Abdeckung, Importfehler und Vorschau mit Lösungen wie bisher.
 - **Konten:** einzeln oder als Liste anlegen, Karten drucken, Passwort zurücksetzen und Konto löschen.
-- **Dorf & Regeln:** Shop/Bauen öffnen oder sperren, Vorlage und Seed ändern, Spielregeln und verkaufte Gegenstände festlegen. Das Neufestlegen des Dorfs braucht weiterhin eine Bestätigung.
+- **Dorf & Regeln:** Shop/Bauen öffnen oder sperren, Vorlage und Seed ändern, Spielregeln und verkaufte Gegenstände festlegen. Neu ist hier die **Weltstimmung** (Normal oder Halloween) je Klasse. Das Neufestlegen des Dorfs braucht weiterhin eine Bestätigung.
+
+### Weltstimmung: Normal oder Halloween
+
+Unter **Dorf & Regeln → Weltstimmung** wählen Sie für die gerade ausgewählte Klasse **Normal** oder **Season I – Halloween** und speichern. Die Einstellung gilt sofort für diese Klasse; die andere Klasse bleibt unverändert. Sichtbare Schülergeräte übernehmen sie spätestens nach 30 Sekunden, beim Zurückkehren in den Tab sofort.
+
+- Halloween wirkt nur, solange die Season im Kalender läuft. Wenn Sie vorher umstellen, steht dort **vorgemerkt**; die dunkle Welt beginnt mit dem Season-Start.
+- Die Weltstimmung ändert **nur** Himmel, Licht, Nebel, Platzdekoration und die Gruselfiguren. LearnPass, Season-Zeitraum, XP, Münzen, Häuser und Grundstücke bleiben unverändert.
+- **Normal** stellt die ursprüngliche Welt vollständig wieder her. Mehrfaches Umschalten erzeugt keine doppelten Lampen, Gräber oder Figuren.
+- Der Halloween-Shop, das Ticket und die Begrüßung bleiben auch in der normalen Welt erreichbar. Die Begrüßung erscheint einmal pro Season und Inhalt, unabhängig von der Weltoptik, und lässt sich am Stand oder über das Ticket erneut öffnen.
+- Wenn die Seite „Weltstimmung konnte nicht geladen werden“ zeigt, laden Sie neu. Die übrigen Dorf-Einstellungen bleiben in diesem Fall benutzbar.
 
 ### Schnell Münzen buchen – auch am Tablet
 
@@ -416,11 +426,17 @@ Eine Saison ist ein Zeitraum von etwa sechs Wochen mit 40 Stufen. In Season I (2
 
 ### Was die Schüler tun
 
-1. **Quests lösen** – jede Buchung im Saisonfenster zählt als Season-XP.
-2. **Stufen abholen** – erreichte Stufen leuchten orange; „Abholen“ gibt Münzen, Truhen, Titel, Rahmen oder eine Gartenszene.
-3. **Truhen öffnen** – im Inventar unter „Season-Truhen“. Pass-Truhen kommen auf Stufe 5, 10, 15, …, 40; die **Truhen-Serie** gibt zusätzlich eine Truhe an jedem dritten Tag in Folge mit gelöster Quest; im Shop gibt es **zwei Truhen pro Woche für je 50 Münzen**.
-4. **Stufe 40** – Truhe, Titel „Halloween Legend“, 25 Münzen und eine **freie Wahl** aus den 28 Truhen-Gegenständen. Wer den Gegenstand schon besitzt, bekommt stattdessen seinen Verkaufswert in Münzen.
-5. **Doppelte verkaufen** – im Inventar bei den Season-Gegenständen. Nur unplatzierte Exemplare, Werte: 15 / 40 / 100 / 250 Münzen je Seltenheit.
+1. **Spooky English Quiz** – am Halloween-Stand oder über das „Season I“-Ticket im Dorf: zehn Klickfragen (Odd one out, Steigerung, BE/AE, vier Hörfragen). Je erste richtige Antwort 10 XP, nach allen zehn 50 XP Bonus – zusammen **genau 150 XP = Stufe 5**, einmal pro Saison, ohne Stempel. Falsche Antworten geben einen Tipp und kosten nichts.
+2. **Quests lösen** – jede Buchung im Saisonfenster zählt als Season-XP.
+3. **Stufen abholen** – erreichte Stufen leuchten orange; „Abholen“ gibt Münzen, Truhen, Titel, Rahmen oder eine Gartenszene.
+4. **Truhen öffnen** – im Inventar unter „Season-Truhen“. Pass-Truhen kommen auf Stufe 5, 10, 15, …, 40; die **Truhen-Serie** gibt zusätzlich eine Truhe an jedem dritten Tag in Folge mit gelöster Quest; im Shop gibt es **zwei Truhen pro Woche für je 50 Münzen**.
+5. **Stufe 40** – Truhe, Titel „Halloween Legend“, 25 Münzen und eine **freie Wahl** aus den 28 Truhen-Gegenständen. Wer den Gegenstand schon besitzt, bekommt stattdessen seinen Verkaufswert in Münzen.
+6. **Was ist drin?** – in der Truhen-Übersicht jeden Gegenstand antippen: Er erscheint groß in 3D zum Drehen und Zoomen. Das ist nur eine Vorschau, es wird nichts geöffnet oder gekauft.
+7. **Doppelte verkaufen** – im Inventar bei den Season-Gegenständen. Nur unplatzierte Exemplare, Werte: 15 / 40 / 100 / 250 Münzen je Seltenheit.
+
+### Musik und Klänge
+
+Im Dorf läuft leise Hintergrundmusik, in den Quizfenstern eine ruhigere Denk-Musik. Richtige und falsche Antworten haben einen eigenen Klang, Sir Byte „blippt“ bei jeder neuen Sprechblase. Unter **Einstellungen** lassen sich **Musik** und **Töne** getrennt ausschalten; das merkt sich jedes Gerät.
 
 ### Saison steuern (Lehrerbereich)
 
@@ -447,3 +463,39 @@ Season-Gegenstände bleiben im Besitz, sind aber nicht mehr im Shop zu kaufen. T
 | „Dafür reichen die Münzen nicht.“ | Der Shop-Kauf kostet 50 Münzen; Quests bringen neue. |
 | „Saison beendet“ | Stufen werden automatisch gutgeschrieben; nichts weiter tun. |
 | „Ende muss Sonntag sein“ | Beim Ändern der Daten ein Sonntagsdatum wählen. |
+
+## Sammelkarten: The Midnight Collection
+
+Die Halloween-Sammlung ist **kein Ersatz** für die 28 Dorfgegenstände und ändert deren Truhenchancen nicht.
+
+### Wo finden die Schüler die Karten?
+
+Profil öffnen und unten auf **Sammelkarten** tippen. Zuerst erscheint der Almanach-Umschlag. **Almanach öffnen** zeigt alle 50 Karten mit Suche und Filtern (Seltenheit, Classroom Curses). Eine Karte antippen zeigt Inhalt und Quellen; **In 3D ansehen** öffnet das gedrehte Modell mit **Umdrehen**, **Ansicht zurücksetzen** und bei Druckkarten **Druckbild ansehen**. Die Vorschau vergibt nichts und ändert keinen Besitz. **Erfolge** ist ausdrücklich noch ein Platzhalter.
+
+- **50 aktive Karten:** 18 normal, 17 rare, 14 epic und genau eine legendary (`Highlight 8`). Acht frühere Figuren bleiben archiviert und erscheinen nie.
+- **35 Karten über den LearnPass:** normal und rare zusätzlich zu den Münzen auf denselben 24 Münzfeldern. Bereits abgeholte Felder werden beim nächsten Öffnen der Sammlung nachgetragen; Münzen werden dabei nicht erneut gebucht.
+- **15 Karten über Season-Truhen:** 14 epic und die eine legendary, nur solange die Karte noch nicht besessen wird. Keine Karte kann doppelt besessen werden.
+- **Truhen-Kartenchance:** Der Kartenbonus in Truhen ist **absichtlich ausgeschaltet**, bis Trefferhäufigkeit und Gewichte festgelegt sind. Dorfgegenstand und Münzen aus der Truhe bleiben unverändert. Vor dieser Änderung geöffnete Truhen ziehen keine Karte nach.
+
+### Neue Datenbank-Migrationen
+
+Für diese Funktionen kommen fünf neue Migrationen dazu:
+
+| Migration | Inhalt |
+| --- | --- |
+| `0034_class_world_theme.sql` | Weltstimmung je Klasse und Welcome-Quittung |
+| `0049_collection_cards.sql` | Kartendefinitionen, Besitz, serverseitige Vergabe |
+| `0050_collection_chest_rewards.sql` | feste Passkarten, Truhen-Kartenbonus (aus), Nachbuchung |
+| `0051_season_starter.sql` | Spooky English Quiz: zehn Fragen, Fortschritt, 150 XP einmal pro Saison |
+| `0052_season_item_rarities.sql` | Kürbismädchen und Hexen-Statue werden Episch, das Kürbisfeld Selten |
+
+Sie werden – wie alle Migrationen – beim Merge nach `main` automatisch eingespielt. Vorher nichts von Hand in Supabase ausführen. Nach der Live-Prüfung friert der technische Lauf die Migrationen mit `npm run migrations:lock` ein. Der Branch `codex/halloween-collection` ist bewusst **noch nicht gepusht**.
+
+### Wenn etwas nicht klappt
+
+| Meldung | Bedeutung |
+| --- | --- |
+| „Die Sammlung konnte nicht geladen werden.“ | Katalog oder Besitz nicht erreichbar; Seite neu laden. Der Besitz bleibt serverseitig erhalten. |
+| „3D-Ansicht ist auf diesem Gerät nicht verfügbar.“ | Der Browser kann kein WebGL öffnen; Karte und Quellen bleiben lesbar. |
+| „Das Modell konnte nicht geladen werden.“ | Modelldatei fehlt oder Netzwerkfehler; **Erneut versuchen** antippen. |
+| Leere Sammlung trotz Abholung | Profil neu öffnen; die Nachbuchung läuft beim Lesen der Sammlung automatisch. |

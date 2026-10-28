@@ -27,7 +27,10 @@
 .inside-head h2 {
   flex: 1;
   margin: 0;
-  font: 700 28px 'Comic Neue', 'Comic Sans MS', cursive;
+  font:
+    700 28px 'Comic Neue',
+    'Comic Sans MS',
+    cursive;
 }
 .inside-close {
   width: 48px;
@@ -57,13 +60,18 @@
   border-top: 1px solid #ffffff14;
 }
 .inside-pct {
-  font: 700 34px/1 'Comic Neue', 'Comic Sans MS', cursive;
+  font:
+    700 34px/1 'Comic Neue',
+    'Comic Sans MS',
+    cursive;
   color: var(--r);
 }
 .inside-pct small {
   display: block;
   margin-top: 4px;
-  font: 700 14px system-ui, sans-serif;
+  font:
+    700 14px system-ui,
+    sans-serif;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -171,4 +179,45 @@
   .pick-grid {
     grid-template-columns: repeat(4, 1fr);
   }
+}
+
+/* Each chest item is one button (picture + name): at least 48 px, visible focus, no hover needed. */
+.inside-items .inside-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: none;
+  color: #b6a5c6;
+  font:
+    400 12px/1.2 system-ui,
+    sans-serif;
+  text-align: center;
+  cursor: pointer;
+}
+.inside-item:hover {
+  border-color: #3d2c52;
+}
+.inside-item .inside-box {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0;
+}
+.inside-name {
+  display: block;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+.inside-intro[hidden],
+.inside-bands[hidden] {
+  display: none;
 }

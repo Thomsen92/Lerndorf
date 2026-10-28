@@ -11,6 +11,33 @@ import { createSeasonCard } from './seasonCard';
 import type { SeasonApi } from '../api/season';
 import './profile.css';
 import type { AvatarLook } from '../avatars/look';
+
+/** Small card-stack icon for the almanach entry (no external image). */
+function cardStackSvg(size: number): SVGSVGElement {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 48 48');
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('aria-hidden', 'true');
+  for (const [x, y] of [
+    [10, 12],
+    [15, 9],
+    [20, 6],
+  ]) {
+    const rect = document.createElementNS(ns, 'rect');
+    rect.setAttribute('x', String(x));
+    rect.setAttribute('y', String(y));
+    rect.setAttribute('width', '20');
+    rect.setAttribute('height', '30');
+    rect.setAttribute('rx', '3');
+    rect.setAttribute('fill', '#2a1f33');
+    rect.setAttribute('stroke', '#d6a34f');
+    rect.setAttribute('stroke-width', '2');
+    svg.append(rect);
+  }
+  return svg;
+}
 let serial = 0;
 export function openProfile(opts: {
   api: ProgressApi;
@@ -26,6 +53,8 @@ export function openProfile(opts: {
   onQuests?: () => void;
   /** Season entry card (U5); omitted in read-only views without a season. */
   season?: { api: SeasonApi; onOpen: () => void };
+  /** Opens the Halloween card almanach (package 6); omitted where no collection exists. */
+  collection?: { open: () => void };
   sound?: Sound;
   reducedMotion: boolean;
 }): AreaHandle {
@@ -210,6 +239,17 @@ export function openProfile(opts: {
     collection.append(label);
     text(collection, 'span', '→', 'profile-collection-arrow');
     content.append(collection);
+    if (opts.collection) {
+      const cardCollection = button('', () => opts.collection?.open(), 'profile-collection-link');
+      cardCollection.setAttribute('aria-label', tr('Sammelkarten ansehen'));
+      cardCollection.append(cardStackSvg(48));
+      const cardLabel = document.createElement('span');
+      text(cardLabel, 'strong', tr('Sammelkarten'));
+      text(cardLabel, 'span', tr('Der Halloween-Almanach'));
+      cardCollection.append(cardLabel);
+      text(cardCollection, 'span', '→', 'profile-collection-arrow');
+      content.append(cardCollection);
+    }
   }
   async function choose(reward: Reward | null, b: HTMLButtonElement, error: HTMLElement): Promise<void> {
     if (!progress || busy || closed) return;
@@ -311,10 +351,7 @@ export function openProfile(opts: {
         if (!selected) void choose(reward, button, error);
       });
       b.dataset.reward = reward?.id ?? 'none';
-      b.setAttribute(
-        'aria-label',
-        `${reward?.label ?? tr('Kein Titel')}${note}`,
-      );
+      b.setAttribute('aria-label', `${reward?.label ?? tr('Kein Titel')}${note}`);
       b.setAttribute('aria-pressed', String(selected));
       b.disabled = locked || busy;
       if (selected) b.setAttribute('aria-disabled', 'true');

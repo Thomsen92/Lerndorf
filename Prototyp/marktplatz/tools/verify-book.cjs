@@ -1,0 +1,42 @@
+const {chromium}=require('../../../web/node_modules/playwright');
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const ROOT=path.resolve(__dirname,'..'),BASE='http://127.0.0.1:5188/';
+(async()=>{
+ const browser=await chromium.launch({headless:true,executablePath:'C:/Users/Thomas/AppData/Local/ms-playwright/chromium-1248/chrome-win64/chrome.exe',args:['--use-angle=d3d11']});
+ const report={checks:[],errors:[],visualReview:'User review pending; no screenshots'};
+ const check=(name,value)=>{assert.ok(value,name);report.checks.push(name);console.log('PASS '+name);};
+ try{
+  const page=await browser.newPage({viewport:{width:1440,height:1000}}),requests=[];
+  page.on('pageerror',e=>report.errors.push(e.message));page.on('console',m=>{if(m.type()==='error')report.errors.push(m.text());});page.on('response',r=>{if(r.status()>=400)report.errors.push(r.status()+' '+r.url());});page.on('request',r=>requests.push(r.url()));
+  await page.goto(BASE+'collection.html');await page.waitForFunction(()=>window.collectionPreview?.ready);
+  check('almanac contains 50 active cards',await page.evaluate(()=>window.collectionPreview.stats().cards===50));
+  check('no benched figure appears in the picker',await page.locator('[data-id="sofia-moon-witch"], [data-id="liberty-after-dark"]').count()===0);
+  await page.locator('#open-book').click();await page.waitForFunction(()=>window.bookPreview?.ready);await page.waitForTimeout(150);
+  let stats=await page.evaluate(()=>window.bookPreview.stats());report.book=stats;
+  check('book renders within the budget',stats.calls>0&&stats.calls<=5&&stats.triangles===868);
+  check('book has height, width and physical spine thickness',Math.abs(stats.size[0]-.2)<.001&&Math.abs(stats.size[1]-.27521)<.001&&Math.abs(stats.size[2]-.017024)<.001);
+  check('book links to almanac and Legendary collectible',await page.locator('#book-open-almanac').getAttribute('href')==='./collection.html#cards-section'&&await page.locator('#book-collectible').getAttribute('href')==='./collection.html?card=highlight-halloween-card');
+  check('no figure model was loaded',requests.filter(u=>/sofia|bella|mason|ryan|selena|liberty-after-dark|werehound|ghost-level/.test(u)).length===0);
+  const before=await page.evaluate(()=>window.bookPreview.camera()),box=await page.locator('#book-stage').boundingBox();
+  await page.mouse.move(box.x+box.width*.45,box.y+box.height*.5);await page.mouse.down();await page.mouse.move(box.x+box.width*.65,box.y+box.height*.5,{steps:8});await page.mouse.up();await page.waitForTimeout(200);
+  check('book actually rotates with the mouse',JSON.stringify(before)!==JSON.stringify(await page.evaluate(()=>window.bookPreview.camera())));
+  await page.locator('#book-back').click();check('back view works',await page.evaluate(()=>window.bookPreview.camera()[2]<0));
+  check('back cover meme and both source images are available',await page.locator('#back-cover-detail img').evaluate(img=>img.complete&&img.naturalWidth>1000)&&fs.existsSync(path.join(ROOT,'assets/collection/textbook/reference-traffic-stop.png'))&&fs.existsSync(path.join(ROOT,'assets/collection/textbook/reference-back-cover.png')));
+  await page.locator('#book-front').click();check('cover view works',await page.evaluate(()=>window.bookPreview.camera()[2]>0));
+  await page.locator('#book-stage').focus();const keyBefore=await page.evaluate(()=>window.bookPreview.camera());await page.keyboard.press('ArrowRight');
+  check('keyboard rotation works',JSON.stringify(keyBefore)!==JSON.stringify(await page.evaluate(()=>window.bookPreview.camera())));
+  check('full edited cover is available',await page.locator('.cover-detail img').first().evaluate(img=>img.complete&&img.naturalWidth===1069&&img.naturalHeight===1471));
+  await page.setViewportSize({width:390,height:844});await page.waitForTimeout(200);check('book preview fits portrait width',await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth));
+  await page.emulateMedia({reducedMotion:'reduce'});await page.locator('#book-front').click();const still=await page.evaluate(()=>window.bookPreview.camera());await page.waitForTimeout(300);
+  const after=await page.evaluate(()=>window.bookPreview.camera());report.stillMotionDistance=Math.hypot(...still.map((v,i)=>v-after[i]));
+  check('book does not spin automatically',report.stillMotionDistance<1e-7);
+  check('no errors or missing resources',report.errors.length===0);
+  check('all runtime requests stay local',requests.every(u=>u.startsWith(BASE)||/^(blob:|data:)/.test(u)));
+  const audit=JSON.parse(fs.readFileSync(path.join(ROOT,'assets/collection/textbook/book-audit.json')));
+  check('native/export audit confirms full cover UVs and embedded texture',audit.success&&audit.fullCoverUV&&audit.frontNormalCorrect&&Math.max(...audit.embeddedTexture)===1024);
+  check('meme texture is embedded on a readable back face',audit.fullBackUV&&audit.backNormalCorrect&&audit.backNotMirrored&&Math.max(...audit.embeddedBackTexture)===1024);
+  await page.goto(BASE+'book.html?view=back');await page.waitForFunction(()=>window.bookPreview?.ready);
+  check('direct back-cover preview opens the meme side',await page.evaluate(()=>window.bookPreview.camera()[2]<0));
+  report.success=true;
+ }finally{await browser.close();fs.writeFileSync(path.join(ROOT,'assets/collection/textbook/book-browser-audit.json'),JSON.stringify(report,null,2)+'\n');}
+})().catch(e=>{console.error(e);process.exit(1);});

@@ -1,0 +1,44 @@
+{
+  "success": true,
+  "source": {
+    "triangles": 868,
+    "materials": 5,
+    "size": [
+      0.20000000298023224,
+      0.017023999243974686,
+      0.2752104699611664
+    ]
+  },
+  "export": {
+    "triangles": 868,
+    "materials": 5,
+    "size": [
+      0.20000000298023224,
+      0.017023999243974686,
+      0.2752104699611664
+    ]
+  },
+  "coverOriginalSize": [
+    1069,
+    1471
+  ],
+  "embeddedTexture": [
+    744,
+    1024
+  ],
+  "backOriginalSize": [
+    1069,
+    1472
+  ],
+  "embeddedBackTexture": [
+    744,
+    1024
+  ],
+  "fullCoverUV": true,
+  "frontNormalCorrect": true,
+  "fullBackUV": true,
+  "backNormalCorrect": true,
+  "backNotMirrored": true,
+  "bytes": 1995284,
+  "visualReview": "User review pending"
+}

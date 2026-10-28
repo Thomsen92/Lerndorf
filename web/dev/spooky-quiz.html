@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spooky English Quiz – harness</title>
+    <link rel="icon" href="data:," />
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #1d1626;
+      }
+      #app {
+        position: relative;
+        height: 100%;
+      }
+      #pass {
+        position: fixed;
+        left: 16px;
+        bottom: 16px;
+        color: #f6e9d2;
+        font:
+          16px system-ui,
+          sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <p id="pass" role="status"></p>
+    <script type="module">
+      // Dev only, never built: the hub and the real quiz view against an in-memory server that
+      // follows migration 0051 (10 XP per first correct answer, 50 XP bonus, hints only when wrong).
+      // The questions come from the private seed itself, so nothing is copied into the app.
+      import '../src/style.css';
+      import seed from '../../Prototyp/marktplatz/sources/season-starter/quiz.private.json';
+      import { createSeasonHub } from '../src/season/seasonHub.ts';
+      import { openSpookyQuiz } from '../src/season/spookyQuizView.ts';
+      import { setLocale } from '../src/i18n.ts';
+      import { createSound } from '../src/ui/sound.ts';
+
+      const params = new URLSearchParams(location.search);
+      setLocale(params.get('lang') === 'de' ? 'de' : 'en');
+      const solvedAtStart = Number(params.get('solved') ?? 0);
+      const solved = new Set(seed.questions.slice(0, solvedAtStart).map((q) => q.id));
+      const attempts = new Map();
+      let xp = solved.size * 10;
+      const tierOf = (x) => Math.floor(x / 30);
+      const api = {
+        async state(seasonId) {
+          return {
+            seasonId,
+            state: params.get('state') ?? 'running',
+            solved: solved.size,
+            total: seed.questions.length,
+            awardedXp: xp,
+            completed: solved.size === seed.questions.length,
+            questions: seed.questions.map((q) => ({
+              id: q.id,
+              kind: q.kind,
+              type: q.type,
+              prompt: q.prompt,
+              options: q.options,
+              ...(q.type === 'listening' ? { speak: q.speak } : {}),
+              solved: solved.has(q.id),
+              attempts: attempts.get(q.id) ?? 0,
+            })),
+          };
+        },
+        async answer(_season, id, value) {
+          await new Promise((resolve) => setTimeout(resolve, 150));
+          const q = seed.questions.find((x) => x.id === id);
+          const already = solved.has(id);
+          const correct = already || value === q.solution;
+          let awarded = 0,
+            bonus = 0;
+          if (!already) attempts.set(id, (attempts.get(id) ?? 0) + 1);
+          if (correct && !already) {
+            solved.add(id);
+            awarded = 10;
+            if (solved.size === seed.questions.length) bonus = 50;
+            xp += awarded + bonus;
+          }
+          return {
+            correct,
+            alreadySolved: already,
+            hint: correct ? null : q.hint,
+            solved: solved.size,
+            total: seed.questions.length,
+            completed: solved.size === seed.questions.length,
+            awardedXp: awarded + bonus,
+            completionBonusXp: bonus,
+            seasonXp: xp,
+            reachedTier: tierOf(xp),
+            progress: null,
+          };
+        },
+      };
+      // the game's sound: village loop, quiz loop, answer sounds and Sir Byte's blips (after the first tap)
+      const sound = createSound();
+      sound.setMusic('village');
+      for (const event of ['pointerdown', 'keydown']) window.addEventListener(event, () => sound.unlock());
+      const pass = document.getElementById('pass');
+      const hub = createSeasonHub({
+        host: document.getElementById('app'),
+        canOpen: () => true,
+        openLearnPass: () => (pass.textContent = 'LearnPass opened'),
+        openQuiz: () =>
+          openSpookyQuiz({
+            api,
+            seasonId: '2026-11-halloween',
+            opener: hub.el,
+            openLearnPass: () => (pass.textContent = 'LearnPass opened'),
+          }),
+      });
+      hub.setState({
+        classId: '8a',
+        requestedTheme: 'normal',
+        effectiveTheme: 'normal',
+        revision: 0,
+        seasonId: '2026-11-halloween',
+        seasonLabel: 'Season I – Halloween',
+        seasonState: params.get('state') ?? 'running',
+        welcomeSeen: true,
+      });
+      window.spookyHarness = {
+        solution: (id) => seed.questions.find((q) => q.id === id).solution,
+        ready: true,
+      };
+    </script>
+  </body>
+</html>

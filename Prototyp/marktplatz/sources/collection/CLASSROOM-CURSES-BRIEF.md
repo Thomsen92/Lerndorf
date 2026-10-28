@@ -1,0 +1,9 @@
+# Classroom Curses · eight comedy cards / r10
+
+User explicitly supplied eight card titles and requested self-aware English descriptions, dry British humour, English effects, generated artwork printed as a texture and Halloween-themed backs. The existing printed-surface pipeline is used. All work stays in Prototyp/marktplatz; Claude/user handles artistic acceptance. No commits/push or production/gameplay changes.
+
+Titles are quoted as provided, including slang and the deliberately incorrect “Can I go of the toilet”. The latter also gives the useful corrected request “Can I go to the toilet, please?”. The Kerim phrase is a quoted fictional card title; no pupil record, real portrait, surname, class membership or behaviour history is stored. Images are absurd school props/ghosts with no identifiable pupils. The cooling-off image is an open picnic cooler with ice/props; no person is confined inside. Vaping satire is about fog and official envelopes, without a person vaping or a marketed device.
+
+Humour targets the card itself, paperwork and dramatic classroom rituals. Effects are explicitly imaginary card flavour, never implemented sanctions, teacher controls, removal from lessons, punishment counters or real player modifiers. Rarities for these additions: three Normal, three Rare, two Epic. The existing Highlight-8 cover remains the sole active Legendary. No random rewards, probabilities or account mutations are added.
+
+Each distinct illustration uses one built-in Imagegen call; exact prompts are defined in tools/classroom-curses-data.cjs and saved with the outputs. Native SVG typography keeps titles, descriptions and effects readable rather than relying on text inside the generated images. Front/back print textures are embedded in thin 3D card GLBs; existing 112-triangle / three-material budget applies. Full-size print links and the existing bounded preview cache remain in use. Model sources remain editable in textbook-prints.blend.

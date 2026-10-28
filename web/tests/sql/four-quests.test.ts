@@ -88,3 +88,45 @@ it('rejects slot five and keeps solutions inaccessible to pupils', async () => {
   await db.exec(`select set_config('request.jwt.claim.sub','${A}',false); set role authenticated;`);
   await expect(db.query('select * from daily_quest_solutions')).rejects.toThrow(/permission denied/);
 });
+it('D11 (28.10.2026): attempts 1–2 pay in full, every later correct answer half (rounded up)', async () => {
+  await db.exec(`insert into daily_quests(key,week,day,slot,qid,type,prompt,reward,data) values
+      ('c1','2026-11-09','2026-11-09',1,'c1','choice','Pick yes',10,'{"options":["yes","no","maybe"]}'),
+      ('c2','2026-11-09','2026-11-09',2,'c2','choice','Pick yes',10,'{"options":["yes","no","maybe"]}'),
+      ('c3','2026-11-09','2026-11-09',3,'c3','choice','Pick yes',5,'{"options":["yes","no","maybe"]}'),
+      ('old','2026-11-02','2026-11-08',1,'old','choice','Pick yes',10,'{"options":["yes","no","maybe"]}');
+    insert into daily_quest_solutions(quest_key,solution) select key,'"yes"' from daily_quests;
+    select set_config('request.jwt.claim.sub','${A}',false); set role authenticated;`);
+  type Answer = { correct: boolean; reward: number; reward_left: number };
+  const answer = async (key: string, value: string): Promise<Answer> =>
+    (await db.query<{ v: Answer }>(`select submit_quest_answer('${key}','"${value}"') v`)).rows[0].v;
+  const left = async (key: string): Promise<number> =>
+    (
+      await db.query<{ v: Array<{ key: string; reward_left: number }> }>('select my_daily_quests() v')
+    ).rows[0].v.find((q) => q.key === key)!.reward_left;
+  // second try still full
+  expect(await answer('c1', 'no')).toMatchObject({ correct: false, reward_left: 10 });
+  expect(await answer('c1', 'yes')).toMatchObject({ correct: true, reward: 10 });
+  // after two wrong answers: half, also for many more tries
+  await answer('c2', 'no');
+  expect(await answer('c2', 'maybe')).toMatchObject({ reward_left: 5 });
+  expect(await left('c2')).toBe(5);
+  for (let i = 0; i < 5; i++) await answer('c2', 'no');
+  expect(await answer('c2', 'yes')).toMatchObject({ correct: true, reward: 5 });
+  // odd rewards round up
+  await answer('c3', 'no');
+  await answer('c3', 'no');
+  expect(await answer('c3', 'yes')).toMatchObject({ reward: 3 });
+  // catch-up: halved first (10 → 5), then the rule (5 → 3)
+  expect(await left('old')).toBe(5);
+  await answer('old', 'no');
+  await answer('old', 'no');
+  expect(await answer('old', 'yes')).toMatchObject({ reward: 3 });
+  await db.exec('reset role');
+  expect(
+    (
+      await db.query<{ s: number }>(
+        `select coalesce(sum(delta),0)::int s from coin_ledger where player_id='${A}'`,
+      )
+    ).rows[0].s,
+  ).toBe(10 + 5 + 3 + 3);
+});

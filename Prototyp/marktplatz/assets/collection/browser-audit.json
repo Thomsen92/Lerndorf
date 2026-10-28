@@ -1,0 +1,567 @@
+{
+  "checks": [
+    "50 active cards and exactly two collection sections",
+    "only the active GLB loads on first visit",
+    "30 original cards, twenty prints and eight preserved benched figures",
+    "Highlight cover is the only active Legendary card",
+    "same cover artwork serves the almanac and the collectible",
+    "blood-moon-story: former Legendary is Epic in data and print",
+    "fortune-brave: former Legendary is Epic in data and print",
+    "knowledge-power: former Legendary is Epic in data and print",
+    "all six verse cards contain verifiable original excerpts",
+    "midnight-focus-card: original source image embedded byte-for-byte",
+    "two-ways-boo-card: original source image embedded byte-for-byte",
+    "become-go-grow-card: original source image embedded byte-for-byte",
+    "spooky-sounds-card: original source image embedded byte-for-byte",
+    "midnight-map-card: original source image embedded byte-for-byte",
+    "midnight-bird-card: original source image embedded byte-for-byte",
+    "haunted-definitions-card: original source image embedded byte-for-byte",
+    "spooky-as-as-card: original source image embedded byte-for-byte",
+    "towers-after-dark-card: original source image embedded byte-for-byte",
+    "index is sorted Normal, Rare, Epic, Legendary",
+    "lantern-verbs: card render and dimensions",
+    "lantern-verbs: front/back switch",
+    "lantern-verbs: separate 3D motif render",
+    "lantern-verbs: bounded model cache",
+    "pumpkin-comparisons: card render and dimensions",
+    "pumpkin-comparisons: front/back switch",
+    "pumpkin-comparisons: separate 3D motif render",
+    "pumpkin-comparisons: bounded model cache",
+    "ghost-questions: card render and dimensions",
+    "ghost-questions: front/back switch",
+    "ghost-questions: separate 3D motif render",
+    "ghost-questions: bounded model cache",
+    "witch-recipe: card render and dimensions",
+    "witch-recipe: front/back switch",
+    "witch-recipe: separate 3D motif render",
+    "witch-recipe: bounded model cache",
+    "haunted-prepositions: card render and dimensions",
+    "haunted-prepositions: front/back switch",
+    "haunted-prepositions: separate 3D motif render",
+    "haunted-prepositions: bounded model cache",
+    "blood-moon-story: card render and dimensions",
+    "blood-moon-story: front/back switch",
+    "blood-moon-story: separate 3D motif render",
+    "blood-moon-story: bounded model cache",
+    "night-light: card render and dimensions",
+    "night-light: front/back switch",
+    "night-light: separate 3D motif render",
+    "night-light: bounded model cache",
+    "night-light: exact excerpt and attribution visible",
+    "bat-cat: card render and dimensions",
+    "bat-cat: front/back switch",
+    "bat-cat: separate 3D motif render",
+    "bat-cat: bounded model cache",
+    "bat-cat: exact excerpt and attribution visible",
+    "moon-spoon: card render and dimensions",
+    "moon-spoon: front/back switch",
+    "moon-spoon: separate 3D motif render",
+    "moon-spoon: bounded model cache",
+    "moon-spoon: exact excerpt and attribution visible",
+    "book-look: card render and dimensions",
+    "book-look: front/back switch",
+    "book-look: separate 3D motif render",
+    "book-look: bounded model cache",
+    "book-look: exact excerpt and attribution visible",
+    "adjective-key: card render and dimensions",
+    "adjective-key: front/back switch",
+    "adjective-key: separate 3D motif render",
+    "adjective-key: bounded model cache",
+    "past-footsteps: card render and dimensions",
+    "past-footsteps: front/back switch",
+    "past-footsteps: separate 3D motif render",
+    "past-footsteps: bounded model cache",
+    "talking-pumpkin: card render and dimensions",
+    "talking-pumpkin: front/back switch",
+    "talking-pumpkin: separate 3D motif render",
+    "talking-pumpkin: bounded model cache",
+    "time-for-tea: card render and dimensions",
+    "time-for-tea: front/back switch",
+    "time-for-tea: separate 3D motif render",
+    "time-for-tea: bounded model cache",
+    "better-late: card render and dimensions",
+    "better-late: front/back switch",
+    "better-late: separate 3D motif render",
+    "better-late: bounded model cache",
+    "two-heads: card render and dimensions",
+    "two-heads: front/back switch",
+    "two-heads: separate 3D motif render",
+    "two-heads: bounded model cache",
+    "practice-perfect: card render and dimensions",
+    "practice-perfect: front/back switch",
+    "practice-perfect: separate 3D motif render",
+    "practice-perfect: bounded model cache",
+    "friend-in-need: card render and dimensions",
+    "friend-in-need: front/back switch",
+    "friend-in-need: separate 3D motif render",
+    "friend-in-need: bounded model cache",
+    "hidden-key: card render and dimensions",
+    "hidden-key: front/back switch",
+    "hidden-key: separate 3D motif render",
+    "hidden-key: bounded model cache",
+    "slow-steady: card render and dimensions",
+    "slow-steady: front/back switch",
+    "slow-steady: separate 3D motif render",
+    "slow-steady: bounded model cache",
+    "rain-train: card render and dimensions",
+    "rain-train: front/back switch",
+    "rain-train: separate 3D motif render",
+    "rain-train: bounded model cache",
+    "rain-train: exact excerpt and attribution visible",
+    "quiet-mouse: card render and dimensions",
+    "quiet-mouse: front/back switch",
+    "quiet-mouse: separate 3D motif render",
+    "quiet-mouse: bounded model cache",
+    "silver-lining: card render and dimensions",
+    "silver-lining: front/back switch",
+    "silver-lining: separate 3D motif render",
+    "silver-lining: bounded model cache",
+    "book-cover: card render and dimensions",
+    "book-cover: front/back switch",
+    "book-cover: separate 3D motif render",
+    "book-cover: bounded model cache",
+    "actions-words: card render and dimensions",
+    "actions-words: front/back switch",
+    "actions-words: separate 3D motif render",
+    "actions-words: bounded model cache",
+    "birds-feather: card render and dimensions",
+    "birds-feather: front/back switch",
+    "birds-feather: separate 3D motif render",
+    "birds-feather: bounded model cache",
+    "sleepy-skeletons: card render and dimensions",
+    "sleepy-skeletons: front/back switch",
+    "sleepy-skeletons: separate 3D motif render",
+    "sleepy-skeletons: bounded model cache",
+    "sleepy-skeletons: exact excerpt and attribution visible",
+    "echo-verse: card render and dimensions",
+    "echo-verse: front/back switch",
+    "echo-verse: separate 3D motif render",
+    "echo-verse: bounded model cache",
+    "echo-verse: exact excerpt and attribution visible",
+    "fortune-brave: card render and dimensions",
+    "fortune-brave: front/back switch",
+    "fortune-brave: separate 3D motif render",
+    "fortune-brave: bounded model cache",
+    "knowledge-power: card render and dimensions",
+    "knowledge-power: front/back switch",
+    "knowledge-power: separate 3D motif render",
+    "knowledge-power: bounded model cache",
+    "empire-state-postcard: card render and dimensions",
+    "empire-state-postcard: front/back switch",
+    "empire-state-postcard: full-size print link and no sculpted motif control",
+    "empire-state-postcard: bounded model cache",
+    "empire-state-postcard: full printed surface fits the viewport",
+    "manhattan-postcard: card render and dimensions",
+    "manhattan-postcard: front/back switch",
+    "manhattan-postcard: full-size print link and no sculpted motif control",
+    "manhattan-postcard: bounded model cache",
+    "manhattan-postcard: full printed surface fits the viewport",
+    "midnight-focus-card: card render and dimensions",
+    "midnight-focus-card: front/back switch",
+    "midnight-focus-card: full-size print link and no sculpted motif control",
+    "midnight-focus-card: bounded model cache",
+    "midnight-focus-card: full printed surface fits the viewport",
+    "two-ways-boo-card: card render and dimensions",
+    "two-ways-boo-card: front/back switch",
+    "two-ways-boo-card: full-size print link and no sculpted motif control",
+    "two-ways-boo-card: bounded model cache",
+    "two-ways-boo-card: full printed surface fits the viewport",
+    "become-go-grow-card: card render and dimensions",
+    "become-go-grow-card: front/back switch",
+    "become-go-grow-card: full-size print link and no sculpted motif control",
+    "become-go-grow-card: bounded model cache",
+    "become-go-grow-card: full printed surface fits the viewport",
+    "spooky-sounds-card: card render and dimensions",
+    "spooky-sounds-card: front/back switch",
+    "spooky-sounds-card: full-size print link and no sculpted motif control",
+    "spooky-sounds-card: bounded model cache",
+    "spooky-sounds-card: full printed surface fits the viewport",
+    "midnight-map-card: card render and dimensions",
+    "midnight-map-card: front/back switch",
+    "midnight-map-card: full-size print link and no sculpted motif control",
+    "midnight-map-card: bounded model cache",
+    "midnight-map-card: full printed surface fits the viewport",
+    "midnight-bird-card: card render and dimensions",
+    "midnight-bird-card: front/back switch",
+    "midnight-bird-card: full-size print link and no sculpted motif control",
+    "midnight-bird-card: bounded model cache",
+    "midnight-bird-card: full printed surface fits the viewport",
+    "haunted-definitions-card: card render and dimensions",
+    "haunted-definitions-card: front/back switch",
+    "haunted-definitions-card: full-size print link and no sculpted motif control",
+    "haunted-definitions-card: bounded model cache",
+    "haunted-definitions-card: full printed surface fits the viewport",
+    "spooky-as-as-card: card render and dimensions",
+    "spooky-as-as-card: front/back switch",
+    "spooky-as-as-card: full-size print link and no sculpted motif control",
+    "spooky-as-as-card: bounded model cache",
+    "spooky-as-as-card: full printed surface fits the viewport",
+    "towers-after-dark-card: card render and dimensions",
+    "towers-after-dark-card: front/back switch",
+    "towers-after-dark-card: full-size print link and no sculpted motif control",
+    "towers-after-dark-card: bounded model cache",
+    "towers-after-dark-card: full printed surface fits the viewport",
+    "highlight-halloween-card: card render and dimensions",
+    "highlight-halloween-card: front/back switch",
+    "highlight-halloween-card: full-size print link and no sculpted motif control",
+    "highlight-halloween-card: bounded model cache",
+    "highlight-halloween-card: full printed surface fits the viewport",
+    "bloody-friday-card: card render and dimensions",
+    "bloody-friday-card: front/back switch",
+    "bloody-friday-card: full-size print link and no sculpted motif control",
+    "bloody-friday-card: bounded model cache",
+    "bloody-friday-card: full printed surface fits the viewport",
+    "school-rules-card: card render and dimensions",
+    "school-rules-card: front/back switch",
+    "school-rules-card: full-size print link and no sculpted motif control",
+    "school-rules-card: bounded model cache",
+    "school-rules-card: full printed surface fits the viewport",
+    "official-reprimand-card: card render and dimensions",
+    "official-reprimand-card: front/back switch",
+    "official-reprimand-card: full-size print link and no sculpted motif control",
+    "official-reprimand-card: bounded model cache",
+    "official-reprimand-card: full printed surface fits the viewport",
+    "vaping-reprimand-card: card render and dimensions",
+    "vaping-reprimand-card: front/back switch",
+    "vaping-reprimand-card: full-size print link and no sculpted motif control",
+    "vaping-reprimand-card: bounded model cache",
+    "vaping-reprimand-card: full printed surface fits the viewport",
+    "forgotten-homework-card: card render and dimensions",
+    "forgotten-homework-card: front/back switch",
+    "forgotten-homework-card: full-size print link and no sculpted motif control",
+    "forgotten-homework-card: bounded model cache",
+    "forgotten-homework-card: full printed surface fits the viewport",
+    "cool-box-card: card render and dimensions",
+    "cool-box-card: front/back switch",
+    "cool-box-card: full-size print link and no sculpted motif control",
+    "cool-box-card: bounded model cache",
+    "cool-box-card: full printed surface fits the viewport",
+    "cuess-digga-card: card render and dimensions",
+    "cuess-digga-card: front/back switch",
+    "cuess-digga-card: full-size print link and no sculpted motif control",
+    "cuess-digga-card: bounded model cache",
+    "cuess-digga-card: full printed surface fits the viewport",
+    "toilet-question-card: card render and dimensions",
+    "toilet-question-card: front/back switch",
+    "toilet-question-card: full-size print link and no sculpted motif control",
+    "toilet-question-card: bounded model cache",
+    "toilet-question-card: full printed surface fits the viewport",
+    "motif can actually be rotated with the mouse",
+    "normal: correct chapter contents",
+    "rare: correct chapter contents",
+    "epic: correct chapter contents",
+    "legendary: correct chapter contents",
+    "proverbs can be found",
+    "six authentic verse cards can be found",
+    "previous/next pages stay within the filtered chapter",
+    "single-result pages disable navigation",
+    "empty search has an explicit recovery",
+    "clear filters restores all cards",
+    "single book study replaces the figure banner",
+    "new print studies have a collection entry",
+    "author search finds the sourced Shakespeare card",
+    "Achievements is only a coming-later placeholder",
+    "back to the almanac works",
+    "book fits portrait width",
+    "empire-state-postcard: portrait framing fits the complete print",
+    "manhattan-postcard: portrait framing fits the complete print",
+    "midnight-focus-card: portrait framing fits the complete print",
+    "two-ways-boo-card: portrait framing fits the complete print",
+    "become-go-grow-card: portrait framing fits the complete print",
+    "spooky-sounds-card: portrait framing fits the complete print",
+    "midnight-map-card: portrait framing fits the complete print",
+    "midnight-bird-card: portrait framing fits the complete print",
+    "haunted-definitions-card: portrait framing fits the complete print",
+    "spooky-as-as-card: portrait framing fits the complete print",
+    "towers-after-dark-card: portrait framing fits the complete print",
+    "highlight-halloween-card: portrait framing fits the complete print",
+    "bloody-friday-card: portrait framing fits the complete print",
+    "school-rules-card: portrait framing fits the complete print",
+    "official-reprimand-card: portrait framing fits the complete print",
+    "vaping-reprimand-card: portrait framing fits the complete print",
+    "forgotten-homework-card: portrait framing fits the complete print",
+    "cool-box-card: portrait framing fits the complete print",
+    "cuess-digga-card: portrait framing fits the complete print",
+    "toilet-question-card: portrait framing fits the complete print",
+    "placeholder fits portrait width",
+    "earlier frame/title designs remain viewable",
+    "direct card/motif link works",
+    "rapid selection keeps the latest card and cache limit",
+    "no runtime errors, missing resources or external requests"
+  ],
+  "errors": [],
+  "models": [
+    {
+      "id": "lantern-verbs",
+      "motifTriangles": 536,
+      "motifBounds": [
+        1.925601334110541,
+        2.2,
+        0.2599566128430856
+      ]
+    },
+    {
+      "id": "pumpkin-comparisons",
+      "motifTriangles": 308,
+      "motifBounds": [
+        2.181697412052143,
+        2.2,
+        0.5157316482446399
+      ]
+    },
+    {
+      "id": "ghost-questions",
+      "motifTriangles": 332,
+      "motifBounds": [
+        1.8333333564547107,
+        2.2,
+        0.23833333164369425
+      ]
+    },
+    {
+      "id": "witch-recipe",
+      "motifTriangles": 480,
+      "motifBounds": [
+        1.7477173833343862,
+        2.2,
+        0.3058504946092656
+      ]
+    },
+    {
+      "id": "haunted-prepositions",
+      "motifTriangles": 672,
+      "motifBounds": [
+        2.2,
+        2.099518308075032,
+        0.2000006469417081
+      ]
+    },
+    {
+      "id": "blood-moon-story",
+      "motifTriangles": 144,
+      "motifBounds": [
+        2.2,
+        1.5631579316285684,
+        0.3126315701501106
+      ]
+    },
+    {
+      "id": "night-light",
+      "motifTriangles": 116,
+      "motifBounds": [
+        2.2,
+        2.0923243179100446,
+        0.35524404042122326
+      ]
+    },
+    {
+      "id": "bat-cat",
+      "motifTriangles": 448,
+      "motifBounds": [
+        2.2,
+        1.7213286796384495,
+        0.6062255734555448
+      ]
+    },
+    {
+      "id": "moon-spoon",
+      "motifTriangles": 144,
+      "motifBounds": [
+        2.2,
+        1.5631579316285684,
+        0.3126315701501106
+      ]
+    },
+    {
+      "id": "book-look",
+      "motifTriangles": 448,
+      "motifBounds": [
+        2.2,
+        1.7213286796384495,
+        0.6062255734555448
+      ]
+    },
+    {
+      "id": "adjective-key",
+      "motifTriangles": 372,
+      "motifBounds": [
+        2.2,
+        1.8158440911545504,
+        0.1590422539378849
+      ]
+    },
+    {
+      "id": "past-footsteps",
+      "motifTriangles": 460,
+      "motifBounds": [
+        2.2,
+        2.191199902389945,
+        0.32119999254196896
+      ]
+    },
+    {
+      "id": "talking-pumpkin",
+      "motifTriangles": 264,
+      "motifBounds": [
+        2.2,
+        1.8071428414624267,
+        0.2671428570121869
+      ]
+    },
+    {
+      "id": "time-for-tea",
+      "motifTriangles": 644,
+      "motifBounds": [
+        2.1827124245409486,
+        2.2,
+        0.34546525715141757
+      ]
+    },
+    {
+      "id": "better-late",
+      "motifTriangles": 744,
+      "motifBounds": [
+        2.199999672227093,
+        2.2,
+        0.31908399605797255
+      ]
+    },
+    {
+      "id": "two-heads",
+      "motifTriangles": 532,
+      "motifBounds": [
+        1.9891823854074042,
+        2.2,
+        0.4237036697660045
+      ]
+    },
+    {
+      "id": "practice-perfect",
+      "motifTriangles": 900,
+      "motifBounds": [
+        2.1908597366469698,
+        2.2,
+        0.1515446917901625
+      ]
+    },
+    {
+      "id": "friend-in-need",
+      "motifTriangles": 64,
+      "motifBounds": [
+        2.2,
+        2.0428570121868876,
+        0.31428570921163396
+      ]
+    },
+    {
+      "id": "hidden-key",
+      "motifTriangles": 584,
+      "motifBounds": [
+        1.965957321291993,
+        2.2,
+        0.37446805133796784
+      ]
+    },
+    {
+      "id": "slow-steady",
+      "motifTriangles": 616,
+      "motifBounds": [
+        2.2,
+        1.5048560151728638,
+        0.5350598594074997
+      ]
+    },
+    {
+      "id": "rain-train",
+      "motifTriangles": 556,
+      "motifBounds": [
+        2.2,
+        2.1685713681766705,
+        0.15714284146242652
+      ]
+    },
+    {
+      "id": "quiet-mouse",
+      "motifTriangles": 416,
+      "motifBounds": [
+        2.1531857321339913,
+        2.2,
+        0.449565192312495
+      ]
+    },
+    {
+      "id": "silver-lining",
+      "motifTriangles": 268,
+      "motifBounds": [
+        2.2,
+        1.3463574809027885,
+        0.32910956696849136
+      ]
+    },
+    {
+      "id": "book-cover",
+      "motifTriangles": 648,
+      "motifBounds": [
+        1.7285713658497062,
+        2.2,
+        0.38499999268246576
+      ]
+    },
+    {
+      "id": "actions-words",
+      "motifTriangles": 232,
+      "motifBounds": [
+        2.2,
+        2.1900138266071405,
+        0.2579310817465471
+      ]
+    },
+    {
+      "id": "birds-feather",
+      "motifTriangles": 188,
+      "motifBounds": [
+        2.111950702867177,
+        2.2,
+        0.18707523423818834
+      ]
+    },
+    {
+      "id": "sleepy-skeletons",
+      "motifTriangles": 672,
+      "motifBounds": [
+        1.7807041369587966,
+        2.2,
+        0.5804255303149075
+      ]
+    },
+    {
+      "id": "echo-verse",
+      "motifTriangles": 480,
+      "motifBounds": [
+        1.7477173833343862,
+        2.2,
+        0.3058504946092656
+      ]
+    },
+    {
+      "id": "fortune-brave",
+      "motifTriangles": 120,
+      "motifBounds": [
+        1.7032258490928138,
+        2.2,
+        0.36193550284630216
+      ]
+    },
+    {
+      "id": "knowledge-power",
+      "motifTriangles": 420,
+      "motifBounds": [
+        1.5638125196890462,
+        2.2,
+        0.4833602092854753
+      ]
+    }
+  ],
+  "visualReview": "User review pending; no screenshots",
+  "success": true
+}

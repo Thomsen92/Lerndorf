@@ -31,7 +31,14 @@ export function seasonChestModel(): THREE.Group {
 }
 
 /** Models that arrive asynchronously; everything else is built synchronously by plotAsset. */
-async function modelFor(kind: SlotKind, itemId: string): Promise<{ model: THREE.Object3D; shared: boolean }> {
+/**
+ * The model of one item as the village builds it. `shared` models (GLB and pass-scene clones) share
+ * geometry and materials with the village and must never be disposed by the caller.
+ */
+export async function itemModel(
+  kind: SlotKind,
+  itemId: string,
+): Promise<{ model: THREE.Object3D; shared: boolean }> {
   if (itemId === SEASON_CHEST_THUMB) return { model: seasonChestModel(), shared: false };
   if (isGlbItem(itemId)) return { model: await loadGlbItem(itemId), shared: true };
   if (itemId in PASS_SCENES) return { model: await loadPassScene(itemId), shared: true };
@@ -109,7 +116,7 @@ export function createWebGLThumbRender(): {
   return {
     async render(kind, itemId) {
       // GLB and pass-scene clones share geometry with the village: those are never disposed.
-      const { model, shared } = await modelFor(kind, itemId);
+      const { model, shared } = await itemModel(kind, itemId);
       try {
         model.rotation.y = PREVIEW_STILL_YAW;
         scene.add(model);

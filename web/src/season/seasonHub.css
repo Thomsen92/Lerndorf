@@ -1,0 +1,88 @@
+.season-world-ticket {
+  position: absolute;
+  right: 16px;
+  top: 80px;
+  z-index: 8;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: 112px;
+  min-height: 64px;
+  padding: 5px 8px 7px;
+  border: 1px solid #ba955b;
+  border-radius: 12px;
+  background: #302a3de8;
+  color: #f7dfaa;
+  box-shadow: 0 5px 16px #2b2b3333;
+  cursor: pointer;
+}
+.season-world-ticket[hidden] {
+  display: none;
+}
+.season-world-ticket img {
+  display: block;
+  width: 100px;
+  height: 54px;
+}
+.season-world-ticket span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.season-world-ticket:focus-visible {
+  outline: 3px solid #f0c574;
+  outline-offset: 3px;
+}
+.season-world-welcome {
+  text-align: center;
+  max-height: 70dvh;
+  overflow: auto;
+}
+.season-world-welcome > img {
+  width: 160px;
+  height: auto;
+  margin: 12px auto;
+}
+.season-world-welcome p {
+  line-height: 1.6;
+}
+.season-world-intro {
+  font-size: 18px;
+}
+.season-world-actions {
+  display: grid;
+  gap: 12px;
+  padding: 16px 0;
+}
+.season-world-actions button {
+  min-height: 52px;
+  white-space: normal;
+}
+.season-world-actions button:disabled {
+  opacity: 0.65;
+}
+@media (max-width: 650px) {
+  .season-world-ticket {
+    top: 76px;
+    right: 12px;
+    min-width: 88px;
+    padding: 3px 5px 5px;
+  }
+  .season-world-ticket img {
+    width: 82px;
+    height: 44px;
+  }
+  .season-world-ticket span {
+    font-size: 10px;
+  }
+}
+@media (max-height: 600px) {
+  .season-world-ticket {
+    top: 70px;
+    right: 12px;
+  }
+  .season-world-ticket img {
+    width: 70px;
+    height: 37px;
+  }
+}

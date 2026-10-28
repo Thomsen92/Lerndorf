@@ -2,6 +2,9 @@
 // Shows one map and seed from fixed viewpoints with sample residents, so the layout can be
 // judged from pictures. `scripts/galerie.ts` drives it with Playwright.
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { createWorldAppearance } from '../src/season/worldAppearance';
+import type { WorldTheme } from '../src/api/worldTheme';
 import { bridgeHeight, buildLayout } from '../src/world/layout';
 import { setBoardNote } from '../src/render/plaza';
 import { buildVillage } from '../src/render/village';
@@ -97,6 +100,10 @@ if (params.get('ruin') === '1')
 const village = buildVillage(layout, members, null);
 if (params.has('notice')) setBoardNote(village, 'Bring your English folder on Monday. Let’s learn together!');
 scene.add(village);
+const appearance = params.has('theme')
+  ? createWorldAppearance({ scene, village, layout, rig, renderer })
+  : null;
+appearance?.setTheme(params.get('theme') === 'halloween' ? 'halloween' : 'normal');
 const byte = createMarketByte({ scene, layout, sound: { enabled: false }, openQuests: () => undefined });
 if (params.get('byte') === '0') byte.root.visible = false;
 const crowd = new Crowd(
@@ -110,6 +117,13 @@ const crowd = new Crowd(
 );
 
 const camera = new THREE.PerspectiveCamera(38, 1280 / 800, 0.1, 400);
+const controls = params.has('interactive') ? new OrbitControls(camera, renderer.domElement) : null;
+if (controls) {
+  controls.enableDamping = true;
+  controls.minDistance = 10;
+  controls.maxDistance = 150;
+  controls.maxPolarAngle = 1.35;
+}
 const VIEWS: Record<string, { target: THREE.Vector3; offset: THREE.Vector3 }> = {
   byte: {
     target: byte.root.position.clone().add(new THREE.Vector3(0, 1, 0)),
@@ -163,6 +177,8 @@ function setView(name: string): void {
   const v = VIEWS[name] ?? VIEWS.overview;
   camera.position.copy(v.target).add(v.offset);
   camera.lookAt(v.target);
+  controls?.target.copy(v.target);
+  controls?.update();
   rig.follow(v.target);
 }
 
@@ -173,20 +189,23 @@ function step(seconds: number): void {
     crowd.update(dt);
     if (params.get('byte') !== '0') byte.update(dt, camera, true);
     (village.userData.animate as ((t: number) => void) | undefined)?.(t);
+    appearance?.update(dt, t, params.get('reduced') === '1');
   }
 }
 
 /** Draw calls: whole picture, and the world without the residents. */
-function drawCalls(): { total: number; world: number } {
+function drawCalls(): { total: number; world: number; totalTriangles: number; worldTriangles: number } {
   renderer.info.reset();
   renderer.render(scene, camera);
   const total = renderer.info.render.calls;
+  const totalTriangles = renderer.info.render.triangles;
   crowd.villagers.forEach((v) => (v.group.visible = false));
   renderer.info.reset();
   renderer.render(scene, camera);
   const world = renderer.info.render.calls;
+  const worldTriangles = renderer.info.render.triangles;
   crowd.villagers.forEach((v) => (v.group.visible = true));
-  return { total, world };
+  return { total, world, totalTriangles, worldTriangles };
 }
 
 /** Development-only same-frame measurement isolates the mascot from moving residents. */
@@ -215,8 +234,11 @@ declare global {
   interface Window {
     galerie: {
       setView(name: string): void;
+      setTheme(theme: WorldTheme): Promise<void>;
+      theme(): WorldTheme;
+      sceneState(): { children: number; layerCount: number; failures: string[] };
       step(seconds: number): void;
-      drawCalls(): { total: number; world: number };
+      drawCalls(): { total: number; world: number; totalTriangles: number; worldTriangles: number };
       byteCost(reaction: 'idle' | 'celebrate'): { calls: number; triangles: number };
       appearanceCost(): {
         residents: number;
@@ -232,6 +254,18 @@ declare global {
 
 window.galerie = {
   setView,
+  async setTheme(theme) {
+    appearance?.setTheme(theme);
+    await appearance?.ready();
+    appearance?.update(0.1, 12, params.get('reduced') === '1');
+    renderer.render(scene, camera);
+  },
+  theme: () => appearance?.theme ?? 'normal',
+  sceneState: () => ({
+    children: scene.children.length,
+    layerCount: scene.children.filter((o) => o.name === 'halloweenLayer').length,
+    failures: (scene.getObjectByName('halloweenLayer')?.userData.assetFailures ?? []) as string[],
+  }),
   step,
   drawCalls,
   byteCost,
@@ -261,6 +295,7 @@ void Promise.all([
   kenneyReady().then(() => new Promise((r) => setTimeout(r, 0))),
   Promise.all([loadCharacter('boy'), loadCharacter('girl')]),
 ]).then(async ([sky]) => {
+  await appearance?.ready();
   if (params.has('wardrobe'))
     await Promise.all(
       crowd.villagers.map(async (v, i) => {
@@ -285,4 +320,49 @@ void Promise.all([
   crowd.updateLabels(camera);
   renderer.render(scene, camera);
   window.galerie.ready = true;
+  if (params.has('responsive') && !controls) {
+    const resize = () => {
+      renderer.setSize(innerWidth, innerHeight);
+      camera.aspect = innerWidth / innerHeight;
+      camera.fov = innerWidth < innerHeight ? 52 : 38;
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+    };
+    addEventListener('resize', resize);
+    resize();
+  }
+  if (controls) {
+    const resize = () => {
+      renderer.setSize(innerWidth, innerHeight);
+      camera.aspect = innerWidth / innerHeight;
+      camera.fov = innerWidth < innerHeight ? 52 : 38;
+      camera.updateProjectionMatrix();
+    };
+    addEventListener('resize', resize);
+    resize();
+    let last = performance.now(),
+      elapsed = 20;
+    function frame() {
+      const now = performance.now(),
+        dt = Math.min(0.1, (now - last) / 1000);
+      last = now;
+      if (!document.hidden) {
+        elapsed += dt;
+        controls!.update();
+        rig.follow(controls!.target);
+        appearance?.update(
+          dt,
+          elapsed,
+          params.get('reduced') === '1' || matchMedia('(prefers-reduced-motion: reduce)').matches,
+        );
+        byte.update(dt, camera, matchMedia('(prefers-reduced-motion: reduce)').matches);
+        (village.userData.animate as ((t: number) => void) | undefined)?.(elapsed);
+        crowd.update(dt);
+        crowd.updateLabels(camera);
+        renderer.render(scene, camera);
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
 });

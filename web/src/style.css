@@ -670,6 +670,12 @@ table.ledger td {
   aspect-ratio: 4 / 3;
   max-height: 40vh;
 }
+.item-description {
+  margin: 8px 0 4px;
+  color: #5b4a6b;
+  font-size: 14px;
+  line-height: 1.45;
+}
 .item-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1406,3 +1412,294 @@ table.ledger td {
   height: 22px;
 }
 
+/*
+ * Daily quests, polished (28.10.2026): clear open/done states, a progress line for today,
+ * coins as a small coin pill, answer choices as big tap tiles (≥ 52 px, 10 px apart) and a
+ * larger check button. Selectors start at `.quests` so the shared forms elsewhere stay as they are.
+ */
+.quests > .status:empty {
+  display: none;
+}
+.quests .quest-progress {
+  display: grid;
+  grid-template-columns: auto minmax(80px, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 10px;
+}
+.quests .quest-progress-text {
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 15px;
+}
+.quests .quest-progress-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.quests .quest-progress-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ffd16d, #ffb347);
+  transition: width 0.4s ease-out;
+}
+.quests .quest-list {
+  gap: 10px;
+}
+.quests .quest-card {
+  background: #27344e;
+  border-color: #3d4d6c;
+  transition: border-color 0.15s;
+}
+.quests .quest-card:not(.solved):hover {
+  border-color: #6f84a8;
+}
+.quests .quest-card.open {
+  border-color: var(--lantern);
+  box-shadow: 0 0 0 3px rgba(255, 209, 109, 0.15);
+}
+.quests .quest-card.solved {
+  background: #233a35;
+  border-color: #3f6b57;
+}
+.quests .quest-card .quest-head {
+  min-height: 56px;
+  padding: 12px 14px;
+  gap: 8px 12px;
+}
+.quests .quest-dot {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  box-sizing: border-box;
+  border: 2px solid #8a9bbb;
+  border-radius: 50%;
+}
+.quests .quest-card.open .quest-dot {
+  border-color: var(--lantern);
+  background: radial-gradient(circle, var(--lantern) 0 4px, transparent 5px);
+}
+.quests .quest-card.solved .quest-dot {
+  border: 0;
+  background: #6fcf97 no-repeat center / 14px
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='%23123323' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.quests .quest-prompt {
+  flex: 1 1 180px;
+  font-size: 18px;
+  line-height: 1.35;
+}
+.quests .quest-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 6px;
+  border-radius: 999px;
+  background: rgba(255, 209, 109, 0.12);
+  color: #ffe2a3;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.quests .quest-reward::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff1b8, #f0b43c 60%, #b97d17);
+}
+.quests .quest-card.solved .quest-reward {
+  background: rgba(111, 207, 151, 0.16);
+  color: #9be3b8;
+}
+.quests .quest-card.solved .quest-reward::before,
+.quests .quest-reward.none::before {
+  display: none;
+}
+.quests .quest-reward.none {
+  padding-left: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-weight: 600;
+  white-space: normal;
+}
+.quests .quest-catchup {
+  display: inline-block;
+  padding: 2px 10px;
+  border: 1px solid rgba(255, 209, 109, 0.6);
+  border-radius: 999px;
+  color: var(--lantern);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* answers: one tap per answer, big tiles for tablets (no dropdowns, radio buttons or checkboxes) */
+.quests .quest-body {
+  gap: 12px;
+  padding: 2px 14px 14px;
+}
+.quests .tap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.quests .tap {
+  min-height: 56px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  border: 2px solid #4a5b79;
+  border-radius: 14px;
+  background: #1f2a40;
+  color: var(--ink);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.08s,
+    border-color 0.15s,
+    background-color 0.15s;
+}
+.quests .tap:hover:not(:disabled) {
+  border-color: #7185a5;
+}
+.quests .tap:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.quests .tap:focus-visible {
+  outline: 3px solid var(--lantern);
+  outline-offset: 2px;
+}
+.quests .tap.picked,
+.quests .tap.active {
+  border-color: var(--lantern);
+  background: #3a4766;
+  box-shadow: 0 0 0 3px rgba(255, 181, 71, 0.22);
+}
+.quests .tap.wrong,
+.quests .tap.wrong:disabled {
+  opacity: 1;
+  border-color: rgba(255, 138, 101, 0.5);
+  background: rgba(255, 138, 101, 0.08);
+  color: #c9a59a;
+  text-decoration: line-through;
+  cursor: default;
+}
+.quests .quest-form.busy .tap:disabled:not(.wrong) {
+  opacity: 0.75;
+  cursor: progress;
+}
+.quests .tap-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+.quests .tap-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+/* match: two columns, a pair shares the colour of its left word */
+.quests .match-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+}
+.quests .match-col {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+.quests .tap.paired {
+  border-color: var(--pair);
+  background: color-mix(in srgb, var(--pair) 22%, #1f2a40);
+}
+.quests .tap.pair-0 {
+  --pair: #6fcf97;
+}
+.quests .tap.pair-1 {
+  --pair: #6fb6ff;
+}
+.quests .tap.pair-2 {
+  --pair: #d59bff;
+}
+.quests .tap.pair-3 {
+  --pair: #ff9fb8;
+}
+.quests .tap.pair-4 {
+  --pair: #5fd6d0;
+}
+.quests .tap.pair-5 {
+  --pair: #f2d06b;
+}
+/* order: the sentence grows on top, the word bank keeps its gaps so nothing jumps */
+.quests .order-sentence {
+  min-height: 72px;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 2px dashed #4a5b79;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.18);
+}
+.quests .order-empty {
+  padding: 0 8px;
+  color: var(--muted);
+  font-size: 16px;
+}
+.quests .order-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.quests .order-bank .tap,
+.quests .order-sentence .tap {
+  min-width: 64px;
+}
+.quests .tap.placed {
+  border-color: var(--lantern);
+  background: #33405c;
+}
+.quests .tap.ghost {
+  display: inline-flex;
+  align-items: center;
+  visibility: hidden;
+}
+.quests .quest-body input[type='text'] {
+  min-height: 48px;
+  padding: 8px 12px;
+  font-size: 18px;
+}
+.quests .quest-body button.primary {
+  min-height: 52px;
+  min-width: 160px;
+  font-size: 18px;
+}
+.quests .quest-body button.quest-listen {
+  border-radius: 999px;
+  padding: 8px 20px;
+}
+@media (max-width: 700px) {
+  .quests .quest-body button.primary {
+    justify-self: stretch;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quests .quest-progress-bar > span,
+  .quests .tap {
+    transition: none;
+  }
+  .quests .tap:active:not(:disabled) {
+    transform: none;
+  }
+}
+.quests .quest-body > p:empty {
+  display: none;
+}

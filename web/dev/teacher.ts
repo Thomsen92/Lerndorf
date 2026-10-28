@@ -50,12 +50,40 @@ const ledger: Array<{ player_id: string; delta: number; reason: string; ref: str
 const ok = (data: unknown) => ({ data, error: null }),
   err = (message: string) => ({ data: null, error: { message } });
 const calls: string[] = [];
+const worldThemes = new Map<string, 'normal' | 'halloween'>();
+const worldThemeRevisions = new Map<string, number>();
+const season = {
+  seasonId: '2026-11-halloween',
+  seasonLabel: 'Season I – Halloween',
+  seasonState: 'running',
+};
+function worldThemeState(classId: string) {
+  const requestedTheme = worldThemes.get(classId) ?? 'normal';
+  return {
+    classId,
+    requestedTheme,
+    effectiveTheme: requestedTheme,
+    revision: worldThemeRevisions.get(classId) ?? 0,
+    ...season,
+    welcomeSeen: false,
+  };
+}
 async function rpc(name: string, args: Record<string, unknown> = {}) {
   calls.push(name);
   await new Promise((r) => setTimeout(r, Number(params.get('wait') ?? '60')));
   const cls = String(args.p_class_id ?? '8a'),
     list = pupils.filter((p) => p.class_id === cls);
   switch (name) {
+    case 'teacher_world_theme_state':
+      return ok(worldThemeState(String(args.p_class)));
+    case 'teacher_set_world_theme': {
+      const classId = String(args.p_class),
+        theme = args.p_theme === 'halloween' ? 'halloween' : 'normal';
+      if ((worldThemes.get(classId) ?? 'normal') !== theme)
+        worldThemeRevisions.set(classId, (worldThemeRevisions.get(classId) ?? 0) + 1);
+      worldThemes.set(classId, theme);
+      return ok(worldThemeState(classId));
+    }
     case 'teacher_class_pupils':
       return ok(list);
     case 'class_board':

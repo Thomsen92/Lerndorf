@@ -1,0 +1,96 @@
+{
+  "revision": "r14",
+  "activeModel": "halloween-shop-event.glb",
+  "benched": "bench/custom-stand-r1/",
+  "sources": {
+    "HalloweenShop": {
+      "file": "halloween+shop+3d+model.glb",
+      "sha256": "5a7cc805e5236cf71f44eefbf2320c15a4f0989b948671a48e7575810aed6841"
+    },
+    "LargeHalloweenCat": {
+      "file": "halloween+cat+3d+model_Clone1.glb",
+      "sha256": "cecee5c953cef238d04989662c6affe9463d7291fff392e1324ecd75165b1f49"
+    },
+    "CandyCauldron": {
+      "file": "halloween+candy+cauldron+3d+model.glb",
+      "sha256": "10ed34fac4d587888cbe3eae4472639a80da6e249d5b66b240c7142248238ad1"
+    }
+  },
+  "triangles": 19818,
+  "materials": 3,
+  "sourceDimensions": [
+    4.568629741668701,
+    3.6401729583740234,
+    3.6000001430511475
+  ],
+  "catSelection": {
+    "method": "largest welded-position connectivity island; original UVs preserved",
+    "retainedLogicalComponents": 1,
+    "retainedSourceVertices": 5076,
+    "removedOtherIslands": 5,
+    "triangles": 3487
+  },
+  "placements": {
+    "shop": [
+      0,
+      0,
+      0
+    ],
+    "cat": [
+      -0.55,
+      0,
+      1.86
+    ],
+    "candyCauldron": [
+      1.15,
+      0,
+      1.9
+    ]
+  },
+  "textures": [
+    {
+      "name": "halloween_cat_3d_model_Clone1_basecolor",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "name": "halloween_cat_3d_model_Clone1_normal",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "name": "halloween_cat_3d_model_Clone1_rm",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "name": "tripo_image_5fd54f20-4525-4136-b073-1974e43d0d98_0_0",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "name": "tripo_image_f60fb4c0-37b2-45bc-94fb-1863e85a2e96_0_0",
+      "size": [
+        1024,
+        1024
+      ]
+    }
+  ],
+  "artisticApproval": "user-review-pending",
+  "contactAndClearanceVerified": true,
+  "exportVerified": true,
+  "reimportTriangles": 19818,
+  "reimportDimensions": [
+    4.568629741668701,
+    3.6401729583740234,
+    3.6000001430511475
+  ]
+}

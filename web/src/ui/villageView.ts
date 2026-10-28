@@ -39,6 +39,15 @@ import { loadClassSlots, type SlotMap } from '../api/build';
 import { Crowd } from '../render/crowd';
 import { createDoubleTap } from '../avatars/doubleTap';
 import { setupScene } from '../render/scene';
+import { worldThemeApi, type WorldThemeState } from '../api/worldTheme';
+import { collectionApi } from '../api/collection';
+import { collectionCatalog } from '../collection/catalog';
+import { openCollection } from '../collection/collectionView';
+import { createWorldThemeController, type WorldThemeController } from '../season/worldThemeController';
+import { createWorldAppearance, isWorldObjectVisible, type WorldAppearance } from '../season/worldAppearance';
+import { createSeasonHub } from '../season/seasonHub';
+import { openSpookyQuiz } from '../season/spookyQuizView';
+import { seasonStarterApi } from '../api/seasonStarter';
 import { supabaseItemApi, type ItemKind } from '../api/items';
 import {
   HOUSE_AREAS,
@@ -168,6 +177,8 @@ export async function mountVillage(
   let areas: AreaController | null = null;
   let buildMode: BuildMode | null = null;
   const sound = createSound();
+  // background loop everywhere in the village; it starts with the first tap (browser rule)
+  sound.setMusic('village');
   let marketByte: MarketByte | null = null;
   const unlockSound = (): void => sound.unlock();
   window.addEventListener('pointerdown', unlockSound);
@@ -191,8 +202,15 @@ export async function mountVillage(
   let disposeHouseCards = () => {};
   let disposeBoardCue = () => {};
   let disposeCrowd = () => {};
+  let worldAppearance: WorldAppearance | null = null;
+  let worldThemes: WorldThemeController | null = null;
+  let seasonHub: ReturnType<typeof createSeasonHub> | null = null;
+  let worldThemeState: WorldThemeState | null = null;
   const stop = (): void => {
     tutorialAbort.abort();
+    worldThemes?.dispose();
+    worldAppearance?.dispose();
+    seasonHub?.dispose();
     disposeCrowd();
     // close the current area (the build preview reverts via exit) and every open modal, so no `inert` is left behind
     void areas?.select('dorf');
@@ -520,23 +538,90 @@ export async function mountVillage(
   puffTexture = loadPuffTexture();
   fx = new BuildFx(scene, { texture: puffTexture, reducedMotion });
 
-  // Season I: the LearnPass opens from the profile card (U5). The market is not part of this plan.
+  // The shop, HUD ticket and profile all enter the same existing LearnPass.
   const openSeasonPass = (): void => {
-    openLearnPass({
-      api: seasonApi(supabase),
-      getCoins: () => coinsNow,
-      onCoins,
-      reducedMotion: reducedMotion(),
-      onOpenInventory: () => void areas?.select('inventar'),
-      // frame rewards show the player's own portrait in the season frame (plan §14.2)
-      portrait: (frameId) =>
-        avatarPortrait({ character: myCharacter, look: myWardrobe[myCharacter ?? 'boy'], frameId, size: 'small' }),
-    });
+    modals.track(
+      openLearnPass({
+        api: seasonApi(supabase),
+        getCoins: () => coinsNow,
+        onCoins,
+        reducedMotion: reducedMotion(),
+        onOpenInventory: () => void areas?.select('inventar'),
+        // frame rewards show the player's own portrait in the season frame (plan §14.2)
+        portrait: (frameId) =>
+          avatarPortrait({
+            character: myCharacter,
+            look: myWardrobe[myCharacter ?? 'boy'],
+            frameId,
+            size: 'small',
+          }),
+      }),
+    );
   };
+  // The almanach is a separate, personal view; it never grants or changes anything.
+  const openCollectionAlmanach = async (): Promise<void> => {
+    try {
+      const [catalog, season] = await Promise.all([collectionCatalog(), seasonApi(supabase).state()]);
+      if (!running) return;
+      openCollection({
+        api: collectionApi(supabase),
+        seasonId: season.season.id,
+        catalog,
+        reducedMotion: reducedMotion(),
+      });
+    } catch {
+      showNotice(tr('Die Sammlung konnte nicht geladen werden.'));
+    }
+  };
+  worldAppearance = createWorldAppearance({ scene, village, layout, rig, renderer: gl });
+  worldThemes = createWorldThemeController({
+    classId: profile.classId,
+    read: () => worldThemeApi(supabase).state(),
+    apply: (state) => {
+      worldThemeState = state;
+      worldAppearance?.setTheme(state.effectiveTheme);
+      seasonHub?.setState(state);
+      seasonHub?.maybeAutoOpen();
+      renderOnce?.();
+    },
+  });
+  void worldThemes.refresh();
+  seasonHub = createSeasonHub({
+    host: root,
+    openLearnPass: openSeasonPass,
+    openQuiz: () => {
+      const seasonId = worldThemeState?.seasonId;
+      if (!seasonId || !running) return;
+      openSpookyQuiz({
+        api: seasonStarterApi(supabase),
+        seasonId,
+        opener: seasonHub?.el ?? null,
+        openLearnPass: openSeasonPass,
+        // XP badge, level-up and pass refresh run through the same flow as daily quests
+        onProgress: (delta) => void worldOnProgress(delta),
+        track: (handle) => modals.track(handle),
+      });
+    },
+    canOpen: () =>
+      running && !inTutorial && !modals.anyOpen && !flight && (areas?.current ?? 'dorf') === 'dorf',
+    track: (handle) => {
+      modals.track(handle);
+    },
+    onAcknowledge: (seasonId) => {
+      void worldThemeApi(supabase)
+        .acknowledgeWelcome(seasonId)
+        .catch(() => {
+          // The dialog stays usable; the server retries on the next entry.
+        });
+    },
+  });
+  seasonHub.setState(worldThemeState);
+  seasonHub.setVisible(!inTutorial);
   const applyControls = (area: NavArea): void => {
     cameraTools.hidden = inTutorial || area !== 'dorf';
     houseCards.setVisible(!inTutorial && area === 'dorf' && !marketFocused);
     boardCue.setVisible(!inTutorial && area === 'dorf');
+    seasonHub?.setVisible(!inTutorial && area === 'dorf');
     if (!HOUSE_AREAS.has(area)) {
       flight = null; // leaving the house cancels a running flight
       controls.enabled = true;
@@ -644,10 +729,14 @@ export async function mountVillage(
     // the tutorial leads; taps on the village do nothing meanwhile
     if (inTutorial) return;
     raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects(scene.children, true)[0];
+    const hit = raycaster.intersectObjects(scene.children, true).find((h) => isWorldObjectVisible(h.object));
     const v = hit ? crowd.findByObject(hit.object) : null;
     if (v) {
       crowd.react(v, figureTap(v.nickname, performance.now()));
+      return;
+    }
+    if (hit?.object.userData.kind === 'seasonStand') {
+      seasonHub?.open();
       return;
     }
     // the task board: tap the board in the market
@@ -773,6 +862,7 @@ export async function mountVillage(
             if (!on) silenceSirByte();
           },
         },
+        music: { on: sound.musicOn, onChange: (on) => sound.setMusicOn(on) },
         onQuality: (q) => {
           choice = q;
           applyQuality();
@@ -839,6 +929,7 @@ export async function mountVillage(
           onSettings: openSettings,
           onQuests: () => void areas?.select('aufgaben'),
           season: { api: seasonApi(supabase), onOpen: openSeasonPass },
+          collection: { open: () => void openCollectionAlmanach() },
           onClose: () => void areas?.select('dorf'),
           sound,
           reducedMotion: reducedMotion(),
@@ -1108,6 +1199,7 @@ export async function mountVillage(
     cameraTools.hidden = on || (areas?.current ?? 'dorf') !== 'dorf';
     houseCards.setVisible(!on && (areas?.current ?? 'dorf') === 'dorf');
     boardCue.setVisible(!on && (areas?.current ?? 'dorf') === 'dorf');
+    seasonHub?.setVisible(!on && (areas?.current ?? 'dorf') === 'dorf');
     nav?.setLocked(on);
     controls.enabled = !on;
   };
@@ -1156,7 +1248,7 @@ export async function mountVillage(
       if (!flight) applyControls(areas?.current ?? 'dorf');
     }
     // covered by an area: no rendering and no Auto measurement
-    if (paused) return;
+    if (paused || document.hidden || modals.anyOpen) return;
     byte.update(dt, camera, reducedMotion());
     if (autoResult === null) {
       elapsed += dt;
@@ -1168,6 +1260,8 @@ export async function mountVillage(
       }
     }
     crowd.update(dt);
+    worldAppearance?.update(dt, now / 1000, reducedMotion());
+    seasonHub?.maybeAutoOpen();
     (village.userData.animate as ((t: number) => void) | undefined)?.(performance.now() / 1000);
     (village.userData.labelUpdate as ((c: THREE.Camera) => void) | undefined)?.(camera);
     crowd.updateLabels(camera);

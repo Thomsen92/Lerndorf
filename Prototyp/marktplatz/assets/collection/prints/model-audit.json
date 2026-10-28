@@ -1,0 +1,566 @@
+{
+  "success": true,
+  "models": [
+    {
+      "id": "empire-state-postcard",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0008079999824985862,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        683,
+        1024
+      ],
+      "bytes": 1639300,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0008079999824985862,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "manhattan-postcard",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0008079999824985862,
+          0.10499999672174454
+        ]
+      },
+      "textures": [
+        1024,
+        512
+      ],
+      "bytes": 1359552,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0008079999824985862,
+          0.10499999672174454
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "midnight-focus-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.13289062678813934
+        ]
+      },
+      "textures": [
+        1024,
+        648
+      ],
+      "bytes": 274712,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.13289062678813934
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "two-ways-boo-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.13001953065395355
+        ]
+      },
+      "textures": [
+        1024,
+        634
+      ],
+      "bytes": 191160,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.13001953065395355
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "become-go-grow-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.11894531548023224
+        ]
+      },
+      "textures": [
+        1024,
+        580
+      ],
+      "bytes": 205144,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.11894531548023224
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "spooky-sounds-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.11156249791383743
+        ]
+      },
+      "textures": [
+        1024,
+        544
+      ],
+      "bytes": 170024,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.11156249791383743
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "midnight-map-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.106201171875,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        725,
+        1024
+      ],
+      "bytes": 1143284,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.106201171875,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "midnight-bird-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.13268554210662842
+        ]
+      },
+      "textures": [
+        1024,
+        647
+      ],
+      "bytes": 364484,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.13268554210662842
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "haunted-definitions-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.1683691442012787
+        ]
+      },
+      "textures": [
+        1024,
+        821
+      ],
+      "bytes": 449256,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.1683691442012787
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "spooky-as-as-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.15052734315395355
+        ]
+      },
+      "textures": [
+        1024,
+        734
+      ],
+      "bytes": 291056,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.15052734315395355
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "towers-after-dark-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.15319335460662842
+        ]
+      },
+      "textures": [
+        1024,
+        747
+      ],
+      "bytes": 316176,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.20999999344348907,
+          0.0012080000014975667,
+          0.15319335460662842
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "highlight-halloween-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10898437350988388,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        744,
+        1024
+      ],
+      "bytes": 2526668,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10898437350988388,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "bloody-friday-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        683,
+        1024
+      ],
+      "bytes": 1472056,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "school-rules-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        683,
+        1024
+      ],
+      "bytes": 1425960,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "official-reprimand-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        683,
+        1024
+      ],
+      "bytes": 1437604,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "vaping-reprimand-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        683,
+        1024
+      ],
+      "bytes": 1474772,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "forgotten-homework-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        683,
+        1024
+      ],
+      "bytes": 1456788,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "cool-box-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        683,
+        1024
+      ],
+      "bytes": 1449876,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "cuess-digga-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        683,
+        1024
+      ],
+      "bytes": 1462460,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    },
+    {
+      "id": "toilet-question-card",
+      "source": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "textures": [
+        683,
+        1024
+      ],
+      "bytes": 1419424,
+      "export": {
+        "triangles": 112,
+        "materials": 3,
+        "size": [
+          0.10004882514476776,
+          0.0012080000014975667,
+          0.15000000596046448
+        ]
+      },
+      "fullFrontBackUV": true,
+      "success": true
+    }
+  ],
+  "visualReview": "User review pending"
+}

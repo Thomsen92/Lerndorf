@@ -11,20 +11,78 @@ import {
 } from '../api';
 import type { ClassId } from '../router';
 import { esc } from '../../ui/esc';
+import { worldThemeApi, type WorldThemeState } from '../../api/worldTheme';
 export default {
   title: 'Dorf & Regeln',
   async mount(root, ctx) {
     const supabase = ctx.supabase;
+    const classId = ctx.classId;
+    const themes = worldThemeApi(supabase);
     const status = (text: string, error = false) => ctx.status(text, error ? 'error' : 'ok');
     const drawClass = () => ctx.refresh();
-    const [flags, inst] = await Promise.all([
+    const [flags, inst, worldTheme] = await Promise.all([
       loadClassFlags(supabase, ctx.classId),
       loadInstance(supabase, ctx.classId),
+      themes.teacherState(classId).catch(() => null),
     ]);
     if (!ctx.alive()) return;
     root.innerHTML =
+      worldThemeSection(classId, worldTheme) +
       (flags.ok ? switchSection(flags.value) : '<p>Schalter nicht verfügbar</p>') +
       instanceSection(inst.ok ? inst.value : null);
+    root.querySelector<HTMLButtonElement>('[data-world-theme-retry]')?.addEventListener('click', () => {
+      if (ctx.alive()) ctx.refresh();
+    });
+    const themeForm = root.querySelector<HTMLFormElement>('#worldThemeForm');
+    const themeChoice = themeForm?.querySelector<HTMLSelectElement>('[name=worldTheme]');
+    const themeButton = themeForm?.querySelector<HTMLButtonElement>('button');
+    const themeStatus = root.querySelector<HTMLElement>('#worldThemeStatus');
+    let savedTheme = worldTheme;
+    let themePending = false;
+    themeForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (themePending || !savedTheme || !themeChoice || !themeButton || !themeStatus || !ctx.alive()) return;
+      const theme = themeChoice.value;
+      if (theme !== 'normal' && theme !== 'halloween') return;
+      if (theme === 'halloween' && !savedTheme.seasonId) {
+        themeChoice.value = savedTheme.requestedTheme;
+        themeStatus.className = 'error';
+        themeStatus.textContent = 'Keine Saison vorhanden. Halloween braucht eine Season im System.';
+        return;
+      }
+      themePending = true;
+      themeChoice.disabled = true;
+      themeButton.disabled = true;
+      themeStatus.className = 'hint';
+      themeStatus.textContent = 'Weltstimmung wird gespeichert …';
+      try {
+        const result = await themes.teacherSet(
+          classId,
+          theme,
+          theme === 'halloween' ? savedTheme.seasonId : null,
+        );
+        if (!ctx.alive()) return;
+        savedTheme = result;
+        themeChoice.value = result.requestedTheme;
+        const summary = root.querySelector<HTMLElement>('#worldThemeSummary');
+        if (summary) summary.textContent = themeSummary(result);
+        themeStatus.className = 'hint';
+        themeStatus.textContent = themeMessage(result);
+        status(themeStatus.textContent);
+      } catch {
+        if (!ctx.alive()) return;
+        themeChoice.value = savedTheme.requestedTheme;
+        themeStatus.className = 'error';
+        themeStatus.textContent = 'Weltstimmung wurde nicht gespeichert. Bitte erneut versuchen.';
+        status(themeStatus.textContent, true);
+      } finally {
+        if (ctx.alive()) {
+          themePending = false;
+          themeChoice.disabled = false;
+          themeButton.disabled = false;
+        }
+      }
+    });
     const wireSwitches = (cls: ClassId): void => {
       const form = root.querySelector<HTMLFormElement>('#switchForm');
       form?.addEventListener('submit', async (ev) => {
@@ -87,6 +145,46 @@ export default {
     wireInstance(ctx.classId);
   },
 } satisfies TeacherPage;
+
+function worldThemeSection(classId: string, state: WorldThemeState | null): string {
+  const season = state?.seasonLabel
+    ? `${esc(state.seasonLabel)}${state.seasonState === 'upcoming' ? ' (geplant)' : ''}`
+    : 'keine Saison';
+  return `<section aria-labelledby="worldThemeTitle"><h2 id="worldThemeTitle">Weltstimmung</h2>
+    <p class="hint">Ändert nur die Dorfstimmung dieser Klasse. LearnPass und Saisonzeitraum werden hier nicht verändert. Saison: ${season}.</p>
+    ${
+      state
+        ? `<form id="worldThemeForm" class="row">
+      <label>Welt für Klasse ${esc(classId)} <select name="worldTheme">
+        <option value="normal" ${state.requestedTheme === 'normal' ? 'selected' : ''}>Normal</option>
+        <option value="halloween" ${state.requestedTheme === 'halloween' ? 'selected' : ''}>Season I – Halloween</option>
+      </select></label><button type="submit">Weltstimmung speichern</button>
+    </form>
+    <p id="worldThemeSummary" class="hint">${themeSummary(state)}</p>
+    <p id="worldThemeStatus" class="hint" role="status" aria-live="polite"></p>`
+        : '<p class="error" role="status">Weltstimmung konnte nicht geladen werden.</p><button type="button" data-world-theme-retry>Erneut laden</button>'
+    }
+    </section>`;
+}
+
+/** Requested and effective world; redrawn after every save so it never contradicts the status line. */
+function themeSummary(state: WorldThemeState): string {
+  const effective =
+    state.effectiveTheme === 'halloween'
+      ? 'Halloween ist aktiv.'
+      : state.requestedTheme === 'halloween'
+        ? 'Halloween ist vorgemerkt und wirkt, sobald die Season läuft.'
+        : 'Normal ist aktiv.';
+  return `Angefordert: ${state.requestedTheme === 'halloween' ? 'Halloween' : 'Normal'} · Revision ${state.revision}. ${effective}`;
+}
+
+function themeMessage(state: WorldThemeState): string {
+  if (state.effectiveTheme === 'halloween') return `Halloween ist für Klasse ${state.classId} aktiv.`;
+  if (state.requestedTheme === 'halloween')
+    return `Halloween ist für Klasse ${state.classId} vorgemerkt und wirkt, sobald die Season läuft.`;
+  return `Normal ist für Klasse ${state.classId} aktiv.`;
+}
+
 function instanceSection(
   inst: { rules: InstanceRules; maps: Array<{ id: string; name: string }>; shop: ShopEntry[] } | null,
 ): string {

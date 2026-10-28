@@ -7,6 +7,9 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 function isBakeable(mesh: THREE.Mesh): boolean {
+  for (let ancestor: THREE.Object3D | null = mesh; ancestor; ancestor = ancestor.parent) {
+    if (ancestor.userData.bakeStatic === false) return false;
+  }
   if (mesh instanceof THREE.InstancedMesh) return false;
   if (mesh.userData.kind) return false;
   const m = mesh.material;
