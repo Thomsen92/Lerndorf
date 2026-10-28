@@ -10,6 +10,8 @@ export interface WorldAppearance {
   ready(): Promise<void>;
   dispose(): void;
   readonly theme: WorldTheme;
+  /** The Halloween shop stand (always there, in both looks). */
+  readonly stand: THREE.Object3D;
 }
 
 /** Three's raycaster includes hidden meshes; removed seasonal groups must not intercept taps. */
@@ -62,6 +64,9 @@ export function createWorldAppearance(opts: {
   return {
     get theme() {
       return theme;
+    },
+    get stand() {
+      return stand.root;
     },
     setTheme,
     update(dt, elapsed, reducedMotion) {

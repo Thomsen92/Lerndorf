@@ -1,0 +1,8 @@
+/* Creepster (OFL, web/public/fonts/Creepster-OFL.txt) for spooky headlines outside the quiz. */
+@font-face {
+  font-family: 'Creepster';
+  src: url('/fonts/Creepster-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

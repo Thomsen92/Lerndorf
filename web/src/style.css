@@ -1703,3 +1703,39 @@ table.ledger td {
 .quests .quest-body > p:empty {
   display: none;
 }
+
+/* Daily Quests: one tap to the Spooky English Quiz while the season runs */
+.quests .quest-spooky-link {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  width: 100%;
+  margin: 14px 0 4px;
+  padding: 12px 16px 12px 64px;
+  border: 2px solid #f08a24;
+  border-radius: 14px;
+  background:
+    url('/assets/halloween/season-ticket.svg') no-repeat 10px center / 44px auto,
+    linear-gradient(120deg, #2a1838, #1a0f24 70%);
+  color: #ffd9a8;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 0 16px #f08a2433;
+}
+.quests .quest-spooky-link:hover {
+  border-color: #ffc46b;
+  box-shadow: 0 0 22px #f08a2466;
+}
+.quests .quest-spooky-title {
+  font:
+    400 26px/1.05 'Creepster',
+    'Comic Neue',
+    cursive;
+  letter-spacing: 0.05em;
+  color: #ff9a2e;
+  text-shadow: 0 2px 0 #3a1458;
+}
+.quests .quest-spooky-sub {
+  font-size: 15px;
+  color: #e8d5ff;
+}

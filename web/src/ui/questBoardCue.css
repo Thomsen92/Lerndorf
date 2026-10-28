@@ -54,3 +54,66 @@
     animation: none;
   }
 }
+
+.quest-board-letter {
+  display: inline-block;
+}
+/* Halloween world: pumpkin sign, Creepster and letters that hop one after another. */
+.quest-board-cue.spooky .quest-board-label {
+  padding: 8px 16px 6px;
+  background: #1c0f26;
+  color: #ff9a2e;
+  border-color: #ff8a1f;
+  font:
+    400 22px/1 'Creepster',
+    'Comic Neue',
+    cursive;
+  letter-spacing: 0.06em;
+  text-shadow:
+    0 0 8px #ff6a0099,
+    0 2px 0 #3a1458;
+  box-shadow:
+    0 0 14px #ff7a1a66,
+    0 3px 12px #0b0614aa;
+}
+.quest-board-cue.spooky .quest-board-letter {
+  animation: quest-letter-hop 1.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+.quest-board-cue.spooky img {
+  filter: hue-rotate(-28deg) saturate(1.6) drop-shadow(0 0 6px #ff7a1a);
+}
+.quest-board-cue.spooky.is-highlighted .quest-board-label {
+  background: #2c1638;
+  color: #ffc46b;
+  border-color: #ffc46b;
+}
+@keyframes quest-letter-hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  20% {
+    transform: translateY(-6px) rotate(-6deg);
+  }
+  40% {
+    transform: translateY(1px) rotate(4deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quest-board-cue.spooky .quest-board-letter {
+    animation: none;
+  }
+}
+
+/* The beehive sign: honey and wax */
+.quest-board-cue.honey .quest-board-label {
+  background: #ffc81e;
+  color: #3b2a10;
+  border-color: #8a5300;
+  font-size: 16px;
+}
+.quest-board-cue.honey.is-highlighted .quest-board-label {
+  background: #ffe07a;
+}

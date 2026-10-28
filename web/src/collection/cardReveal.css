@@ -1,0 +1,243 @@
+/* A newly drawn card: mystery, flip and a close look (cardReveal.ts). */
+.overlay.modal.reveal-overlay {
+  align-items: center;
+  background: radial-gradient(ellipse at 50% 45%, #2c1640ee 0, #0d0715f5 70%);
+}
+.overlay.modal.reveal-overlay .panel {
+  width: min(720px, 100%);
+  max-height: none;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #f3e3c0;
+  text-align: center;
+}
+.reveal-overlay .panel-head {
+  border: 0;
+}
+.reveal-overlay .panel-head h2 {
+  font:
+    400 32px/1 'Creepster',
+    'Comic Neue',
+    cursive;
+  letter-spacing: 0.06em;
+  color: #ff9a2e;
+  text-shadow:
+    0 0 14px #ff6a0066,
+    0 3px 0 #3a1458;
+}
+.card-reveal {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+.reveal-stage {
+  --tone: #b16cff;
+  position: relative;
+  width: min(560px, 100%);
+  height: min(52dvh, 440px);
+  min-height: 280px;
+}
+.reveal-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.reveal-swirl {
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    color-mix(in srgb, var(--tone) 55%, transparent),
+    transparent 30%,
+    #7a3cff55,
+    transparent 60%,
+    color-mix(in srgb, var(--tone) 45%, transparent),
+    transparent
+  );
+  filter: blur(18px);
+  opacity: 0.85;
+  animation: reveal-swirl 2.2s linear infinite;
+}
+.card-reveal.revealed .reveal-swirl {
+  opacity: 0.45;
+  animation-duration: 7s;
+}
+@keyframes reveal-swirl {
+  to {
+    rotate: 360deg;
+  }
+}
+.reveal-flash {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0, var(--tone) 25%, transparent 62%);
+  opacity: 0;
+  pointer-events: none;
+}
+.card-reveal.revealed .reveal-flash {
+  animation: reveal-flash 0.9s ease-out;
+}
+@keyframes reveal-flash {
+  20% {
+    opacity: 0.95;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+.reveal-sparks {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+}
+.reveal-sparks i {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  margin: -11px;
+  background: #fff;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  opacity: 0;
+}
+.card-reveal.revealed .reveal-sparks i {
+  animation: reveal-spark 1s ease-out var(--d) both;
+}
+@keyframes reveal-spark {
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--sx), var(--sy)) scale(0.4) rotate(120deg);
+  }
+}
+.reveal-caption {
+  min-height: 96px;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+.reveal-caption p,
+.reveal-caption h3 {
+  margin: 0;
+}
+.reveal-drawing {
+  font:
+    400 26px/1.2 'Creepster',
+    'Comic Neue',
+    cursive;
+  letter-spacing: 0.05em;
+  color: #d9b8ff;
+  animation: reveal-pulse 1.1s ease-in-out infinite;
+}
+@keyframes reveal-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+.reveal-new {
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--tone, #b16cff);
+  color: #1b1020;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  animation: reveal-pop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+@keyframes reveal-pop {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+.reveal-name {
+  font-size: 26px;
+  color: #fff3d6;
+}
+.reveal-meta {
+  color: #d9c6ec;
+  font-size: 14px;
+  font-weight: 700;
+}
+.reveal-key {
+  color: #ffcf8a;
+  font-weight: 800;
+}
+.reveal-hint {
+  color: #bba8d3;
+  font-size: 13px;
+}
+.reveal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.reveal-actions[hidden] {
+  display: none;
+}
+.reveal-actions button {
+  min-height: 52px;
+  min-width: 160px;
+  font-size: 18px;
+}
+/* picture fallback: a dark back that turns into the printed card */
+.reveal-fallback {
+  position: absolute;
+  inset: 8% 30%;
+  perspective: 900px;
+}
+.reveal-fallback-back,
+.reveal-fallback-front {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  transition: transform 0.65s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+.reveal-fallback-back {
+  display: grid;
+  place-items: center;
+  background: repeating-linear-gradient(45deg, #241530 0 8px, #1c1027 8px 16px);
+  border: 3px solid var(--tone);
+  color: var(--tone);
+  font:
+    400 72px/1 'Creepster',
+    'Comic Neue',
+    cursive;
+}
+.reveal-fallback-front {
+  object-fit: contain;
+  transform: rotateY(180deg);
+}
+.reveal-fallback.flipped .reveal-fallback-back {
+  transform: rotateY(-180deg);
+}
+.reveal-fallback.flipped .reveal-fallback-front {
+  transform: rotateY(0deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-swirl,
+  .reveal-drawing,
+  .card-reveal.revealed .reveal-flash,
+  .card-reveal.revealed .reveal-sparks i,
+  .reveal-new {
+    animation: none;
+  }
+  .reveal-fallback-back,
+  .reveal-fallback-front {
+    transition: none;
+  }
+}

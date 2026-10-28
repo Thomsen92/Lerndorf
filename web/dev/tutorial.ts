@@ -17,7 +17,14 @@ const QUESTIONS = [
     hint: 'You live in it.',
     sol: 'house',
   },
-  { nr: 2, type: 'choice', prompt: 'My name ___ Tom.', data: { options: ['am', 'is', 'are'] }, hint: "Use a form of 'be'.", sol: 'is' },
+  {
+    nr: 2,
+    type: 'choice',
+    prompt: 'My name ___ Tom.',
+    data: { options: ['am', 'is', 'are'] },
+    hint: "Use a form of 'be'.",
+    sol: 'is',
+  },
   {
     nr: 3,
     type: 'listening',
@@ -71,6 +78,22 @@ async function rpc(fn: string, args: Record<string, unknown> = {}) {
     return err('Failed to fetch');
   }
   switch (fn) {
+    case 'spelling_state':
+      return ok({
+        day: '2026-10-28',
+        puzzle: {
+          id: 1,
+          center: 'n',
+          letters: ['a', 'g', 'i', 'k', 'p', 'r'],
+          word_count: 1,
+          max_points: 14,
+          hashes: [],
+        },
+        round_seconds: 180,
+        free_rounds: 3,
+        rewarded_left: 3,
+        board: { week: '2026-10-26', top: [], me: null },
+      });
     case 'tutorial_state':
       return ok(state());
     case 'tutorial_start':
@@ -150,16 +173,46 @@ async function rpc(fn: string, args: Record<string, unknown> = {}) {
       return ok(null);
     case 'village_members':
       return ok([
-        ...others.map((m,i)=>({...m,level:7+i,title_label:i<3?'Busy Bee':'Grammar Explorer',frame_id:i<3?'frame_bronze':'frame_silver'})),
+        ...others.map((m, i) => ({
+          ...m,
+          level: 7 + i,
+          title_label: i < 3 ? 'Busy Bee' : 'Grammar Explorer',
+          frame_id: i < 3 ? 'frame_bronze' : 'frame_silver',
+        })),
         { id: 'u1', nickname: 'Fuchs', plot_index: s.plot, avatar: { character: s.character } },
       ]);
     case 'public_profile': {
-      const m=others.find(p=>p.id===args.p_player_id);if(!m)return err('profile unavailable');
-      const i=others.indexOf(m);
-      return ok({id:m.id,nickname:m.nickname,level:7+i,title_label:i<3?'Busy Bee':'Grammar Explorer',frame_id:i<3?'frame_bronze':'frame_silver',current_streak:3+i,character:m.avatar.character,look:{items:[],colors:{}}});
+      const m = others.find((p) => p.id === args.p_player_id);
+      if (!m) return err('profile unavailable');
+      const i = others.indexOf(m);
+      return ok({
+        id: m.id,
+        nickname: m.nickname,
+        level: 7 + i,
+        title_label: i < 3 ? 'Busy Bee' : 'Grammar Explorer',
+        frame_id: i < 3 ? 'frame_bronze' : 'frame_silver',
+        current_streak: 3 + i,
+        character: m.avatar.character,
+        look: { items: [], colors: {} },
+      });
     }
     case 'my_daily_quests':
       return ok([]);
+    case 'world_theme_state': {
+      // ?theme=halloween: the running Halloween season (welcome already seen)
+      if (!q.get('theme')) return ok([]); // as before: no world theme in the other harness runs
+      const theme = q.get('theme') === 'halloween' ? 'halloween' : 'normal';
+      return ok({
+        classId: '8a',
+        requestedTheme: theme,
+        effectiveTheme: theme,
+        revision: 1,
+        seasonId: theme === 'halloween' ? '2026-11-halloween' : null,
+        seasonLabel: theme === 'halloween' ? 'Season I – Halloween' : null,
+        seasonState: theme === 'halloween' ? 'running' : null,
+        welcomeSeen: true,
+      });
+    }
     default:
       return ok([]);
   }

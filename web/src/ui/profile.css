@@ -440,3 +440,35 @@
     transform: none;
   }
 }
+
+/* "My Almanac": the almanach cover and a spooky title (teacher, 28.10.2026) */
+.profile-area .profile-almanac-link {
+  border-color: #b5651d;
+  background: linear-gradient(110deg, #2a1838, #1a0f24 75%);
+}
+.profile-almanac-cover {
+  width: 48px;
+  height: 66px;
+  object-fit: cover;
+  border-radius: 4px 6px 6px 4px;
+  box-shadow:
+    -3px 0 0 #6b3a1a,
+    0 4px 10px #00000088;
+}
+.profile-almanac-link .profile-almanac-title {
+  font:
+    400 24px/1.05 'Creepster',
+    'Comic Neue',
+    cursive;
+  letter-spacing: 0.05em;
+  color: #ff9a2e;
+  text-shadow: 0 2px 0 #3a1458;
+}
+.profile-almanac-link span span {
+  color: #e8d5ff;
+}
+.profile-area .collection-achievements {
+  padding: 16px;
+  border: 1px dashed #8f6bb0;
+  border-radius: 12px;
+}

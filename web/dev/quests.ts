@@ -259,6 +259,13 @@ if (view === 'teacher') {
   const sound = createSound();
   sound.setMusic('village');
   for (const event of ['pointerdown', 'keydown']) window.addEventListener(event, () => sound.unlock());
-  openDailyQuests({ supabase: fake, coins, onCoins: () => undefined, onClose: () => undefined, sound });
+  openDailyQuests({
+    supabase: fake,
+    coins,
+    onCoins: () => undefined,
+    onClose: () => undefined,
+    sound,
+    spookyQuiz: () => (document.body.dataset.spooky = 'opened'),
+  });
   document.body.dataset.ready = 'true';
 }

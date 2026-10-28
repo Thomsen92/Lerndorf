@@ -11,6 +11,9 @@ export type SoundName =
   | 'blip'
   | 'typing'
   | 'victory'
+  | 'mystery'
+  | 'cardFlip'
+  | 'giggle'
   | 'shopClick' | 'shopOpen' | 'shopSave' | 'shopPage' | 'shopConfirm'
   | 'shopCancel' | 'shopCoin' | 'shopHover' | 'ollieBlip' | 'ollieTyping';
 export const SOUND_FILES: Record<SoundName, string> = {
@@ -39,10 +42,14 @@ export const SOUND_FILES: Record<SoundName, string> = {
   typing: 'assets/audio/sfx/dialog-typing.mp3',
   // a whole quiz done: own composition (scripts/audio/make-victory-fanfare.py), CC0
   victory: 'assets/audio/sfx/victory-fanfare.mp3',
+  // almanac and card draw: own synthesis (scripts/audio/make-almanac-sounds.py), CC0
+  mystery: 'assets/audio/sfx/mystery.mp3',
+  cardFlip: 'assets/audio/sfx/card-flip.mp3',
+  giggle: 'assets/audio/sfx/giggle.mp3',
 };
 /** Per-sound loudness; the speech sounds sit below the game effects. */
 /** Sounds that pause the background music while they play (a fanfare over a loop sounds messy). */
-const DUCK: ReadonlySet<SoundName> = new Set(['victory']);
+const DUCK: ReadonlySet<SoundName> = new Set(['victory', 'mystery', 'giggle']);
 const VOLUME: Partial<Record<SoundName, number>> = {
   shopClick: .12, shopOpen: .12, shopSave: .10, shopPage: .10,
   shopConfirm: .10, shopCancel: .08, shopCoin: .14, shopHover: .035,

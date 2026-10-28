@@ -1,5 +1,6 @@
 /** Seasonal dressing of the current layout, never a second world or a replacement plot. */
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { Layout } from '../../world/layout';
 import { createRng } from '../../world/rng';
@@ -9,6 +10,8 @@ import { placePlotBorderDecor, publicDecorAllowed } from './placement';
 
 export interface HalloweenLayer {
   root: THREE.Group;
+  /** The giant almanach on the horizon (null until loaded); taps on it have kind 'almanacGiant'. */
+  readonly almanac?: THREE.Object3D | null;
   ready: Promise<void>;
   update(dt: number, elapsed: number, reducedMotion: boolean): void;
   dispose(): void;
@@ -29,7 +32,13 @@ interface Actor {
   kind: string;
 }
 
-export function createHalloweenLayer(layout: Layout): HalloweenLayer {
+/** Height of the giant almanach on the horizon, in metres. */
+export const GIANT_ALMANAC_HEIGHT = 21;
+
+export function createHalloweenLayer(
+  layout: Layout,
+  opts: { loadAlmanac?: () => Promise<THREE.Object3D> } = {},
+): HalloweenLayer {
   const root = new THREE.Group();
   root.name = 'halloweenLayer';
   root.userData.bakeStatic = false;
@@ -420,6 +429,89 @@ export function createHalloweenLayer(layout: Layout): HalloweenLayer {
       z = layout.plaza.z + Math.sin(a) * r;
     return { x, z, y: layout.terrain.groundHeight(x, z) + 0.7, width: 11 + rng() * 12, phase: rng() * 6.28 };
   });
+  // A giant almanach floats on the horizon in front of the blood moon (teacher, 28.10.2026). A tap on
+  // it opens "My Almanac". It is loaded only in the Halloween look and released with the layer.
+  const almanac = new THREE.Group();
+  almanac.name = 'giantAlmanac';
+  // beside the moon (which stays visible), turned a little so its spine and pages show
+  const almanacAt = new THREE.Vector3(layout.plaza.x - 8, 0, layout.plaza.z - 82);
+  almanac.position.copy(almanacAt);
+  almanac.rotation.y = Math.atan2(layout.plaza.x - almanacAt.x, layout.plaza.z - almanacAt.z) + 0.5;
+  let almanacReady = false;
+  const almanacGlow = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: mistTexture,
+      color: '#ff8a2a',
+      transparent: true,
+      opacity: 0.55,
+      fog: false,
+      depthWrite: false,
+      toneMapped: false,
+      blending: THREE.AdditiveBlending,
+    }),
+  );
+  materials.add(almanacGlow.material);
+  almanacGlow.scale.set(GIANT_ALMANAC_HEIGHT * 1.5, GIANT_ALMANAC_HEIGHT * 1.6, 1);
+  almanacGlow.position.set(0, GIANT_ALMANAC_HEIGHT / 2, -1.5);
+  almanacGlow.raycast = () => {};
+  almanac.add(almanacGlow);
+  const loadAlmanac =
+    opts.loadAlmanac ??
+    (async () =>
+      (
+        await new GLTFLoader().loadAsync(
+          `${import.meta.env.BASE_URL}assets/collection/textbook/highlight-halloween-book.glb`,
+        )
+      ).scene);
+  void loadAlmanac()
+    .then((book) => {
+      if (disposed) return;
+      const box = new THREE.Box3().setFromObject(book);
+      const size = box.getSize(new THREE.Vector3());
+      const scale = GIANT_ALMANAC_HEIGHT / Math.max(size.y, 1e-6);
+      book.scale.setScalar(scale);
+      book.position.set(
+        -((box.min.x + box.max.x) / 2) * scale,
+        -box.min.y * scale,
+        -((box.min.z + box.max.z) / 2) * scale,
+      );
+      book.rotation.x = -0.06;
+      // seen from 80 m the printed covers would flicker against the boards: lift them off a bit
+      // (the loader turns spaces in node names into underscores)
+      const prints = ['Edited cover printed on book face', 'Meme printed on back cover'];
+      for (const print of book.children.filter((c) => prints.includes(c.name.replace(/_/g, ' ')))) {
+        const box = new THREE.Box3().setFromObject(print);
+        print.position.z += box.getCenter(new THREE.Vector3()).z >= 0 ? 0.004 : -0.004;
+      }
+      book.traverse((object) => {
+        if (!(object instanceof THREE.Mesh)) return;
+        object.userData.kind = 'almanacGiant';
+        geometries.add(object.geometry);
+        const list = Array.isArray(object.material) ? object.material : [object.material];
+        for (const material of list) {
+          materials.add(material);
+          if (material instanceof THREE.MeshStandardMaterial) {
+            // readable far away in the dark: the cover glows a little and ignores the fog
+            material.fog = false;
+            if (material.map) {
+              material.emissive.set('#ffffff');
+              material.emissiveMap = material.map;
+              material.emissiveIntensity = 0.28;
+
+              textures.add(material.map);
+            }
+          }
+          for (const value of Object.values(material))
+            if (value instanceof THREE.Texture) textures.add(value);
+        }
+      });
+      almanac.add(book);
+      almanacReady = true;
+    })
+    .catch(() => {
+      root.userData.assetFailures.push('collection/textbook/highlight-halloween-book.glb');
+    });
+  root.add(almanac);
   const lampColor = new THREE.Color('#ffc56b');
   function update(_dt: number, elapsed: number, reducedMotion: boolean): void {
     if (disposed) return;
@@ -464,10 +556,17 @@ export function createHalloweenLayer(layout: Layout): HalloweenLayer {
       fog.setMatrixAt(i, dummy.matrix);
     });
     fog.instanceMatrix.needsUpdate = true;
+    // the almanach floats and sways slowly
+    almanac.position.y =
+      layout.terrain.groundHeight(almanacAt.x, almanacAt.z) + 1.5 + Math.sin(t * 0.6) * 0.8;
+    almanac.rotation.z = Math.sin(t * 0.37) * 0.03;
   }
   update(0, 0, true);
   return {
     root,
+    get almanac() {
+      return almanacReady ? almanac : null;
+    },
     ready: Promise.all(pending).then(() => undefined),
     update,
     dispose(): void {

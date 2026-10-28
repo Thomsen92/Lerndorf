@@ -119,4 +119,16 @@ describe('independent season ticket and welcome', () => {
     expect(quiz.textContent).toMatch(/Season-Start/);
     hub.dispose();
   });
+
+  it('places the ticket right below the player card, so they never overlap', () => {
+    const nav = document.createElement('nav');
+    nav.className = 'game-nav';
+    nav.getBoundingClientRect = () => ({ top: 12, bottom: 150, height: 138 }) as DOMRect;
+    const host = document.createElement('div');
+    document.body.append(nav, host);
+    const hub = createSeasonHub({ host, openLearnPass: vi.fn(), canOpen: () => true });
+    hub.setState(state());
+    expect(hub.el.style.top).toBe('162px');
+    hub.dispose();
+  });
 });

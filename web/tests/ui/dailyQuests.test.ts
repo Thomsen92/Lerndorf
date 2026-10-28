@@ -588,4 +588,27 @@ describe('daily quest area', () => {
     expect(play).toHaveBeenCalledTimes(1);
     expect(document.querySelector('.celebration .celebration-title')?.textContent).toBe('Geschafft!');
   });
+
+  it('links to the Spooky English Quiz only while the season offers it', async () => {
+    const spookyQuiz = vi.fn();
+    handles.push(
+      openDailyQuests({
+        supabase: {} as SupabaseClient,
+        coins: 5,
+        onCoins: vi.fn(),
+        onClose: vi.fn(),
+        spookyQuiz,
+      }),
+    );
+    await flush();
+    const link = document.querySelector<HTMLButtonElement>('[data-spooky-quiz]');
+    expect(link?.textContent).toContain('Spooky English Quiz');
+    link?.click();
+    expect(spookyQuiz).toHaveBeenCalledWith(link);
+    handles.forEach((h) => h.close());
+    handles = [];
+    open();
+    await flush();
+    expect(document.querySelector('[data-spooky-quiz]')).toBeNull();
+  });
 });

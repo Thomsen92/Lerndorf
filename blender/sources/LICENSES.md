@@ -107,6 +107,11 @@ Die goldene Tafelkontur und der Hinweis-Button sind eigene Geometrie/UI. Der Sir
 | `web/public/assets/audio/sfx/dialog-typing.mp3` | vom Auftraggeber geliefert | wie oben | Tippgeräusch bei Zeilen ohne Aufnahme |
 | `web/public/assets/audio/sfx/chest-open.mp3`, `level-up.mp3` | vom Auftraggeber geliefert („LockChime_2.wav“, „LockChime_1.wav“), in MP3 umgewandelt | wie oben | Truhe öffnen, Level-up (die Kenney-Klänge bleiben im Repo) |
 | `web/public/assets/audio/sfx/victory-fanfare.mp3` | eigene Komposition, synthetisch erzeugt mit `web/scripts/audio/make-victory-fanfare.py` (keine Samples) | CC0 | großes „Success!“ am Ende der Daily Quests und des Spooky English Quiz |
+| `web/public/assets/audio/sfx/mystery.mp3`, `card-flip.mp3`, `giggle.mp3` | eigene Klänge, synthetisch erzeugt mit `web/scripts/audio/make-almanac-sounds.py` (keine Samples) | CC0 | Karte wird gezogen, Karte dreht sich um, Kichern beim Riesen-Almanach |
+| `web/src/render/beehive.ts`, `web/src/minigames/spellingBee/beeArt.ts` | eigene Geometrie (Bienenkorb, Tisch, Honigtopf, drei runde Bienen) und eigene SVG-Biene, im Code gebaut | CC0 | Spelling Bee am Markt; Klang „ding“ ist das vorhandene Kenney-CC0-`ding.mp3` |
+| `web/scripts/spelling/puzzles.json` | Wortlisten aus den freien Paketen `english-words` (MIT; Liste „web2“ = Webster's Second International, gemeinfrei) und `wordfreq` (Apache-2.0, Häufigkeitsfilter), Themen nach Highlight 8 | frei | Spelling-Bee-Rätsel (Migration 0056) |
+| `web/public/assets/halloween/almanac-cover.webp`, `almanac-cover-small.webp` | verkleinert aus `assets/collection/textbook/highlight-halloween-cover.png` (Highlight-8-Umschlag, von der Lehrkraft geliefert) | wie das Original (Lehrkraft) | „My Almanac“ im Profil und Buchdeckel |
+| `web/public/assets/shop/monitor-01.glb`, `tv-crt-07.glb` | wie bisher (FBX-Paket der Lehrkraft); 28.10.2026 nur die fast schwarzen Grautöne der eingebetteten 32×32-Palette aufgehellt (`web/scripts/assets/lift-dark-palette.py`), Geometrie unverändert | wie bisher | Retro-Monitor und Röhrenfernseher waren im Shop nur eine schwarze Silhouette |
 
 ## Schrift „Creepster“ (28.10.2026)
 

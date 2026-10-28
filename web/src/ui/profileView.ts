@@ -9,35 +9,10 @@ import type { Sound } from './sound';
 import { createChestControl, type ChestControl } from './chestControl';
 import { createSeasonCard } from './seasonCard';
 import type { SeasonApi } from '../api/season';
+import '../season/spookyFont.css';
 import './profile.css';
 import type { AvatarLook } from '../avatars/look';
 
-/** Small card-stack icon for the almanach entry (no external image). */
-function cardStackSvg(size: number): SVGSVGElement {
-  const ns = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(ns, 'svg');
-  svg.setAttribute('viewBox', '0 0 48 48');
-  svg.setAttribute('width', String(size));
-  svg.setAttribute('height', String(size));
-  svg.setAttribute('aria-hidden', 'true');
-  for (const [x, y] of [
-    [10, 12],
-    [15, 9],
-    [20, 6],
-  ]) {
-    const rect = document.createElementNS(ns, 'rect');
-    rect.setAttribute('x', String(x));
-    rect.setAttribute('y', String(y));
-    rect.setAttribute('width', '20');
-    rect.setAttribute('height', '30');
-    rect.setAttribute('rx', '3');
-    rect.setAttribute('fill', '#2a1f33');
-    rect.setAttribute('stroke', '#d6a34f');
-    rect.setAttribute('stroke-width', '2');
-    svg.append(rect);
-  }
-  return svg;
-}
 let serial = 0;
 export function openProfile(opts: {
   api: ProgressApi;
@@ -104,7 +79,7 @@ export function openProfile(opts: {
     rewards: Reward[] = [],
     busy = false;
   let page: 'overview' | 'collection' = 'overview',
-    category: 'title' | 'frame' = 'title';
+    category: 'title' | 'frame' | 'achievements' = 'title';
   let chests: ChestControl[] = [];
   const clearChests = (): void => {
     chests.forEach((c) => c.dispose());
@@ -235,17 +210,28 @@ export function openProfile(opts: {
     collection.append(frameSvg(p.frameId, 48));
     const label = document.createElement('span');
     text(label, 'strong', tr('Sammlung'));
-    text(label, 'span', tr('Titel und Rahmen'));
+    text(label, 'span', tr('Titel, Rahmen und Erfolge'));
     collection.append(label);
     text(collection, 'span', '→', 'profile-collection-arrow');
     content.append(collection);
     if (opts.collection) {
-      const cardCollection = button('', () => opts.collection?.open(), 'profile-collection-link');
-      cardCollection.setAttribute('aria-label', tr('Sammelkarten ansehen'));
-      cardCollection.append(cardStackSvg(48));
+      // "My Almanac": a tap opens the almanach book directly (teacher, 28.10.2026)
+      const cardCollection = button(
+        '',
+        () => opts.collection?.open(),
+        'profile-collection-link profile-almanac-link',
+      );
+      cardCollection.setAttribute('aria-label', tr('Mein Almanach öffnen'));
+      const cover = document.createElement('img');
+      cover.className = 'profile-almanac-cover';
+      cover.src = `${import.meta.env.BASE_URL}assets/halloween/almanac-cover-small.webp`;
+      cover.alt = '';
+      cover.width = 48;
+      cover.height = 66;
+      cardCollection.append(cover);
       const cardLabel = document.createElement('span');
-      text(cardLabel, 'strong', tr('Sammelkarten'));
-      text(cardLabel, 'span', tr('Der Halloween-Almanach'));
+      text(cardLabel, 'strong', tr('Mein Almanach'), 'profile-almanac-title');
+      text(cardLabel, 'span', tr('The Midnight Collection'));
       cardCollection.append(cardLabel);
       text(cardCollection, 'span', '→', 'profile-collection-arrow');
       content.append(cardCollection);
@@ -291,8 +277,11 @@ export function openProfile(opts: {
     const focusTab = (): void => {
       content.querySelector<HTMLButtonElement>('[role=tab][aria-selected=true]')?.focus();
     };
-    for (const kind of ['title', 'frame'] as const) {
-      const tab = button(kind === 'title' ? tr('Titel') : tr('Rahmen'), () => {
+    // achievements moved here from the almanach (teacher, 28.10.2026)
+    const kinds = ['title', 'frame', 'achievements'] as const;
+    for (const kind of kinds) {
+      const label = kind === 'title' ? tr('Titel') : kind === 'frame' ? tr('Rahmen') : tr('Erfolge');
+      const tab = button(label, () => {
         category = kind;
         render();
         focusTab();
@@ -305,20 +294,35 @@ export function openProfile(opts: {
       tab.addEventListener('keydown', (event) => {
         if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
         event.preventDefault();
+        const at = kinds.indexOf(category);
         category =
           event.key === 'Home'
-            ? 'title'
+            ? kinds[0]
             : event.key === 'End'
-              ? 'frame'
-              : category === 'title'
-                ? 'frame'
-                : 'title';
+              ? kinds[kinds.length - 1]
+              : kinds[(at + (event.key === 'ArrowLeft' ? kinds.length - 1 : 1)) % kinds.length];
         render();
         focusTab();
       });
       tabs.append(tab);
     }
     content.append(tabs);
+    if (category === 'achievements') {
+      const box = document.createElement('section');
+      box.className = 'collection-achievements';
+      box.id = panelId;
+      box.setAttribute('role', 'tabpanel');
+      box.setAttribute('aria-labelledby', `${panelId}-achievements`);
+      text(
+        box,
+        'p',
+        tr(
+          'Erfolge sind noch ein Platzhalter. Rahmen und Titel sind Vorschauen, keine freigeschalteten Erfolge.',
+        ),
+      );
+      content.append(box);
+      return;
+    }
     const list = document.createElement('section');
     list.className = `collection-grid${category === 'title' ? ' collection-grid--titles' : ''}`;
     list.id = panelId;

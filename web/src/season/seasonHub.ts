@@ -41,6 +41,30 @@ export function createSeasonHub(opts: SeasonHubOptions): SeasonHub {
   el.append(image, label);
   opts.host.append(el);
 
+  // The ticket sits right below the player card. The card's height changes with the UI size,
+  // the language and the zoom, so it is measured instead of guessed (no overlap, teacher 28.10.2026).
+  const place = (): void => {
+    const nav = document.querySelector<HTMLElement>('nav.game-nav');
+    if (!nav || !nav.isConnected) return;
+    const navRect = nav.getBoundingClientRect();
+    if (navRect.height === 0) return;
+    const hostRect = opts.host.getBoundingClientRect();
+    el.style.top = `${Math.round(navRect.bottom - hostRect.top + 12)}px`;
+  };
+  const resize = typeof ResizeObserver === 'function' ? new ResizeObserver(() => place()) : null;
+  let watched: Element | null = null;
+  const watch = (): void => {
+    const nav = document.querySelector('nav.game-nav');
+    if (nav && nav !== watched) {
+      if (watched) resize?.unobserve(watched);
+      resize?.observe(nav);
+      watched = nav;
+    }
+    place();
+  };
+  window.addEventListener('resize', watch);
+  requestAnimationFrame(watch);
+
   let state: WorldThemeState | null = null;
   let modal: ModalHandle | null = null;
   // A welcome acknowledged in this session must not pop again while the poll is in flight.
@@ -125,6 +149,7 @@ export function createSeasonHub(opts: SeasonHubOptions): SeasonHub {
     open,
     setState(next) {
       state = next;
+      watch();
       if (!next?.seasonId) return;
       if (acknowledged === next.seasonId) return;
       if (next.welcomeSeen) acknowledged = next.seasonId;
@@ -139,9 +164,12 @@ export function createSeasonHub(opts: SeasonHubOptions): SeasonHub {
     },
     setVisible(visible) {
       el.hidden = !visible;
+      if (visible) watch();
     },
     dispose() {
       modal?.close();
+      resize?.disconnect();
+      window.removeEventListener('resize', watch);
       el.remove();
     },
   };

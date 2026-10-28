@@ -127,6 +127,8 @@ if (view === 'wappen') {
     onSettings: () => {},
     onClose: () => {},
     reducedMotion,
+    // "My Almanac" entry (the book itself has its own harness, dev/collection.html)
+    collection: { open: () => (document.body.dataset.almanac = 'opened') },
   });
 } else if (view === 'levelup') {
   openLevelUp({

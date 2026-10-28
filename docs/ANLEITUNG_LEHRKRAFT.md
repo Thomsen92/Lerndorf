@@ -528,3 +528,14 @@ Sie werden – wie alle Migrationen – beim Merge nach `main` automatisch einge
 | „3D-Ansicht ist auf diesem Gerät nicht verfügbar.“ | Der Browser kann kein WebGL öffnen; Karte und Quellen bleiben lesbar. |
 | „Das Modell konnte nicht geladen werden.“ | Modelldatei fehlt oder Netzwerkfehler; **Erneut versuchen** antippen. |
 | Leere Sammlung trotz Abholung | Profil neu öffnen; die Nachbuchung läuft beim Lesen der Sammlung automatisch. |
+
+## Spelling Bee am Markt
+
+Neben der Questtafel steht ein Bienenkorb mit Schild „Spelling Bee“. Antippen öffnet ein Wortspiel: sieben Buchstaben in Waben, jedes Wort braucht den gelben Buchstaben, eine Runde dauert 3 Minuten. Jeden Tag gibt es ein neues Rätsel zu Themen aus Highlight 8.
+
+- **Belohnung:** Die ersten 3 Runden pro Tag bringen Münzen und XP (4–10 Münzen, 10–30 XP je nach Punkten). Danach kann man weiterspielen, es zählt dann nur noch für die Bestenliste. So bleiben Münzen vor allem Lohn für die Englisch-Aufgaben.
+- **Übungsrunde:** Die allererste Runde jedes Schülers ist eine Übungsrunde mit 5 Minuten. Sir Byte zeigt die ersten 2 Wörter, und der nächste Buchstabe leuchtet orange, bis beide Wörter gefunden sind. Sie bringt einmalig Extra-Münzen und verbraucht keine der 3 Runden.
+- **Goldenes Wort:** Jeden Tag ist ein Wort golden und zählt doppelt. Welches, verrät das Spiel erst, wenn man es findet.
+- **Bestenliste:** drei Reiter, 8a und 8b gemeinsam, nur Spitznamen: **Woche** (beste Runde dieser Woche), **Allzeit** (beste Runde überhaupt), **Fleißigste** (alle Punkte der Woche zusammen).
+- **Was Sie tun müssen:** nichts von Hand. Die neue Migration `0057_spelling_bee.sql` wird wie alle Migrationen beim Merge nach `main` eingespielt. Vorher nichts in Supabase ausführen.
+- **Wenn etwas nicht klappt:** „Keine Verbindung“ → **Noch einmal senden** antippen, die Runde geht nicht verloren, solange das Fenster offen ist.

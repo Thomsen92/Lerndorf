@@ -25,6 +25,13 @@ export const LINES = {
   catchUp: "You can still do yesterday's quests.",
   spooky: 'Welcome to the Spooky English Quiz! Tap the right answer. No rush.',
   spookyDone: 'Spooktacular! Now collect your rewards in your LearnPass.',
+  bee: 'Welcome to the Spelling Bee! Every word needs the yellow letter. Ready, steady, buzz!',
+  beeLong: 'What a long word! Splendid.',
+  beePangram: 'A pangram! All seven letters. Rather impressive!',
+  beeDone: "Time's up! Well buzzed.",
+  beeTutorial: 'A practice round! Tap the glowing letters, then press Enter.',
+  beeTutorialDone: 'Splendid! Now find more words on your own.',
+  beeGolden: 'The golden word! Double points. Jolly good show!',
 } as const;
 export type LineKey = keyof typeof LINES;
 /** Recordings of single lines, as file names without folder and extension. */

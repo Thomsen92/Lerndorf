@@ -3,8 +3,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import type { CollectionCatalog } from '../../src/collection/types';
 const preview = vi.hoisted(() => vi.fn());
-vi.mock('../../src/collection/cardPreview', () => ({ openCardPreview: preview }));
-import { openCollection } from '../../src/collection/collectionView';
+vi.mock('../../src/collection/cardPreview', () => ({
+  openCardPreview: preview,
+}));
+import { ALMANAC_CHAPTERS, CARDS_PER_PAGE, openCollection } from '../../src/collection/collectionView';
 import type { CollectionApi } from '../../src/api/collection';
 
 const catalog = JSON.parse(
@@ -15,97 +17,104 @@ const api = (owned: string[]) =>
   ({
     my: async () => ({
       seasonId: '2026-11-halloween',
-      cards: owned.map((cardId) => ({ cardId, quantity: 1, firstAcquiredAt: '2026-10-28T10:00:00Z' })),
+      cards: owned.map((cardId) => ({
+        cardId,
+        quantity: 1,
+        firstAcquiredAt: '2026-10-28T10:00:00Z',
+      })),
     }),
     teacherRead: vi.fn(),
   }) as unknown as CollectionApi;
 
-function open(owned: string[] = []) {
+const flush = async (): Promise<void> => {
+  for (let i = 0; i < 4; i++) await Promise.resolve();
+};
+
+function open(owned: string[] = [], focusCardId?: string) {
   return openCollection({
     api: api(owned),
     seasonId: '2026-11-halloween',
     catalog,
     reducedMotion: true,
+    focusCardId,
   });
 }
 
+const ribbon = (label: string): HTMLButtonElement =>
+  Array.from(document.querySelectorAll<HTMLButtonElement>('.almanac-ribbon')).find((b) =>
+    b.textContent?.startsWith(label),
+  )!;
+const tiles = () => Array.from(document.querySelectorAll<HTMLButtonElement>('.almanac-card'));
+
 afterEach(() => document.body.replaceChildren());
 
-describe('collection almanach', () => {
-  it('opens on the shared cover and reveals the almanach without owning the legendary card', async () => {
-    open();
-    await Promise.resolve();
-    const cover = document.querySelector<HTMLImageElement>('.collection-cover-image');
-    expect(cover?.getAttribute('src')).toContain('assets/collection/textbook/highlight-halloween-cover.png');
-    expect(document.body.textContent).toContain('50 Karten');
-    const legendary = Array.from(document.querySelectorAll('button')).find((b) =>
-      b.textContent?.includes('Legendary-Karte'),
-    );
-    legendary?.click();
-    expect(document.body.textContent).toContain('Highlight 8');
-  });
-
-  it('lists all 50 cards, filters by rarity, curses and search', async () => {
-    open();
-    await Promise.resolve();
-    const almanach = Array.from(document.querySelectorAll('button')).find(
-      (b) => b.textContent === 'Almanach öffnen',
-    );
-    almanach?.click();
-    expect(document.querySelectorAll('.collection-card')).toHaveLength(50);
-
-    const curses = Array.from(document.querySelectorAll('button')).find(
-      (b) => b.textContent === 'Classroom Curses',
-    );
-    curses?.click();
-    expect(document.querySelectorAll('.collection-card')).toHaveLength(8);
-
-    const all = Array.from(document.querySelectorAll('button')).find((b) => b.textContent === 'Alle');
-    all?.click();
-    const search = document.querySelector<HTMLInputElement>('input[type=search]')!;
-    search.value = 'Pumpkin Comparisons';
-    search.dispatchEvent(new Event('input'));
-    const names = Array.from(document.querySelectorAll('.collection-card-name')).map(
-      (el) => el.textContent ?? '',
-    );
-    expect(names).toEqual(['Pumpkin Comparisons']);
-  });
-
-  it('marks owned cards and shows full card content with a 3D opener', async () => {
+describe('My Almanac', () => {
+  it('opens as a book of its own with the cover and four rarity chapters', async () => {
     open(['night-light']);
-    await Promise.resolve();
-    await Promise.resolve();
-    Array.from(document.querySelectorAll('button'))
-      .find((b) => b.textContent === 'Almanach öffnen')!
-      .click();
-    expect(document.querySelectorAll('.collection-owned')).toHaveLength(1);
+    await flush();
+    expect(document.querySelector('.overlay.almanac-overlay')).not.toBeNull();
+    expect(document.querySelector('[role=dialog] h2')?.textContent).toBe('Mein Almanach');
+    expect(document.querySelector('.almanac-intro-art')?.getAttribute('src')).toContain('almanac-cover.webp');
+    expect(document.body.textContent).toContain('1 von 50 Karten entdeckt');
+    const labels = Array.from(document.querySelectorAll('.almanac-ribbon')).map((b) => b.textContent);
+    expect(labels).toEqual(['Normal1/18', 'Selten0/17', 'Episch0/14', 'Legendär0/1']);
+    expect(ALMANAC_CHAPTERS).toEqual(['normal', 'rare', 'epic', 'legendary']);
+  });
 
-    const search = document.querySelector<HTMLInputElement>('input[type=search]')!;
-    search.value = 'The Star';
-    search.dispatchEvent(new Event('input'));
-    document.querySelector<HTMLButtonElement>('.collection-card')!.click();
-    expect(document.body.textContent).toContain('Classic verse');
+  it('lists every card once, sorted into its rarity chapter, at most nine per page', async () => {
+    open();
+    await flush();
+    const seen = new Set<string>();
+    for (const chapter of ['Normal', 'Selten', 'Episch', 'Legendär']) {
+      ribbon(chapter).click();
+      for (let guard = 0; guard < 4; guard++) {
+        const page = tiles();
+        expect(page.length).toBeLessThanOrEqual(CARDS_PER_PAGE * 2);
+        page.forEach((tile) => seen.add(tile.dataset.cardId!));
+        const next = document.querySelector<HTMLButtonElement>('.almanac-turn:last-child')!;
+        if (next.disabled) break;
+        next.click();
+      }
+    }
+    expect(seen.size).toBe(50);
+  });
+
+  it('keeps undiscovered cards dark and closed, discovered ones open their page and 3D view', async () => {
+    open(['night-light'], 'night-light');
+    await flush();
+    const locked = tiles().filter((tile) => tile.classList.contains('locked'));
+    expect(locked.length).toBeGreaterThan(0);
+    expect(locked.every((tile) => tile.disabled && !tile.querySelector('img'))).toBe(true);
+    expect(locked[0].getAttribute('aria-label')).toMatch(/noch nicht entdeckt/);
+    locked[0].click();
+    expect(document.querySelector('.almanac-detail-art')).toBeNull();
+
+    const star = tiles().find((tile) => tile.dataset.cardId === 'night-light')!;
+    expect(star.disabled).toBe(false);
+    star.click();
     expect(document.body.textContent).toContain('TWINKLE');
     expect(document.body.textContent).toContain('Jane Taylor');
-    expect(document.body.textContent).toContain('In deiner Sammlung');
     Array.from(document.querySelectorAll('button'))
       .find((b) => b.textContent === 'In 3D ansehen')!
       .click();
     expect(preview).toHaveBeenCalledWith(
-      expect.objectContaining({ card: expect.objectContaining({ id: 'night-light' }) }),
+      expect.objectContaining({
+        card: expect.objectContaining({ id: 'night-light' }),
+      }),
     );
-  });
-
-  it('labels achievements as a placeholder', async () => {
-    open();
-    await Promise.resolve();
     Array.from(document.querySelectorAll('button'))
-      .find((b) => b.textContent === 'Erfolge')!
+      .find((b) => b.textContent === '← Zurück zur Seite')!
       .click();
-    expect(document.body.textContent).toContain('Platzhalter');
+    expect(document.querySelector('.almanac-detail-art')).toBeNull();
   });
 
-  it('keeps the almanach readable when ownership fails', async () => {
+  it('has no achievements any more (they moved to the profile collection)', async () => {
+    open();
+    await flush();
+    expect(document.body.textContent).not.toContain('Erfolge');
+  });
+
+  it('keeps every card dark when ownership cannot be loaded', async () => {
     const failing = {
       my: async () => {
         throw new Error('offline');
@@ -118,9 +127,9 @@ describe('collection almanach', () => {
       catalog,
       reducedMotion: true,
     });
-    await Promise.resolve();
-    await Promise.resolve();
-    expect(document.body.textContent).toContain('50 Karten');
-    expect(document.querySelectorAll('.collection-owned')).toHaveLength(0);
+    await flush();
+    expect(document.body.textContent).toContain('konnten nicht geladen werden');
+    ribbon('Legendär').click();
+    expect(tiles().every((tile) => tile.classList.contains('locked'))).toBe(true);
   });
 });

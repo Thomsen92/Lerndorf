@@ -5,6 +5,10 @@
 import { tr } from '../../i18n';
 import type { PoolItem, SeasonApi } from '../../api/season';
 import { announceCardGrants } from '../../collection/cardNotice';
+import { cardById, collectionCatalog } from '../../collection/catalog';
+import { revealCards } from '../../collection/cardReveal';
+import type { CardDefinition } from '../../collection/types';
+import type { SoundName } from '../sound';
 import { itemName } from '../seasonChests';
 import { renderLearnPass, type LearnPassHandle } from './learnpassView';
 import { openInside } from './insideModal';
@@ -19,6 +23,9 @@ export interface OpenLearnPassOptions {
   onOpenInventory: () => void;
   /** The player's portrait in a given frame (frame rewards); a default figure otherwise. */
   portrait?: PortraitFactory;
+  sound?: { play(name: SoundName, delayMs?: number): void } | null;
+  /** "Zum Almanach" after a drawn card: opens the almanach at that card. */
+  onOpenAlmanac?: (cardId: string) => void;
 }
 
 export interface LearnPassOverlay {
@@ -56,8 +63,8 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
       const cards = (result.rewards.cards ?? [])
         .filter((card) => card.granted)
         .map((card) => card.id);
-      if (cards.length) announceCardGrants(cards);
       await refresh();
+      if (cards.length) void showDrawnCards(cards);
       return coins;
     },
     async onBuyChest(): Promise<void> {
@@ -86,6 +93,25 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
       });
     },
   };
+
+  /** New cards from a claim: the reveal with mystery and flip; the short notice if that fails. */
+  async function showDrawnCards(ids: string[]): Promise<void> {
+    try {
+      const catalog = await collectionCatalog();
+      const cards = ids
+        .map((id) => cardById(catalog, id))
+        .filter((card): card is CardDefinition => Boolean(card));
+      if (!cards.length || closed) throw Error('no cards');
+      revealCards({
+        cards,
+        reducedMotion: opts.reducedMotion,
+        sound: opts.sound,
+        onAlmanac: opts.onOpenAlmanac,
+      });
+    } catch {
+      announceCardGrants(ids);
+    }
+  }
 
   async function refresh(): Promise<void> {
     if (closed) return;

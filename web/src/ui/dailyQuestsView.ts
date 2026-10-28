@@ -28,6 +28,7 @@ import type { ProgressDelta } from '../api/progress';
 import { createCompanion, type Companion } from '../mascot/mascotStage';
 import type { Sound } from './sound';
 import { celebrate } from './celebration';
+import '../season/spookyFont.css';
 
 export interface DailyQuestsOptions {
   sound?: Pick<Sound, 'enabled'> & Partial<Pick<Sound, 'play' | 'quiet'>>;
@@ -36,6 +37,8 @@ export interface DailyQuestsOptions {
   coins: number;
   onCoins: (coins: number) => void;
   onClose: () => void;
+  /** Opens the Spooky English Quiz while the season runs; without it there is no link. */
+  spookyQuiz?: (opener: HTMLElement) => void;
 }
 
 const TITLE = 'Daily Quests';
@@ -132,6 +135,14 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
           <h3>Heute</h3>
           ${today.length > 0 ? progressHtml(today) : ''} ${todayHtml}
           ${
+            opts.spookyQuiz
+              ? html`<button type="button" class="quest-spooky-link" data-spooky-quiz>
+                  <span class="quest-spooky-title">Spooky English Quiz</span>
+                  <span class="quest-spooky-sub">Zehn Gruselfragen, bis zu 150 XP</span>
+                </button>`
+              : ''
+          }
+          ${
             catchUp.length === 0
               ? ''
               : html`<h3>Nachholen von gestern</h3>
@@ -144,6 +155,10 @@ export function openDailyQuests(opts: DailyQuestsOptions): AreaHandle {
     </section>`;
     overlay.querySelector('.byte-slot')?.replaceWith(byte!.el);
     bindClose();
+    const spooky = overlay.querySelector<HTMLButtonElement>('[data-spooky-quiz]');
+    spooky?.addEventListener('click', () => {
+      if (!pending) opts.spookyQuiz?.(spooky);
+    });
     overlay.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((btn) =>
       btn.addEventListener('click', () => {
         if (pending) return;

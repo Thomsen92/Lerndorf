@@ -37,12 +37,28 @@
           return this.my();
         },
       };
-      const view = openCollection({
-        api,
-        seasonId: '2026-11-halloween',
-        catalog,
-        reducedMotion: false,
-      });
+      // ?reveal=night-light,bat-cat shows the card draw of the LearnPass instead of the book
+      const reveal = new URLSearchParams(location.search).get('reveal');
+      const { revealCards } = await import('../src/collection/cardReveal.ts');
+      const view = reveal
+        ? revealCards({
+            cards: reveal.split(',').map((id) => catalog.cards.find((c) => c.id === id)),
+            reducedMotion: false,
+            onAlmanac: (cardId) =>
+              openCollection({
+                api,
+                seasonId: '2026-11-halloween',
+                catalog,
+                reducedMotion: false,
+                focusCardId: cardId,
+              }),
+          })
+        : openCollection({
+            api,
+            seasonId: '2026-11-halloween',
+            catalog,
+            reducedMotion: false,
+          });
       const open = () =>
         openCollection({
           api,

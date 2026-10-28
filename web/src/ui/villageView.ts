@@ -96,6 +96,9 @@ import { openNoticeCard } from './noticeCard';
 import { setBoardNote } from '../render/plaza';
 import type { ReadOnlyView } from './readOnlyVillage';
 import { openProfile } from './profileView';
+import { createBeehive, type Beehive } from '../render/beehive';
+import { openSpellingBee } from '../minigames/spellingBee/spellingBeeView';
+import { spellingApi } from '../api/spellingBee';
 import {
   AUTO_MEASURE_SECONDS,
   decideAuto,
@@ -205,6 +208,7 @@ export async function mountVillage(
   let disposeMarketShop = () => {};
   let disposeCrowd = () => {};
   let worldAppearance: WorldAppearance | null = null;
+  let beehive: Beehive | null = null;
   let worldThemes: WorldThemeController | null = null;
   let seasonHub: ReturnType<typeof createSeasonHub> | null = null;
   let worldThemeState: WorldThemeState | null = null;
@@ -212,6 +216,7 @@ export async function mountVillage(
     tutorialAbort.abort();
     worldThemes?.dispose();
     worldAppearance?.dispose();
+    beehive?.dispose();
     seasonHub?.dispose();
     disposeCrowd();
     // close the current area (the build preview reverts via exit) and every open modal, so no `inert` is left behind
@@ -527,6 +532,10 @@ export async function mountVillage(
   let flight: { from: CameraPose; to: CameraPose; t: number; onArrive?: () => void } | null = null;
   let paused = false;
   const boardObject = village.getObjectByName('questBoard');
+  let shopCue: ReturnType<typeof createQuestBoardCue> | null = null;
+  let almanacPending = false;
+  let beeCueVisible: ((on: boolean) => void) | null = null;
+  let beeCueUpdate: ((camera: THREE.Camera) => void) | null = null;
   const boardCue = createQuestBoardCue({
     host: root,
     board: boardObject,
@@ -551,6 +560,9 @@ export async function mountVillage(
         onCoins,
         reducedMotion: reducedMotion(),
         onOpenInventory: () => void areas?.select('inventar'),
+        // a drawn card: mystery, flip and a way into the almanach at that card
+        sound,
+        onOpenAlmanac: (cardId) => void openCollectionAlmanach(cardId),
         // frame rewards show the player's own portrait in the season frame (plan §14.2)
         portrait: (frameId) =>
           avatarPortrait({
@@ -562,22 +574,131 @@ export async function mountVillage(
       }),
     );
   };
+  /** The Spelling Bee at the beehive; a modal of its own, so the village pauses meanwhile. */
+  const openBee = (): void => {
+    if (!running || inTutorial || flight || modals.anyOpen) return;
+    modals.track(
+      openSpellingBee({
+        api: spellingApi(supabase),
+        reducedMotion: reducedMotion(),
+        sound,
+        onCoins,
+        onProgress: (delta) => void worldOnProgress(delta),
+      }),
+    );
+  };
+  /** The Spooky English Quiz, from the season welcome or from the Daily Quests page. */
+  const openSeasonQuiz = (opener: HTMLElement | null): void => {
+    const seasonId = worldThemeState?.seasonId;
+    if (!seasonId || !running) return;
+    openSpookyQuiz({
+      api: seasonStarterApi(supabase),
+      seasonId,
+      opener,
+      openLearnPass: openSeasonPass,
+      // XP badge, level-up and pass refresh run through the same flow as daily quests
+      onProgress: (delta) => void worldOnProgress(delta),
+      track: (handle) => modals.track(handle),
+    });
+  };
   // The almanach is a separate, personal view; it never grants or changes anything.
-  const openCollectionAlmanach = async (): Promise<void> => {
+  const openCollectionAlmanach = async (focusCardId?: string): Promise<void> => {
     try {
       const [catalog, season] = await Promise.all([collectionCatalog(), seasonApi(supabase).state()]);
       if (!running) return;
-      openCollection({
-        api: collectionApi(supabase),
-        seasonId: season.season.id,
-        catalog,
-        reducedMotion: reducedMotion(),
-      });
+      // a modal of its own: while the book is open the village stops rendering
+      modals.track(
+        openCollection({
+          api: collectionApi(supabase),
+          seasonId: season.season.id,
+          catalog,
+          reducedMotion: reducedMotion(),
+          focusCardId,
+        }),
+      );
     } catch {
       showNotice(tr('Die Sammlung konnte nicht geladen werden.'));
     }
   };
   worldAppearance = createWorldAppearance({ scene, village, layout, rig, renderer: gl });
+  // The Halloween shop gets the same outline and arrow as the quest board, in the spooky look.
+  // A glowing silhouette around the real model, so it is built once the stand has loaded.
+  const standRoot = worldAppearance.stand;
+  const appearance = worldAppearance;
+  void appearance.ready().then(() => {
+    if (!running || shopCue) return;
+    standRoot.updateMatrixWorld(true);
+    const inverse = standRoot.matrixWorld.clone().invert();
+    const box = new THREE.Box3();
+    // only the shop itself: the cat and the cauldron stand in front of it
+    const shop = standRoot.getObjectByName('HalloweenShop') ?? standRoot;
+    shop.traverse((object) => {
+      if (!(object instanceof THREE.Mesh) || !object.visible) return;
+      const material = object.material as THREE.Material;
+      if (material.visible === false) return; // the invisible tap box
+      object.geometry.computeBoundingBox();
+      const part = object.geometry.boundingBox!.clone();
+      part.applyMatrix4(object.matrixWorld).applyMatrix4(inverse);
+      box.union(part);
+    });
+    if (box.isEmpty()) return;
+    const pad = 0.15;
+    const [x0, x1, top] = [box.min.x - pad, box.max.x + pad, box.max.y + pad];
+    shopCue = createQuestBoardCue({
+      host: root,
+      board: standRoot,
+      layout,
+      label: 'Halloween Shop',
+      ariaLabel: tr('Season I – Halloween öffnen'),
+      spooky: true,
+      silhouette: shop,
+      shape: {
+        contour: [
+          [x0, 0],
+          [x0, top],
+        ],
+        z: box.max.z,
+        baseY: 0,
+        at: new THREE.Vector3((x0 + x1) / 2, top + 0.8, box.max.z).applyMatrix4(standRoot.matrixWorld),
+      },
+      onOpen: () => {
+        if (!inTutorial && !flight) seasonHub?.open();
+      },
+    });
+    shopCue.setVisible(!inTutorial && (areas?.current ?? 'dorf') === 'dorf');
+  });
+  // The beehive with the Spelling Bee: own geometry, an outline and a sign like the quest board.
+  const hive = createBeehive(layout);
+  beehive = hive;
+  scene.add(hive.root);
+  const beeCue = createQuestBoardCue({
+    host: root,
+    board: hive.root,
+    layout,
+    label: 'Spelling Bee',
+    ariaLabel: tr('Spelling Bee öffnen'),
+    silhouette: hive.skep,
+    shape: {
+      contour: [
+        [0, 0],
+        [0, 1],
+      ],
+      z: 0,
+      baseY: 0,
+      at: hive.root.position.clone().add(new THREE.Vector3(0, 3.2, 0)),
+    },
+    onOpen: () => openBee(),
+  });
+  beeCue.el.classList.add('honey');
+  beeCue.setVisible(!inTutorial);
+  beeCueVisible = (on) => beeCue.setVisible(on);
+  beeCueUpdate = (cam) => beeCue.update(cam);
+  const disposeQuestCue = disposeBoardCue;
+  disposeBoardCue = () => {
+    disposeQuestCue();
+    shopCue?.dispose();
+    beeCue.dispose();
+  };
   worldThemes = createWorldThemeController({
     classId: profile.classId,
     read: () => worldThemeApi(supabase).state(),
@@ -593,19 +714,7 @@ export async function mountVillage(
   seasonHub = createSeasonHub({
     host: root,
     openLearnPass: openSeasonPass,
-    openQuiz: () => {
-      const seasonId = worldThemeState?.seasonId;
-      if (!seasonId || !running) return;
-      openSpookyQuiz({
-        api: seasonStarterApi(supabase),
-        seasonId,
-        opener: seasonHub?.el ?? null,
-        openLearnPass: openSeasonPass,
-        // XP badge, level-up and pass refresh run through the same flow as daily quests
-        onProgress: (delta) => void worldOnProgress(delta),
-        track: (handle) => modals.track(handle),
-      });
-    },
+    openQuiz: () => openSeasonQuiz(seasonHub?.el ?? null),
     canOpen: () =>
       running && !inTutorial && !modals.anyOpen && !flight && (areas?.current ?? 'dorf') === 'dorf',
     track: (handle) => {
@@ -625,6 +734,8 @@ export async function mountVillage(
     cameraTools.hidden = inTutorial || area !== 'dorf';
     houseCards.setVisible(!inTutorial && area === 'dorf' && !marketFocused);
     boardCue.setVisible(!inTutorial && area === 'dorf');
+    shopCue?.setVisible(!inTutorial && area === 'dorf');
+    beeCueVisible?.(!inTutorial && area === 'dorf');
     seasonHub?.setVisible(!inTutorial && area === 'dorf');
     if (!HOUSE_AREAS.has(area)) {
       flight = null; // leaving the house cancels a running flight
@@ -741,6 +852,25 @@ export async function mountVillage(
     }
     if (hit?.object.userData.kind === 'seasonStand') {
       seasonHub?.open();
+      return;
+    }
+    // the beehive: the Spelling Bee
+    if (hit?.object.userData.kind === 'spellingBee') {
+      openBee();
+      return;
+    }
+    // the giant almanach on the horizon: a creepy giggle, then the book opens
+    if (hit?.object.userData.kind === 'almanacGiant') {
+      if (almanacPending) return;
+      almanacPending = true;
+      sound.play('giggle');
+      setTimeout(
+        () => {
+          almanacPending = false;
+          if (running && !modals.anyOpen) void openCollectionAlmanach();
+        },
+        reducedMotion() ? 200 : 1100,
+      );
       return;
     }
     if (hit?.object.userData.kind === 'marketShop') {
@@ -934,6 +1064,11 @@ export async function mountVillage(
           onCoins,
           onProgress: (delta, from) => void worldOnProgress(delta, from),
           onClose: () => void areas?.select('dorf'),
+          // the season quiz is one tap away while the season runs (teacher, 28.10.2026)
+          spookyQuiz:
+            worldThemeState?.seasonState === 'running' && worldThemeState.seasonId
+              ? (opener: HTMLElement) => openSeasonQuiz(opener)
+              : undefined,
         }),
       profil: async () =>
         openProfile({
@@ -1225,6 +1360,8 @@ export async function mountVillage(
     cameraTools.hidden = on || (areas?.current ?? 'dorf') !== 'dorf';
     houseCards.setVisible(!on && (areas?.current ?? 'dorf') === 'dorf');
     boardCue.setVisible(!on && (areas?.current ?? 'dorf') === 'dorf');
+    shopCue?.setVisible(!on && (areas?.current ?? 'dorf') === 'dorf');
+    beeCueVisible?.(!on && (areas?.current ?? 'dorf') === 'dorf');
     seasonHub?.setVisible(!on && (areas?.current ?? 'dorf') === 'dorf');
     nav?.setLocked(on);
     controls.enabled = !on;
@@ -1287,6 +1424,7 @@ export async function mountVillage(
     }
     crowd.update(dt);
     worldAppearance?.update(dt, now / 1000, reducedMotion());
+    beehive?.update(dt, now / 1000, reducedMotion());
     village.userData.updateMarketShop?.(dt, now / 1000, reducedMotion());
     seasonHub?.maybeAutoOpen();
     (village.userData.animate as ((t: number) => void) | undefined)?.(performance.now() / 1000);
@@ -1305,6 +1443,8 @@ export async function mountVillage(
     rig.follow(controls.target);
     houseCards.update(camera);
     boardCue.update(camera);
+    shopCue?.update(camera);
+    beeCueUpdate?.(camera);
     buildMode?.update(now / 1000);
     fx?.update(dt, camera);
     gl.render(scene, camera);

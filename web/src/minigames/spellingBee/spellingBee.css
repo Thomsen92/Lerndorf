@@ -1,0 +1,520 @@
+/* Spelling Bee: honey and wax on a warm evening (spellingBeeView.ts). Tap targets >= 52 px. */
+.overlay.modal.bee-overlay {
+  align-items: center;
+  background: radial-gradient(ellipse at 50% 30%, #3a2a12f2, #140d05f8 75%);
+}
+.overlay.modal.bee-overlay .panel {
+  width: min(1040px, 100%);
+  max-height: calc(100dvh - 20px);
+  background: linear-gradient(160deg, #fff6d8, #ffe9a8);
+  color: #3b2a10;
+  border: 3px solid #e0a419;
+  box-shadow: 0 20px 60px #000000aa;
+}
+.bee-overlay .panel-head {
+  border-bottom: 2px solid #e0a41966;
+}
+.bee-overlay .panel-head h2 {
+  font:
+    800 28px/1 'Comic Neue',
+    var(--font, system-ui, sans-serif);
+  color: #8a5300;
+  letter-spacing: 0.02em;
+}
+.bee-overlay .panel button {
+  border-color: #c98a12;
+  background: #fffaf0;
+  color: #3b2a10;
+}
+.bee-overlay .panel button.primary {
+  background: #ffb800;
+  color: #3b2a10;
+}
+.bee {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.bee-side {
+  display: grid;
+  justify-items: center;
+  position: sticky;
+  top: 0;
+}
+/* Sir Byte above, his bubble below (as on the daily quests page), in honey colours */
+.bee-side > .byte-stage {
+  width: 100%;
+  grid-template-columns: 1fr;
+  border-color: #d29a1e;
+  background: radial-gradient(ellipse at 50% 35%, #5a3d12, #2e1f0a 78%);
+}
+.bee-side > .byte-stage .byte-picture {
+  width: 200px;
+  max-width: 100%;
+  justify-self: center;
+}
+.bee-side > .byte-stage .byte-bubble {
+  border-color: #e6a817;
+  background: #fff6d6;
+  color: #3b2a10;
+}
+.bee-side > .byte-stage .byte-bubble::before {
+  left: 44%;
+  top: -10px;
+  transform: rotate(135deg);
+  border-color: #e6a817;
+  background: #fff6d6;
+}
+.bee-side > .byte-stage .byte-bubble p {
+  font-size: 16px;
+}
+.bee-side > .byte-stage .byte-label {
+  color: #a0700f;
+}
+.bee-main {
+  min-width: 0;
+}
+.bee-status {
+  font-weight: 700;
+}
+.bee-status.error {
+  color: #a3361c;
+}
+.bee-start {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+}
+.bee-hero .bee-art {
+  animation: bee-hover 2.4s ease-in-out infinite;
+}
+@keyframes bee-hover {
+  50% {
+    transform: translateY(-6px) rotate(-3deg);
+  }
+}
+.bee-rules {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  font-size: 16px;
+}
+.bee-rules li::before {
+  content: '🍯 ';
+}
+.bee-reward {
+  margin: 4px 0 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #ffcf3f;
+  font-weight: 800;
+}
+.bee-reward.none {
+  background: #f1e3bd;
+  font-weight: 600;
+}
+.bee-overlay .panel .bee-go {
+  min-height: 56px;
+  padding: 0 28px;
+  font-size: 19px;
+}
+.bee-start h3 {
+  margin: 10px 0 0;
+  color: #8a5300;
+}
+.bee-board {
+  width: min(420px, 100%);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.bee-board li {
+  display: grid;
+  grid-template-columns: 36px 1fr 44px 56px;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #fff9e6;
+  text-align: left;
+}
+.bee-board li.me {
+  background: #ffcf3f;
+  font-weight: 800;
+}
+.bee-rank {
+  font-weight: 800;
+  color: #a86a00;
+}
+.bee-class {
+  font-size: 13px;
+  color: #7a5a20;
+}
+.bee-board strong {
+  text-align: right;
+}
+.bee-board-empty,
+.bee-best,
+.bee-mine {
+  margin: 0;
+  color: #6b4a10;
+}
+
+/* The round */
+.bee-game {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+.bee-top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font-weight: 800;
+  font-size: 20px;
+}
+.bee-time.hurry {
+  color: #c23a12;
+}
+.bee-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: #f1e3bd;
+  overflow: hidden;
+}
+.bee-bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ffb800, #ffd84a);
+  transition: width 0.25s linear;
+}
+.bee-input {
+  min-height: 44px;
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.bee-input .c {
+  color: #e08a00;
+}
+.bee-caret {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: #8a6a30;
+}
+.bee-input.shake {
+  animation: bee-shake 0.35s;
+}
+@keyframes bee-shake {
+  25% {
+    transform: translateX(-8px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+}
+.bee-hive {
+  --cell: clamp(64px, 11vw, 92px);
+  position: relative;
+  width: calc(var(--cell) * 3.1);
+  height: calc(var(--cell) * 3);
+}
+.bee-overlay .panel .bee-cell {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--cell);
+  height: calc(var(--cell) * 0.9);
+  margin: calc(var(--cell) * -0.45) 0 0 calc(var(--cell) * -0.5);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  background: #f3e3b3;
+  color: #3b2a10;
+  font-size: calc(var(--cell) * 0.38);
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.08s;
+}
+.bee-overlay .panel .bee-cell.center {
+  background: #ffc81e;
+}
+.bee-overlay .panel .bee-cell:active {
+  transform: scale(0.92);
+}
+.bee-cell:nth-child(2) {
+  translate: 0 calc(var(--cell) * -0.95);
+}
+.bee-cell:nth-child(3) {
+  translate: calc(var(--cell) * 0.78) calc(var(--cell) * -0.475);
+}
+.bee-cell:nth-child(4) {
+  translate: calc(var(--cell) * 0.78) calc(var(--cell) * 0.475);
+}
+.bee-cell:nth-child(5) {
+  translate: 0 calc(var(--cell) * 0.95);
+}
+.bee-cell:nth-child(6) {
+  translate: calc(var(--cell) * -0.78) calc(var(--cell) * 0.475);
+}
+.bee-cell:nth-child(7) {
+  translate: calc(var(--cell) * -0.78) calc(var(--cell) * -0.475);
+}
+.bee-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.bee-overlay .panel .bee-actions button {
+  min-width: 96px;
+  min-height: 52px;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 800;
+}
+.bee-toast {
+  min-height: 26px;
+  margin: 0;
+  padding: 2px 14px;
+  border-radius: 999px;
+  font-weight: 800;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.bee-toast.show {
+  opacity: 1;
+}
+.bee-toast.good {
+  background: #d9f4c7;
+  color: #24601a;
+}
+.bee-toast.bad {
+  background: #ffe0d4;
+  color: #8a2a10;
+}
+.bee-toast.pangram {
+  background: #ffcf3f;
+  color: #3b2a10;
+  animation: bee-pop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+@keyframes bee-pop {
+  from {
+    transform: scale(0.4);
+  }
+}
+.bee-found-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-weight: 700;
+}
+.bee-overlay .panel .bee-found-head button {
+  min-height: 44px;
+  font-size: 14px;
+}
+.bee-found {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.bee-found li {
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: #fffaf0;
+  border: 1px solid #e0c27a;
+  font-weight: 700;
+}
+.bee-found li.pangram {
+  background: #ffcf3f;
+}
+.bee-found.done {
+  justify-content: center;
+}
+.bee-final {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 900;
+  color: #8a5300;
+}
+.bee-gain {
+  margin: 0;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: #ffcf3f;
+  font-weight: 800;
+}
+.bee-gain.none {
+  background: #f1e3bd;
+  font-weight: 600;
+}
+.bee-words-line {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .bee {
+    grid-template-columns: 1fr;
+  }
+  .bee-side {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bee-hero .bee-art,
+  .bee-input.shake,
+  .bee-toast.pangram {
+    animation: none;
+  }
+}
+
+/* practice round: the help words and the glowing next step */
+.bee-reward.practice {
+  background: #dff3d0;
+  color: #24521a;
+}
+.bee-help {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-weight: 700;
+  color: #7a5410;
+}
+.bee-help b {
+  padding: 4px 12px;
+  border: 2px dashed #e0a92b;
+  border-radius: 999px;
+  background: #fff8e1;
+  letter-spacing: 2px;
+  color: #3b2a10;
+}
+.bee-help b.current {
+  border-style: solid;
+  background: #ffe7a0;
+}
+.bee-help b.done {
+  border: 2px solid #5aa83c;
+  background: #e2f5d8;
+  color: #2c6b18;
+  text-decoration: line-through;
+}
+.bee .glow {
+  animation: bee-glow 1s ease-in-out infinite;
+  outline: 4px solid #ffef6e;
+  outline-offset: 2px;
+  z-index: 2;
+}
+.bee-overlay .panel .bee-cell.glow {
+  outline: none;
+  background: #ff9d1c;
+  color: #fff;
+  text-shadow: 0 1px 2px #7a3d00;
+}
+.bee-overlay .panel .bee-cell.center.glow {
+  background: #ff7a00;
+}
+@keyframes bee-glow {
+  50% {
+    transform: scale(1.08);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bee .glow {
+    animation: none;
+  }
+}
+
+/* golden word: counts double */
+.bee-golden-rule {
+  color: #9a6a00;
+  font-weight: 800;
+}
+.bee-golden {
+  margin: 0 0 4px;
+  text-align: center;
+  font-weight: 800;
+  color: #9a6a00;
+}
+.bee-golden::before {
+  content: '✨ ';
+}
+.bee-golden.found {
+  color: #6b4a00;
+  text-shadow: 0 0 10px #ffe36e;
+}
+.bee-toast.golden {
+  background: linear-gradient(90deg, #ffd84a, #fff3b0, #ffd84a);
+  color: #5a3c00;
+  box-shadow: 0 0 18px #ffd84a;
+}
+.bee-found li.golden {
+  border-color: #e0a92b;
+  background: linear-gradient(135deg, #ffe680, #fff6c8);
+  font-weight: 800;
+}
+.bee-found li.golden::after {
+  content: ' ×2';
+  color: #b07a00;
+}
+
+/* high score lists: three tabs */
+.bee-boards {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+.bee-boards h3 {
+  margin: 4px 0 0;
+}
+.bee-tabs {
+  display: flex;
+  gap: 6px;
+}
+.bee-overlay .panel .bee-tabs button {
+  min-height: 36px;
+  padding: 4px 14px;
+  border: 2px solid #e0a92b;
+  border-radius: 999px;
+  background: #fff8e1;
+  color: #6b4a00;
+  font-weight: 700;
+}
+.bee-overlay .panel .bee-tabs button[aria-selected='true'] {
+  background: #ffc81e;
+  color: #3b2a10;
+}
+.bee-board-hint {
+  margin: 0;
+  font-size: 13px;
+  color: #8a6a2a;
+  text-align: center;
+}
+.bee-boards [role='tabpanel'] {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+}
+.bee-boards [role='tabpanel'][hidden] {
+  display: none;
+}

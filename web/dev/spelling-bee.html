@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Spelling Bee · lokale Abnahme</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      // Local harness: a fake server built from the generated puzzles (scripts/spelling/puzzles.json).
+      // ?left=0 shows the "only for the list" state, ?puzzle=3 picks a puzzle, ?tutorial=0 skips the practice round.
+      import '../src/style.css';
+      import puzzles from '../scripts/spelling/puzzles.json';
+      import { wordHash, wordPoints, rewardFor } from '../src/minigames/spellingBee/game.ts';
+      import { openSpellingBee } from '../src/minigames/spellingBee/spellingBeeView.ts';
+
+      const params = new URLSearchParams(location.search);
+      const id = Number(params.get('puzzle') ?? 1);
+      const p = puzzles[(id - 1) % puzzles.length];
+      let left = Number(params.get('left') ?? 3);
+      let coins = 42;
+      let best = 0;
+      let practice = params.get('tutorial') !== '0';
+      const hints = p.words
+        .slice()
+        .sort((a, b) => a.length - b.length || a.localeCompare(b))
+        .slice(0, 2);
+      const hashes = await Promise.all(p.words.map((w) => wordHash(id, w)));
+      const ref = { id, center: p.center, letters: p.outer, hashes };
+      // golden word of the fake server: the first word with 5+ letters that is no help word (?golden=word)
+      const goldenWord =
+        params.get('golden') ??
+        p.words.find(
+          (w) =>
+            w.length >= 5 &&
+            !p.words
+              .slice()
+              .sort((a, b) => a.length - b.length || a.localeCompare(b))
+              .slice(0, 2)
+              .includes(w),
+        );
+      const golden = goldenWord ? await wordHash(id, goldenWord) : '';
+      let total = 0;
+      const list = (rows, mine) => {
+        const all = [...rows, ...(mine ? [{ nickname: 'du', classId: '8a', score: mine, me: true }] : [])]
+          .sort((a, b) => b.score - a.score)
+          .map((r, i) => ({ me: false, ...r, rank: i + 1 }));
+        const me = all.find((r) => r.me);
+        return { top: all, me: me ? { score: me.score, rank: me.rank } : null };
+      };
+      const maxPoints = p.words.reduce((s, w) => s + wordPoints(w, ref), 0);
+      const board = () => ({
+        week: '2026-10-26',
+        ...list(
+          [
+            { nickname: 'fuchs', classId: '8a', score: 31 },
+            { nickname: 'luna', classId: '8b', score: 18 },
+          ],
+          best,
+        ),
+        all: list(
+          [
+            { nickname: 'max', classId: '8b', score: 64 },
+            { nickname: 'fuchs', classId: '8a', score: 41 },
+          ],
+          best,
+        ),
+        total: list(
+          [
+            { nickname: 'luna', classId: '8b', score: 120 },
+            { nickname: 'fuchs', classId: '8a', score: 75 },
+          ],
+          total,
+        ),
+      });
+      const rounds = new Map();
+      const api = {
+        async state() {
+          return {
+            day: '2026-10-28',
+            puzzle: { ...ref, golden, wordCount: p.words.length, maxPoints },
+            roundSeconds: Number(params.get('seconds') ?? 180),
+            freeRounds: 3,
+            rewardedLeft: left,
+            tutorial: practice,
+            board: board(),
+          };
+        },
+        async start() {
+          const tutorial = practice;
+          const rewarded = tutorial || left > 0;
+          if (rewarded && !tutorial) left--;
+          const round = rounds.size + 1;
+          rounds.set(round, rewarded);
+          return {
+            round,
+            puzzle: id,
+            endsAt: '',
+            seconds: tutorial ? 300 : Number(params.get('seconds') ?? 180),
+            rewarded,
+            rewardedLeft: left,
+            tutorial,
+            hints: tutorial ? hints : [],
+          };
+        },
+        async finish(round, words) {
+          const found = [...new Set(words)].filter((w) => p.words.includes(w)).sort();
+          const score = found.reduce((s, w) => s + wordPoints(w, ref) * (w === goldenWord ? 2 : 1), 0);
+          const rewarded = rounds.get(round);
+          const r = rewarded ? rewardFor(score) : { coins: 0, xp: 0 };
+          coins += r.coins;
+          best = Math.max(best, score);
+          total += score;
+          practice = false;
+          return {
+            score,
+            words: found,
+            maxPoints,
+            rewarded,
+            coinsGained: r.coins,
+            xpGained: r.xp,
+            coins,
+            rewardedLeft: left,
+            board: board(),
+            progress: null,
+          };
+        },
+      };
+      window.beeDev = {
+        words: p.words,
+        hints,
+        golden: goldenWord,
+        center: p.center,
+        letters: p.outer,
+        open: () => openSpellingBee({ api, reducedMotion: false }),
+      };
+      window.beeDev.view = window.beeDev.open();
+    </script>
+  </body>
+</html>

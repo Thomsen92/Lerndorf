@@ -58,6 +58,9 @@ it('keeps overview short and moves locked rewards to their own collection page',
   find('Rahmen').click();
   expect(document.body.textContent).toContain('Gold');
   expect(document.body.textContent).not.toContain('Busy Bee');
+  // achievements moved here from the almanach (28.10.2026)
+  find('Erfolge').click();
+  expect(document.querySelector('[role=tabpanel]')?.textContent).toContain('Platzhalter');
   find('Zurück zum Profil').click();
   expect(document.querySelector('h2')?.textContent).toBe('Mein Profil');
   handle.close();
