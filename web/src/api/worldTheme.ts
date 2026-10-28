@@ -30,11 +30,7 @@ function isTheme(value: unknown): value is WorldTheme {
 
 function isSeasonState(value: unknown): value is SeasonUiState | null {
   return (
-    value === null ||
-    value === 'upcoming' ||
-    value === 'running' ||
-    value === 'ended' ||
-    value === 'closed'
+    value === null || value === 'upcoming' || value === 'running' || value === 'ended' || value === 'closed'
   );
 }
 

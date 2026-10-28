@@ -162,7 +162,7 @@ describe('class world theme', () => {
     expect((await call('world_theme_state()')).welcomeSeen).toBe(true);
     await db.exec(`select public.ack_season_welcome('${SEASON}')`);
     expect(
-      (await db.query("select count(*)::int n from public.season_welcome_seen where player_id = $1", [A]))
+      (await db.query('select count(*)::int n from public.season_welcome_seen where player_id = $1', [A]))
         .rows,
     ).toEqual([{ n: 1 }]);
     // A new content version asks once again; another pupil keeps their own state.
@@ -196,9 +196,9 @@ describe('class world theme', () => {
     ).rejects.toThrow(/season/);
     await db.exec(`reset role; select set_config('request.jwt.claim.sub','',false); set role anon;`);
     await expect(call('world_theme_state()')).rejects.toThrow(/permission denied/);
-    await expect(
-      call('teacher_set_world_theme($1,$2,$3)', ['8a', 'halloween', SEASON]),
-    ).rejects.toThrow(/permission denied/);
+    await expect(call('teacher_set_world_theme($1,$2,$3)', ['8a', 'halloween', SEASON])).rejects.toThrow(
+      /permission denied/,
+    );
     await expect(db.query(`select public.ack_season_welcome('${SEASON}')`)).rejects.toThrow(
       /permission denied/,
     );
@@ -246,7 +246,7 @@ describe('class world theme', () => {
         ),
       );
     const seasonsBefore = (
-      await db.query("select starts_on, ends_on, closed_at from public.seasons where id = $1", [SEASON])
+      await db.query('select starts_on, ends_on, closed_at from public.seasons where id = $1', [SEASON])
     ).rows;
     const before = await snapshot();
     await actor(T);
@@ -255,7 +255,7 @@ describe('class world theme', () => {
     await db.exec('reset role;');
     expect(await snapshot()).toEqual(before);
     expect(
-      (await db.query("select starts_on, ends_on, closed_at from public.seasons where id = $1", [SEASON]))
+      (await db.query('select starts_on, ends_on, closed_at from public.seasons where id = $1', [SEASON]))
         .rows,
     ).toEqual(seasonsBefore);
   });

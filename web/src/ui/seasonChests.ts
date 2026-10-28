@@ -2,7 +2,14 @@
 import { tr, msg, itemName as globalItemName } from '../i18n';
 import { ITEM_NAMES } from '../i18n/itemNames';
 import type { ChestResult, SeasonApi } from '../api/season';
-import { RARITY, chestSvg, modelPicture, rarityOf, seasonPictures, type SeasonPictures } from './learnpass/rewardArt';
+import {
+  RARITY,
+  chestSvg,
+  modelPicture,
+  rarityOf,
+  seasonPictures,
+  type SeasonPictures,
+} from './learnpass/rewardArt';
 import { openInside } from './learnpass/insideModal';
 import { cardById, collectionCatalog } from '../collection/catalog';
 import { SEASON_CHEST_THUMB } from '../render/itemThumbs';

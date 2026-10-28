@@ -18,14 +18,12 @@ async function actor(id: string): Promise<void> {
   );
 }
 async function claim(tier: number): Promise<Record<string, unknown>> {
-  return (
-    await db.query<{ v: Record<string, unknown> }>('select public.claim_season_tier($1) v', [tier])
-  ).rows[0].v;
+  return (await db.query<{ v: Record<string, unknown> }>('select public.claim_season_tier($1) v', [tier]))
+    .rows[0].v;
 }
 async function open(id: number): Promise<Record<string, unknown>> {
-  return (
-    await db.query<{ v: Record<string, unknown> }>('select public.open_season_chest($1) v', [id])
-  ).rows[0].v;
+  return (await db.query<{ v: Record<string, unknown> }>('select public.open_season_chest($1) v', [id]))
+    .rows[0].v;
 }
 async function newChest(player: string): Promise<number> {
   chest += 1;
@@ -95,23 +93,18 @@ describe('pass and chest card rewards', () => {
     expect(rewards.coins).toBe(5);
     expect(await ownerCards(A)).toEqual(['pumpkin-comparisons']);
     await db.exec('reset role;');
-    const coins = (await db.query("select coins from public.profiles where id = $1", [A])).rows[0];
+    const coins = (await db.query('select coins from public.profiles where id = $1', [A])).rows[0];
     await actor(A);
     await expect(claim(1)).rejects.toThrow(/already claimed/);
     await db.exec('reset role;');
-    expect((await db.query("select coins from public.profiles where id = $1", [A])).rows[0]).toEqual(
-      coins,
-    );
+    expect((await db.query('select coins from public.profiles where id = $1', [A])).rows[0]).toEqual(coins);
   });
 
   it('backfills a claimed tier once when the collection is read', async () => {
     await actor(A);
     const third = (await claim(3)) as { rewards: { cards: Array<{ id: string }> } };
     expect(third.rewards).toMatchObject({
-      cards: [
-        expect.objectContaining({ id: 'bat-cat' }),
-        expect.objectContaining({ id: 'night-light' }),
-      ],
+      cards: [expect.objectContaining({ id: 'bat-cat' }), expect.objectContaining({ id: 'night-light' })],
     });
     // Simulate a claim from before the card migration.
     await db.exec(
@@ -120,10 +113,9 @@ describe('pass and chest card rewards', () => {
     );
     await actor(A);
     const state = (
-      await db.query<{ v: { cards: Array<{ cardId: string }> } }>(
-        'select public.my_season_cards($1) v',
-        [SEASON],
-      )
+      await db.query<{ v: { cards: Array<{ cardId: string }> } }>('select public.my_season_cards($1) v', [
+        SEASON,
+      ])
     ).rows[0].v;
     expect(state.cards.map((card) => card.cardId)).toEqual(
       expect.arrayContaining(['bat-cat', 'night-light']),
@@ -218,7 +210,7 @@ describe('pass and chest card rewards', () => {
     await db.exec('reset role;');
     const item = (
       await db.query<{ id: string }>(
-        "select id from public.items where season = $1 and lootbox_weight > 0 order by id limit 1",
+        'select id from public.items where season = $1 and lootbox_weight > 0 order by id limit 1',
         [SEASON],
       )
     ).rows[0].id;
@@ -237,9 +229,9 @@ describe('pass and chest card rewards', () => {
 
   it('never grants the card bonus to clients directly', async () => {
     await actor(A);
-    await expect(
-      db.query('select public.season_reconcile_pass_cards($1,$2)', [A, SEASON]),
-    ).rejects.toThrow(/permission denied/);
+    await expect(db.query('select public.season_reconcile_pass_cards($1,$2)', [A, SEASON])).rejects.toThrow(
+      /permission denied/,
+    );
     await db.exec('reset role;');
   });
 });

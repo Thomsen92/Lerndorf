@@ -61,7 +61,12 @@ export interface PoolItem {
   sell: number;
 }
 
-const SELL_BY_RARITY: Record<PoolItem['rarity'], number> = { common: 15, rare: 40, epic: 100, legendary: 250 };
+const SELL_BY_RARITY: Record<PoolItem['rarity'], number> = {
+  common: 15,
+  rare: 40,
+  epic: 100,
+  legendary: 250,
+};
 
 export interface ChestResult {
   rarity: string;
@@ -101,11 +106,15 @@ export function seasonApi(supabase: SupabaseClient): SeasonApi {
         .eq('season', seasonId)
         .gt('lootbox_weight', 0)
         .order('id');
-      const rows = unwrap<Array<{ id: string; kind: PoolItem['kind']; rarity: PoolItem['rarity']; sell_price: number | null }>>(
-        data,
-        error,
-      );
-      return rows.map((r) => ({ id: r.id, kind: r.kind, rarity: r.rarity, sell: r.sell_price ?? SELL_BY_RARITY[r.rarity] }));
+      const rows = unwrap<
+        Array<{ id: string; kind: PoolItem['kind']; rarity: PoolItem['rarity']; sell_price: number | null }>
+      >(data, error);
+      return rows.map((r) => ({
+        id: r.id,
+        kind: r.kind,
+        rarity: r.rarity,
+        sell: r.sell_price ?? SELL_BY_RARITY[r.rarity],
+      }));
     },
     async owned() {
       const { data, error } = await supabase.from('inventory').select('item_id, qty').gt('qty', 0);
@@ -128,7 +137,10 @@ export function seasonApi(supabase: SupabaseClient): SeasonApi {
       return unwrap<ClaimResult>(data, error);
     },
     async choose(itemId, seasonId) {
-      const { data, error } = await supabase.rpc('choose_season_item', { p_item_id: itemId, p_season: seasonId ?? null });
+      const { data, error } = await supabase.rpc('choose_season_item', {
+        p_item_id: itemId,
+        p_season: seasonId ?? null,
+      });
       return unwrap(data, error);
     },
     async buyChest() {

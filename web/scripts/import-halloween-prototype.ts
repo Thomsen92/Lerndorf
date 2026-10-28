@@ -4,14 +4,7 @@
 //
 // The prototype stays the single content source. This script never builds models or images.
 import { createHash } from 'node:crypto';
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { assetPaths, validateCollectionCatalog } from '../src/collection/catalog.ts';
@@ -117,10 +110,7 @@ function main(): void {
     }
   }
 
-  writeIfChanged(
-    join(TARGET, 'catalog.json'),
-    Buffer.from(`${JSON.stringify(runtime, null, 2)}\n`),
-  );
+  writeIfChanged(join(TARGET, 'catalog.json'), Buffer.from(`${JSON.stringify(runtime, null, 2)}\n`));
   writeIfChanged(
     manifestPath,
     Buffer.from(

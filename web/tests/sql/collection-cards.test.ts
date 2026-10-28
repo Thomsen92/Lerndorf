@@ -23,18 +23,20 @@ async function grant(
   ref = `tier:1:${card}`,
 ): Promise<{ v: Record<string, unknown> }> {
   return (
-    await db.query<{ v: Record<string, unknown> }>(
-      'select public.grant_season_card($1,$2,$3,$4,$5) v',
-      [player, SEASON, card, source, ref],
-    )
+    await db.query<{ v: Record<string, unknown> }>('select public.grant_season_card($1,$2,$3,$4,$5) v', [
+      player,
+      SEASON,
+      card,
+      source,
+      ref,
+    ])
   ).rows[0];
 }
 async function cards(): Promise<Array<{ cardId: string }>> {
   const row = (
-    await db.query<{ v: { cards: Array<{ cardId: string }> } }>(
-      'select public.my_season_cards($1) v',
-      [SEASON],
-    )
+    await db.query<{ v: { cards: Array<{ cardId: string }> } }>('select public.my_season_cards($1) v', [
+      SEASON,
+    ])
   ).rows[0];
   return row.v.cards;
 }
@@ -129,9 +131,8 @@ describe('collection card ownership', () => {
       ).rows,
     ).toEqual([{ n: 1 }]);
     expect(
-      (
-        await db.query('select count(*)::int n from public.season_card_grants where player_id = $1', [A])
-      ).rows,
+      (await db.query('select count(*)::int n from public.season_card_grants where player_id = $1', [A]))
+        .rows,
     ).toEqual([{ n: 3 }]);
   });
 
@@ -159,10 +160,14 @@ describe('collection card ownership', () => {
   });
 
   it('rejects inactive cards, unknown cards and the wrong season', async () => {
-    await db.exec("reset role; update public.season_card_definitions set active = false where id = 'night-light'");
+    await db.exec(
+      "reset role; update public.season_card_definitions set active = false where id = 'night-light'",
+    );
     await actionError(() => grant(B, 'night-light'), /not available/);
     await actionError(() => grant(A, 'not-a-card'), /unknown card/);
-    await db.exec("reset role; update public.season_card_definitions set active = true where id = 'night-light'");
+    await db.exec(
+      "reset role; update public.season_card_definitions set active = true where id = 'night-light'",
+    );
   });
 
   it('blocks direct ownership writes and keeps quantity at one', async () => {
@@ -176,13 +181,13 @@ describe('collection card ownership', () => {
     ).rejects.toThrow(/row-level security/);
     expect((await db.query('delete from public.player_season_cards returning card_id')).rows).toEqual([]);
     expect(
-      (await db.query("update public.player_season_cards set quantity = 2 returning card_id")).rows,
+      (await db.query('update public.player_season_cards set quantity = 2 returning card_id')).rows,
     ).toEqual([]);
     await expect(
-      db.query("insert into public.season_card_grants(player_id,season_id,source,source_ref,card_id) values($1,$2,'learnpass','x','witch-recipe')", [
-        A,
-        SEASON,
-      ]),
+      db.query(
+        "insert into public.season_card_grants(player_id,season_id,source,source_ref,card_id) values($1,$2,'learnpass','x','witch-recipe')",
+        [A, SEASON],
+      ),
     ).rejects.toThrow(/row-level security/);
   });
 
