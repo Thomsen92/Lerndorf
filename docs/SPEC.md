@@ -549,7 +549,7 @@ Zukünftige Quest-Versuche erhalten einen Zeitstempel, auch wenn sie falsch sind
 
 ### 13.1 Season I – LearnPass (Migrationen 0028–0032)
 
-Eine Saison läuft in einem festen Fenster (Europe/Berlin); Season I: **28.10.–06.12.2026**. Schüler öffnen den LearnPass über die Profilkarte. Markt und Welt bleiben unverändert (LOOK §3); der Halloween-Marktplatz ist ein getrennter Auftrag (Lehrkraft 27.10.2026).
+Eine Saison läuft in einem festen Fenster (Europe/Berlin); Season I: **28.10.–06.12.2026**. Schüler öffnen den LearnPass über die Profilkarte. Die Dorfstimmung kann die Lehrkraft je Klasse auf Halloween schalten (§13.2); das ändert keine Season-Daten und keine Belohnung.
 
 - **XP und Stufen:** Summe `xp_ledger.delta` im Fenster; 40 Stufen bis 3.000 XP (30/60/90/120 XP je Zehnerblock).
 - **Belohnungen:** 5 Münzen auf Stufe 1–20 und 25 Münzen je Meilenstein; Pass-Truhen auf 5, 10, …, 40; 12 Garten-Szenen auf den Deko-Stufen; 4 Titel und 4 Rahmen; Stufe 40 mit Truhe, Titel, 25 Münzen und freier Wahl aus dem Truhen-Pool.
@@ -569,6 +569,17 @@ Eine Saison läuft in einem festen Fenster (Europe/Berlin); Season I: **28.10.�
 
 Datumsänderungen wirken sofort: Abgeholte Stufen bleiben, XP vor dem neuen Start zählen nicht mehr. Die Sonntagsregel prüft nur `teacher_set_season_dates`; „Jetzt beenden“ darf früher enden. Details für die Lehrkraft: [Anleitung für die Lehrkraft](ANLEITUNG_LEHRKRAFT.md#season-i--halloween-learnpass).
 
+### 13.2 Weltstimmung je Klasse und Season-Welcome (Migration 0034)
+
+Die Lehrkraft wählt unter **Dorf & Regeln → Weltstimmung** je Klasse `normal` oder `halloween`. Die Einstellung ist reine Optik und ändert weder Season-Zeitraum noch XP, Münzen, Besitz oder Platzierungen.
+
+- **Daten:** `class_world_theme(class_id, theme, season_id, revision, changed_at, changed_by)`; `season_welcome_seen(player_id, class_id, season_id, content_version, seen_at)` mit RLS und ohne Client-Schreibrechte.
+- **Wirksamkeit:** Halloween wirkt nur, solange die zugehörige Season im Berliner Kalenderfenster läuft. Außerhalb bleibt die Welt normal; die Lehrkraft sieht „vorgemerkt“. Die Anzeige leitet den Zustand aus `season_today()`/`season_state_of()` ab, nie aus Browserzeit.
+- **RPCs:** `world_theme_state()` (eigene Klasse aus Auth), `teacher_world_theme_state(class)`, `teacher_set_world_theme(class, theme, season)`, `ack_season_welcome(season)`.
+- **Welcome:** einmal pro Schüler und Season-Inhaltsversion (`seasons.welcome_version`, derzeit `r14`), unabhängig von der Weltoptik. Es erklärt nur Quiz, 150 XP und LearnPass; Sammelkarten kommen darin nicht vor. Schließen quittiert serverseitig; ein neuer Inhalt öffnet erneut. Der Stand und das Ticket öffnen es jederzeit manuell.
+- **Synchronisierung:** sichtbare Clients fragen alle 30 Sekunden und beim Zurückkehren in den Tab. Fehler behalten die letzte gültige Szene. 8a und 8b bleiben getrennt.
+- **Rückweg:** Normal stellt Himmel, Licht, Nebel und Platz wieder her; die Halloween-Ebene wird vollständig freigegeben. Kein zweiter Renderer und keine zweite Animationsschleife.
+
 ## 14. Wirtschaft (Standardwerte; je Instanz in `classes` änderbar, Preise in `items`)
 
 | Größe | Standard |
@@ -585,6 +596,17 @@ Datumsänderungen wirken sofort: Abgeholte Stufen bleiben, XP vor dem neuen Star
 | Truhe | 20 + 5 × Level Münzen; große Truhe ×3; Serverwurf 70 % einfach / 25 % doppelt / 5 % dreifach; einmalige Buchung |
 
 Ziel: Pro Woche mindestens ein neues Teil erreichbar, große Wünsche brauchen 3–6 Wochen. **[OFFEN]** Beträge mit der Lehrkraft final abstimmen.
+
+## 14a. Sammelkarten-Collection (Migrationen 0049–0050)
+
+Die Halloween-Collection ist getrennt von den 28 Dorfgegenständen, ihren Preisen und den Truhenchancen 55/30/12/3.
+
+- **Inhalt:** 50 aktive Karten (18 normal, 17 rare, 14 epic, genau eine legendary `highlight-halloween-card`), 8 archivierte Figuren (`benched`, werden nie verlost). 35 Karten liegen fest auf den 24 Münzfeldern des LearnPass, 15 (14 epic + die eine legendary) im Truppenpool.
+- **Laufzeitkatalog:** `npm run import:collection` kopiert nur die benötigten Dateien aus `Prototyp/marktplatz/assets/collection` nach `web/public/assets/collection`, validiert den Katalog und schreibt `catalog.json` mit `contentVersion`. Keine `.blend`-Dateien, keine Prototyp-URLs.
+- **Besitz (0049):** `season_card_definitions`, `player_season_cards` (höchstens ein Datensatz, `quantity = 1`), `season_card_grants` (idempotent je Quelle/Referenz). `grant_season_card` ist ausschließlich serverseitig ausführbar; normale/rare Karten nur über den LearnPass, epic/legendary nur über Truhen. `my_season_cards(season)` liest nur den eigenen Besitz, `teacher_player_cards` die Lehrkraft.
+- **Vergabe (0050):** `season_book_tier` vergibt die festen Passkarten in derselben Transaktion wie Münzen/Truhen und trägt bereits abgeholte Felder idempotent nach. `open_season_chest` bleibt beim Dorfgegenstand unverändert und kann zusätzlich eine noch nicht besessene epic-/legendary-Karte vergeben. Alle Karten eines Pools besessen → `cardStatus = 'complete'`, kein Ersatz. Vor dieser Migration geöffnete Truhen bleiben `legacy` und ziehen nicht rückwirkend.
+- **Noch offen:** Trefferhäufigkeit und Seltenheitsgewichte der Truhenkarten (`season_chest_card_config`) sind absichtlich leer; der Bonus ist deaktiviert, bis die Lehrkraft sie festlegt.
+- **Ansicht:** Profil → Sammelkarten öffnet den Almanach (Umschlag, Suche, Seltenheitsfilter, Classroom-Curses-Filter, Detail mit Quellen, 3D-Vorschau mit Umdrehen/Reset). Die Vorschau vergibt nichts, lädt höchstens vier Modelle im LRU, hält genau ein aktives Modell und gibt Renderer, Steuerung und Texturen beim Schließen frei. Achievements bleiben ein sichtbarer Platzhalter.
 
 ## 15. Assets und Blender-Pipeline
 

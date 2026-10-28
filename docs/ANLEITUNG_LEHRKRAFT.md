@@ -334,7 +334,17 @@ Oben wählen Sie **Klasse 8a** oder **Klasse 8b**. Die Adresse merkt sich die Kl
 - **Münzen & Stempel:** kleine Belohnungen, Korrekturen und Wochenplan-Stempel.
 - **Daily Quests:** Abdeckung, Importfehler und Vorschau mit Lösungen wie bisher.
 - **Konten:** einzeln oder als Liste anlegen, Karten drucken, Passwort zurücksetzen und Konto löschen.
-- **Dorf & Regeln:** Shop/Bauen öffnen oder sperren, Vorlage und Seed ändern, Spielregeln und verkaufte Gegenstände festlegen. Das Neufestlegen des Dorfs braucht weiterhin eine Bestätigung.
+- **Dorf & Regeln:** Shop/Bauen öffnen oder sperren, Vorlage und Seed ändern, Spielregeln und verkaufte Gegenstände festlegen. Neu ist hier die **Weltstimmung** (Normal oder Halloween) je Klasse. Das Neufestlegen des Dorfs braucht weiterhin eine Bestätigung.
+
+### Weltstimmung: Normal oder Halloween
+
+Unter **Dorf & Regeln → Weltstimmung** wählen Sie für die gerade ausgewählte Klasse **Normal** oder **Season I – Halloween** und speichern. Die Einstellung gilt sofort für diese Klasse; die andere Klasse bleibt unverändert. Sichtbare Schülergeräte übernehmen sie spätestens nach 30 Sekunden, beim Zurückkehren in den Tab sofort.
+
+- Halloween wirkt nur, solange die Season im Kalender läuft. Wenn Sie vorher umstellen, steht dort **vorgemerkt**; die dunkle Welt beginnt mit dem Season-Start.
+- Die Weltstimmung ändert **nur** Himmel, Licht, Nebel, Platzdekoration und die Gruselfiguren. LearnPass, Season-Zeitraum, XP, Münzen, Häuser und Grundstücke bleiben unverändert.
+- **Normal** stellt die ursprüngliche Welt vollständig wieder her. Mehrfaches Umschalten erzeugt keine doppelten Lampen, Gräber oder Figuren.
+- Der Halloween-Shop, das Ticket und die Begrüßung bleiben auch in der normalen Welt erreichbar. Die Begrüßung erscheint einmal pro Season und Inhalt, unabhängig von der Weltoptik, und lässt sich am Stand oder über das Ticket erneut öffnen.
+- Wenn die Seite „Weltstimmung konnte nicht geladen werden“ zeigt, laden Sie neu. Die übrigen Dorf-Einstellungen bleiben in diesem Fall benutzbar.
 
 ### Schnell Münzen buchen – auch am Tablet
 
@@ -447,3 +457,37 @@ Season-Gegenstände bleiben im Besitz, sind aber nicht mehr im Shop zu kaufen. T
 | „Dafür reichen die Münzen nicht.“ | Der Shop-Kauf kostet 50 Münzen; Quests bringen neue. |
 | „Saison beendet“ | Stufen werden automatisch gutgeschrieben; nichts weiter tun. |
 | „Ende muss Sonntag sein“ | Beim Ändern der Daten ein Sonntagsdatum wählen. |
+
+## Sammelkarten: The Midnight Collection
+
+Die Halloween-Sammlung ist **kein Ersatz** für die 28 Dorfgegenstände und ändert deren Truhenchancen nicht.
+
+### Wo finden die Schüler die Karten?
+
+Profil öffnen und unten auf **Sammelkarten** tippen. Zuerst erscheint der Almanach-Umschlag. **Almanach öffnen** zeigt alle 50 Karten mit Suche und Filtern (Seltenheit, Classroom Curses). Eine Karte antippen zeigt Inhalt und Quellen; **In 3D ansehen** öffnet das gedrehte Modell mit **Umdrehen**, **Ansicht zurücksetzen** und bei Druckkarten **Druckbild ansehen**. Die Vorschau vergibt nichts und ändert keinen Besitz. **Erfolge** ist ausdrücklich noch ein Platzhalter.
+
+- **50 aktive Karten:** 18 normal, 17 rare, 14 epic und genau eine legendary (`Highlight 8`). Acht frühere Figuren bleiben archiviert und erscheinen nie.
+- **35 Karten über den LearnPass:** normal und rare zusätzlich zu den Münzen auf denselben 24 Münzfeldern. Bereits abgeholte Felder werden beim nächsten Öffnen der Sammlung nachgetragen; Münzen werden dabei nicht erneut gebucht.
+- **15 Karten über Season-Truhen:** 14 epic und die eine legendary, nur solange die Karte noch nicht besessen wird. Keine Karte kann doppelt besessen werden.
+- **Truhen-Kartenchance:** Der Kartenbonus in Truhen ist **absichtlich ausgeschaltet**, bis Trefferhäufigkeit und Gewichte festgelegt sind. Dorfgegenstand und Münzen aus der Truhe bleiben unverändert. Vor dieser Änderung geöffnete Truhen ziehen keine Karte nach.
+
+### Neue Datenbank-Migrationen
+
+Für diese Funktion kommen drei neue Migrationen dazu:
+
+| Migration | Inhalt |
+| --- | --- |
+| `0034_class_world_theme.sql` | Weltstimmung je Klasse und Welcome-Quittung |
+| `0049_collection_cards.sql` | Kartendefinitionen, Besitz, serverseitige Vergabe |
+| `0050_collection_chest_rewards.sql` | feste Passkarten, Truhen-Kartenbonus (aus), Nachbuchung |
+
+Sie werden – wie alle Migrationen – beim Merge nach `main` automatisch eingespielt. Vorher nichts von Hand in Supabase ausführen. Nach der Live-Prüfung friert der technische Lauf die Migrationen mit `npm run migrations:lock` ein. Der Branch `codex/halloween-collection` ist bewusst **noch nicht gepusht**.
+
+### Wenn etwas nicht klappt
+
+| Meldung | Bedeutung |
+| --- | --- |
+| „Die Sammlung konnte nicht geladen werden.“ | Katalog oder Besitz nicht erreichbar; Seite neu laden. Der Besitz bleibt serverseitig erhalten. |
+| „3D-Ansicht ist auf diesem Gerät nicht verfügbar.“ | Der Browser kann kein WebGL öffnen; Karte und Quellen bleiben lesbar. |
+| „Das Modell konnte nicht geladen werden.“ | Modelldatei fehlt oder Netzwerkfehler; **Erneut versuchen** antippen. |
+| Leere Sammlung trotz Abholung | Profil neu öffnen; die Nachbuchung läuft beim Lesen der Sammlung automatisch. |

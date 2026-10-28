@@ -498,3 +498,19 @@ Plan: [Season & LearnPass](superpowers/plans/2026-10-27-season-und-learnpass.md)
 | T1 | [x] | Abnahme: 1004 Tests + Build grün, Galerie (37 Bilder) und alle Screenshots angesehen; Nachbesserungen 0033 (Besitz von Season-Titeln/-Rahmen), Sammlungslabels, Verkaufen im Inventar, Änderungsprotokoll; Abschlussbericht `docs/superpowers/reviews/deepseek-bericht.md` |
 | R1 | [x] | **Korrekturrunde nach Review (Claude, 27.10.2026)** – [Review](superpowers/reviews/2026-10-27-claude-review-season.md) §9. SQL: aktuelle statt neueste Saison (`season_current`), Shop-Kauf sperrt vor dem Zählen, Stufe-40-Wahl über alle Saisons, „Jetzt beenden“ am Starttag, Münz-Referenzen mit Saison, eine Uhr `season_today()` (Tests unabhängig vom Datum), 10.000-Würfe-Test. 3D: eigene Klone je Grundstück/Vorschaubild, nie größer als modelliert, Autos gedreht, Katzen gedeckelt, Fernversion erst nach dem Hauptmodell. Oberfläche nach §14: Karten-Bilder in 3D, Schiene unter jeder Karte, Silhouette/Nebel, Kaufen mit Rückfrage, „What's inside?“ aus der Datenbank mit Bildern, Stufe-40-Wahl, Truhe öffnen mit Strahlenkranz, Profilkarte, vier Season-Rahmen, englische Namen für 46 Items, Lehrer-Reiter mit Rückfragen und deutschen Meldungen. 1019 Tests, Lint, Build grün; Galerie unverändert (Welt-Draw-Calls gleich) |
 | R2 | [x] | Abnahme der Korrekturrunde durch die Lehrkraft am 27.10.2026 („passt“) anhand der Screenshots in `designs/learnpass/korrektur/`. Offen bis zum Live-Gang: Durchlauf in der Test-Umgebung mit echter Datenbank und Modellgrößen auf dem Grundstück |
+
+## Zwischenpaket H – Halloween-Collection und Weltstimmung (28.10.2026)
+
+Plan: [DeepSeek-Umsetzungsplan](../../Prototyp/marktplatz/DEEPSEEK_UMSETZUNGSPLAN.md), ergänzt durch `DEEPSEEK_SPOOKY_STARTER.md` (r13/r14). Branch `codex/halloween-collection`, **nicht gepusht**. Die Render-Pakete 4–5 waren als uncommittete Vorarbeit vorhanden; 10–11 bleiben außen vor.
+
+| Paket | Status | Notiz |
+| --- | --- | --- |
+| H1 | [x] | Runtime-Katalog `web/public/assets/collection` (50 Karten, 18/17/14/1, 242 Dateien, 81,3 MB), Importskript `npm run import:collection` mit Schutz-Hashprüfung, `contentVersion` (sha256), Validierung + Negativtests |
+| H2 | [x] | Migration 0034: `class_world_theme`, `season_welcome_seen`, Weltzustand mit requested/effective, Season-Kopplung, Welcome-Quittung je Inhaltsversion; SQL-, API- und Controller-Tests |
+| H3 | [x] | Lehrer-Schalter „Weltstimmung“ mit Klassenwechsel-/Fehlerbehandlung; Polling alle 30 s nur im sichtbaren Tab, Request-Sperre, Fehler behalten die Szene |
+| H6 | [x] | Almanach-Ansicht (Umschlag, 50 Karten, Suche, Filter, Detail mit Quellen), 3D-Kartenvorschau (LRU 4, ein aktives Modell, Umdrehen/Reset/Druckbild, Retry), Einstieg über Profil; Achievements als Platzhalter |
+| H7 | [x] | Welcome-Hub an Stand/Ticket, einmal pro Season/Inhalt, unabhängig von der Weltoptik; r14-Text ohne Sammelkartenwerbung; manuell wiederholbar; Quittung serverseitig |
+| H8 | [x] | Migration 0049: Definitionen, Besitz (`quantity = 1`), idempotente serverseitige Vergabe, RLS; `my_season_cards`/`teacher_player_cards`; SQL- und API-Tests |
+| H9 | [x] | Migration 0050: 35 feste Passkarten auf 24 Münzfeldern, Nachbuchung abgeholter Felder, Truhen-Kartenbonus (epic/legendary, duplikatfrei, **standardmäßig aus**); Reveal und LearnPass-Hinweis; SQL-Tests |
+
+Offen und bewusst nicht behauptet: Truhen-Kartenchancen (Trefferhäufigkeit/Gewichte) sind leer, der Bonus ist deaktiviert; keine echte Tablet-FPS-Messung; Pakete 4–5, 10–11 nicht Teil dieses Auftrags; kein Push, keine Live-Migration.
