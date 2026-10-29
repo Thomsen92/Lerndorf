@@ -32,7 +32,8 @@ export interface GlbItem {
 export const GLB_ITEMS: Record<string, GlbItem> = {
   // 28 chest items (season 0030)
   season_warlock: { file: 'season1/warlock.glb', kind: 'deco' },
-  season_house_horror: { file: 'season1/house-horror.glb', kind: 'house' },
+  // The legendary house is the fantasy tree house now (BUG-011); it comes in at about 1 m and fills the plot.
+  season_house_horror: { file: 'season1/house-horror.glb', kind: 'house', fill: true },
   season_pumpkin_patch: { file: 'season1/pumpkin-patch.glb', kind: 'deco' },
   season_clock_tower: { file: 'season1/clock-tower.glb', kind: 'deco' },
   season_dodge: { file: 'season1/dodge-pickup.glb', kind: 'car' },

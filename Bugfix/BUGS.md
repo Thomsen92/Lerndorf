@@ -5,7 +5,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 > Jeder Fehler bekommt eine ID, einen Steckbrief und – sobald beauftragt –
 > ein Fix-Paket in `handoff/`. Bilder liegen unter `bilder/`.
 
-> **Als nächstes zu fixen:** BUG-010 und BUG-011 warten auf Antworten der Lehrkraft (siehe Notizen). Alle anderen offenen Bugs sind bearbeitet; BUG-006 und UX-001/002 sind laut Auftrag ausgenommen. BUG-001 committet (70add80).
+> **Als nächstes zu fixen:** BUG-010 wartet auf Antworten der Lehrkraft (siehe Notiz). Alle anderen offenen Bugs sind bearbeitet; BUG-006 und UX-001/002 sind laut Auftrag ausgenommen. BUG-001 committet (70add80).
 
 ## Übersicht
 
@@ -20,7 +20,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 | [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | **Fix da** | [FIX-05](handoff/FIX-05.md) |
 | [BUG-009](#bug-009--inventar-platzhalter-gegenstände-mit-falschem-icon) | Inventar: Platzhalter-Gegenstände (Haare/T-Shirt) mit falschem T-Shirt-Icon | Inventar / Kleiderschrank | **S3** | **M** | **Fix da** | [FIX-06](handoff/FIX-06.md) |
 | [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | **Rückfrage an Lehrkraft** | [FIX-07](handoff/FIX-07.md) |
-| [BUG-011](#bug-011--legendäres-hausmodell-ersetzen) | Legendäres Hausmodell rendert als schwarze/grüne Masse – durch angehängtes Fantasy-Treehouse-GLB ersetzen | Dorf / Hausplatz | **S3** | **M** | **Rückfrage an Lehrkraft** | [FIX-08](handoff/FIX-08.md) |
+| [BUG-011](#bug-011--legendäres-hausmodell-ersetzen) | Legendäres Hausmodell rendert als schwarze/grüne Masse – durch angehängtes Fantasy-Treehouse-GLB ersetzen | Dorf / Hausplatz | **S3** | **M** | **Fix da** | [FIX-08](handoff/FIX-08.md) |
 
 ## UI/UX-Vorhaben (keine Fehler)
 
@@ -1161,7 +1161,7 @@ aufbereitet oder importiert werden müssen.
 | **Aufwand** | **M – 0,5–2 Std** (Asset-Tausch + Skalierung/Kollision); **L** bei Animationen/Kollisionsumbau |
 | **Häufigkeit** | immer |
 | **Gerät/Browser** | Screenshot 263 × 242 px; Browser nicht angegeben |
-| **Status** | **gestoppt: Lizenz-/Designfrage** (29.10.2026) |
+| **Status** | **Fix da** (29.10.2026, Lizenz und Tausch von der Lehrkraft freigegeben) |
 | **Bild** | `bilder/BUG-011_01.png` |
 | **Neues Modell** | `modelle/legendary-house-fantasy-treehouse.glb` (10.875.488 Bytes) |
 | **Fix-Paket** | [FIX-08](handoff/FIX-08.md) |
@@ -1179,6 +1179,14 @@ Ich habe **nichts eingebaut**: Lizenz ungeklärt, und der Tausch berührt ein Sp
 1. Hast du das Modell selbst bei Tripo erzeugt und gibst du es für die App frei (Lizenzvermerk „Tripo, nicht CC0, auf Anweisung der Lehrkraft“)?
 2. Soll das Item „Horror-Haus“ heißen bleiben (nur das Aussehen tauschen) oder umbenannt werden?
 3. Ist es in Ordnung, dass Schüler, die das Haus schon besitzen, danach das Treehouse sehen?
+
+### Änderungsnotiz (Fix da, 29.10.2026)
+
+- **Freigabe der Lehrkraft:** Lizenz CC0 in Ordnung, Tausch durchführen (Name „Horror-Haus“ unverändert, Besitzer sehen das neue Modell).
+- **Dateien:** `web/public/assets/season1/house-horror.glb` (463 KB, 8149 Dreiecke) und `house-horror.lod.glb` (34 KB, 1224 Dreiecke) ersetzt (Original 10,6 MB, Skript `web/scripts/assets/optimize-tripo-decos.mjs`), `season1/manifest.json` (Dreiecke/Bytes), `glbItems.ts`: `season_house_horror` bekommt `fill: true`, weil das Modell nur etwa 1 m groß kommt und sonst nicht auf Hausgröße wächst. Ergebnis nach der Normalisierung: 4,12 × 6,0 × 3,56 m, Unterkante y = 0, Vorderseite (Tür, Leiter) zeigt nach +Z. Lizenzvermerk in `blender/sources/LICENSES.md`.
+- **Geprüft:** im Browser auf einer Wegwerf-Seite mit dem echten Loader (Texturen korrekt, kein Schwarz/Grün, Haus steht auf dem 6 × 4-Platz). `npm test` 219 Dateien / 1324 Tests grün (u. a. Asset-Vertrag mit Fernversion).
+- **Nicht geprüft:** Galerie (`npm run galerie`) und das Haus im echten Dorf auf einem Mobilgerät; Kollision verwendet wie bei allen Häusern die Plot-Platzform, nicht das Modell. Das Haus ist mit 6 m recht hoch (Hausgrenze 6 m).
+- **Bild:** [bilder/BUG-011_02.jpg](bilder/BUG-011_02.jpg)
 
 ### Beobachtung (Ist)
 

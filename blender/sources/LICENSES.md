@@ -146,3 +146,15 @@ Die goldene Tafelkontur und der Hinweis-Button sind eigene Geometrie/UI. Der Sir
 - Änderungen: ausschließlich `emp_state._final_14` / `Object_28` als Empire State Building exportiert; X/Z zentriert, Unterkante auf Y=0, proportional auf 1,80 m Höhe verkleinert. Alle anderen Gebäude sind nur in der editierbaren Quelle ausgeblendet, nicht gelöscht. Keine fremden neuen Texturen, Originalmaterial/512×512-Textur erhalten.
 - Ziele `web/public/assets/shop/ollie-empire-state.glb` und `.lod.glb`; 1368 Dreiecke, ein Material, 454572 Bytes je GLB. Öffentliche Attribution einschließlich Änderungen unter `LICENSE-ollie-empire-state.txt` und neben den 3D-Vorschauen. Quelle, genauer Lizenznachweis, native Blender-Datei, Maße/Hashes/Reviews: `content/quests/empire-source/`. Erzeugung `web/scripts/assets/extract-ollie-empire.py`.
 - Das alte eigene Postkartenmodell bleibt als CC0-Archiv erhalten; die bestehende Reward-ID wird für das neue Souvenir weiterverwendet. Sie erzeugt keinen zweiten Besitz-/Shopartikel und keine zusätzliche Belohnungsvergabe.
+
+## Sieben Tripo-Modelle als Shop-Deko (29.10.2026, Migration 0058)
+
+- Von der Lehrkraft gelieferte GLBs aus `C:/Users/Thomas/Downloads/` (Generator laut Datei: **Tripo**, KI-generiert): `medieval castle 3d model_Clone1_Clone1 (1).glb`, `blue armored exosuit robot 3d model.glb`, `barack obama 3d model.glb`, `simson motorcycle 3d model_Clone1.glb`, `moped 3d model_Clone1.glb`, `scooter 3d model.glb`, `fendt tractor 3d model_Clone1.glb`. **Nicht als CC0 ausgewiesen**; Nutzung auf ausdrückliche Anweisung der Lehrkraft, Lizenz-/Nutzungsbedingungen des Tripo-Kontos gelten. Kein Weiterverkauf der Rohdateien.
+- Änderungen (`web/scripts/assets/optimize-tripo-decos.mjs`): Skelett entfernt (Robot starr), nur Basisfarbtextur (JPEG 1024 px, Ferne 256 px), Normal-/Metallic-Maps entfernt, Dreiecke reduziert, Fahrzeuge auf Realmaße (Länge 1,7–4,2 m), meshopt. Ziele `web/public/assets/shop/{medieval-castle,exosuit-robot,obama-statue,simson-motorcycle,moped,scooter,fendt-tractor}.glb` plus `.lod.glb`.
+- Hinweis: Die Obama-Statue zeigt eine reale Person des öffentlichen Lebens (wie die vorhandene Trump-Statue); Marken-/Namensbezug bei Simson und Fendt.
+
+## Horror-Haus: Fantasy-Treehouse (29.10.2026, BUG-011)
+
+- `web/public/assets/season1/house-horror.glb` und `.lod.glb` (Item `season_house_horror`, legendary) ersetzen das alte, fleckig rendernde Modell durch das gelieferte Fantasy-Treehouse (`Bugfix/modelle/legendary-house-fantasy-treehouse.glb`, Generator Tripo). **Lizenz laut Lehrkraft (29.10.2026): CC0 / freigegeben**, die Lehrkraft hat das Modell geliefert und ausdrücklich zum Tausch freigegeben. Der Tripo-Generator vermerkt selbst keine Lizenz in der Datei.
+- Änderungen (`web/scripts/assets/optimize-tripo-decos.mjs`): Dreiecke 9752 → 8149 (Ferne 1224), nur Basisfarbtextur (JPEG 1024 px), Normal-/Metallic-Maps entfernt, meshopt; 10,6 MB → 463 KB (Ferne 34 KB). Item-Name und Beschreibung blieben unverändert.
+
