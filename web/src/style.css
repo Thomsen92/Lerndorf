@@ -437,6 +437,19 @@ button:disabled {
   cursor: pointer;
 }
 
+.build-chips {
+  gap: 6px;
+}
+.build-bar .build-chip {
+  position: relative;
+  min-width: 56px;
+  padding: 6px 12px;
+  font-weight: 700;
+}
+.build-bar .build-chip--empty {
+  border-style: dashed;
+  color: var(--muted);
+}
 .build-bar button.primary {
   background: var(--lantern);
   color: #2a1d05;

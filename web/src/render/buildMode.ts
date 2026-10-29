@@ -412,13 +412,27 @@ export class BuildMode {
     const st = this.state;
     const slot = this.slot;
     const nameOf = (id: string): string => st.items.find((i) => i.id === id)?.nameDe ?? id;
-    const slotList = html`<div class="build-items" role="group" aria-label="Plätze">
+    // Compact chips (BUG-005): the full names stay in the accessible name, the eye gets short labels,
+    // and empty places are dashed with a "+". Tapping a place in the village works as well.
+    const short = (id: string): string =>
+      ({
+        house: tr('Haus'),
+        garage: tr('Garage'),
+        car: tr('Auto'),
+        deco_1: tr('Deko 1'),
+        deco_2: tr('Deko 2'),
+        deco_3: tr('Deko 3'),
+        deco_4: tr('Deko 4'),
+      })[id] ?? id;
+    const slotList = html`<div class="build-items build-chips" role="group" aria-label="Plätze">
       ${SLOTS.map((s) => {
         const cur = realItem(st.slots, s.id, s.kind);
         const picked = slot?.id === s.id;
-        return `<button type="button" data-slot="${s.id}" aria-pressed="${picked}" class="${picked ? 'primary' : ''}"><strong>${escape(
-          s.nameDe,
-        )}</strong>: ${cur ? escape(nameOf(cur.itemId)) : 'leer'}</button>`;
+        return `<button type="button" data-slot="${s.id}" aria-pressed="${picked}" class="build-chip${picked ? ' primary' : ''}${
+          cur ? '' : ' build-chip--empty'
+        }"><span class="sr-only"><strong>${escape(s.nameDe)}</strong>: ${cur ? escape(nameOf(cur.itemId)) : 'leer'}</span><span aria-hidden="true">${escape(
+          short(s.id),
+        )}${cur ? '' : ' +'}</span></button>`;
       }).join('')}
     </div>`;
 
@@ -426,7 +440,7 @@ export class BuildMode {
       this.bar.innerHTML = html` <p class="build-info" role="status">
           ${escape(
             this.message ??
-              tr('Wähle einen Platz: Haus, Garage, Auto-Platz oder einen der vier Deko-Plätze.'),
+              tr('Tippe im Dorf auf einen Platz oder wähle hier:'),
           )}
         </p>
         ${slotList}

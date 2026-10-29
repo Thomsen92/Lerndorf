@@ -5,7 +5,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 > Jeder Fehler bekommt eine ID, einen Steckbrief und – sobald beauftragt –
 > ein Fix-Paket in `handoff/`. Bilder liegen unter `bilder/`.
 
-> **Als nächstes zu fixen:** BUG-005 (nach Review von BUG-007). BUG-001 committet (70add80).
+> **Als nächstes zu fixen:** BUG-009 (nach Review von BUG-005). BUG-001 committet (70add80).
 
 ## Übersicht
 
@@ -15,7 +15,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 | [BUG-002](#bug-002--learnpass-münzen-einsammeln-friert-die-seite-ein) | Learnpass: Münzen einsammeln friert die Seite ein (Hard Reset nötig) | Season-Pass / Learnpass | **S1** | **L** | **Fix da** (Abnahme am Gerät offen) | [FIX-02](handoff/FIX-02.md) |
 | [BUG-003](#bug-003--learnpass-ansicht-zu-groß-für-smartphones) | Learnpass-Ansicht zu groß für Smartphones, Karten links/rechts angeschnitten | Season-Pass / Learnpass | **S3** | **M** | **Fix da** | [FIX-02](handoff/FIX-02.md) |
 | [BUG-004](#bug-004--scrollen-im-learnpass-ruckelt) | Scrollen im Learnpass ruckelt / fühlt sich verbuggt an | Season-Pass / Learnpass | **S3** | **M** | **Fix da** (Abnahme am Gerät offen) | [FIX-02](handoff/FIX-02.md) |
-| [BUG-005](#bug-005--bau-modus-feldauswahl-verdeckt-das-dorf-direkter-klick-auf-gebäudedeko-fehlt) | Bau-Modus: Feldauswahl verdeckt das Dorf, direkter Klick auf Gebäude/Deko fehlt | Dorf → Bauen | **S3** | **M** | bestätigt | [FIX-03](handoff/FIX-03.md) |
+| [BUG-005](#bug-005--bau-modus-feldauswahl-verdeckt-das-dorf-direkter-klick-auf-gebäudedeko-fehlt) | Bau-Modus: Feldauswahl verdeckt das Dorf, direkter Klick auf Gebäude/Deko fehlt | Dorf → Bauen | **S3** | **M** | **Fix da** | [FIX-03](handoff/FIX-03.md) |
 | [BUG-007](#bug-007--season-hub-almanac-direkt-unter-season-1) | Season-Hub: My Almanac steht unten – soll direkt unter Season 1 | Season-Hub / Almanac | **S3** | **S** | **Fix da** | [FIX-04](handoff/FIX-04.md) |
 | [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | **Fix da** | [FIX-05](handoff/FIX-05.md) |
 | [BUG-009](#bug-009--inventar-platzhalter-gegenstände-mit-falschem-icon) | Inventar: Platzhalter-Gegenstände (Haare/T-Shirt) mit falschem T-Shirt-Icon | Inventar / Kleiderschrank | **S3** | **M** | bestätigt | [FIX-06](handoff/FIX-06.md) |
@@ -457,9 +457,18 @@ Fix günstiger; wenn Rendering/Blur die Ursache ist, eher **L**.
 | **Aufwand** | **M – 0,5–2 Std** (UI; **L**, falls die 3D-Auswahl erst gebaut werden muss) |
 | **Häufigkeit** | immer im Bau-Modus auf dem Smartphone |
 | **Gerät/Browser** | Screenshot 380 × 844 px; Browser nicht angegeben |
-| **Status** | bestätigt (Screenshot + Nutzermeldung) |
+| **Status** | **Fix da** (29.10.2026) |
 | **Bild** | `bilder/BUG-005_01.png` |
 | **Fix-Paket** | [FIX-03](handoff/FIX-03.md) |
+
+### Änderungsnotiz (Fix da, 29.10.2026)
+
+- **Befund beim Lesen des Codes:** Der direkte Tap existiert schon: `BuildMode.handleTap` trifft per Raycast auf die Plätze des eigenen Grundstücks und wählt sie aus (`web/src/render/buildMode.ts`). Das Problem war die Platzliste (`slotList`): sieben Knöpfe mit Langtext („Decoration space 1: Ollie’s Empire State Building“) füllten den halben Bildschirm.
+- **Fix (nur Darstellung, keine Bau-Logik):** Die Liste ist jetzt eine Chip-Leiste: sichtbar kurze Beschriftung („House · Garage · Car + · Deco 1 · Deco 2 + …“), leere Plätze gestrichelt mit „+“; der volle Name („Decoration space 2: leer“) bleibt der zugängliche Name (`sr-only`), also bleiben Tastatur/Screenreader und die E2E-Namen gleich. Hinweistext kürzer: „Tippe im Dorf auf einen Platz oder wähle hier:“. Dateien: `buildMode.ts`, `style.css` (`.build-chip*`), `i18n/en.ts`.
+- **Gemessen (380 × 844, Wegwerf-Seite mit der echten `BuildMode`-Leiste und Fake-Daten):** Leiste 247 px hoch (vorher rund 490 px), Dorfansicht 71 % des Bildschirms (Soll ≥ 50 %), „Fertig/Done“ sichtbar. Der Ablauf nach der Auswahl (Editor-Sheet, Aufstellen, Drehen, Wegräumen) ist unverändert.
+- **Nicht geprüft:** der echte Tap auf 3D-Objekte im Dorf auf einem Touch-Gerät (Logik unverändert; die Dorf-Testseite `dev/build.html` ließ sich in dieser Umgebung nicht bis in den Bau-Modus bedienen), 360 × 800 und 430 × 932 (Chips umbrechen, gleiche Regel), Desktop 1280 (nur Tests).
+- **Tests:** neuer Test in `tests/ui/buildBar.test.ts`; `npm test` 219 Dateien / 1323 Tests grün; `tsc` grün; Build weiter lokal blockiert.
+- **Bild:** [bilder/BUG-005_02.jpg](bilder/BUG-005_02.jpg)
 
 ### Beobachtung (Ist)
 

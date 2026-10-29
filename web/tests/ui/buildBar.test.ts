@@ -70,6 +70,17 @@ beforeEach(() => {
 afterEach(() => mode.dispose());
 
 describe('build bar', () => {
+  it('lists the places as compact chips: short visible label, full accessible name, empty ones marked (BUG-005)', async () => {
+    await mode.enter();
+    const empty = document.querySelector<HTMLElement>('[data-slot="deco_2"]')!;
+    const filled = document.querySelector<HTMLElement>('[data-slot="deco_1"]')!;
+    expect(empty.classList.contains('build-chip--empty')).toBe(true);
+    expect(filled.classList.contains('build-chip--empty')).toBe(false);
+    expect(empty.querySelector('[aria-hidden="true"]')?.textContent).toBe('Deko 2 +');
+    expect(empty.querySelector('.sr-only')?.textContent).toBe('Deko-Platz 2: leer');
+    expect(filled.querySelector('[aria-hidden="true"]')?.textContent).toBe('Deko 1');
+    expect(document.querySelector('#done')).not.toBe(null);
+  });
   it('forwards only confirmed placement XP to the progression loop', async () => {
     mode.dispose();
     const onProgress = vi.fn();
