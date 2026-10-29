@@ -5,6 +5,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { Layout } from '../../world/layout';
 import { createRng } from '../../world/rng';
 import { kenneyModel, type KenneyModel, type Pack } from '../kenney';
+import { DECOR_STALL_OFFSETS, marketShopPlacement, removedStall } from '../marketShop';
 import { createBloodFountain } from './bloodFountain';
 import { placePlotBorderDecor, publicDecorAllowed } from './placement';
 
@@ -206,7 +207,9 @@ export function createHalloweenLayer(
 
   // The market keeps its Kenney stalls (plaza.ts shows them in season colours with pumpkins);
   // this layer only hangs two lampions at the front posts of each stall (same places, r = 5).
-  for (const delta of [1.4, 2.6, 3.8]) {
+  const droppedStall = removedStall(marketShopPlacement(layout).replacesStall);
+  for (const [stallIndex, delta] of DECOR_STALL_OFFSETS.entries()) {
+    if (stallIndex === droppedStall) continue; // that stall is gone (teacher, 29.10.2026)
     const angle = layout.map.boardAngle + delta,
       x = layout.plaza.x + Math.cos(angle) * 5.0,
       z = layout.plaza.z + Math.sin(angle) * 5.0;

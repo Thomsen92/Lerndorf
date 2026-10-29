@@ -6,6 +6,14 @@ import { HALLOWEEN_STAND_ANGLE, HALLOWEEN_STAND_RADIUS, PLAZA_RADIUS } from '../
 import { instancedModel, kenneyModel, type KenneyModel } from './kenney';
 
 export const DECOR_STALL_OFFSETS = [1.4, 2.6, 3.8] as const;
+/**
+ * One of the decor stalls is dropped to give the market room (teacher, 29.10.2026): the one that
+ * stands closest to the Halloween stand, unless Ollie's shop took its place already.
+ */
+export function removedStall(replacedStall: number): number {
+  for (let i = DECOR_STALL_OFFSETS.length - 1; i >= 0; i--) if (i !== replacedStall) return i;
+  return -1;
+}
 /** Conservative footprint including Ollie in front of the counter. */
 export const MARKET_SHOP_RADIUS = 1.8;
 export interface MarketShopPlacement extends Point2 {

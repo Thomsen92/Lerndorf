@@ -10,7 +10,7 @@ import type { Layout } from '../world/layout';
 import { PLAZA_RADIUS } from '../world/constants';
 import { pavingTexture } from './textures';
 import { bakeStatic } from './merge';
-import { createMarketShop } from './marketShop';
+import { createMarketShop, removedStall } from './marketShop';
 
 const STONE = '#a7a3a0';
 const WOOD = '#8a5a36';
@@ -378,7 +378,7 @@ export function buildPlaza(layout: Layout): THREE.Group {
       halloweenStalls = new THREE.Group();
       halloweenStalls.name = 'halloweenStalls';
       halloweenStalls.userData.bakeStatic = false;
-      for (const [angle, stripe] of HALLOWEEN_STALLS(layout).filter((_, i) => i !== replacedStall))
+      for (const [angle, stripe] of HALLOWEEN_STALLS(layout).filter((_, i) => i !== replacedStall && i !== removed))
         halloweenStalls.add(stall(layout, angle, 5.0, stripe, ['#f2994a', '#e2703a', '#f2994a'], 'pumpkins'));
       root.add(halloweenStalls);
     }
@@ -457,7 +457,8 @@ export function buildPlaza(layout: Layout): THREE.Group {
     [layout.map.boardAngle + 2.6, '#3f8f88', ['#bb6bd9', '#f2a7d0', '#56ccf2'], 'bread'],
     [layout.map.boardAngle + 3.8, '#d08a3c', ['#f2994a', '#6fcf97', '#f2994a'], 'pumpkins'],
   ];
-  for (const [angle, stripe, colours, goods] of stalls.filter((_, i) => i !== replacedStall)) {
+  const removed = removedStall(replacedStall);
+  for (const [angle, stripe, colours, goods] of stalls.filter((_, i) => i !== replacedStall && i !== removed)) {
     normalSeason.add(stall(layout, angle, 5.0, stripe, colours, goods));
   }
   for (const angle of layout.map.benchAngles) root.add(bench(layout, angle));

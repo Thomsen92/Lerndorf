@@ -79,11 +79,11 @@ describe('permanent Ollie shop', () => {
     expect(shop).toBeDefined();
     expect(plaza.userData.marketShopReady).toBeInstanceOf(Promise);
     const normal = plaza.getObjectByName('normalSeasonPlaza')!;
-    expect(normal.children.filter((o) => o.name === 'decorMarketStall')).toHaveLength(2);
+    expect(normal.children.filter((o) => o.name === 'decorMarketStall')).toHaveLength(1); // Ollie replaced one, one more is dropped
     for (let i = 0; i < 5; i++) {
       plaza.userData.setSeasonTheme('halloween');
       expect(shop.visible).toBe(true);
-      expect(plaza.getObjectByName('halloweenStalls')!.children).toHaveLength(2);
+      expect(plaza.getObjectByName('halloweenStalls')!.children).toHaveLength(1);
       plaza.userData.setSeasonTheme('normal');
     }
     const shops: THREE.Object3D[] = [];
@@ -153,5 +153,14 @@ describe('permanent Ollie shop', () => {
     expect(mat).not.toHaveBeenCalled();
     shop.update(0.1, 5, false);
     expect(shop.root.children).toHaveLength(0);
+  });
+});
+
+describe('dropped decor stall', () => {
+  it('drops the stall closest to the Halloween stand that Ollie did not replace', async () => {
+    const { removedStall } = await import('../../src/render/marketShop');
+    expect(removedStall(2)).toBe(1);
+    expect(removedStall(1)).toBe(2);
+    expect(removedStall(0)).toBe(2);
   });
 });
