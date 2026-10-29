@@ -5,7 +5,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 > Jeder Fehler bekommt eine ID, einen Steckbrief und – sobald beauftragt –
 > ein Fix-Paket in `handoff/`. Bilder liegen unter `bilder/`.
 
-> **Als nächstes zu fixen:** BUG-008 (nach Review von BUG-003/004). BUG-001 committet (70add80).
+> **Als nächstes zu fixen:** BUG-007 (nach Review von BUG-008) – vorher klären, siehe Notiz an die Lehrkraft. BUG-001 committet (70add80).
 
 ## Übersicht
 
@@ -17,7 +17,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 | [BUG-004](#bug-004--scrollen-im-learnpass-ruckelt) | Scrollen im Learnpass ruckelt / fühlt sich verbuggt an | Season-Pass / Learnpass | **S3** | **M** | **Fix da** (Abnahme am Gerät offen) | [FIX-02](handoff/FIX-02.md) |
 | [BUG-005](#bug-005--bau-modus-feldauswahl-verdeckt-das-dorf-direkter-klick-auf-gebäudedeko-fehlt) | Bau-Modus: Feldauswahl verdeckt das Dorf, direkter Klick auf Gebäude/Deko fehlt | Dorf → Bauen | **S3** | **M** | bestätigt | [FIX-03](handoff/FIX-03.md) |
 | [BUG-007](#bug-007--season-hub-almanac-direkt-unter-season-1) | Season-Hub: My Almanac steht unten – soll direkt unter Season 1 | Season-Hub / Almanac | **S3** | **S** | bestätigt | [FIX-04](handoff/FIX-04.md) |
-| [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | bestätigt | [FIX-05](handoff/FIX-05.md) |
+| [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | **Fix da** | [FIX-05](handoff/FIX-05.md) |
 | [BUG-009](#bug-009--inventar-platzhalter-gegenstände-mit-falschem-icon) | Inventar: Platzhalter-Gegenstände (Haare/T-Shirt) mit falschem T-Shirt-Icon | Inventar / Kleiderschrank | **S3** | **M** | bestätigt | [FIX-06](handoff/FIX-06.md) |
 | [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | bestätigt | [FIX-07](handoff/FIX-07.md) |
 | [BUG-011](#bug-011--legendäres-hausmodell-ersetzen) | Legendäres Hausmodell rendert als schwarze/grüne Masse – durch angehängtes Fantasy-Treehouse-GLB ersetzen | Dorf / Hausplatz | **S3** | **M** | bestätigt | [FIX-08](handoff/FIX-08.md) |
@@ -887,9 +887,18 @@ zwei Viewports prüfen. Kein Datenmodell, keine Logik, keine Migration.
 | **Aufwand** | **S – ≤ 30 Min** (CSS; Breite/Innenabstand) |
 | **Häufigkeit** | immer bei 642 × 229 px |
 | **Gerät/Browser** | Screenshot 642 × 229 px; Browser nicht angegeben |
-| **Status** | bestätigt |
+| **Status** | **Fix da** (29.10.2026) |
 | **Bild** | `bilder/BUG-008_01.png` |
 | **Fix-Paket** | [FIX-05](handoff/FIX-05.md) |
+
+### Änderungsnotiz (Fix da, 29.10.2026)
+
+- **Datei:** `web/src/ui/learnpass/learnpass.css`, `.lp-tile` und `.lp-act`.
+- **Nachgestellt (Harness, Fensterbreite 900 / 1000 / 1280):** „Open in inventory“ ragte 80 px / 55 px / 10 px über den Kachel-Innenrand hinaus (am Rand bzw. in den Rahmen). Ursache: Spalte `1fr` darf nicht unter die Breite des Kindes schrumpfen (`min-width: auto`) und der Knopf hatte `white-space: nowrap`.
+- **Fix:** Kachel-Spalte `minmax(0, 1fr)`, Knopf `max-width: 100%`, Umbruch erlaubt (`white-space: nowrap` entfernt), Innenabstand oben/unten 6 px. Text, Farbe, Klickziel unverändert.
+- **Gemessen (Knopf-Rechtskante minus Kachel-Innenrand, ≤ 0 = innerhalb):** 360: −45, 430: −115, 642: −327, 900: −1, 1000: −1, 1280: −1; kein horizontaler Überlauf. Bei schmalen Kacheln (900/1000) bricht der Text auf zwei Zeilen um (Höhe 56 px), danach vollständig sichtbar.
+- **Tests:** `npm test` 219 Dateien / 1321 Tests grün; `tsc` grün; Build weiter lokal blockiert (siehe BUG-001).
+- **Bild:** [bilder/BUG-008_02.jpg](bilder/BUG-008_02.jpg) (900 px).
 
 ### Beobachtung (Ist)
 

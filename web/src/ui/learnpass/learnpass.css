@@ -491,7 +491,8 @@
 }
 .lp-tile {
   display: grid;
-  grid-template-columns: 52px 1fr;
+  /* minmax(0, 1fr): the column may shrink below its widest child, so the button never pokes out */
+  grid-template-columns: 52px minmax(0, 1fr);
   align-content: center;
   align-items: center;
   gap: 2px 12px;
@@ -520,14 +521,15 @@
   justify-self: start;
   min-height: 48px;
   margin-top: 6px;
-  padding: 0 14px;
+  max-width: 100%;
+  padding: 6px 14px;
   border: 0;
   border-radius: 10px;
   background: var(--lp-pumpkin);
   color: var(--lp-soot) !important;
   font-size: 15px;
   font-weight: 700;
-  white-space: nowrap;
+  line-height: 1.2;
 }
 .lp-act:disabled {
   background: #2d2040;
