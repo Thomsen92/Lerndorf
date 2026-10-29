@@ -7,6 +7,8 @@ const products: Array<{ id: string; kind: string; price: number; file: string; n
   JSON.parse(readFileSync(new URL('../../../content/shop/ollie-items.json', import.meta.url), 'utf8')).items;
 const migrationPath = new URL('../../../supabase/migrations/0054_ollie_shop_items.sql', import.meta.url);
 const migration = existsSync(migrationPath) ? readFileSync(migrationPath, 'utf8') : '';
+// 0059 relabels the rarities after 0054; replaying 0054 resets them, so the replay ends with 0059 as a deploy would.
+const rarities = readFileSync(new URL('../../../supabase/migrations/0059_shop_rarities.sql', import.meta.url), 'utf8');
 let db: PGlite;
 beforeAll(async () => { db = await teacherDb(); }, 30000);
 afterAll(async () => { await db?.close(); });
@@ -39,7 +41,9 @@ it('replays only item content, preserving balances, inventory, placements and cl
   ]).then(results => results.map(result => result.rows));
   const before = await snapshot();
   await db.exec(migration);
+  await db.exec(rarities);
   await db.exec(migration);
+  await db.exec(rarities);
   expect(await snapshot()).toEqual(before);
 });
 

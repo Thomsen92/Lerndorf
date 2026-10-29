@@ -952,6 +952,69 @@
             "price": 0,
             "shopVisible": false,
             "rewardOnly": true
+        },
+        {
+            "file": "medieval-castle.glb",
+            "name": "Mittelalterburg",
+            "kind": "house",
+            "price": 1000,
+            "triangles": 7653,
+            "bytes": 328292,
+            "dims": "3,82 × 4,08 × 4,00 m"
+        },
+        {
+            "file": "exosuit-robot.glb",
+            "name": "Blauer Exo-Roboter",
+            "kind": "deco",
+            "price": 350,
+            "triangles": 4893,
+            "bytes": 208176,
+            "dims": "1,64 × 3,00 × 1,14 m"
+        },
+        {
+            "file": "obama-statue.glb",
+            "name": "Obama-Statue",
+            "kind": "deco",
+            "price": 1000,
+            "triangles": 9000,
+            "bytes": 207280,
+            "dims": "2,40 × 3,00 × 1,25 m"
+        },
+        {
+            "file": "simson-motorcycle.glb",
+            "name": "Simson-Motorrad",
+            "kind": "car",
+            "price": 700,
+            "triangles": 9523,
+            "bytes": 482328,
+            "dims": "0,79 × 1,49 × 2,00 m"
+        },
+        {
+            "file": "moped.glb",
+            "name": "Moped",
+            "kind": "car",
+            "price": 300,
+            "triangles": 7000,
+            "bytes": 438856,
+            "dims": "0,81 × 1,17 × 1,80 m"
+        },
+        {
+            "file": "scooter.glb",
+            "name": "Roller",
+            "kind": "car",
+            "price": 400,
+            "triangles": 4500,
+            "bytes": 170224,
+            "dims": "0,85 × 1,67 × 1,70 m"
+        },
+        {
+            "file": "fendt-tractor.glb",
+            "name": "Fendt-Traktor",
+            "kind": "car",
+            "price": 300,
+            "triangles": 7999,
+            "bytes": 310724,
+            "dims": "1,16 × 1,62 × 4,20 m"
         }
     ],
     "pending": [

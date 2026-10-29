@@ -148,6 +148,15 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   shop_lantern_house: { file: 'shop/lantern-house.glb', kind: 'house', lod: false },
   shop_apple_gable_garage: { file: 'shop/apple-gable-garage.glb', kind: 'garage', lod: false },
   shop_moss_workshop: { file: 'shop/moss-workshop.glb', kind: 'garage', lod: false },
+  // Tripo models (0058): textures and meshes trimmed by web/scripts/assets/optimize-tripo-decos.mjs.
+  // The vehicles are authored at real size along X, so they keep it (no `fill`) and turn a quarter.
+  shop_medieval_castle: { file: 'shop/medieval-castle.glb', kind: 'house', fill: true },
+  shop_exosuit_robot: { file: 'shop/exosuit-robot.glb', kind: 'deco', fill: true },
+  shop_obama_statue: { file: 'shop/obama-statue.glb', kind: 'deco', fill: true },
+  shop_simson_motorcycle: { file: 'shop/simson-motorcycle.glb', kind: 'car', yaw: Math.PI / 2 },
+  shop_moped: { file: 'shop/moped.glb', kind: 'car', yaw: Math.PI / 2 },
+  shop_scooter: { file: 'shop/scooter.glb', kind: 'car', yaw: Math.PI / 2 },
+  shop_fendt_tractor: { file: 'shop/fendt-tractor.glb', kind: 'car', yaw: Math.PI / 2 },
   // Stable reward ID preserves existing ownership; the souvenir is now the supplied Empire State model.
   reward_ollie_nyc_postcard:{file:'shop/ollie-empire-state.glb',kind:'deco'},
   // Retain the original own postcard model as an archive asset, without a new catalogue item.

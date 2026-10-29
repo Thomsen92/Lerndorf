@@ -108,6 +108,13 @@ export const ITEM_NAMES: Record<string, string> = {
   shop_toyoyo: 'Toyoyo',
   shop_president_car: 'Präsidentenwagen',
   shop_trump: 'Trump-Statue',
+  shop_medieval_castle: 'Mittelalterburg',
+  shop_exosuit_robot: 'Blauer Exo-Roboter',
+  shop_obama_statue: 'Obama-Statue',
+  shop_simson_motorcycle: 'Simson-Motorrad',
+  shop_moped: 'Moped',
+  shop_scooter: 'Roller',
+  shop_fendt_tractor: 'Fendt-Traktor',
   shop_white_house: 'Weißes Haus',
   ...OLLIE_ITEM_NAMES,
 };
