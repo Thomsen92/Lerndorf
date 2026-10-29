@@ -5,7 +5,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 > Jeder Fehler bekommt eine ID, einen Steckbrief und – sobald beauftragt –
 > ein Fix-Paket in `handoff/`. Bilder liegen unter `bilder/`.
 
-> **Als nächstes zu fixen:** BUG-010 (nach Review von BUG-009) – vorher klären, woher die Unit-Wörter kommen. BUG-001 committet (70add80).
+> **Als nächstes zu fixen:** BUG-010 wartet auf Antworten der Lehrkraft (siehe Notiz); danach BUG-011 (Lizenzfrage). BUG-001 committet (70add80).
 
 ## Übersicht
 
@@ -19,7 +19,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 | [BUG-007](#bug-007--season-hub-almanac-direkt-unter-season-1) | Season-Hub: My Almanac steht unten – soll direkt unter Season 1 | Season-Hub / Almanac | **S3** | **S** | **Fix da** | [FIX-04](handoff/FIX-04.md) |
 | [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | **Fix da** | [FIX-05](handoff/FIX-05.md) |
 | [BUG-009](#bug-009--inventar-platzhalter-gegenstände-mit-falschem-icon) | Inventar: Platzhalter-Gegenstände (Haare/T-Shirt) mit falschem T-Shirt-Icon | Inventar / Kleiderschrank | **S3** | **M** | **Fix da** | [FIX-06](handoff/FIX-06.md) |
-| [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | bestätigt | [FIX-07](handoff/FIX-07.md) |
+| [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | **Rückfrage an Lehrkraft** | [FIX-07](handoff/FIX-07.md) |
 | [BUG-011](#bug-011--legendäres-hausmodell-ersetzen) | Legendäres Hausmodell rendert als schwarze/grüne Masse – durch angehängtes Fantasy-Treehouse-GLB ersetzen | Dorf / Hausplatz | **S3** | **M** | bestätigt | [FIX-08](handoff/FIX-08.md) |
 
 ## UI/UX-Vorhaben (keine Fehler)
@@ -1068,9 +1068,23 @@ dann vorher Backup und Rücksprache.
 | **Aufwand** | **M – 0,5–2 Std**; **L**, wenn der Wortpool erst aus dem Lehrbuch/Unit importiert werden muss |
 | **Häufigkeit** | bei jedem Spiel |
 | **Gerät/Browser** | nicht angegeben |
-| **Status** | bestätigt |
+| **Status** | **gestoppt: Rückfrage an die Lehrkraft** (29.10.2026, Daten-/Designfragen) |
 | **Bild** | — |
 | **Fix-Paket** | [FIX-07](handoff/FIX-07.md) |
+
+### Notiz der Fix-KI (gestoppt, 29.10.2026)
+
+Ich habe BUG-010 gelesen und **nichts geändert**, weil alle drei Wünsche Live-Daten oder eine Spielentscheidung berühren (Stopp-Bedingung des Auftrags):
+
+- **Mehr Buchstaben:** Ein Rätsel hat heute fest 7 Buchstaben (Mitte + 6 außen). Das steht in der Live-Tabelle `spelling_puzzles` (Prüfung `letters ~ '^[a-z]{6}$'`, 70 Rätsel aus `web/scripts/spelling/make-puzzles.py`) und in der Wortprüfung/den Hash-Werten des Servers (Migration 0057, bereits eingespielt). Mehr Buchstaben heißt neue Rätsel/andere Tabellenform = neue Migration und geänderte Live-Daten, die auf dem Sechseck (Layout) beruhen.
+- **3 Joker:** Es gibt **keinen Joker**. Nur die Übungsrunde zeigt zwei Hilfswörter (`round.hints`). Die Wörter liegen absichtlich nur auf dem Server (der Client bekommt nur Hashes). Ein Joker, der ein Wort zeigt oder prüft, braucht eine neue Server-Funktion (RPC) und eine Regel, was ein Joker genau tut (Wort verraten? erster Buchstabe? Anzahl?). Das ist eine Spiel- und Datenentscheidung.
+- **Wörter aus der Unit:** Eine Unit-/Lehrbuch-Wortliste liegt **nicht** im Repo (`content/` enthält keine). Die Rätsel sind heute aus Themen von Highlight 8 und einer allgemeinen Häufigkeitsliste (wordfreq) erzeugt. Ohne Liste würde ich raten.
+
+**Fragen an die Lehrkraft:**
+1. Welche Unit/Wörter sollen es sein? Kannst du eine Wortliste (Datei oder Foto der Vokabelseite) liefern?
+2. Joker: Was soll ein Joker tun (z. B. „zeigt den Anfang eines noch nicht gefundenen Wortes“)? Pro Runde 3? Kosten sie Punkte?
+3. „Mehr Buchstaben“: Meinst du ein größeres Sechseck (8–9 Buchstaben) oder dass **mehr Wörter mit den vorhandenen 7** akzeptiert werden (kürzere/häufigere Wörter, Mindestlänge 3 statt 4)? Letzteres wäre ohne Änderung der Buchstaben-Form möglich, aber ebenfalls eine Migration (Wortlisten der Rätsel).
+4. Darf eine neue Migration die Rätsel-Tabelle ergänzen/ändern (nur additiv, vorher Backup)?
 
 ### Beobachtung (Ist)
 
