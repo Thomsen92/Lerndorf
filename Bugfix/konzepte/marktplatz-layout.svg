@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640" viewBox="0 0 900 640" font-family="Verdana, sans-serif">
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#233149" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="plaza" cx="50%" cy="45%" r="60%">
+      <stop offset="0" stop-color="#1c2c44"/>
+      <stop offset="1" stop-color="#132035"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="900" height="640" fill="#0c1424"/>
+  <rect width="900" height="640" fill="url(#grid)" opacity=".55"/>
+
+  <text x="40" y="48" fill="#f7eeda" font-size="22" font-weight="700" letter-spacing="1.2">MARKTPLATZ – LAYOUT-VORSCHLAG</text>
+  <text x="40" y="72" fill="#a9b1c2" font-size="12">Aufgaben und Shops trennen · Platz +25 % · Shop-Marker kleiner · Ollie mit Silhouette + Pfeil</text>
+
+  <!-- plaza -->
+  <circle cx="450" cy="350" r="220" fill="url(#plaza)" stroke="#6b5336" stroke-width="2"/>
+  <circle cx="450" cy="350" r="190" fill="none" stroke="#3a4a67" stroke-width="1.5" stroke-dasharray="5 7" opacity=".7"/>
+  <circle cx="450" cy="350" r="48" fill="#274766" stroke="#6f9cc4" stroke-width="2"/>
+  <circle cx="450" cy="350" r="34" fill="#3d6f95" opacity=".5"/>
+  <text x="450" y="354" text-anchor="middle" fill="#cfe6f5" font-size="10" font-weight="700">BRUNNEN</text>
+
+  <!-- zone shading -->
+  <path d="M450 130 A220 220 0 0 0 450 570 L450 398 A48 48 0 0 1 450 302 Z" fill="#ffb547" opacity=".07"/>
+  <path d="M450 130 A220 220 0 0 1 450 570 L450 398 A48 48 0 0 1 450 302 Z" fill="#7fcf8f" opacity=".07"/>
+  <text x="118" y="346" fill="#ffb547" font-size="12" font-weight="700" letter-spacing="2" transform="rotate(-90 118 346)">LERNEN · AUFGABEN</text>
+  <text x="790" y="354" fill="#7fcf8f" font-size="12" font-weight="700" letter-spacing="2" transform="rotate(90 790 354)">MARKT · SHOPS</text>
+
+  <!-- spokes -->
+  <g stroke="#3a4a67" stroke-width="1.2" stroke-dasharray="4 6" opacity=".8">
+    <line x1="450" y1="350" x2="260" y2="240"/>
+    <line x1="450" y1="350" x2="260" y2="460"/>
+    <line x1="450" y1="350" x2="640" y2="240"/>
+    <line x1="450" y1="350" x2="640" y2="460"/>
+  </g>
+
+  <!-- nodes -->
+  <g>
+    <circle cx="260" cy="240" r="19" fill="#2a2333" stroke="#ffb547" stroke-width="2"/>
+    <text x="260" y="246" text-anchor="middle" fill="#ffb547" font-size="15">▤</text>
+    <circle cx="260" cy="460" r="19" fill="#2a2333" stroke="#ffb547" stroke-width="2"/>
+    <text x="260" y="466" text-anchor="middle" fill="#ffb547" font-size="15">✿</text>
+    <circle cx="640" cy="240" r="19" fill="#1b3026" stroke="#7fcf8f" stroke-width="2"/>
+    <text x="640" y="246" text-anchor="middle" fill="#7fcf8f" font-size="15">⌂</text>
+    <circle cx="640" cy="460" r="19" fill="#33211c" stroke="#ff8a65" stroke-width="2"/>
+    <text x="640" y="466" text-anchor="middle" fill="#ff8a65" font-size="15">◒</text>
+  </g>
+
+  <!-- cards -->
+  <g>
+    <rect x="40" y="112" width="188" height="86" rx="12" fill="#182135" stroke="#ffb547" stroke-width="1.5"/>
+    <text x="56" y="136" fill="#ffb547" font-size="10" font-weight="700" letter-spacing="1">10 UHR · LERNEN</text>
+    <text x="56" y="158" fill="#f7eeda" font-size="16" font-weight="700">Daily Quests</text>
+    <text x="56" y="176" fill="#a9b1c2" font-size="11">Tafel + Sir Byte</text>
+    <line x1="228" y1="198" x2="260" y2="240" stroke="#ffb547" stroke-width="1.5" stroke-dasharray="3 4"/>
+
+    <rect x="40" y="452" width="188" height="86" rx="12" fill="#182135" stroke="#ffb547" stroke-width="1.5"/>
+    <text x="56" y="476" fill="#ffb547" font-size="10" font-weight="700" letter-spacing="1">8 UHR · LERNEN</text>
+    <text x="56" y="498" fill="#f7eeda" font-size="16" font-weight="700">Spelling Bee</text>
+    <text x="56" y="516" fill="#a9b1c2" font-size="11">Bienenstock</text>
+    <line x1="228" y1="500" x2="260" y2="460" stroke="#ffb547" stroke-width="1.5" stroke-dasharray="3 4"/>
+
+    <rect x="672" y="112" width="188" height="86" rx="12" fill="#182135" stroke="#7fcf8f" stroke-width="1.5"/>
+    <text x="688" y="136" fill="#7fcf8f" font-size="10" font-weight="700" letter-spacing="1">2 UHR · MARKT</text>
+    <text x="688" y="158" fill="#f7eeda" font-size="16" font-weight="700">Ollie's Market</text>
+    <text x="688" y="176" fill="#a9b1c2" font-size="11">Silhouette + Pfeil</text>
+    <line x1="672" y1="198" x2="640" y2="240" stroke="#7fcf8f" stroke-width="1.5" stroke-dasharray="3 4"/>
+
+    <rect x="672" y="452" width="188" height="86" rx="12" fill="#182135" stroke="#ff8a65" stroke-width="1.5"/>
+    <text x="688" y="476" fill="#ff8a65" font-size="10" font-weight="700" letter-spacing="1">4 UHR · MARKT</text>
+    <text x="688" y="498" fill="#f7eeda" font-size="16" font-weight="700">Halloween Shop</text>
+    <text x="688" y="516" fill="#a9b1c2" font-size="11">Pfeil kleiner</text>
+    <line x1="672" y1="500" x2="640" y2="460" stroke="#ff8a65" stroke-width="1.5" stroke-dasharray="3 4"/>
+  </g>
+
+  <!-- walk ring dimension -->
+  <line x1="450" y1="302" x2="450" y2="130" stroke="#7fcf8f" stroke-width="1" stroke-dasharray="2 3" opacity=".5"/>
+  <line x1="450" y1="398" x2="450" y2="570" stroke="#7fcf8f" stroke-width="1" stroke-dasharray="2 3" opacity=".5"/>
+
+  <!-- legend -->
+  <g transform="translate(40,596)">
+    <circle cx="6" cy="-4" r="5" fill="#ffb547"/><text x="18" y="0" fill="#c7cede" font-size="11">Aufgaben/Lernen</text>
+    <circle cx="166" cy="-4" r="5" fill="#7fcf8f"/><text x="178" y="0" fill="#c7cede" font-size="11">Ollie / Markt</text>
+    <circle cx="300" cy="-4" r="5" fill="#ff8a65"/><text x="312" y="0" fill="#c7cede" font-size="11">Halloween</text>
+  </g>
+  <text x="40" y="622" fill="#8c97ab" font-size="11">Marker: 60–70 % der jetzigen Größe · Label 12–13 px · Pfeil 20–24 px · Abstand der Anker ≥ 2,5 m</text>
+  <text x="860" y="622" text-anchor="end" fill="#6b7790" font-size="10">nicht maßstabsgetreu</text>
+</svg>

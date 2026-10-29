@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Lerndorf – Haus-Menü (Konzept)</title>
+<style>
+  @font-face {
+    font-family: 'Comic Neue';
+    src: url('./fonts/ComicNeue-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+  }
+  @font-face {
+    font-family: 'Comic Neue';
+    src: url('./fonts/ComicNeue-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: block;
+  }
+
+  :root {
+    --night: #0a1120;
+    --sheet: #182135;
+    --sheet-2: #111a2b;
+    --card: #202c45;
+    --card-2: #18233a;
+    --line: #35445f;
+    --brass: #e2b25c;
+    --brass-2: #c58f37;
+    --ink: #f7eeda;
+    --muted: #a9b1c2;
+    --green: #7fcf8f;
+    --amber: #ffb547;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--night);
+    color: var(--ink);
+    font-family: Verdana, 'Atkinson Hyperlegible', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .app { position: relative; width: 100%; height: 100%; overflow: hidden; }
+  .scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(120% 75% at 50% 28%, transparent 38%, rgba(4, 7, 14, .55) 100%),
+      linear-gradient(180deg, transparent 55%, rgba(4, 7, 14, .35) 100%);
+  }
+
+  /* ---------- the floating signboard ---------- */
+  .sheet {
+    position: absolute;
+    left: 14px; right: 14px; bottom: 14px;
+    padding: 10px 16px 14px;
+    border-radius: 26px;
+    background:
+      radial-gradient(120% 90% at 18% 0%, rgba(60, 78, 112, .45) 0%, transparent 55%),
+      linear-gradient(180deg, #1c2740 0%, #121a2b 100%);
+    border: 1px solid #6b5336;
+    box-shadow:
+      0 26px 60px rgba(0, 0, 0, .62),
+      0 2px 0 #090e18,
+      inset 0 1px 0 rgba(255, 255, 255, .08);
+    overflow: visible;
+  }
+  .sheet::before {
+    content: '';
+    position: absolute; left: 14px; right: 14px; top: 0; height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: linear-gradient(90deg, #6e4c2b, #f0c87c, #9a6a34, #6e4c2b);
+    opacity: .85;
+  }
+  .grab {
+    width: 38px; height: 4px; margin: 3px auto 7px;
+    border-radius: 3px; background: #6a563b;
+  }
+
+  /* porch lamp = the signature status light */
+  .porch {
+    position: absolute; top: -21px; right: 22px;
+    width: 36px; height: 36px; display: grid; place-items: center;
+    z-index: 3;
+  }
+  .porch .glow {
+    position: absolute; inset: -16px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 181, 71, .55) 0%, rgba(255, 181, 71, 0) 68%);
+    filter: blur(2px);
+  }
+  .porch svg {
+    width: 25px; height: 25px; color: #ffcf7a;
+    filter: drop-shadow(0 0 7px rgba(255, 181, 71, .8));
+  }
+  .porch .lamp-badge {
+    position: absolute; top: -1px; right: -1px;
+    width: 15px; height: 15px; border-radius: 50%;
+    background: var(--green); color: #0e1b12;
+    border: 1px solid #0d1522;
+    font: 700 9px/14px Verdana, sans-serif; text-align: center;
+  }
+
+  /* ---------- header ---------- */
+  .head { display: flex; align-items: center; gap: 11px; padding-top: 1px; }
+  .crest {
+    flex: none; width: 48px; height: 48px; border-radius: 50%;
+    display: grid; place-items: center; color: #3a2a12;
+    background: linear-gradient(145deg, #f6d795, #c58f37);
+    border: 1px solid #8a5f22;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 3px 0 #6b4a1c;
+  }
+  .crest svg { width: 26px; height: 26px; }
+  .head-text { min-width: 0; flex: 1; }
+  .eyebrow {
+    font: 700 9px/1 Verdana, sans-serif;
+    letter-spacing: 1.7px; color: #d9a441;
+  }
+  h1 {
+    margin: 3px 0 2px;
+    font: 700 22px/1.02 'Comic Neue', 'Comic Sans MS', cursive;
+    color: #fbf3e2; letter-spacing: .1px;
+    white-space: nowrap;
+  }
+  .head-text p { margin: 0; font: 10.5px/1.2 Verdana, sans-serif; color: var(--muted); }
+  .head-text p span { color: #66738c; padding: 0 2px; }
+
+  /* ---------- action cards ---------- */
+  .grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-top: 13px;
+  }
+  .card {
+    position: relative;
+    min-height: 116px;
+    padding: 10px 11px;
+    text-align: left;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, #22304b 0%, #18233a 100%);
+    box-shadow:
+      0 2px 0 #0b111d,
+      0 8px 16px rgba(0, 0, 0, .18),
+      inset 0 1px 0 rgba(255, 255, 255, .06);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .card.featured {
+    border-color: #8b6a3d;
+    background: linear-gradient(180deg, #293a56 0%, #1b2740 100%);
+  }
+  .card.featured::before {
+    content: '';
+    position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: linear-gradient(180deg, #ffd27f, #c58f37);
+  }
+  .ic {
+    width: 34px; height: 34px; border-radius: 11px;
+    display: grid; place-items: center;
+    color: #ffcf7a; background: #2b3b59;
+    border: 1px solid #40557a;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+  }
+  .ic svg { width: 19px; height: 19px; }
+  .card-title {
+    display: block; margin-top: 8px;
+    font: 700 16px/1.05 'Comic Neue', 'Comic Sans MS', cursive;
+    color: #fbf3e2;
+  }
+  .card-sub {
+    display: block; margin-top: 2px;
+    font: 10px/1.25 Verdana, sans-serif; color: #a4adc0;
+    max-width: 118px;
+  }
+  .chev {
+    position: absolute; right: 9px; bottom: 9px;
+    width: 14px; height: 14px; color: #7f8aa0;
+  }
+  .badge {
+    position: absolute; top: 10px; right: 10px;
+    min-width: 18px; height: 18px; padding: 0 4px;
+    border-radius: 9px; background: var(--green); color: #0e1b12;
+    border: 1px solid #0d1522;
+    font: 700 10px/17px Verdana, sans-serif; text-align: center;
+  }
+
+  /* ---------- footer ---------- */
+  .foot { display: flex; gap: 9px; margin-top: 13px; }
+  .settings {
+    flex: none; width: 103px; height: 46px;
+    border-radius: 13px; border: 1px solid #3b4b66;
+    background: #1a2438; color: #b9c0cf;
+    font: 11px Verdana, sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .settings svg { width: 15px; height: 15px; color: #98a3b6; }
+  .back {
+    flex: 1; height: 46px; border-radius: 13px;
+    border: 1px solid #8a5f22;
+    background: linear-gradient(180deg, #f4d18b 0%, #dfa94f 100%);
+    color: #2a1d05;
+    font: 700 13px Verdana, sans-serif;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 3px 0 #6b4a1c, 0 8px 16px rgba(0, 0, 0, .22);
+  }
+  .back svg { width: 18px; height: 18px; }
+
+  /* On a desktop browser the mockup sits in a phone frame instead of stretching. */
+  @media (min-width: 520px) {
+    body { display: grid; place-items: center; background: #05080f; }
+    .app {
+      width: 380px;
+      height: min(844px, 96vh);
+      border-radius: 36px;
+      border: 1px solid #2b3548;
+      box-shadow: 0 34px 90px rgba(0, 0, 0, .75);
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <svg class="scene" viewBox="0 0 380 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#0b1629"/>
+        <stop offset=".55" stop-color="#17263f"/>
+        <stop offset="1" stop-color="#2a3b4d"/>
+      </linearGradient>
+      <radialGradient id="moonGlow">
+        <stop offset="0" stop-color="#ffe9b0" stop-opacity=".55"/>
+        <stop offset="1" stop-color="#ffe9b0" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="hillA" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#22402f"/>
+        <stop offset="1" stop-color="#15281f"/>
+      </linearGradient>
+      <linearGradient id="hillB" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1a3327"/>
+        <stop offset="1" stop-color="#0f1e17"/>
+      </linearGradient>
+      <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="5"/>
+      </filter>
+    </defs>
+
+    <rect width="380" height="844" fill="url(#sky)"/>
+
+    <g fill="#f7eeda">
+      <circle cx="52" cy="46" r="1.2" opacity=".55"/>
+      <circle cx="300" cy="58" r="1.4" opacity=".5"/>
+      <circle cx="338" cy="132" r="1" opacity=".4"/>
+      <circle cx="28" cy="158" r="1" opacity=".35"/>
+      <circle cx="250" cy="28" r="1" opacity=".45"/>
+    </g>
+    <circle cx="72" cy="96" r="62" fill="url(#moonGlow)"/>
+    <circle cx="72" cy="96" r="16" fill="#f7e6bd"/>
+
+    <path d="M0 292 Q 62 252 128 286 T 262 284 T 380 272 V844 H0 Z" fill="url(#hillA)"/>
+    <path d="M0 340 Q 92 300 178 334 T 380 320 V844 H0 Z" fill="url(#hillB)"/>
+
+    <!-- cottage -->
+    <g>
+      <ellipse cx="198" cy="304" rx="104" ry="15" fill="#050a10" opacity=".45"/>
+      <ellipse cx="198" cy="312" rx="74" ry="17" fill="#ffcf7a" opacity=".10" filter="url(#softGlow)"/>
+
+      <rect x="138" y="178" width="120" height="118" fill="#2b3652" stroke="#3e4d6b" stroke-width="1.4"/>
+      <polygon points="120,182 198,112 276,182" fill="#7c4336"/>
+      <polygon points="120,182 198,112 198,182" fill="#8d4d3d"/>
+      <polygon points="198,112 276,182 198,182" fill="#6f3a30" opacity=".55"/>
+      <rect x="232" y="120" width="13" height="42" fill="#4b3428"/>
+      <rect x="232" y="120" width="13" height="5" fill="#6a4a36"/>
+
+      <rect x="186" y="222" width="28" height="74" fill="#5b3c26" stroke="#3c2819" stroke-width="1.2"/>
+      <circle cx="208" cy="260" r="2" fill="#ffcf7a"/>
+
+      <rect x="151" y="204" width="27" height="25" fill="#ffcf7a"/>
+      <rect x="151" y="204" width="27" height="25" fill="none" stroke="#5b3c26" stroke-width="2"/>
+      <path d="M164.5 204v25M151 216.5h27" stroke="#5b3c26" stroke-width="2"/>
+      <rect x="219" y="204" width="27" height="25" fill="#ffcf7a"/>
+      <rect x="219" y="204" width="27" height="25" fill="none" stroke="#5b3c26" stroke-width="2"/>
+      <path d="M232.5 204v25M219 216.5h27" stroke="#5b3c26" stroke-width="2"/>
+
+      <rect x="150" y="204" width="27" height="25" fill="#ffcf7a" opacity=".35" filter="url(#softGlow)"/>
+      <rect x="218" y="204" width="27" height="25" fill="#ffcf7a" opacity=".35" filter="url(#softGlow)"/>
+    </g>
+
+    <!-- fence + path -->
+    <g stroke="#3a2a1e" stroke-width="2.6" stroke-linecap="round" opacity=".9">
+      <path d="M26 332h82M26 348h82"/>
+      <path d="M34 322v34M50 320v36M66 322v34M82 320v36M98 322v34"/>
+    </g>
+    <path d="M198 296 L182 344 L214 344 Z" fill="#7a5a3a" opacity=".65"/>
+
+    <!-- trees -->
+    <g fill="#10231b">
+      <polygon points="28,330 52,244 76,330"/>
+      <polygon points="312,334 336,250 360,334"/>
+    </g>
+    <g fill="#3a2a1e">
+      <rect x="48" y="324" width="7" height="26"/>
+      <rect x="332" y="328" width="7" height="26"/>
+    </g>
+  </svg>
+
+  <div class="vignette"></div>
+
+  <section class="sheet" aria-label="My house">
+    <div class="porch" aria-hidden="true">
+      <span class="glow"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 3h6"/><path d="M10 3v3h4V3"/><rect x="8" y="6" width="8" height="10" rx="2"/>
+        <path d="M10 16v3h4v-3"/><path d="M12 8v5"/>
+      </svg>
+      <span class="lamp-badge">1</span>
+    </div>
+
+    <div class="grab" aria-hidden="true"></div>
+
+    <header class="head">
+      <div class="crest" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>
+        </svg>
+      </div>
+      <div class="head-text">
+        <div class="eyebrow">MY HOUSE</div>
+        <h1>Home, sweet home</h1>
+        <p>Level 6 <span>·</span> 12 items</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <button class="card featured" type="button">
+        <span class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 4l6 6"/><path d="M17 3l4 4-3 3-4-4z"/><path d="M13 8L4 17l3 3 9-9"/>
+          </svg>
+        </span>
+        <span class="card-title">Build</span>
+        <span class="card-sub">Expand &amp; decorate</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+
+      <button class="card" type="button">
+        <span class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 8a2 2 0 1 1 2-2c0 2-2 2-2 4"/><path d="M12 10L3 17h18L12 10z"/>
+          </svg>
+        </span>
+        <span class="card-title">Wardrobe</span>
+        <span class="card-sub">Your look</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+
+      <button class="card" type="button">
+        <span class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8h12l1 12H5z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>
+          </svg>
+        </span>
+        <span class="card-title">Shop</span>
+        <span class="card-sub">Furniture &amp; decor</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+
+      <button class="card" type="button">
+        <span class="badge">3</span>
+        <span class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="9" width="16" height="11" rx="2"/><path d="M4 13h16"/><path d="M9 9V7a3 3 0 0 1 6 0v2"/><circle cx="12" cy="16" r="1"/>
+          </svg>
+        </span>
+        <span class="card-title">Inventory</span>
+        <span class="card-sub">12 items</span>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+
+    <footer class="foot">
+      <button class="settings" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 0 0-1.7-1L14.5 3h-5l-.4 2.6a7 7 0 0 0-1.7 1l-2.3-1-2 3.4L5 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 1.7 1l.4 2.6h5l.4-2.6a7 7 0 0 0 1.7-1l2.3 1 2-3.4-2-1.5a7 7 0 0 0 .1-1z"/>
+        </svg>
+        Settings
+      </button>
+      <button class="back" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 4h6v16h-6"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h9"/>
+        </svg>
+        Back to the village
+      </button>
+    </footer>
+  </section>
+</div>
+</body>
+</html>
