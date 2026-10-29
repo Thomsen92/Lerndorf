@@ -5,6 +5,12 @@ export const PLACE_SECONDS = 0.6,
   REMOVE_SECONDS = 0.4,
   PUFF_SECONDS = 0.5,
   MAX_PUFFS = 8;
+function finishRemoval(obj: THREE.Object3D): void {
+  obj.removeFromParent();
+  const release = obj.userData.onBuildRemoved as (() => void) | undefined;
+  delete obj.userData.onBuildRemoved;
+  release?.();
+}
 const clamp = (t: number): number => Math.max(0, Math.min(1, t));
 export function popScale(t: number): number {
   const x = clamp(t / PLACE_SECONDS) - 1;
@@ -76,7 +82,7 @@ export class BuildFx {
   private start(obj: THREE.Object3D, kind: SlotKind, remove: boolean): void {
     this.clear();
     if (this.opts.reducedMotion()) {
-      if (remove) obj.removeFromParent();
+      if (remove) finishRemoval(obj);
       return;
     }
     const centre = obj.getWorldPosition(new THREE.Vector3());
@@ -107,7 +113,7 @@ export class BuildFx {
     e.obj.scale.copy(e.scale).multiplyScalar(e.remove ? pose.scale : popScale(e.time));
     if (e.remove) {
       e.obj.rotation.y = e.yaw + pose.yaw;
-      if (e.time >= REMOVE_SECONDS) e.obj.removeFromParent();
+      if (e.time >= REMOVE_SECONDS) finishRemoval(e.obj);
     }
     const quaternion = camera.getWorldQuaternion(new THREE.Quaternion());
     puffLayout(this.smoke.count, e.radius, e.time).forEach((p, i) => {
@@ -125,7 +131,7 @@ export class BuildFx {
   clear(): void {
     const e = this.effect;
     if (e) {
-      if (e.remove) e.obj.removeFromParent();
+      if (e.remove) finishRemoval(e.obj);
       else e.obj.scale.copy(e.scale);
     }
     this.effect = null;
