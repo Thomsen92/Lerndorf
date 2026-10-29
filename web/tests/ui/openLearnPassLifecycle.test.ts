@@ -1,10 +1,23 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { SeasonApi, SeasonState } from '../../src/api/season';
-const mocks = vi.hoisted(() => ({ release: vi.fn(), destroy: vi.fn() }));
+const mocks = vi.hoisted(() => ({
+  release: vi.fn(),
+  destroy: vi.fn(),
+  actions: null as null | { onClaim(tier: number): Promise<number> },
+  reveal: vi.fn(),
+}));
 vi.mock('../../src/ui/learnpass/rewardArt', () => ({ seasonPictures: () => ({ release: mocks.release }) }));
 vi.mock('../../src/ui/learnpass/learnpassView', () => ({
-  renderLearnPass: () => ({ el: document.createElement('section'), update: vi.fn(), destroy: mocks.destroy }),
+  renderLearnPass: (_state: unknown, actions: typeof mocks.actions) => {
+    mocks.actions = actions;
+    return { el: document.createElement('section'), update: vi.fn(), destroy: mocks.destroy };
+  },
+}));
+vi.mock('../../src/collection/cardReveal', () => ({ revealCards: mocks.reveal }));
+vi.mock('../../src/collection/catalog', () => ({
+  collectionCatalog: async () => ({}),
+  cardById: (_catalog: unknown, id: string) => ({ id }),
 }));
 import { openLearnPass } from '../../src/ui/learnpass/openLearnPass';
 import { createModalTracker } from '../../src/ui/areas';
@@ -54,5 +67,24 @@ describe('LearnPass entered through the season hub', () => {
     pass.close();
     expect(document.querySelector('.learnpass-error')).toBe(null);
     expect(pass.isOpen).toBe(false);
+  });
+  it('closes the pass before the almanac opens from a drawn card (the almanac would open behind it)', async () => {
+    const onOpenAlmanac = vi.fn();
+    const state = { season: { id: 'test' } } as SeasonState;
+    const pass = openLearnPass({
+      ...options(async () => state),
+      api: {
+        state: async () => state,
+        claim: async () => ({ rewards: { coins: 5, cards: [{ id: 'c1', granted: true }] } }),
+      } as unknown as SeasonApi,
+      onOpenAlmanac,
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+    await mocks.actions!.onClaim(1);
+    await vi.waitFor(() => expect(mocks.reveal).toHaveBeenCalledOnce());
+    mocks.reveal.mock.calls[0][0].onAlmanac('c1');
+    expect(pass.isOpen).toBe(false);
+    expect(onOpenAlmanac).toHaveBeenCalledWith('c1');
   });
 });

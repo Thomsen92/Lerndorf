@@ -5,14 +5,14 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 > Jeder Fehler bekommt eine ID, einen Steckbrief und – sobald beauftragt –
 > ein Fix-Paket in `handoff/`. Bilder liegen unter `bilder/`.
 
-> **Als nächstes zu fixen:** BUG-002 (nach Review von BUG-001).
+> **Als nächstes zu fixen:** BUG-003 + BUG-004 (nach Review von BUG-002). BUG-001 committet (70add80).
 
 ## Übersicht
 
 | ID | Titel | Ort | Schwere | Aufwand | Status | Fix-Paket |
 |---|---|---|---|---|---|---|
 | [BUG-001](#bug-001--smartphone-hud-überdeckt-die-kopfzeile-der-daily-quests) | Smartphone: HUD überdeckt die Kopfzeile der Daily Quests, „Schließen“ praktisch unerreichbar (auch Profil/Settings) | Dorf → Aufgaben / Profil | **S2** | **S** | **Fix da** | [FIX-01](handoff/FIX-01.md) |
-| [BUG-002](#bug-002--learnpass-münzen-einsammeln-friert-die-seite-ein) | Learnpass: Münzen einsammeln friert die Seite ein (Hard Reset nötig) | Season-Pass / Learnpass | **S1** | **L** | bestätigt | [FIX-02](handoff/FIX-02.md) |
+| [BUG-002](#bug-002--learnpass-münzen-einsammeln-friert-die-seite-ein) | Learnpass: Münzen einsammeln friert die Seite ein (Hard Reset nötig) | Season-Pass / Learnpass | **S1** | **L** | **Fix da** (Abnahme am Gerät offen) | [FIX-02](handoff/FIX-02.md) |
 | [BUG-003](#bug-003--learnpass-ansicht-zu-groß-für-smartphones) | Learnpass-Ansicht zu groß für Smartphones, Karten links/rechts angeschnitten | Season-Pass / Learnpass | **S3** | **M** | bestätigt | [FIX-02](handoff/FIX-02.md) |
 | [BUG-004](#bug-004--scrollen-im-learnpass-ruckelt) | Scrollen im Learnpass ruckelt / fühlt sich verbuggt an | Season-Pass / Learnpass | **S3** | **M** | bestätigt | [FIX-02](handoff/FIX-02.md) |
 | [BUG-005](#bug-005--bau-modus-feldauswahl-verdeckt-das-dorf-direkter-klick-auf-gebäudedeko-fehlt) | Bau-Modus: Feldauswahl verdeckt das Dorf, direkter Klick auf Gebäude/Deko fehlt | Dorf → Bauen | **S3** | **M** | bestätigt | [FIX-03](handoff/FIX-03.md) |
@@ -205,9 +205,19 @@ eher **M** (0,5–2 Std), weil `gameNav.ts` und ein ResizeObserver dazukommen.
 | **Aufwand** | **L – 2–6 Std** (mobile-only Freeze; Ursache muss erst reproduziert werden) |
 | **Häufigkeit** | mindestens einmal; ob zuverlässig reproduzierbar, ist offen |
 | **Gerät/Browser** | Screenshot 380 × 839 px; Gerät und Browser nicht angegeben |
-| **Status** | bestätigt (Nutzermeldung + Screenshot des Screens) |
+| **Status** | **Fix da** (29.10.2026, wartet auf Review und Test am Gerät) |
 | **Bild** | `bilder/BUG-002_01.png` |
 | **Fix-Paket** | [FIX-02](handoff/FIX-02.md) |
+
+### Änderungsnotiz (Fix da, 29.10.2026)
+
+- **Ursache (im Browser nachgestellt, Harness `dev/learnpass-ui.html`, 380 × 839):** Wer eine Stufe abholt, die eine Sammelkarte vergibt, bekommt direkt danach das Karten-Fenster (`revealCards`, ein `openModal` mit `z-index: 45`). Der LearnPass liegt mit `z-index: 60` darüber. Das Karten-Fenster öffnet sich also **hinter** dem Pass und macht ihn gleichzeitig `inert` (`ui/dialog.ts`). Ergebnis: Der Pass sieht normal aus, reagiert auf nichts mehr, das unsichtbare Fenster ist nicht erreichbar (Escape gibt es auf dem Handy nicht) – es wirkt wie ein Freeze, nur ein Neuladen hilft. Gemessen: Overlay-z 45, Pass-z 60, Pass `inert`, `elementFromPoint` trifft den Pass.
+- **Dieselbe Ursache, zweite Stelle:** „Zum Almanach“ im Karten-Fenster öffnet den Almanach (ebenfalls Modal, z 45) hinter dem noch offenen Pass.
+- **Fix:** (1) `web/src/collection/cardReveal.css`: `.overlay.modal.reveal-overlay { z-index: 70 }` (über dem Pass; die Karten-Hinweiszeile `cardNotice` nutzt ebenfalls 70). (2) `web/src/ui/learnpass/openLearnPass.ts`: „Zum Almanach“ schließt zuerst den Pass, wie „Im Inventar öffnen“. Keine Änderung an Münz-/Karten-RPCs oder Daten.
+- **Nachher geprüft:** Karten-Fenster liegt sichtbar über dem Pass, „Next“ schließt es, der Pass ist danach nicht mehr `inert`.
+- **Tests:** neuer Test in `tests/ui/openLearnPassLifecycle.test.ts`; `npm test` 219 Dateien / 1318 Tests grün, `tsc --noEmit` grün. `npm run build` lokal weiterhin wegen „Access is denied“ im Temp-Ordner nicht prüfbar (siehe BUG-001).
+- **Wichtig / offen:** Die Meldung nennt nur „Münzen einsammeln“; ich habe den Freeze im Harness über den Karten-Pfad nachgestellt (Münz-Stufen vergeben laut H9 Sammelkarten). Dass genau das die Ursache auf dem Gerät war, ist sehr wahrscheinlich, aber **nicht auf dem Gerät bestätigt**. Ein Münz-Collect ohne Karte hängt im Harness nicht. Bitte am Handy an einer Stufe mit Karte prüfen; reduzierte Bewegung nicht getrennt getestet.
+- **Bilder:** [vorher](bilder/BUG-002_02_vorher.jpg) (Karten-Fenster unsichtbar, Pass eingefroren), [nachher](bilder/BUG-002_03_nachher.jpg).
 
 ### Beobachtung (Ist)
 

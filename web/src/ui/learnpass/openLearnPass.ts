@@ -106,7 +106,13 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
         cards,
         reducedMotion: opts.reducedMotion,
         sound: opts.sound,
-        onAlmanac: opts.onOpenAlmanac,
+        // the almanac is a modal like the reveal and would open behind the pass: close the pass first
+        onAlmanac: opts.onOpenAlmanac
+          ? (cardId) => {
+              close();
+              opts.onOpenAlmanac?.(cardId);
+            }
+          : undefined,
       });
     } catch {
       announceCardGrants(ids);

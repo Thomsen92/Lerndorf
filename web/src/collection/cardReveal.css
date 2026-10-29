@@ -1,5 +1,8 @@
 /* A newly drawn card: mystery, flip and a close look (cardReveal.ts). */
 .overlay.modal.reveal-overlay {
+  /* Above the LearnPass (z-index 60): the reveal opens right after a claim, while the pass is
+     still on screen. Below it, the reveal was invisible and the inert pass looked frozen. */
+  z-index: 70;
   align-items: center;
   background: radial-gradient(ellipse at 50% 45%, #2c1640ee 0, #0d0715f5 70%);
 }
