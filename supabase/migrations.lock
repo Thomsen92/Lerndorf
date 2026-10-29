@@ -51,5 +51,9 @@
   "0050_collection_chest_rewards.sql": "5a756dc8f095fc9c2b0d68087092aa4cded2489421c63f478c0bc24a1ec56264",
   "0051_season_starter.sql": "9109bac2aa2c6b0e380401d4af07d8bd9fd118dbb4855db69be89534695671eb",
   "0052_season_item_rarities.sql": "25c7ab3330eb3dabc053c766801f92e8fecf96d7616f4d5811eff2db9299d8b1",
-  "0053_quest_coin_rule.sql": "9d309bd6e97a452fb678f51bd47640713eb78912f94ae3518cf0fa7f3763bdd5"
+  "0053_quest_coin_rule.sql": "9d309bd6e97a452fb678f51bd47640713eb78912f94ae3518cf0fa7f3763bdd5",
+  "0054_ollie_shop_items.sql": "f2a273540720b4751616232bb45f484a865d20b56c216a5d8fc3fb0d63dc513e",
+  "0055_ollie_story.sql": "186d0dc6436ddc8fc1a2726d7399ec0067919cdbf82498562074d9b1aa7c059e",
+  "0056_ollie_story_nyc_extension.sql": "2da4f486d83e1feb5bd903236d1ce4ffec08c113c933d291ed3ae831b9e86f56",
+  "0057_spelling_bee.sql": "2df572cfec4f018207649247ce4087b985f83ef52955f5f57d35470cb2051774"
 }
