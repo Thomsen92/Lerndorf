@@ -26,6 +26,10 @@ import { buildNature, buildVegetation } from './nature';
 import { buildPlaza } from './plaza';
 import { buildBridge } from './bridges';
 import { bakeStatic } from './merge';
+import { createDecoPresentation, type DecoRarity, type DecoPresentation } from './decoPresentation';
+import { decoStyle } from './decoStyles';
+import { createDrivewayGlow } from './drivewayGlow';
+const decoEffects = new WeakMap<THREE.Object3D, DecoPresentation>();
 import { buildLandmarks } from './landmarks';
 import { rippleNormalTexture, skyTexture } from './textures';
 import { fenceGeometry } from './house';
@@ -455,7 +459,7 @@ function driveGates(plots: Plot[]): THREE.Group {
  * with car pedestal, footpath, four decoration pedestals (green lawn while empty), fence with a gate
  * on the footpath and an opening for the driveway, mailbox at the gate.
  */
-function plotContents(p: Plot, slots: SlotMap): THREE.Group {
+function plotContents(p: Plot, slots: SlotMap, rarities: ReadonlyMap<string, DecoRarity> = new Map(), register?: (effect: DecoPresentation) => void): THREE.Group {
   const g = new THREE.Group();
   const lawn = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.1, p.d), p.index % 2 ? MAT.grass : MAT.grass2);
   lawn.position.y = 0.02;
@@ -475,11 +479,40 @@ function plotContents(p: Plot, slots: SlotMap): THREE.Group {
     const content = shownItem(slots, slot.id, slot.kind);
     if (!content) continue; // empty pedestal: green lawn
     const model = plotAsset(slot.kind, content.itemId, tint);
-    model.userData.slot = slot.id;
+    let placed: THREE.Object3D = model;
+    if (slot.kind === 'deco') {
+      const effect = createDecoPresentation(content.itemId);
+      effect.setRarity(rarities.get(content.itemId) ?? 'common');
+      effect.root.userData.bakeStatic = false;
+      decoEffects.set(effect.root, effect);
+      model.position.y = decoStyle(content.itemId).height;
+      const ready = model.userData.modelReady as Promise<THREE.Object3D> | undefined;
+      if (ready) void ready.then(loaded => effect.fitModel(loaded));
+      else effect.fitModel(model);
+      effect.root.add(model);
+      placed = effect.root;
+      register?.(effect);
+    } else if (slot.kind === 'garage') {
+      const effect = createDrivewayGlow(3, p.d / 2 - driveStart);
+      const car = shownItem(slots, 'car', 'car');
+      effect.setRarity(car ? rarities.get(car.itemId) ?? 'common' : 'common');
+      const wrapper = new THREE.Group();
+      const centre = rectCentre(slot);
+      effect.root.position.set(DRIVEWAY_X - centre.lx, 0.08, (driveStart + p.d / 2) / 2 - centre.lz);
+      wrapper.add(model, effect.root);
+      register?.(effect);
+      wrapper.userData.onBuildRemoved = () => {
+        decoEffects.delete(wrapper);
+        effect.root.userData.onBuildRemoved?.();
+      };
+      decoEffects.set(wrapper, effect);
+      placed = wrapper;
+    }
+    placed.userData.slot = slot.id;
     const c = rectCentre(slot);
-    model.position.set(c.lx, 0.07, c.lz);
-    model.rotation.y = (content.rot * Math.PI) / 2;
-    g.add(model);
+    placed.position.set(c.lx, 0.07, c.lz);
+    placed.rotation.y = (content.rot * Math.PI) / 2;
+    g.add(placed);
   }
 
   const post = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.9, 0.1), MAT.trunk);
@@ -509,7 +542,7 @@ function keepLive(g: THREE.Object3D): void {
   });
 }
 
-function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): THREE.Group {
+function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean, rarities: ReadonlyMap<string, DecoRarity>, register: (effect: DecoPresentation) => void): THREE.Group {
   if (!member) return freeLot(p);
   const g = new THREE.Group();
   g.position.set(p.x, p.h, p.z);
@@ -519,7 +552,7 @@ function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean): TH
   tag.position.set(house.lx, 7.2, house.lz);
   tag.userData = { house: true, own };
   g.add(tag);
-  const contents = plotContents(p, member.slots ?? {});
+  const contents = plotContents(p, member.slots ?? {}, rarities, register);
   contents.name = 'contents';
   if (own) keepLive(contents);
   g.add(contents);
@@ -534,8 +567,26 @@ export function buildVillage(
   layout: Layout,
   members: VillageMember[] = [],
   ownPlotIndex: number | null = null,
+  rarities: ReadonlyMap<string, DecoRarity> = new Map(),
 ): THREE.Group {
   const root = new THREE.Group();
+  const effects = new Set<DecoPresentation>();
+  const register = (effect: DecoPresentation): void => {
+    effects.add(effect);
+    effect.root.userData.onBuildRemoved = () => { effects.delete(effect); decoEffects.delete(effect.root); effect.dispose(); };
+  };
+  const cameraPosition = new THREE.Vector3(), effectPosition = new THREE.Vector3();
+  root.userData.updateDecoEffects = (time: number, camera: THREE.Camera, quality: 'low' | 'high', reduced: boolean): void => {
+    camera.getWorldPosition(cameraPosition);
+    const nearest = [...effects].map(effect => ({ effect, distance: effect.root.getWorldPosition(effectPosition).distanceToSquared(cameraPosition) }))
+      .sort((a, b) => a.distance - b.distance);
+    let spots = 0;
+    nearest.forEach(({ effect, distance }) => {
+      effect.root.userData.stageLightAllowed = effect.root.name === 'deco-presentation' && distance < 625 && spots++ < 4;
+      effect.update(time, camera, quality, reduced);
+    });
+  };
+  root.userData.disposeDecoEffects = (): void => { effects.forEach(effect => effect.dispose()); effects.clear(); };
   const byPlot = new Map(members.map((m) => [m.plotIndex, m]));
   root.add(terrainMesh(layout));
   const river = riverMesh(layout.terrain.river);
@@ -557,7 +608,7 @@ export function buildVillage(
 
   let ownGroup: THREE.Group | null = null;
   for (const p of layout.plots) {
-    const g = plotGroup(p, byPlot.get(p.index), p.index === ownPlotIndex);
+    const g = plotGroup(p, byPlot.get(p.index), p.index === ownPlotIndex, rarities, register);
     if (p.index === ownPlotIndex) ownGroup = g;
     root.add(g);
   }
@@ -567,8 +618,16 @@ export function buildVillage(
     const plot = ownPlotIndex === null ? undefined : layout.plots[ownPlotIndex];
     if (!ownGroup || !plot) return;
     const old = ownGroup.getObjectByName('contents');
-    if (old) ownGroup.remove(old);
-    const fresh = plotContents(plot, slots);
+    if (old) {
+      const removed: DecoPresentation[] = [];
+      old.traverse(object => {
+        const effect = decoEffects.get(object);
+        if (effect) removed.push(effect);
+      });
+      removed.forEach(effect => { effect.dispose(); effects.delete(effect); });
+      ownGroup.remove(old);
+    }
+    const fresh = plotContents(plot, slots, rarities, register);
     fresh.name = 'contents';
     ownGroup.add(fresh);
   };

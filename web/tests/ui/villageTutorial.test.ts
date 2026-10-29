@@ -86,6 +86,7 @@ vi.mock('../../src/api/build', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../src/api/build')>()),
   loadClassSlots: async () => new Map(),
 }));
+vi.mock('../../src/api/decoRarities', () => ({ loadDecoRarities: async () => new Map() }));
 const tutorialState = vi.fn();
 const finishTutorial = vi.fn();
 vi.mock('../../src/api/tutorial', async (importOriginal) => ({

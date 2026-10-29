@@ -36,6 +36,8 @@ import {
 import { buildLayout } from '../world/layout';
 import { buildVillage } from '../render/village';
 import { loadClassSlots, type SlotMap } from '../api/build';
+import { loadDecoRarities } from '../api/decoRarities';
+import type { DecoRarity } from '../render/decoPresentation';
 import { Crowd } from '../render/crowd';
 import { createDoubleTap } from '../avatars/doubleTap';
 import { setupScene } from '../render/scene';
@@ -122,6 +124,7 @@ interface Loaded {
   members: Member[];
   /** Slots of every classmate, by player id. */
   slots: Map<string, SlotMap>;
+  decoRarities: Map<string, DecoRarity>;
 }
 
 async function load(supabase: SupabaseClient): Promise<Loaded> {
@@ -129,6 +132,7 @@ async function load(supabase: SupabaseClient): Promise<Loaded> {
   const cls = await loadClass(supabase, profile.classId);
   const members = await loadMembers(supabase);
   const slots = await loadClassSlots(supabase);
+  const decoRarities = await loadDecoRarities(supabase);
   return {
     profile,
     layoutSeed: cls.layoutSeed,
@@ -137,6 +141,7 @@ async function load(supabase: SupabaseClient): Promise<Loaded> {
     buildOpen: cls.buildOpen,
     members,
     slots,
+    decoRarities,
   };
 }
 
@@ -391,8 +396,8 @@ export async function mountVillage(
       level: m.level,
       titleLabel: m.titleLabel,
     }));
-  const village = buildVillage(layout, labels, ownPlot);
-  disposeMarketShop = () => village.userData.disposeMarketShop?.();
+  const village = buildVillage(layout, labels, ownPlot, loaded.decoRarities);
+  disposeMarketShop = () => { village.userData.disposeMarketShop?.(); village.userData.disposeDecoEffects?.(); };
   scene.add(village);
   village.userData.externalHouseCards = true;
   village.traverse((object) => {
@@ -1460,6 +1465,7 @@ export async function mountVillage(
     worldAppearance?.update(dt, now / 1000, reducedMotion());
     beehive?.update(dt, now / 1000, reducedMotion());
     village.userData.updateMarketShop?.(dt, now / 1000, reducedMotion());
+    village.userData.updateDecoEffects?.(now / 1000, camera, effectiveLevel(choice, autoResult), reducedMotion());
     seasonHub?.maybeAutoOpen();
     (village.userData.animate as ((t: number) => void) | undefined)?.(performance.now() / 1000);
     (village.userData.labelUpdate as ((c: THREE.Camera) => void) | undefined)?.(camera);
