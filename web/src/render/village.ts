@@ -26,9 +26,10 @@ import { buildNature, buildVegetation } from './nature';
 import { buildPlaza } from './plaza';
 import { buildBridge } from './bridges';
 import { bakeStatic } from './merge';
-import { createDecoPresentation, type DecoRarity } from './decoPresentation';
+import { createDecoPresentation, type DecoRarity, type DecoPresentation } from './decoPresentation';
+import { decoStyle } from './decoStyles';
 import { createDrivewayGlow } from './drivewayGlow';
-const decoEffects = new WeakMap<THREE.Object3D, ReturnType<typeof createDecoPresentation>>();
+const decoEffects = new WeakMap<THREE.Object3D, DecoPresentation>();
 import { buildLandmarks } from './landmarks';
 import { rippleNormalTexture, skyTexture } from './textures';
 import { fenceGeometry } from './house';
@@ -458,7 +459,7 @@ function driveGates(plots: Plot[]): THREE.Group {
  * with car pedestal, footpath, four decoration pedestals (green lawn while empty), fence with a gate
  * on the footpath and an opening for the driveway, mailbox at the gate.
  */
-function plotContents(p: Plot, slots: SlotMap, rarities: ReadonlyMap<string, DecoRarity> = new Map(), register?: (effect: ReturnType<typeof createDecoPresentation>) => void): THREE.Group {
+function plotContents(p: Plot, slots: SlotMap, rarities: ReadonlyMap<string, DecoRarity> = new Map(), register?: (effect: DecoPresentation) => void): THREE.Group {
   const g = new THREE.Group();
   const lawn = new THREE.Mesh(new THREE.BoxGeometry(p.w, 0.1, p.d), p.index % 2 ? MAT.grass : MAT.grass2);
   lawn.position.y = 0.02;
@@ -480,11 +481,14 @@ function plotContents(p: Plot, slots: SlotMap, rarities: ReadonlyMap<string, Dec
     const model = plotAsset(slot.kind, content.itemId, tint);
     let placed: THREE.Object3D = model;
     if (slot.kind === 'deco') {
-      const effect = createDecoPresentation();
+      const effect = createDecoPresentation(content.itemId);
       effect.setRarity(rarities.get(content.itemId) ?? 'common');
       effect.root.userData.bakeStatic = false;
       decoEffects.set(effect.root, effect);
-      model.position.y = 0.22;
+      model.position.y = decoStyle(content.itemId).height;
+      const ready = model.userData.modelReady as Promise<THREE.Object3D> | undefined;
+      if (ready) void ready.then(loaded => effect.fitModel(loaded));
+      else effect.fitModel(model);
       effect.root.add(model);
       placed = effect.root;
       register?.(effect);
@@ -538,7 +542,7 @@ function keepLive(g: THREE.Object3D): void {
   });
 }
 
-function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean, rarities: ReadonlyMap<string, DecoRarity>, register: (effect: ReturnType<typeof createDecoPresentation>) => void): THREE.Group {
+function plotGroup(p: Plot, member: VillageMember | undefined, own: boolean, rarities: ReadonlyMap<string, DecoRarity>, register: (effect: DecoPresentation) => void): THREE.Group {
   if (!member) return freeLot(p);
   const g = new THREE.Group();
   g.position.set(p.x, p.h, p.z);
@@ -566,8 +570,8 @@ export function buildVillage(
   rarities: ReadonlyMap<string, DecoRarity> = new Map(),
 ): THREE.Group {
   const root = new THREE.Group();
-  const effects = new Set<ReturnType<typeof createDecoPresentation>>();
-  const register = (effect: ReturnType<typeof createDecoPresentation>): void => {
+  const effects = new Set<DecoPresentation>();
+  const register = (effect: DecoPresentation): void => {
     effects.add(effect);
     effect.root.userData.onBuildRemoved = () => { effects.delete(effect); decoEffects.delete(effect.root); effect.dispose(); };
   };
@@ -615,7 +619,7 @@ export function buildVillage(
     if (!ownGroup || !plot) return;
     const old = ownGroup.getObjectByName('contents');
     if (old) {
-      const removed: ReturnType<typeof createDecoPresentation>[] = [];
+      const removed: DecoPresentation[] = [];
       old.traverse(object => {
         const effect = decoEffects.get(object);
         if (effect) removed.push(effect);

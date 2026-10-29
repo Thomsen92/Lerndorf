@@ -245,16 +245,16 @@ export function glbAsset(itemId: string, kind: string): THREE.Group {
   // The far version is added only after the full one, so the LOD never shows it up close.
   const lod = new THREE.LOD();
   holder.add(lod);
-  void loadGlbItem(itemId, 'high')
+  const ready = loadGlbItem(itemId, 'high')
     .then((model) => {
       holder.remove(placeholder);
       placeholder.geometry.dispose();
       (placeholder.material as THREE.Material).dispose();
       lod.addLevel(model, 0);
-      if (spec?.lod === false) return new THREE.Group();
-      return loadGlbItem(itemId, 'lod');
-    })
-    .then((far) => {
+      return model;
+    });
+  holder.userData.modelReady = ready;
+  void ready.then(() => spec?.lod === false ? new THREE.Group() : loadGlbItem(itemId, 'lod')).then((far) => {
       if (far.children.length > 0) lod.addLevel(far, LOD_DISTANCE);
     });
   return holder;

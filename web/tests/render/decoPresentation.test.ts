@@ -7,21 +7,62 @@ camera.position.set(0, 4, 8);
 const find = (p: ReturnType<typeof createDecoPresentation>, name: string) => p.root.getObjectByName(name)!;
 
 describe('decoration presentation', () => {
-  it('keeps one fixed ring, warm lighting and a 2.8 m base for every rarity', () => {
+  it('places each surface and its fixed contour at the matching support height', () => {
+    for (const [id, height] of [
+      ['shop_pocket_meadow', 0.05],
+      ['shop_evening_lantern', 0.16],
+      ['reward_ollie_nyc_postcard', 0.38],
+    ] as const) {
+      const p = createDecoPresentation(id);
+      const bounds = new THREE.Box3().setFromObject(find(p, 'plinth-base'));
+      expect(bounds.min.y).toBeCloseTo(0);
+      expect(bounds.max.y).toBeCloseTo(height);
+      expect(find(p, 'plinth-ring').getWorldPosition(new THREE.Vector3()).y).toBeCloseTo(height + 0.004);
+      const position = find(p, 'plinth-ring').position.clone();
+      p.update(20, camera, 'high', false);
+      p.update(40, camera, 'low', true);
+      expect(find(p, 'plinth-ring').position).toEqual(position);
+      p.dispose();
+    }
+  });
+  it('keeps one fixed contour on the top, warm lighting and the selected base for every rarity', () => {
     const p = createDecoPresentation();
     for (const rarity of ['common', 'rare', 'epic', 'legendary'] as const) {
       p.setRarity(rarity);
       p.update(8, camera, 'high', false);
-      expect(p.root.children.filter((o) => o.name === 'plinth-ring')).toHaveLength(1);
-      expect(find(p, 'plinth-ring').position.y).toBe(0.224);
+      expect(p.root.getObjectsByProperty('name', 'plinth-ring')).toHaveLength(1);
+      const top = find(p, 'plinth-ring').getWorldPosition(new THREE.Vector3()).y;
+      expect(top).toBeCloseTo(p.root.userData.plinthStyle.height + 0.004);
       expect(find(p, 'warm-light-pool').visible).toBe(true);
       const bounds = new THREE.Box3().setFromObject(find(p, 'plinth-base'));
       expect(bounds.min.y).toBeCloseTo(0);
-      expect(bounds.max.y).toBeCloseTo(0.22);
-      expect(bounds.max.x - bounds.min.x).toBeCloseTo(2.8);
+      expect(bounds.max.y).toBeCloseTo(p.root.userData.plinthStyle.height);
+      expect(bounds.max.x - bounds.min.x).toBeCloseTo(p.root.userData.plinthStyle.width);
       expect(find(p, 'colored-light-mist').visible).toBe(rarity !== 'common');
     }
     p.dispose();
+  });
+
+  it('fits the loaded model in local space, without changing it, and ignores late loads after disposal', () => {
+    const p = createDecoPresentation('shop_one_more_chapter');
+    const model = new THREE.Mesh(new THREE.BoxGeometry(1.46, 1.7, 0.5));
+    const parent = new THREE.Group();
+    parent.rotation.y = 1.1;
+    parent.position.set(8, 4, 7);
+    parent.add(model);
+    const originalScale = model.scale.clone();
+    p.fitModel(model);
+    expect(p.root.userData.plinthStyle.width).toBeCloseTo(1.8);
+    expect(p.root.userData.plinthStyle.depth).toBeCloseTo(0.84);
+    expect(p.root.userData.plinthStyle.shape).toBe('rect');
+    expect(model.scale).toEqual(originalScale);
+    p.setRarity('epic');
+    p.update(10, camera, 'low', true);
+    expect(p.root.getObjectsByProperty('name', 'plinth-ring')).toHaveLength(1);
+    const before = { ...p.root.userData.plinthStyle };
+    p.dispose();
+    p.fitModel(new THREE.Mesh(new THREE.BoxGeometry(3, 3, 3)));
+    expect(p.root.userData.plinthStyle).toEqual(before);
   });
 
   it('changes quality and rarity without replacing GPU resources; culls distant extras', () => {

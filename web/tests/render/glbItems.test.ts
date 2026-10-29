@@ -110,6 +110,8 @@ describe('glb item registry', () => {
 
     const plotA = glbAsset('season_bat', 'deco');
     const plotB = glbAsset('season_bat', 'deco');
+    const loaded = await plotA.userData.modelReady;
+    expect(loaded).toBeInstanceOf(THREE.Group);
     await new Promise((resolve) => setTimeout(resolve, 0));
     await new Promise((resolve) => setTimeout(resolve, 0));
     const lodOf = (g: THREE.Group) => g.children.find((c) => c instanceof THREE.LOD) as THREE.LOD;
