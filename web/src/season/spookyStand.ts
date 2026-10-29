@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { Layout } from '../world/layout';
+import { HALLOWEEN_STAND_ANGLE, HALLOWEEN_STAND_RADIUS } from '../world/constants';
 
 export interface SpookyStand {
   root: THREE.Group;
@@ -35,8 +36,8 @@ export function createSpookyStand(
   const root = new THREE.Group();
   root.name = 'spookySeasonStand';
   root.userData.bakeStatic = false;
-  const a = layout.map.boardAngle + 5.1,
-    r = 7.6;
+  const a = layout.map.boardAngle + HALLOWEEN_STAND_ANGLE,
+    r = HALLOWEEN_STAND_RADIUS;
   root.position.set(
     layout.plaza.x + Math.cos(a) * r,
     layout.plazaHeight + 0.1,

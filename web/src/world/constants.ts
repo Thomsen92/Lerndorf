@@ -9,6 +9,13 @@
 export const WORLD_SCALE = 1.65;
 
 export const MAP_SIZE = Math.round(130 * WORLD_SCALE);
+/**
+ * Angle of the Halloween stand from the quest board (rad) and its distance from the plaza centre. Learning
+ * side (board, bee hive) and market side (stalls, Ollie, Halloween stand) are kept apart on purpose
+ * (teacher, 29.10.2026, UX-002): the stand sits behind the last stall instead of next to the board.
+ */
+export const HALLOWEEN_STAND_ANGLE = 4.4;
+export const HALLOWEEN_STAND_RADIUS = 7.6;
 export const PLAZA_RADIUS = 8;
 /** The valley wall: plots and paths stay inside this radius (plus a small allowance). */
 export const VALLEY_RADIUS = Math.round(52 * WORLD_SCALE);

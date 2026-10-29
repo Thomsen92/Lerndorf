@@ -4,7 +4,7 @@
  */
 import * as THREE from 'three';
 import type { Layout } from '../world/layout';
-import { PLAZA_RADIUS } from '../world/constants';
+import { HALLOWEEN_STAND_ANGLE, HALLOWEEN_STAND_RADIUS, PLAZA_RADIUS } from '../world/constants';
 import { DECOR_STALL_OFFSETS, MARKET_SHOP_RADIUS, marketShopPlacement } from './marketShop';
 
 export interface Beehive {
@@ -26,7 +26,7 @@ export function plazaObstacles(layout: Layout): Array<{ x: number; z: number; r:
   return [
     { ...at(board, 6), r: 1.8 },
     ...DECOR_STALL_OFFSETS.map((o) => ({ ...at(board + o, 5), r: 1.6 })),
-    { ...at(board + 5.1, 7.6), r: 2.4 }, // Halloween stand
+    { ...at(board + HALLOWEEN_STAND_ANGLE, HALLOWEEN_STAND_RADIUS), r: 2.4 }, // Halloween stand
     { x: shop.x, z: shop.z, r: MARKET_SHOP_RADIUS },
     ...layout.map.benchAngles.map((a) => ({ ...at(a, PLAZA_RADIUS - 0.4), r: 1 })),
     { ...at(layout.map.benchAngles[0] + 0.7, PLAZA_RADIUS - 1.2), r: 0.6 },

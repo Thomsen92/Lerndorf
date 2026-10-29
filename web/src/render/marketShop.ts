@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { Layout } from '../world/layout';
 import { dist, segmentDistance, type Point2 } from '../world/geometry';
-import { PLAZA_RADIUS } from '../world/constants';
+import { HALLOWEEN_STAND_ANGLE, HALLOWEEN_STAND_RADIUS, PLAZA_RADIUS } from '../world/constants';
 import { instancedModel, kenneyModel, type KenneyModel } from './kenney';
 
 export const DECOR_STALL_OFFSETS = [1.4, 2.6, 3.8] as const;
@@ -32,7 +32,7 @@ export function marketShopPlacement(layout: Layout): MarketShopPlacement {
     [layout.plaza, 2.3],
     [layout.board, 2.1],
     [byte, 1.1],
-    [at(layout, layout.map.boardAngle + 5.1, 7.6), 2.8],
+    [at(layout, layout.map.boardAngle + HALLOWEEN_STAND_ANGLE, HALLOWEEN_STAND_RADIUS), 2.8],
     ...layout.map.benchAngles.map((a) => [at(layout, a, PLAZA_RADIUS - 0.4), 0.95] as [Point2, number]),
     [at(layout, layout.map.benchAngles[0] + 0.7, PLAZA_RADIUS - 1.2), 0.6],
     [at(layout, layout.map.benchAngles[2] - 0.6, PLAZA_RADIUS - 1.2), 0.6],

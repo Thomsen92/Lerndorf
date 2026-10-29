@@ -27,7 +27,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 | ID | Vorhaben | Ort | Aufwand | Status | Konzept |
 |---|---|---|---|---|---|
 | [UX-001](#ux-001--haus-menü-uiux-überarbeitung) | Haus-Menü komplett überarbeiten: Hierarchie, Icons, Status, mobil + Desktop | Mein Haus | **L** | Konzept | [UI-01](handoff/UI-01.md) · [Mockup](konzepte/haus-menu.html) |
-| [UX-002](#ux-002--marktplatz-layout-und-shop-marker) | Marktplatz größer, Aufgaben/Shops entzerren, Ollie-Silhouette + Pfeil, Shop-UI kleiner | Dorf → Marktplatz | **L** | Konzept | [UI-02](handoff/UI-02.md) · [Layout](konzepte/marktplatz-layout.svg) |
+| [UX-002](#ux-002--marktplatz-layout-und-shop-marker) | Marktplatz größer, Aufgaben/Shops entzerren, Ollie-Silhouette + Pfeil, Shop-UI kleiner | Dorf → Marktplatz | **L** | **teilweise** (Assets verschoben) | [UI-02](handoff/UI-02.md) · [Layout](konzepte/marktplatz-layout.svg) |
 
 **Eingang (noch nicht bewertet):** [BUG-006 – Season-Pass-Kachel](#bug-006--season-pass-kachel-meldung-unvollständig)
 
@@ -676,9 +676,17 @@ nicht nötig.
 |---|---|
 | **Ort** | Dorf → Marktplatz |
 | **Aufwand** | **L – 2–6 Std** (Layout + Marker); **XL**, wenn die Platzgeometrie neu generiert werden muss |
-| **Status** | Konzept |
+| **Status** | **teilweise umgesetzt** (nur Assets verschoben) |
 | **Bild** | `bilder/UX-002_01.png` |
 | **Fix-Paket** | [UI-02](handoff/UI-02.md) |
+
+### Änderungsnotiz (teilweise umgesetzt, 29.10.2026, Freigabe der Lehrkraft: nur Assets verschieben)
+
+- **Umfang laut Lehrkraft:** keine großen Veränderungen, nur Assets verschieben. Nicht umgesetzt: größerer Platz, neue Marker (Ollie-Silhouette/Pfeil), kleinere Shop-Marker, Marker-Kollisionslogik, Kamera-Umbau.
+- **Änderung:** Der Halloween-Stand stand direkt neben der Questtafel (Winkel +5,1 rad zur Tafel, Radius 7,6 m) und damit auch neben dem Bienenstock (der immer neben der Tafel steht). Er steht jetzt bei **+4,4 rad** (gleicher Radius), also hinter dem letzten Marktstand statt neben der Tafel. Lernseite: Tafel + Bienenstock; Marktseite: die drei Stände (darunter Ollie) + Halloween-Stand. Der Winkel ist jetzt eine gemeinsame Konstante `HALLOWEEN_STAND_ANGLE`/`HALLOWEEN_STAND_RADIUS` in `web/src/world/constants.ts`, genutzt von `spookyStand.ts`, `marketShop.ts` (Platzprüfung Ollie) und `beehive.ts` (Platzprüfung Bienenstock). Keine Änderung an Seed/Weltgenerierung, Quest-/Shop-Logik oder Daten.
+- **Gemessen:** Abstand des Stands zu Grundstücken, Wegen, Bänken, Ständen und Tafel über 3 Karten × 60 Seeds: kein Fall schlechter als vorher außer Weg-Abstand um 0,2 m (−0,95 statt −0,75 m, beides schon vorher knapp); Abstand zur Tafel von 2,7 m auf 5,4 m. Die vorhandenen Tests (Platz für Ollie und Bienenstock, 100 Seeds je Karte) laufen weiter grün.
+- **Gesehen (Dorf-Testseite, 1280 × 800):** Tafel mit „Daily quests“ und Bienenstock mit „Spelling Bee“ oben am Platz, Halloween-Stand deutlich abgesetzt auf der anderen Seite, kein Überlappen der Schilder. Bild: [bilder/UX-002_02.jpg](bilder/UX-002_02.jpg).
+- **Nicht geprüft:** `npm run galerie`, 618 × 474 und Mobil, alle drei Karten im Bild (nur die Zahlenprüfung). Bitte im Dorf ansehen; wenn die Schilder noch zusammenrücken, verschiebe ich Bienenstock oder Stand weiter.
 
 ### Ausgangslage
 
