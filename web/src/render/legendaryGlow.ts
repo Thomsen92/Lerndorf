@@ -122,7 +122,7 @@ function build(): GlowParts {
   const seeds = new Float32Array(STREAKS * 5);
   for (let i = 0; i < STREAKS; i++) {
     const angle = rand() * Math.PI * 2;
-    const radius = Math.sqrt(rand()) * 2.7;
+    const radius = Math.sqrt(rand()) * 2.0;
     seeds.set(
       [Math.cos(angle) * radius, Math.sin(angle) * radius, 1.5 + rand() * 3.5, 0.8 + rand() * 2.6, rand()],
       i * 5,
@@ -131,8 +131,9 @@ function build(): GlowParts {
   const streaks = new THREE.BufferGeometry();
   streaks.setAttribute('position', new THREE.BufferAttribute(new Float32Array(STREAKS * 6), 3));
   const made: GlowParts = {
-    curtain: fadedTube(5.2, 3.6, VIOLET, 0.3),
-    core: fadedTube(2.6, 1.1, MAGENTA, 0.5),
+    // compact: the wide outer curtain was too big (teacher, 29.10.2026)
+    curtain: fadedTube(3.2, 2.2, VIOLET, 0.28),
+    core: fadedTube(2.0, 0.9, MAGENTA, 0.5),
     streaks,
     ring,
     curtainMat,
