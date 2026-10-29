@@ -1,33 +1,53 @@
 import * as THREE from 'three';
 
 /**
- * An eerie light cone for the legendary Horror-Haus (teacher, 29.10.2026): a pale green cone of light
- * falls from the night sky onto the house, with a violet core and a glowing ring on the ground.
- * Purely visual: additive, no depth write, never hit by a tap. One geometry/material set is shared by
- * all houses; the pulse runs from the draw call (no extra loop) and stands still with reduced motion.
+ * Light pillar for the legendary Horror-Haus (teacher, 29.10.2026, reference picture: violet and
+ * magenta beams, thin light streaks rising and a glowing ring on the ground). A soft curtain of
+ * violet light, a brighter magenta core, streaks of light that climb through it and a ring with
+ * tick marks that turns slowly on the ground. Purely visual: additive, no depth write, never hit by
+ * a tap. Geometry and materials are shared by all houses; everything moves from the draw call (no
+ * extra loop) and stands still with reduced motion.
  */
-const HEIGHT = 13;
-const RADIUS = 3.6;
+const HEIGHT = 16;
+const STREAKS = 44;
+const VIOLET = new THREE.Color('#8a4dff');
+const MAGENTA = new THREE.Color('#ff3df0');
 
 interface GlowParts {
-  outer: THREE.BufferGeometry;
+  curtain: THREE.BufferGeometry;
   core: THREE.BufferGeometry;
+  streaks: THREE.BufferGeometry;
   ring: THREE.BufferGeometry;
-  outerMat: THREE.MeshBasicMaterial;
+  curtainMat: THREE.MeshBasicMaterial;
   coreMat: THREE.MeshBasicMaterial;
+  streakMat: THREE.LineBasicMaterial;
   ringMat: THREE.MeshBasicMaterial;
+  /** Per streak: x, z, speed, length, phase. */
+  seeds: Float32Array;
+  lastFrame: number;
 }
 let parts: GlowParts | null = null;
 
-/** Brightest at the ground, fading towards the sky; additive blending reads black as "no light". */
-function fadedCone(radius: number, colour: THREE.Color, strength: number): THREE.BufferGeometry {
-  const geometry = new THREE.ConeGeometry(radius, HEIGHT, 40, 1, true);
+/** Deterministic pseudo random numbers, so every house looks the same. */
+function prng(seed: number): () => number {
+  let a = seed;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** An open tube that is brightest at the ground and fades into the sky (additive: black = no light). */
+function fadedTube(bottom: number, top: number, colour: THREE.Color, strength: number): THREE.BufferGeometry {
+  const geometry = new THREE.CylinderGeometry(top, bottom, HEIGHT, 40, 8, true);
   geometry.translate(0, HEIGHT / 2, 0);
   const position = geometry.getAttribute('position');
   const colours = new Float32Array(position.count * 3);
   for (let i = 0; i < position.count; i++) {
-    const h = position.getY(i) / HEIGHT; // 0 on the ground, 1 at the apex
-    const k = strength * Math.pow(1 - h, 1.3);
+    const h = position.getY(i) / HEIGHT; // 0 on the ground, 1 at the top
+    const k = strength * Math.pow(1 - h, 1.4);
     colours[i * 3] = colour.r * k;
     colours[i * 3 + 1] = colour.g * k;
     colours[i * 3 + 2] = colour.b * k;
@@ -37,16 +57,41 @@ function fadedCone(radius: number, colour: THREE.Color, strength: number): THREE
 }
 
 function ringTexture(): THREE.CanvasTexture {
+  const size = 256;
   const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 128;
+  canvas.width = canvas.height = size;
   const ctx = canvas.getContext('2d');
   if (ctx) {
-    const gradient = ctx.createRadialGradient(64, 64, 8, 64, 64, 62);
-    gradient.addColorStop(0, 'rgba(255,255,255,0.55)');
-    gradient.addColorStop(0.65, 'rgba(255,255,255,0.35)');
-    gradient.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 128, 128);
+    const c = size / 2;
+    const glow = ctx.createRadialGradient(c, c, 4, c, c, c);
+    glow.addColorStop(0, 'rgba(255,90,240,0.75)');
+    glow.addColorStop(0.45, 'rgba(160,70,255,0.28)');
+    glow.addColorStop(1, 'rgba(120,60,255,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, size, size);
+    ctx.lineWidth = 2.5;
+    for (const [radius, colour] of [
+      [0.9, 'rgba(255,120,245,0.95)'],
+      [0.74, 'rgba(120,150,255,0.85)'],
+      [0.58, 'rgba(255,80,160,0.8)'],
+    ] as const) {
+      ctx.strokeStyle = colour;
+      ctx.beginPath();
+      ctx.arc(c, c, c * radius, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    // tick marks between the two outer rings
+    ctx.strokeStyle = 'rgba(255,170,250,0.9)';
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 48; i++) {
+      const a = (i / 48) * Math.PI * 2;
+      const r0 = c * (i % 4 === 0 ? 0.76 : 0.82);
+      const r1 = c * 0.9;
+      ctx.beginPath();
+      ctx.moveTo(c + Math.cos(a) * r0, c + Math.sin(a) * r0);
+      ctx.lineTo(c + Math.cos(a) * r1, c + Math.sin(a) * r1);
+      ctx.stroke();
+    }
   }
   return new THREE.CanvasTexture(canvas);
 }
@@ -56,61 +101,97 @@ function build(): GlowParts {
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
-    side: THREE.DoubleSide,
     fog: false,
     toneMapped: false,
   } as const;
-  // back faces only: the far wall of the cone glows behind the house, the house itself stays clean
-  const outerMat = new THREE.MeshBasicMaterial({ ...additive, side: THREE.BackSide, vertexColors: true });
+  // back faces only: the far wall glows behind the house, the house itself stays clean
+  const curtainMat = new THREE.MeshBasicMaterial({ ...additive, side: THREE.BackSide, vertexColors: true });
   const coreMat = new THREE.MeshBasicMaterial({ ...additive, side: THREE.BackSide, vertexColors: true });
+  const streakMat = new THREE.LineBasicMaterial({ ...additive, color: '#ff9af6', opacity: 0.9 });
   const ringMat = new THREE.MeshBasicMaterial({
     ...additive,
+    side: THREE.DoubleSide,
     map: ringTexture(),
-    color: new THREE.Color('#7dffa8'),
-    opacity: 0.55,
+    opacity: 0.9,
   });
-  const ring = new THREE.PlaneGeometry(RADIUS * 2.3, RADIUS * 2.3);
+  const ring = new THREE.PlaneGeometry(10.5, 10.5);
   ring.rotateX(-Math.PI / 2);
-  return {
-    outer: fadedCone(RADIUS, new THREE.Color('#6bff9e'), 0.3),
-    core: fadedCone(RADIUS * 0.5, new THREE.Color('#b16cff'), 0.35),
+  const rand = prng(2910);
+  const seeds = new Float32Array(STREAKS * 5);
+  for (let i = 0; i < STREAKS; i++) {
+    const angle = rand() * Math.PI * 2;
+    const radius = Math.sqrt(rand()) * 2.7;
+    seeds.set(
+      [Math.cos(angle) * radius, Math.sin(angle) * radius, 1.5 + rand() * 3.5, 0.8 + rand() * 2.6, rand()],
+      i * 5,
+    );
+  }
+  const streaks = new THREE.BufferGeometry();
+  streaks.setAttribute('position', new THREE.BufferAttribute(new Float32Array(STREAKS * 6), 3));
+  const made: GlowParts = {
+    curtain: fadedTube(5.2, 3.6, VIOLET, 0.3),
+    core: fadedTube(2.6, 1.1, MAGENTA, 0.5),
+    streaks,
     ring,
-    outerMat,
+    curtainMat,
     coreMat,
+    streakMat,
     ringMat,
+    seeds,
+    lastFrame: -1,
   };
+  moveStreaks(made, 0);
+  return made;
 }
 
-/** Pulse of the shared materials, 0.8 to 1.0 with a little flicker. */
+/** Every streak climbs at its own speed and starts again at the bottom. */
+function moveStreaks(p: GlowParts, t: number): void {
+  const position = p.streaks.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < STREAKS; i++) {
+    const [x, z, speed, length, phase] = p.seeds.subarray(i * 5, i * 5 + 5);
+    const y = ((t * speed + phase * HEIGHT) % (HEIGHT - length)) + 0.2;
+    position.setXYZ(i * 2, x, y, z);
+    position.setXYZ(i * 2 + 1, x, y + length, z);
+  }
+  position.needsUpdate = true;
+}
+
+/** Slow pulse, 0.8 to 1.0, with a little flicker. */
 function pulse(t: number): number {
   return 0.9 + 0.08 * Math.sin(t * 1.7) + 0.03 * Math.sin(t * 7.3 + 1);
 }
 
 export function legendaryGlow(): THREE.Group {
   parts ??= build();
+  const shared = parts;
   const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   const group = new THREE.Group();
   group.name = 'legendaryGlow';
-  const meshes = [
-    new THREE.Mesh(parts.outer, parts.outerMat),
-    new THREE.Mesh(parts.core, parts.coreMat),
-    new THREE.Mesh(parts.ring, parts.ringMat),
-  ];
-  meshes[2].position.y = 0.12;
-  meshes.forEach((mesh, i) => {
-    mesh.raycast = () => undefined; // never blocks a tap on the house
-    mesh.castShadow = false;
-    mesh.receiveShadow = false;
-    mesh.renderOrder = 4 + i;
-    group.add(mesh);
+  const curtain = new THREE.Mesh(shared.curtain, shared.curtainMat);
+  const core = new THREE.Mesh(shared.core, shared.coreMat);
+  const streaks = new THREE.LineSegments(shared.streaks, shared.streakMat);
+  const ring = new THREE.Mesh(shared.ring, shared.ringMat);
+  ring.position.y = 0.12;
+  [curtain, core, streaks, ring].forEach((object, i) => {
+    object.raycast = () => undefined; // never blocks a tap on the house
+    object.frustumCulled = false; // the streaks move outside their first bounding box
+    object.renderOrder = 4 + i;
+    group.add(object);
   });
   if (!reduced) {
-    const mats = parts;
-    meshes[0].onBeforeRender = () => {
-      const k = pulse(performance.now() / 1000);
-      mats.outerMat.opacity = k;
-      mats.coreMat.opacity = k;
-      mats.ringMat.opacity = 0.55 * k;
+    // one update per frame for all houses (the first draw call of a frame does it)
+    curtain.onBeforeRender = () => {
+      const t = performance.now() / 1000;
+      if (shared.lastFrame === Math.floor(t * 60)) return;
+      shared.lastFrame = Math.floor(t * 60);
+      const k = pulse(t);
+      shared.curtainMat.opacity = k;
+      shared.coreMat.opacity = k;
+      shared.ringMat.opacity = 0.9 * k;
+      moveStreaks(shared, t);
+    };
+    ring.onBeforeRender = () => {
+      ring.rotation.y = (performance.now() / 1000) * 0.25;
     };
   }
   return group;

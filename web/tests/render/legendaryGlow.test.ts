@@ -17,7 +17,7 @@ describe('legendary Horror-Haus light cone', () => {
     const a = legendaryGlow();
     const b = legendaryGlow();
     const meshes = a.children as THREE.Mesh[];
-    expect(meshes).toHaveLength(3);
+    expect(meshes).toHaveLength(4); // curtain, core, streaks, ring
     for (const mesh of meshes) {
       expect((mesh.material as THREE.Material).blending).toBe(THREE.AdditiveBlending);
       expect((mesh.material as THREE.Material).depthWrite).toBe(false);
