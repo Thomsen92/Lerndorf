@@ -9,12 +9,20 @@ export interface CardNotice {
   dispose(): void;
 }
 
-export function announceCardGrants(ids: string[], opts: { timeoutMs?: number } = {}): CardNotice {
+/**
+ * `onOpen` turns the notice into a tap target (the LearnPass uses it to show the card reveal on
+ * request): nothing blocks the page or plays a sound until the player taps it.
+ */
+export function announceCardGrants(
+  ids: string[],
+  opts: { timeoutMs?: number; onOpen?: () => void } = {},
+): CardNotice {
   const el = document.createElement('div');
   el.className = 'card-gain-notice';
   el.setAttribute('role', 'status');
   el.setAttribute('aria-live', 'polite');
-  el.textContent = tr('Neue Sammelkarte!');
+  const hint = opts.onOpen ? ` ${tr('Antippen zum Ansehen')}` : '';
+  el.textContent = `${tr('Neue Sammelkarte!')}${hint}`;
   document.body.append(el);
   const timer = setTimeout(() => el.remove(), opts.timeoutMs ?? 6000);
   void collectionCatalog()
@@ -22,7 +30,7 @@ export function announceCardGrants(ids: string[], opts: { timeoutMs?: number } =
       const names = ids
         .map((id) => cardById(catalog, id)?.name)
         .filter((name): name is string => Boolean(name));
-      if (names.length) el.textContent = `${tr('Neue Sammelkarten')}: ${names.join(', ')}`;
+      if (names.length) el.textContent = `${tr('Neue Sammelkarten')}: ${names.join(', ')}${hint}`;
     })
     .catch(() => {
       // The notice is decoration; the server grant stays valid.
@@ -31,6 +39,12 @@ export function announceCardGrants(ids: string[], opts: { timeoutMs?: number } =
     clearTimeout(timer);
     el.remove();
   };
-  el.addEventListener('click', dispose);
+  let tapped = false;
+  el.addEventListener('click', () => {
+    dispose();
+    if (tapped) return;
+    tapped = true;
+    opts.onOpen?.();
+  });
   return { el, dispose };
 }

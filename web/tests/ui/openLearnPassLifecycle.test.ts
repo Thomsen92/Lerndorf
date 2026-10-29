@@ -82,6 +82,10 @@ describe('LearnPass entered through the season hub', () => {
     await Promise.resolve();
     await Promise.resolve();
     await mocks.actions!.onClaim(1);
+    // nothing opens by itself: the notice is tapped first
+    const notice = document.querySelector<HTMLElement>('.card-gain-notice')!;
+    expect(mocks.reveal).not.toHaveBeenCalled();
+    notice.click();
     await vi.waitFor(() => expect(mocks.reveal).toHaveBeenCalledOnce());
     mocks.reveal.mock.calls[0][0].onAlmanac('c1');
     expect(pass.isOpen).toBe(false);

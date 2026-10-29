@@ -94,29 +94,36 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
     },
   };
 
-  /** New cards from a claim: the reveal with mystery and flip; the short notice if that fails. */
+  /**
+   * New cards from a claim: a tap-to-open notice, so the pass stays scrollable and quiet while the
+   * claim lands (the reveal with its sound and 3D card blocked the page for seconds, teacher
+   * 29.10.2026). The reveal opens on tap; the plain notice remains if it cannot be shown.
+   */
   async function showDrawnCards(ids: string[]): Promise<void> {
-    try {
-      const catalog = await collectionCatalog();
-      const cards = ids
-        .map((id) => cardById(catalog, id))
-        .filter((card): card is CardDefinition => Boolean(card));
-      if (!cards.length || closed) throw Error('no cards');
-      revealCards({
-        cards,
-        reducedMotion: opts.reducedMotion,
-        sound: opts.sound,
-        // the almanac is a modal like the reveal and would open behind the pass: close the pass first
-        onAlmanac: opts.onOpenAlmanac
-          ? (cardId) => {
-              close();
-              opts.onOpenAlmanac?.(cardId);
-            }
-          : undefined,
-      });
-    } catch {
-      announceCardGrants(ids);
-    }
+    const reveal = async (): Promise<void> => {
+      try {
+        const catalog = await collectionCatalog();
+        const cards = ids
+          .map((id) => cardById(catalog, id))
+          .filter((card): card is CardDefinition => Boolean(card));
+        if (!cards.length) throw Error('no cards');
+        revealCards({
+          cards,
+          reducedMotion: opts.reducedMotion,
+          sound: opts.sound,
+          // the almanac is a modal like the reveal and would open behind the pass: close the pass first
+          onAlmanac: opts.onOpenAlmanac
+            ? (cardId) => {
+                close();
+                opts.onOpenAlmanac?.(cardId);
+              }
+            : undefined,
+        });
+      } catch {
+        announceCardGrants(ids);
+      }
+    };
+    announceCardGrants(ids, { timeoutMs: 15000, onOpen: () => void reveal() });
   }
 
   async function refresh(): Promise<void> {

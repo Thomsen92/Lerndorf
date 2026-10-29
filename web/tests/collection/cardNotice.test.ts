@@ -30,4 +30,14 @@ describe('card grant notice', () => {
     await new Promise((resolve) => setTimeout(resolve, 25));
     expect(document.body.contains(notice.el)).toBe(false);
   });
+
+  it('opens the reveal only when tapped, once', async () => {
+    const onOpen = vi.fn();
+    const notice = announceCardGrants(['night-light'], { onOpen });
+    expect(onOpen).not.toHaveBeenCalled();
+    expect(notice.el.textContent).toMatch(/Antippen|Tap/);
+    notice.el.click();
+    notice.el.click();
+    expect(onOpen).toHaveBeenCalledOnce();
+  });
 });
