@@ -24,7 +24,19 @@ export function announceCardGrants(
   el.setAttribute('role', 'status');
   el.setAttribute('aria-live', 'polite');
   const hint = opts.onOpen ? ` ${tr('Antippen zum Ansehen')}` : '';
-  el.textContent = `${tr('Neue Sammelkarte!')}${hint}`;
+  // a face-down card silhouette with a question mark: the card is still a surprise until tapped
+  if (opts.onOpen) {
+    const icon = document.createElement('span');
+    icon.className = 'card-gain-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.innerHTML =
+      '<svg viewBox="0 0 48 66" width="40" height="55"><rect x="3" y="3" width="42" height="60" rx="6" fill="#1b1030" stroke="#ffb02e" stroke-width="3"/><rect x="9" y="9" width="30" height="48" rx="3" fill="none" stroke="#b16cff" stroke-width="1.5" stroke-dasharray="3 3"/><text x="24" y="44" text-anchor="middle" font-size="34" font-weight="800" font-family="Comic Neue, Comic Sans MS, cursive" fill="#ffb02e">?</text></svg>';
+    el.append(icon);
+  }
+  const label = document.createElement('span');
+  label.className = 'card-gain-text';
+  label.textContent = `${tr('Neue Sammelkarte!')}${hint}`;
+  el.append(label);
   if (opts.host) el.classList.add('card-gain-notice--inline');
   (opts.host ?? document.body).append(el);
   // phones stack the tiles, so the notice can sit below the visible part of the pass
@@ -36,7 +48,7 @@ export function announceCardGrants(
       const names = ids
         .map((id) => cardById(catalog, id)?.name)
         .filter((name): name is string => Boolean(name));
-      if (names.length) el.textContent = `${tr('Neue Sammelkarten')}: ${names.join(', ')}${hint}`;
+      if (names.length) label.textContent = `${tr('Neue Sammelkarten')}: ${names.join(', ')}${hint}`;
     })
     .catch(() => {
       // The notice is decoration; the server grant stays valid.

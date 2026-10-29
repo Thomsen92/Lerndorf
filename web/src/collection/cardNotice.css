@@ -57,3 +57,17 @@
     animation: none;
   }
 }
+
+.card-gain-notice .card-gain-icon {
+  display: inline-flex;
+  flex: none;
+  margin-right: 12px;
+}
+.card-gain-notice .card-gain-text {
+  min-width: 0;
+}
+.card-gain-notice:has(.card-gain-icon) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
