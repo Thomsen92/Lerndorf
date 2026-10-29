@@ -17,107 +17,70 @@ const state = (overrides: Partial<WorldThemeState> = {}): WorldThemeState => ({
 
 afterEach(() => document.body.replaceChildren());
 
-describe('independent season ticket and welcome', () => {
-  it('opens one simple welcome and closes before entering the real pass', () => {
-    const host = document.createElement('div');
-    document.body.append(host);
-    const openLearnPass = vi.fn(() => expect(document.querySelector('[role=dialog]')).toBe(null));
-    const hub = createSeasonHub({ host, openLearnPass, canOpen: () => true });
+const mount = (opts: Partial<Parameters<typeof createSeasonHub>[0]> = {}) => {
+  const host = document.createElement('div');
+  document.body.append(host);
+  return createSeasonHub({ host, openLearnPass: vi.fn(), canOpen: () => true, ...opts });
+};
+
+describe('season ticket', () => {
+  it('goes straight to the LearnPass without a welcome dialog', () => {
+    const openLearnPass = vi.fn();
+    const hub = mount({ openLearnPass });
     hub.open();
-    const text = document.querySelector('[role=dialog]')!.textContent!;
-    expect(text).toContain('150 XP');
-    expect(text).toContain('LearnPass');
-    expect(text).not.toMatch(/Legendary|Rare|Sammelkarten|Collection/);
-    document.querySelector<HTMLButtonElement>('[data-open-pass]')!.click();
+    expect(document.querySelector('[role=dialog]')).toBe(null);
     expect(openLearnPass).toHaveBeenCalledOnce();
+    hub.el.click();
+    expect(openLearnPass).toHaveBeenCalledTimes(2);
     hub.dispose();
   });
 
-  it('opens the welcome once automatically and acknowledges it on close', () => {
-    const host = document.createElement('div');
-    document.body.append(host);
+  it('acknowledges a running season once, on open', () => {
     const onAcknowledge = vi.fn();
-    const hub = createSeasonHub({ host, openLearnPass: vi.fn(), canOpen: () => true, onAcknowledge });
+    const hub = mount({ onAcknowledge });
     hub.setState(state());
-    hub.maybeAutoOpen();
-    expect(document.querySelector('[role=dialog]')).not.toBe(null);
-    document.querySelector<HTMLButtonElement>('[role=dialog] button')!.click();
-    expect(onAcknowledge).toHaveBeenCalledWith('2026-11-halloween');
-    hub.maybeAutoOpen();
-    expect(document.querySelector('[role=dialog]')).toBe(null);
-    // Opening by hand stays possible after the acknowledgement.
     hub.open();
-    expect(document.querySelector('[role=dialog]')).not.toBe(null);
+    hub.open();
+    expect(onAcknowledge).toHaveBeenCalledOnce();
+    expect(onAcknowledge).toHaveBeenCalledWith('2026-11-halloween');
     hub.dispose();
   });
 
-  it('waits without consuming the one automatic attempt while the village is busy', () => {
-    const host = document.createElement('div');
-    document.body.append(host);
-    let available = false;
-    const hub = createSeasonHub({ host, openLearnPass: vi.fn(), canOpen: () => available });
+  it('marks the season as seen silently, without a popup', () => {
+    const openLearnPass = vi.fn();
+    const onAcknowledge = vi.fn();
+    const hub = mount({ openLearnPass, onAcknowledge });
     hub.setState(state());
     hub.maybeAutoOpen();
-    expect(document.querySelector('[role=dialog]')).toBe(null);
-    available = true;
     hub.maybeAutoOpen();
-    expect(document.querySelector('[role=dialog]')).not.toBe(null);
+    expect(openLearnPass).not.toHaveBeenCalled();
+    expect(document.querySelector('[role=dialog]')).toBe(null);
+    expect(onAcknowledge).toHaveBeenCalledOnce();
     hub.dispose();
   });
 
-  it('does not open for a seen welcome, a planned season or after a theme-only switch', () => {
-    const host = document.createElement('div');
-    document.body.append(host);
-    const hub = createSeasonHub({ host, openLearnPass: vi.fn(), canOpen: () => true });
+  it('does not acknowledge a seen or planned season', () => {
+    const onAcknowledge = vi.fn();
+    const hub = mount({ onAcknowledge });
     hub.setState(state({ seasonState: 'upcoming' }));
     hub.maybeAutoOpen();
-    expect(document.querySelector('[role=dialog]')).toBe(null);
     hub.setState(state({ welcomeSeen: true }));
     hub.maybeAutoOpen();
-    expect(document.querySelector('[role=dialog]')).toBe(null);
+    expect(onAcknowledge).not.toHaveBeenCalled();
     hub.dispose();
   });
 
-  it('respects tutorial/modal coverage and cleans up its own dialog', () => {
-    const host = document.createElement('div');
-    document.body.append(host);
+  it('respects tutorial/modal coverage', () => {
     let available = false;
-    const hub = createSeasonHub({ host, openLearnPass: vi.fn(), canOpen: () => available });
+    const openLearnPass = vi.fn();
+    const hub = mount({ openLearnPass, canOpen: () => available });
     hub.open();
-    expect(document.querySelector('[role=dialog]')).toBe(null);
+    expect(openLearnPass).not.toHaveBeenCalled();
     available = true;
     hub.open();
+    expect(openLearnPass).toHaveBeenCalledOnce();
     hub.dispose();
-    expect(document.querySelector('[role=dialog]')).toBe(null);
-    expect(host.children).toHaveLength(0);
-    expect(host.hasAttribute('inert')).toBe(false);
-  });
-  it('starts the Spooky English Quiz after closing the welcome while the season runs', () => {
-    const host = document.createElement('div');
-    document.body.append(host);
-    const openQuiz = vi.fn(() => expect(document.querySelector('[role=dialog]')).toBe(null));
-    const hub = createSeasonHub({ host, openLearnPass: vi.fn(), openQuiz, canOpen: () => true });
-    hub.setState(state());
-    hub.open();
-    const quiz = document.querySelector<HTMLButtonElement>('[data-open-quiz]')!;
-    expect(quiz.disabled).toBe(false);
-    expect(quiz.textContent).toBe('Spooky English Quiz');
-    quiz.click();
-    expect(openQuiz).toHaveBeenCalledOnce();
-    hub.dispose();
-  });
-
-  it('keeps the quiz locked before the season starts', () => {
-    const host = document.createElement('div');
-    document.body.append(host);
-    const openQuiz = vi.fn();
-    const hub = createSeasonHub({ host, openLearnPass: vi.fn(), openQuiz, canOpen: () => true });
-    hub.setState(state({ seasonState: 'upcoming' }));
-    hub.open();
-    const quiz = document.querySelector<HTMLButtonElement>('[data-open-quiz]')!;
-    expect(quiz.disabled).toBe(true);
-    expect(quiz.textContent).toMatch(/Season-Start/);
-    hub.dispose();
+    expect(document.body.querySelector('.season-world-ticket')).toBe(null);
   });
 
   it('places the ticket right below the player card, so they never overlap', () => {

@@ -68,7 +68,8 @@ export const MUSIC_FILES: Record<MusicTrack, string> = {
   quiz: 'assets/audio/music/quiz-thinking-loop.mp3',
 };
 // the quiz loop sits well below speech and answers (teacher, 28.10.2026)
-const MUSIC_VOLUME: Record<MusicTrack, number> = { village: 0.22, quiz: 0.1 };
+// the village loop was too loud under speech and effects (teacher, 29.10.2026)
+const MUSIC_VOLUME: Record<MusicTrack, number> = { village: 0.11, quiz: 0.06 };
 /** While something is being listened to, the music drops to this share of its volume. */
 const QUIET_SHARE = 0.25;
 
@@ -118,6 +119,8 @@ export interface Sound {
   pushMusic(track: MusicTrack): () => void;
   /** Turns the music down while held (a listening text plays); the returned release restores it. */
   quiet(): () => void;
+  /** Pauses the music completely while held (Ollie's story has its own voice); the release resumes it. */
+  hush(): () => void;
   dispose(): void;
 }
 
@@ -154,6 +157,8 @@ export function createSound(
   let ducked = 0;
   /** How many listening texts hold the music down right now. */
   let quietHolds = 0;
+  /** How many views hold the music paused right now. */
+  let hushHolds = 0;
   const musicGains = new Map<MusicTrack, GainNode>();
   /** Sets every track's loudness: its own volume, lower while something is being listened to. */
   const applyVolume = (): void => {
@@ -210,7 +215,7 @@ export function createSound(
   /** Plays exactly the wanted track, or nothing (muted, hidden tab, before the first gesture). */
   const applyMusic = (): void => {
     const want = overlays.at(-1) ?? base;
-    const audible = enabled && musicOn && unlocked && !disposed && !doc?.hidden && ducked === 0;
+    const audible = enabled && musicOn && unlocked && !disposed && !doc?.hidden && ducked === 0 && hushHolds === 0;
     for (const [name, el] of tracks)
       if (name !== want || !audible) {
         if (!el.paused) el.pause();
@@ -342,6 +347,17 @@ export function createSound(
         released = true;
         quietHolds = Math.max(0, quietHolds - 1);
         applyVolume();
+      };
+    },
+    hush() {
+      hushHolds++;
+      applyMusic();
+      let released = false;
+      return () => {
+        if (released) return;
+        released = true;
+        hushHolds = Math.max(0, hushHolds - 1);
+        applyMusic();
       };
     },
     dispose() {

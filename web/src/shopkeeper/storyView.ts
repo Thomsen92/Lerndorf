@@ -31,6 +31,8 @@ export interface OllieStoryOptions {
 /** Nine server-owned gaps. Only the current question and already-unlocked reply reach this view. */
 export function openOllieStory(opts: OllieStoryOptions): ModalHandle {
   silenceSirByte();
+  // the village music stays off for the whole story; Ollie's voice carries it
+  const releaseMusic = opts.sound?.hush();
   let busy = false,
     narrating = false,
     narration = 0,
@@ -43,6 +45,7 @@ export function openOllieStory(opts: OllieStoryOptions): ModalHandle {
     wide: true,
     canClose: () => !busy,
     onClose: () => {
+      releaseMusic?.();
       ++narration;
       ++loadId;
       speech.dispose();

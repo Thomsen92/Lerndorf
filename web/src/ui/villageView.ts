@@ -622,7 +622,7 @@ export async function mountVillage(
     }
   };
   worldAppearance = createWorldAppearance({ scene, village, layout, rig, renderer: gl });
-  // The Halloween shop gets the same outline and arrow as the quest board, in the spooky look.
+  // The Halloween stand (now the Spooky Quiz) gets the same outline and arrow as the quest board, in the spooky look.
   // A glowing silhouette around the real model, so it is built once the stand has loaded.
   const standRoot = worldAppearance.stand;
   const appearance = worldAppearance;
@@ -649,8 +649,8 @@ export async function mountVillage(
       host: root,
       board: standRoot,
       layout,
-      label: 'Halloween Shop',
-      ariaLabel: tr('Season I – Halloween öffnen'),
+      label: 'Spooooooky QUIZ',
+      ariaLabel: tr('Spooky English Quiz'),
       spooky: true,
       silhouette: shop,
       shape: {
@@ -666,7 +666,7 @@ export async function mountVillage(
         ),
       },
       onOpen: () => {
-        if (!inTutorial && !flight) seasonHub?.open();
+        if (!inTutorial && !flight) openSeasonQuiz(null);
       },
     });
     shopCue.setVisible(!inTutorial && (areas?.current ?? 'dorf') === 'dorf');
@@ -752,12 +752,8 @@ export async function mountVillage(
   seasonHub = createSeasonHub({
     host: root,
     openLearnPass: openSeasonPass,
-    openQuiz: () => openSeasonQuiz(seasonHub?.el ?? null),
     canOpen: () =>
       running && !inTutorial && !modals.anyOpen && !flight && (areas?.current ?? 'dorf') === 'dorf',
-    track: (handle) => {
-      modals.track(handle);
-    },
     onAcknowledge: (seasonId) => {
       void worldThemeApi(supabase)
         .acknowledgeWelcome(seasonId)

@@ -253,14 +253,35 @@ it('turns the music down while something is listened to and back up on release',
   sound.setMusic('village');
   sound.unlock();
   const el = a.made[0] as unknown as { volume: number };
-  expect(el.volume).toBeCloseTo(0.22);
+  expect(el.volume).toBeCloseTo(0.11);
   const release = sound.quiet();
-  expect(el.volume).toBeCloseTo(0.055);
+  expect(el.volume).toBeCloseTo(0.0275);
   release();
   release();
-  expect(el.volume).toBeCloseTo(0.22);
+  expect(el.volume).toBeCloseTo(0.11);
   const quiz = sound.pushMusic('quiz');
-  expect((a.made[1] as unknown as { volume: number }).volume).toBeCloseTo(0.1);
+  expect((a.made[1] as unknown as { volume: number }).volume).toBeCloseTo(0.06);
   quiz();
+  sound.dispose();
+});
+
+it('pauses the music while hushed and resumes it on release', () => {
+  const f = fake(),
+    a = audioFake();
+  const sound = createSound({
+    createContext: () => null,
+    fetchFn: f.fetchFn,
+    store: null,
+    createAudio: a.createAudio,
+    doc: docFake(),
+  });
+  sound.setMusic('village');
+  sound.unlock();
+  expect(a.made[0].paused).toBe(false);
+  const release = sound.hush();
+  expect(a.made[0].paused).toBe(true);
+  release();
+  release();
+  expect(a.made[0].paused).toBe(false);
   sound.dispose();
 });
