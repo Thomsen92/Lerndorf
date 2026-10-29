@@ -5,7 +5,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 > Jeder Fehler bekommt eine ID, einen Steckbrief und – sobald beauftragt –
 > ein Fix-Paket in `handoff/`. Bilder liegen unter `bilder/`.
 
-> **Als nächstes zu fixen:** BUG-010 wartet auf Antworten der Lehrkraft (siehe Notiz); danach BUG-011 (Lizenzfrage). BUG-001 committet (70add80).
+> **Als nächstes zu fixen:** BUG-010 und BUG-011 warten auf Antworten der Lehrkraft (siehe Notizen). Alle anderen offenen Bugs sind bearbeitet; BUG-006 und UX-001/002 sind laut Auftrag ausgenommen. BUG-001 committet (70add80).
 
 ## Übersicht
 
@@ -20,7 +20,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 | [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | **Fix da** | [FIX-05](handoff/FIX-05.md) |
 | [BUG-009](#bug-009--inventar-platzhalter-gegenstände-mit-falschem-icon) | Inventar: Platzhalter-Gegenstände (Haare/T-Shirt) mit falschem T-Shirt-Icon | Inventar / Kleiderschrank | **S3** | **M** | **Fix da** | [FIX-06](handoff/FIX-06.md) |
 | [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | **Rückfrage an Lehrkraft** | [FIX-07](handoff/FIX-07.md) |
-| [BUG-011](#bug-011--legendäres-hausmodell-ersetzen) | Legendäres Hausmodell rendert als schwarze/grüne Masse – durch angehängtes Fantasy-Treehouse-GLB ersetzen | Dorf / Hausplatz | **S3** | **M** | bestätigt | [FIX-08](handoff/FIX-08.md) |
+| [BUG-011](#bug-011--legendäres-hausmodell-ersetzen) | Legendäres Hausmodell rendert als schwarze/grüne Masse – durch angehängtes Fantasy-Treehouse-GLB ersetzen | Dorf / Hausplatz | **S3** | **M** | **Rückfrage an Lehrkraft** | [FIX-08](handoff/FIX-08.md) |
 
 ## UI/UX-Vorhaben (keine Fehler)
 
@@ -1161,10 +1161,24 @@ aufbereitet oder importiert werden müssen.
 | **Aufwand** | **M – 0,5–2 Std** (Asset-Tausch + Skalierung/Kollision); **L** bei Animationen/Kollisionsumbau |
 | **Häufigkeit** | immer |
 | **Gerät/Browser** | Screenshot 263 × 242 px; Browser nicht angegeben |
-| **Status** | bestätigt |
+| **Status** | **gestoppt: Lizenz-/Designfrage** (29.10.2026) |
 | **Bild** | `bilder/BUG-011_01.png` |
 | **Neues Modell** | `modelle/legendary-house-fantasy-treehouse.glb` (10.875.488 Bytes) |
 | **Fix-Paket** | [FIX-08](handoff/FIX-08.md) |
+
+### Notiz der Fix-KI (gestoppt, 29.10.2026)
+
+Ich habe **nichts eingebaut**: Lizenz ungeklärt, und der Tausch berührt ein Spielitem.
+
+- **Welches Item:** Das schwarz/grüne Modell ist `season_house_horror` („Horror-Haus“, **legendary**, Season-Truhe von Season I Halloween, Datei `season1/house-horror.glb`, Migration 0030). Das gelieferte Treehouse (Tripo, 9752 Dreiecke, 3 Texturen, 10,6 MB) soll dieses Modell ersetzen.
+- **Lizenz:** Im GLB steht keine Lizenz; es ist KI-generiert (Tripo), also **nicht CC0** und nicht „eigen“ im Sinn der Projektregel (`CLAUDE.md`: nur CC0 oder eigene Modelle; Auftrag BUG-011: ungeklärt = nicht ausliefern). Die sieben Tripo-Shopmodelle von heute habe ich nach deiner Anweisung mit dem Vermerk „nicht CC0“ in `blender/sources/LICENSES.md` aufgenommen; für dieses Modell brauche ich dieselbe ausdrückliche Freigabe.
+- **Design/Daten:** Der Item-Name („Horror-Haus“), die Beschreibung und die Besitzdaten der Schüler, die es schon aus einer Truhe haben, bleiben. Ein Fantasy-Treehouse in der Halloween-Season ändert das Aussehen eines bereits besessenen Items bei allen Besitzern. Soll der Name bleiben oder angepasst werden (das wäre eine Migration von `name_de`/Beschreibung)?
+- **Technik (kein Problem, nur zur Info):** 10,6 MB sind für Mobil zu groß; ich würde es wie die anderen Tripo-Modelle auf einige 100 KB verkleinern (eine Textur, Fernversion), Skalierung auf den Hausplatz (6 × 4 m) über die vorhandene Normalisierung.
+
+**Fragen an die Lehrkraft:**
+1. Hast du das Modell selbst bei Tripo erzeugt und gibst du es für die App frei (Lizenzvermerk „Tripo, nicht CC0, auf Anweisung der Lehrkraft“)?
+2. Soll das Item „Horror-Haus“ heißen bleiben (nur das Aussehen tauschen) oder umbenannt werden?
+3. Ist es in Ordnung, dass Schüler, die das Haus schon besitzen, danach das Treehouse sehen?
 
 ### Beobachtung (Ist)
 
