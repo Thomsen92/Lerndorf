@@ -63,8 +63,10 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
       const cards = (result.rewards.cards ?? [])
         .filter((card) => card.granted)
         .map((card) => card.id);
-      await refresh();
+      // announce first: the grant is booked on the server, so a failing state reload afterwards
+      // must not swallow the notice (the card was in the almanac but nothing told the player)
       if (cards.length) void showDrawnCards(cards);
+      await refresh();
       return coins;
     },
     async onBuyChest(): Promise<void> {

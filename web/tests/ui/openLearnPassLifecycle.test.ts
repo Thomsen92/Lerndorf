@@ -91,4 +91,22 @@ describe('LearnPass entered through the season hub', () => {
     expect(pass.isOpen).toBe(false);
     expect(onOpenAlmanac).toHaveBeenCalledWith('c1');
   });
+  it('still announces a drawn card when the state reload after the claim fails', async () => {
+    const state = { season: { id: 'test' } } as SeasonState;
+    let calls = 0;
+    openLearnPass({
+      ...options(async () => state),
+      api: {
+        state: async () => {
+          if (++calls > 1) throw Error('offline');
+          return state;
+        },
+        claim: async () => ({ rewards: { cards: [{ id: 'c1', granted: true }] } }),
+      } as unknown as SeasonApi,
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+    await expect(mocks.actions!.onClaim(1)).rejects.toThrow('offline');
+    expect(document.querySelector('.card-gain-notice')).not.toBe(null);
+  });
 });
