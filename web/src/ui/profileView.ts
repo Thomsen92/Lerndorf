@@ -134,6 +134,29 @@ export function openProfile(opts: {
     xp.append(bar);
     content.append(xp);
     if (opts.season) content.append(createSeasonCard({ api: opts.season.api, onOpen: opts.season.onOpen }));
+    if (opts.collection) {
+      // "My Almanac": a tap opens the almanach book directly (teacher, 28.10.2026); right below the
+      // season card, before streak, chests and collection (BUG-007)
+      const cardCollection = button(
+        '',
+        () => opts.collection?.open(),
+        'profile-collection-link profile-almanac-link',
+      );
+      cardCollection.setAttribute('aria-label', tr('Mein Almanach öffnen'));
+      const cover = document.createElement('img');
+      cover.className = 'profile-almanac-cover';
+      cover.src = `${import.meta.env.BASE_URL}assets/halloween/almanac-cover-small.webp`;
+      cover.alt = '';
+      cover.width = 48;
+      cover.height = 66;
+      cardCollection.append(cover);
+      const cardLabel = document.createElement('span');
+      text(cardLabel, 'strong', tr('Mein Almanach'), 'profile-almanac-title');
+      text(cardLabel, 'span', tr('The Midnight Collection'));
+      cardCollection.append(cardLabel);
+      text(cardCollection, 'span', '→', 'profile-collection-arrow');
+      content.append(cardCollection);
+    }
     const daily = document.createElement('div');
     daily.className = 'profile-daily';
     const streak = document.createElement('div');
@@ -214,28 +237,6 @@ export function openProfile(opts: {
     collection.append(label);
     text(collection, 'span', '→', 'profile-collection-arrow');
     content.append(collection);
-    if (opts.collection) {
-      // "My Almanac": a tap opens the almanach book directly (teacher, 28.10.2026)
-      const cardCollection = button(
-        '',
-        () => opts.collection?.open(),
-        'profile-collection-link profile-almanac-link',
-      );
-      cardCollection.setAttribute('aria-label', tr('Mein Almanach öffnen'));
-      const cover = document.createElement('img');
-      cover.className = 'profile-almanac-cover';
-      cover.src = `${import.meta.env.BASE_URL}assets/halloween/almanac-cover-small.webp`;
-      cover.alt = '';
-      cover.width = 48;
-      cover.height = 66;
-      cardCollection.append(cover);
-      const cardLabel = document.createElement('span');
-      text(cardLabel, 'strong', tr('Mein Almanach'), 'profile-almanac-title');
-      text(cardLabel, 'span', tr('The Midnight Collection'));
-      cardCollection.append(cardLabel);
-      text(cardCollection, 'span', '→', 'profile-collection-arrow');
-      content.append(cardCollection);
-    }
   }
   async function choose(reward: Reward | null, b: HTMLButtonElement, error: HTMLElement): Promise<void> {
     if (!progress || busy || closed) return;

@@ -128,3 +128,52 @@ it('recovers from a loading failure and keeps closing available', async () => {
   expect(onClose).toHaveBeenCalled();
   h.close();
 });
+
+it('puts "My Almanac" right after the progress bar, before streak, chests and collection (BUG-007)', async () => {
+  const p = {
+    xp: 620,
+    level: 6,
+    levelXp: 500,
+    nextLevelXp: 675,
+    titleId: null,
+    frameId: 'frame_wood',
+    streak: { current: 6, best: 8, shieldLeft: 1 },
+    today: { solved: 2, total: 3 },
+    chests: [],
+    unseen: [],
+    stats: { quests: 12, stamps: 2, bestStreak: 8 },
+  };
+  const open = vi.fn();
+  const h = openProfile({
+    api: {
+      load: async () => ({ ok: true, value: p }),
+      rewards: async () => ({ ok: true, value: [] }),
+    } as unknown as ProgressApi,
+    nickname: 'Lea',
+    character: 'girl',
+    getCoins: () => 42,
+    onCoins: vi.fn(),
+    onFrame: vi.fn(),
+    onTitle: vi.fn(),
+    onSettings: vi.fn(),
+    onClose: vi.fn(),
+    reducedMotion: true,
+    collection: { open },
+  });
+  await new Promise((r) => setTimeout(r, 0));
+  const order = [
+    ...document.querySelectorAll(
+      '.profile-progress, .profile-almanac-link, .profile-daily, .profile-loot, .profile-collection-link:not(.profile-almanac-link)',
+    ),
+  ].map((el) =>
+    el.classList.contains('profile-almanac-link')
+      ? 'almanac'
+      : el.classList.contains('profile-collection-link')
+        ? 'collection'
+        : el.className.replace('profile-', ''),
+  );
+  expect(order).toEqual(['progress', 'almanac', 'daily', 'loot', 'collection']);
+  document.querySelector<HTMLButtonElement>('.profile-almanac-link')!.click();
+  expect(open).toHaveBeenCalledOnce();
+  h.close();
+});

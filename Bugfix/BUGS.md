@@ -5,7 +5,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 > Jeder Fehler bekommt eine ID, einen Steckbrief und – sobald beauftragt –
 > ein Fix-Paket in `handoff/`. Bilder liegen unter `bilder/`.
 
-> **Als nächstes zu fixen:** BUG-007 (nach Review von BUG-008) – vorher klären, siehe Notiz an die Lehrkraft. BUG-001 committet (70add80).
+> **Als nächstes zu fixen:** BUG-005 (nach Review von BUG-007). BUG-001 committet (70add80).
 
 ## Übersicht
 
@@ -16,7 +16,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 | [BUG-003](#bug-003--learnpass-ansicht-zu-groß-für-smartphones) | Learnpass-Ansicht zu groß für Smartphones, Karten links/rechts angeschnitten | Season-Pass / Learnpass | **S3** | **M** | **Fix da** | [FIX-02](handoff/FIX-02.md) |
 | [BUG-004](#bug-004--scrollen-im-learnpass-ruckelt) | Scrollen im Learnpass ruckelt / fühlt sich verbuggt an | Season-Pass / Learnpass | **S3** | **M** | **Fix da** (Abnahme am Gerät offen) | [FIX-02](handoff/FIX-02.md) |
 | [BUG-005](#bug-005--bau-modus-feldauswahl-verdeckt-das-dorf-direkter-klick-auf-gebäudedeko-fehlt) | Bau-Modus: Feldauswahl verdeckt das Dorf, direkter Klick auf Gebäude/Deko fehlt | Dorf → Bauen | **S3** | **M** | bestätigt | [FIX-03](handoff/FIX-03.md) |
-| [BUG-007](#bug-007--season-hub-almanac-direkt-unter-season-1) | Season-Hub: My Almanac steht unten – soll direkt unter Season 1 | Season-Hub / Almanac | **S3** | **S** | bestätigt | [FIX-04](handoff/FIX-04.md) |
+| [BUG-007](#bug-007--season-hub-almanac-direkt-unter-season-1) | Season-Hub: My Almanac steht unten – soll direkt unter Season 1 | Season-Hub / Almanac | **S3** | **S** | **Fix da** | [FIX-04](handoff/FIX-04.md) |
 | [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | **Fix da** | [FIX-05](handoff/FIX-05.md) |
 | [BUG-009](#bug-009--inventar-platzhalter-gegenstände-mit-falschem-icon) | Inventar: Platzhalter-Gegenstände (Haare/T-Shirt) mit falschem T-Shirt-Icon | Inventar / Kleiderschrank | **S3** | **M** | bestätigt | [FIX-06](handoff/FIX-06.md) |
 | [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | bestätigt | [FIX-07](handoff/FIX-07.md) |
@@ -812,9 +812,17 @@ Ohne diese Angaben wird BUG-006 **nicht** in die Bewertung aufgenommen.
 | **Aufwand** | **S – ≤ 30 Min** (Karte verschieben, keine Logik) |
 | **Häufigkeit** | immer |
 | **Gerät/Browser** | Screenshot 536 × 521 px; Browser nicht angegeben |
-| **Status** | bestätigt |
+| **Status** | **Fix da** (29.10.2026) |
 | **Bild** | `bilder/BUG-007_01.png` |
 | **Fix-Paket** | [FIX-04](handoff/FIX-04.md) |
+
+### Änderungsnotiz (Fix da, 29.10.2026)
+
+- **Ort geklärt:** Der „Season-Hub“ aus dem Screenshot ist die Profil-Ansicht (`web/src/ui/profileView.ts`), nicht das Season-Ticket im Dorf (dessen Willkommens-Fenster wurde heute entfernt, siehe PLAN J2).
+- **Fix:** Die bestehende „Mein Almanach“-Karte wird direkt nach der Season-Karte eingefügt (vorher am Ende nach „Sammlung“). Gleiche Komponente, gleiche DOM-Reihenfolge (kein CSS `order`), Text/Design/Klickziel unverändert.
+- **Gemessen (Harness `dev/profile.html?view=profil`, 536 × 521):** Fortschrittsbalken y 343 → Almanach 397 → Serie/Heute 480 → Truhen 581 → Sammlung 864. Die Season-Karte kommt im Code unmittelbar davor (im Harness nicht eingebunden).
+- **Tests:** neuer Test in `tests/ui/profileView.test.ts` (Reihenfolge und Klick); `npm test` grün; `tsc` grün; Build weiter lokal blockiert.
+- **Bild:** [bilder/BUG-007_02.jpg](bilder/BUG-007_02.jpg)
 
 ### Beobachtung (Ist)
 
