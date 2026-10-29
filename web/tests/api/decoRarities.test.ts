@@ -1,9 +1,15 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { loadDecoRarities } from '../../src/api/decoRarities';
 
 describe('decoration rarity catalogue', () => {
-  const client = (data: unknown, error: unknown = null) => ({ from: () => ({ select: () => ({ eq: () => Promise.resolve({ data, error }) }) }) }) as unknown as SupabaseClient;
+  const client = (data: unknown, error: unknown = null) => ({ from: () => ({ select: () => ({ in: () => Promise.resolve({ data, error }) }) }) }) as unknown as SupabaseClient;
+  it('includes car rarity so driveway lighting follows the parked car', async () => {
+    const filter = vi.fn().mockResolvedValue({data: [{id: 'car_camper', rarity:'rare'}], error:null});
+    const db = {from: () => ({select: () => ({in: filter})})} as unknown as SupabaseClient;
+    expect((await loadDecoRarities(db)).get('car_camper')).toBe('rare');
+    expect(filter).toHaveBeenCalledWith('kind', ['deco', 'car']);
+  });
   it('reads existing rarity metadata without changing placements or inventory', async () => {
     const result = await loadDecoRarities(client([{id: 'blue', rarity: 'rare'}, {id:'gold', rarity:'legendary'}]));
     expect([...result]).toEqual([['blue','rare'], ['gold','legendary']]);

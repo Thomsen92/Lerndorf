@@ -18,9 +18,11 @@ const ids = ['shop_evening_lantern', 'shop_one_more_chapter', 'reward_ollie_nyc_
 const rarities: DecoRarity[] = ['common', 'rare', 'legendary', 'epic'];
 const village = buildVillage(layout, [{plotIndex: 0, nickname: 'Demo', slots: {
   house: { itemId: 'house_fachwerk', rot: 0 },
+  garage: { itemId: 'garage_stein', rot: 0 },
+  car: { itemId: 'car_camper', rot: 0 },
   deco_1: {itemId: ids[0], rot: 0}, deco_2: {itemId: ids[1], rot: 0},
   deco_3: {itemId: ids[2], rot: 0}, deco_4: {itemId: ids[3], rot: 0},
-}}], 0, new Map(ids.map((id, i) => [id, rarities[i]])));
+}}], 0, new Map([...ids.map((id, i) => [id, rarities[i]] as [string, DecoRarity]), ['car_camper', 'rare']]));
 scene.add(village);
 const target = new THREE.Vector3(plot.x, plot.h + 1, plot.z);
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 400);

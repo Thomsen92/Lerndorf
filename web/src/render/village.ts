@@ -27,6 +27,7 @@ import { buildPlaza } from './plaza';
 import { buildBridge } from './bridges';
 import { bakeStatic } from './merge';
 import { createDecoPresentation, type DecoRarity } from './decoPresentation';
+import { createDrivewayGlow } from './drivewayGlow';
 const decoEffects = new WeakMap<THREE.Object3D, ReturnType<typeof createDecoPresentation>>();
 import { buildLandmarks } from './landmarks';
 import { rippleNormalTexture, skyTexture } from './textures';
@@ -487,6 +488,21 @@ function plotContents(p: Plot, slots: SlotMap, rarities: ReadonlyMap<string, Dec
       effect.root.add(model);
       placed = effect.root;
       register?.(effect);
+    } else if (slot.kind === 'garage') {
+      const effect = createDrivewayGlow(3, p.d / 2 - driveStart);
+      const car = shownItem(slots, 'car', 'car');
+      effect.setRarity(car ? rarities.get(car.itemId) ?? 'common' : 'common');
+      const wrapper = new THREE.Group();
+      const centre = rectCentre(slot);
+      effect.root.position.set(DRIVEWAY_X - centre.lx, 0.08, (driveStart + p.d / 2) / 2 - centre.lz);
+      wrapper.add(model, effect.root);
+      register?.(effect);
+      wrapper.userData.onBuildRemoved = () => {
+        decoEffects.delete(wrapper);
+        effect.root.userData.onBuildRemoved?.();
+      };
+      decoEffects.set(wrapper, effect);
+      placed = wrapper;
     }
     placed.userData.slot = slot.id;
     const c = rectCentre(slot);
@@ -560,8 +576,9 @@ export function buildVillage(
     camera.getWorldPosition(cameraPosition);
     const nearest = [...effects].map(effect => ({ effect, distance: effect.root.getWorldPosition(effectPosition).distanceToSquared(cameraPosition) }))
       .sort((a, b) => a.distance - b.distance);
-    nearest.forEach(({ effect, distance }, i) => {
-      effect.root.userData.stageLightAllowed = i < 4 && distance < 625;
+    let spots = 0;
+    nearest.forEach(({ effect, distance }) => {
+      effect.root.userData.stageLightAllowed = effect.root.name === 'deco-presentation' && distance < 625 && spots++ < 4;
       effect.update(time, camera, quality, reduced);
     });
   };
