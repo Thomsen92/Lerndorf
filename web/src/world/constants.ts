@@ -15,6 +15,12 @@ export const MAP_SIZE = Math.round(130 * WORLD_SCALE);
  * (teacher, 29.10.2026, UX-002): the stand sits behind the last stall instead of next to the board.
  */
 export const HALLOWEEN_STAND_ANGLE = 4.4;
+/**
+ * The quest board stands at the edge of the plaza (teacher, 29.10.2026: it used to stand at 4.4 m
+ * near the fountain); pupils walk up to it from the plaza side, at BOARD_APPROACH_RADIUS.
+ */
+export const BOARD_RADIUS = 7.0;
+export const BOARD_APPROACH_RADIUS = 5.4;
 export const HALLOWEEN_STAND_RADIUS = 7.6;
 export const PLAZA_RADIUS = 8;
 /** The valley wall: plots and paths stay inside this radius (plus a small allowance). */

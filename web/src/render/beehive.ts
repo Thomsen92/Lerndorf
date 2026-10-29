@@ -4,7 +4,7 @@
  */
 import * as THREE from 'three';
 import type { Layout } from '../world/layout';
-import { HALLOWEEN_STAND_ANGLE, HALLOWEEN_STAND_RADIUS, PLAZA_RADIUS } from '../world/constants';
+import { BOARD_RADIUS, HALLOWEEN_STAND_ANGLE, HALLOWEEN_STAND_RADIUS, PLAZA_RADIUS } from '../world/constants';
 import { DECOR_STALL_OFFSETS, MARKET_SHOP_RADIUS, marketShopPlacement } from './marketShop';
 
 export interface Beehive {
@@ -24,7 +24,7 @@ export function plazaObstacles(layout: Layout): Array<{ x: number; z: number; r:
   const board = layout.map.boardAngle;
   const shop = marketShopPlacement(layout);
   return [
-    { ...at(board, 6), r: 1.8 },
+    { ...at(board, BOARD_RADIUS), r: 2.0 },
     ...DECOR_STALL_OFFSETS.map((o) => ({ ...at(board + o, 5), r: 1.6 })),
     { ...at(board + HALLOWEEN_STAND_ANGLE, HALLOWEEN_STAND_RADIUS), r: 2.4 }, // Halloween stand
     { x: shop.x, z: shop.z, r: MARKET_SHOP_RADIUS },
@@ -39,22 +39,31 @@ export function plazaObstacles(layout: Layout): Array<{ x: number; z: number; r:
 export const BEEHIVE_RADIUS = 1;
 
 /**
- * Where the hive stands: next to the quest board, on the side and at the distance with the most room
- * (benches sit at different angles on every map). Deterministic, facing the plaza centre.
+ * Where the hive stands: on the learning side, well away from the quest board (teacher, 29.10.2026),
+ * at the plaza rim on the side of the board that points away from the Halloween stand, at the spot
+ * with the most room (benches sit at different angles on every map). Only when that side has no
+ * room does it use the other one. Deterministic, facing the plaza centre.
  */
 export function beehiveSpot(layout: Layout): { x: number; z: number; yaw: number } {
   const obstacles = plazaObstacles(layout);
-  let best = { x: 0, z: 0, clearance: -Infinity };
-  for (const side of [1, -1])
-    for (let offset = 0.55; offset <= 1.0001; offset += 0.05)
-      for (const r of [6.2, 6.6, 7.0]) {
+  const search = (side: number) => {
+    let found = { x: 0, z: 0, clearance: -Infinity };
+    for (let offset = 0.85; offset <= 1.3001; offset += 0.05)
+      for (const r of [6.6, 7.0, 7.4]) {
         const a = layout.map.boardAngle + side * offset;
         const x = layout.plaza.x + Math.cos(a) * r;
         const z = layout.plaza.z + Math.sin(a) * r;
         const clearance = Math.min(...obstacles.map((o) => Math.hypot(o.x - x, o.z - z) - o.r));
-        // ties: prefer the right side and close to the board
-        if (clearance > best.clearance + 0.05) best = { x, z, clearance };
+        if (clearance > found.clearance + 0.05) found = { x, z, clearance };
       }
+    return found;
+  };
+  // the Halloween stand is at a negative angle from the board, the first stall at a positive one
+  let best = search(1);
+  if (best.clearance < BEEHIVE_RADIUS + 0.3) {
+    const other = search(-1);
+    if (other.clearance > best.clearance) best = other;
+  }
   const { x, z } = best;
   return { x, z, yaw: Math.atan2(layout.plaza.x - x, layout.plaza.z - z) };
 }

@@ -7,7 +7,14 @@ import * as THREE from 'three';
 import { createRng, type Rng } from './rng';
 import { dist, yawTo, type Point2 } from './geometry';
 import { Terrain, riverCenterline } from './terrain';
-import { BRIDGE_MIN_END, PLAZA_RADIUS, VALLEY_RADIUS, WORLD_SCALE } from './constants';
+import {
+  BOARD_APPROACH_RADIUS,
+  BOARD_RADIUS,
+  BRIDGE_MIN_END,
+  PLAZA_RADIUS,
+  VALLEY_RADIUS,
+  WORLD_SCALE,
+} from './constants';
 import { DRIVEWAY_X, HOUSE_FRONT_Z, PATH_X, PLOT_D, PLOT_W } from './plotPlan';
 import { getMap, type MapDef } from './maps';
 
@@ -310,8 +317,8 @@ function buildGraph(plots: Plot[], map: MapDef, laneCurves: THREE.CatmullRomCurv
     return id;
   });
 
-  const boardPos = plazaPoint(plaza, map.boardAngle, 6.0);
-  const board = add(boardPos, 'board', yawTo(boardPos, plazaPoint(plaza, map.boardAngle, 4.4)));
+  const boardPos = plazaPoint(plaza, map.boardAngle, BOARD_APPROACH_RADIUS);
+  const board = add(boardPos, 'board', yawTo(boardPos, plazaPoint(plaza, map.boardAngle, BOARD_RADIUS)));
   link(board, nearestPlaza(boardPos));
 
   const fountains = [0.2, 3.6].map((a) => {
@@ -422,6 +429,6 @@ export function buildLayout(layoutSeed: number, plotCount: number, mapId = 'tal'
     terrain,
     graph,
     laneSamples,
-    board: plazaPoint(plaza, map.boardAngle, 4.4),
+    board: plazaPoint(plaza, map.boardAngle, BOARD_RADIUS),
   };
 }
