@@ -1187,7 +1187,7 @@ Ich habe **nichts eingebaut**: Lizenz ungeklärt, und der Tausch berührt ein Sp
 - **Geprüft:** im Browser auf einer Wegwerf-Seite mit dem echten Loader (Texturen korrekt, kein Schwarz/Grün, Haus steht auf dem 6 × 4-Platz). `npm test` 219 Dateien / 1324 Tests grün (u. a. Asset-Vertrag mit Fernversion).
 - **Nicht geprüft:** Galerie (`npm run galerie`) und das Haus im echten Dorf auf einem Mobilgerät; Kollision verwendet wie bei allen Häusern die Plot-Platzform, nicht das Modell. Das Haus ist mit 6 m recht hoch (Hausgrenze 6 m).
 - **Bild:** [bilder/BUG-011_02.jpg](bilder/BUG-011_02.jpg)
-- **Zusatz (Wunsch der Lehrkraft, 29.10.2026): Lichtsäule nach Referenzbild:** violetter Lichtvorhang, magentafarbener Kern, aufsteigende dünne Lichtstreifen und ein langsam drehender Ring mit Strichmarken am Boden, sanftes Pulsieren (steht still bei reduzierter Bewegung), nie antippbar. Nur dieses Haus (`web/src/render/legendaryGlow.ts`, eingebunden in `glbAsset`); geteilte Geometrie/Materialien, kein eigener Render-Loop. Bild: [bilder/BUG-011_03_leuchtkegel.jpg](bilder/BUG-011_03_leuchtkegel.jpg).
+- **Zusatz (Wunsch der Lehrkraft, 29.10.2026): Lichtsäule nach Referenzbild:** violetter Lichtvorhang, magentafarbener Kern, aufsteigende dünne Lichtstreifen und am Boden ein langsam drehendes Pentagramm (ein Kreis, kein äußerer Ring; eine Drehung in etwa 90 s), sanftes Pulsieren (steht still bei reduzierter Bewegung), nie antippbar. Nur dieses Haus (`web/src/render/legendaryGlow.ts`, eingebunden in `glbAsset`); geteilte Geometrie/Materialien, kein eigener Render-Loop. Bild: [bilder/BUG-011_03_leuchtkegel.jpg](bilder/BUG-011_03_leuchtkegel.jpg).
 
 ### Beobachtung (Ist)
 

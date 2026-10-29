@@ -6,7 +6,7 @@ import * as THREE from 'three';
  * violet light, a brighter magenta core, streaks of light that climb through it and a ring with
  * tick marks that turns slowly on the ground. Purely visual: additive, no depth write, never hit by
  * a tap. Geometry and materials are shared by all houses; everything moves from the draw call (no
- * extra loop) and stands still with reduced motion.
+ * extra loop) and stands still with reduced motion. The ground sign is a slowly turning pentagram.
  */
 const HEIGHT = 16;
 const STREAKS = 44;
@@ -69,29 +69,31 @@ function ringTexture(): THREE.CanvasTexture {
     glow.addColorStop(1, 'rgba(120,60,255,0)');
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, size, size);
-    ctx.lineWidth = 2.5;
-    for (const [radius, colour] of [
-      [0.9, 'rgba(255,120,245,0.95)'],
-      [0.74, 'rgba(120,150,255,0.85)'],
-      [0.58, 'rgba(255,80,160,0.8)'],
-    ] as const) {
-      ctx.strokeStyle = colour;
-      ctx.beginPath();
-      ctx.arc(c, c, c * radius, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    // tick marks between the two outer rings
-    ctx.strokeStyle = 'rgba(255,170,250,0.9)';
+    // a pentagram in its circle (the outer ring and the tick marks are gone, teacher 29.10.2026)
+    const radius = c * 0.84;
+    ctx.lineJoin = 'miter';
+    ctx.strokeStyle = 'rgba(255,120,245,0.95)';
     ctx.lineWidth = 3;
-    for (let i = 0; i < 48; i++) {
-      const a = (i / 48) * Math.PI * 2;
-      const r0 = c * (i % 4 === 0 ? 0.76 : 0.82);
-      const r1 = c * 0.9;
-      ctx.beginPath();
-      ctx.moveTo(c + Math.cos(a) * r0, c + Math.sin(a) * r0);
-      ctx.lineTo(c + Math.cos(a) * r1, c + Math.sin(a) * r1);
-      ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(c, c, radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,70,200,0.95)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    // every second corner of the five points, so the lines cross into a star
+    for (let i = 0; i <= 5; i++) {
+      const a = -Math.PI / 2 + ((i * 2) % 5) * ((Math.PI * 2) / 5);
+      const x = c + Math.cos(a) * radius;
+      const y = c + Math.sin(a) * radius;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
     }
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(140,150,255,0.7)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(c, c, radius * 0.38, 0, Math.PI * 2);
+    ctx.stroke();
   }
   return new THREE.CanvasTexture(canvas);
 }
@@ -114,7 +116,7 @@ function build(): GlowParts {
     map: ringTexture(),
     opacity: 0.9,
   });
-  const ring = new THREE.PlaneGeometry(10.5, 10.5);
+  const ring = new THREE.PlaneGeometry(9, 9);
   ring.rotateX(-Math.PI / 2);
   const rand = prng(2910);
   const seeds = new Float32Array(STREAKS * 5);
@@ -191,7 +193,7 @@ export function legendaryGlow(): THREE.Group {
       moveStreaks(shared, t);
     };
     ring.onBeforeRender = () => {
-      ring.rotation.y = (performance.now() / 1000) * 0.25;
+      ring.rotation.y = (performance.now() / 1000) * 0.07; // one turn in about 90 s
     };
   }
   return group;
