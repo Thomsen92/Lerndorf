@@ -18,3 +18,42 @@
   box-shadow: 0 8px 28px #00000088;
   cursor: pointer;
 }
+
+/* In the LearnPass: a wide, glowing tap target right below the bottom tiles. */
+.card-gain-notice.card-gain-notice--inline {
+  position: relative;
+  z-index: auto;
+  left: auto;
+  bottom: auto;
+  transform: none;
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  max-width: 720px;
+  min-height: 56px;
+  margin: 12px auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  border-color: #ffb02e;
+  background: linear-gradient(180deg, #4a2a6a, #2a1f33);
+  box-shadow:
+    0 0 0 3px #ffb02e66,
+    0 8px 28px #000000aa;
+  animation: card-gain-pulse 1.4s ease-in-out infinite;
+}
+@keyframes card-gain-pulse {
+  50% {
+    box-shadow:
+      0 0 0 7px #ffb02e22,
+      0 8px 28px #000000aa;
+  }
+}
+.learnpass.reduced-motion .card-gain-notice--inline {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-gain-notice.card-gain-notice--inline {
+    animation: none;
+  }
+}

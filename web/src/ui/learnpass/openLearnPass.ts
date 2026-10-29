@@ -125,7 +125,9 @@ export function openLearnPass(opts: OpenLearnPassOptions): LearnPassOverlay {
         announceCardGrants(ids);
       }
     };
-    announceCardGrants(ids, { timeoutMs: 15000, onOpen: () => void reveal() });
+    // inline below the bottom tiles ("What's inside?"): a notice at the screen edge went unseen
+    const host = view?.el.querySelector<HTMLElement>('.lp-page') ?? undefined;
+    announceCardGrants(ids, { host, timeoutMs: host ? 0 : 15000, onOpen: () => void reveal() });
   }
 
   async function refresh(): Promise<void> {

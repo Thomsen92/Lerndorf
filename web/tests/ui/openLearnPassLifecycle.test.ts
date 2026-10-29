@@ -84,6 +84,7 @@ describe('LearnPass entered through the season hub', () => {
     await mocks.actions!.onClaim(1);
     // nothing opens by itself: the notice is tapped first
     const notice = document.querySelector<HTMLElement>('.card-gain-notice')!;
+    expect(notice).not.toBe(null);
     expect(mocks.reveal).not.toHaveBeenCalled();
     notice.click();
     await vi.waitFor(() => expect(mocks.reveal).toHaveBeenCalledOnce());

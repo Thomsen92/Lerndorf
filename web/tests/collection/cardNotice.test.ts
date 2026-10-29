@@ -40,4 +40,16 @@ describe('card grant notice', () => {
     notice.el.click();
     expect(onOpen).toHaveBeenCalledOnce();
   });
+
+  it('sits inline in a host and stays until tapped when the timeout is 0', async () => {
+    const host = document.createElement('div');
+    document.body.append(host);
+    const notice = announceCardGrants(['night-light'], { host, timeoutMs: 0 });
+    expect(notice.el.parentElement).toBe(host);
+    expect(notice.el.classList.contains('card-gain-notice--inline')).toBe(true);
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    expect(host.contains(notice.el)).toBe(true);
+    notice.el.click();
+    expect(host.contains(notice.el)).toBe(false);
+  });
 });

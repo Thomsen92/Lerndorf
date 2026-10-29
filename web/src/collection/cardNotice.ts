@@ -11,11 +11,13 @@ export interface CardNotice {
 
 /**
  * `onOpen` turns the notice into a tap target (the LearnPass uses it to show the card reveal on
- * request): nothing blocks the page or plays a sound until the player taps it.
+ * request): nothing blocks the page or plays a sound until the player taps it. With `host` the
+ * notice sits inline in that element (below "What's inside?" in the pass), big and impossible to
+ * miss; a timeout of 0 keeps it until it is tapped or the host goes away.
  */
 export function announceCardGrants(
   ids: string[],
-  opts: { timeoutMs?: number; onOpen?: () => void } = {},
+  opts: { timeoutMs?: number; onOpen?: () => void; host?: HTMLElement } = {},
 ): CardNotice {
   const el = document.createElement('div');
   el.className = 'card-gain-notice';
@@ -23,8 +25,12 @@ export function announceCardGrants(
   el.setAttribute('aria-live', 'polite');
   const hint = opts.onOpen ? ` ${tr('Antippen zum Ansehen')}` : '';
   el.textContent = `${tr('Neue Sammelkarte!')}${hint}`;
-  document.body.append(el);
-  const timer = setTimeout(() => el.remove(), opts.timeoutMs ?? 6000);
+  if (opts.host) el.classList.add('card-gain-notice--inline');
+  (opts.host ?? document.body).append(el);
+  // phones stack the tiles, so the notice can sit below the visible part of the pass
+  if (opts.host) requestAnimationFrame(() => el.scrollIntoView?.({ block: 'nearest' }));
+  const timeout = opts.timeoutMs ?? 6000;
+  const timer = timeout > 0 ? setTimeout(() => el.remove(), timeout) : undefined;
   void collectionCatalog()
     .then((catalog) => {
       const names = ids
@@ -36,7 +42,7 @@ export function announceCardGrants(
       // The notice is decoration; the server grant stays valid.
     });
   const dispose = (): void => {
-    clearTimeout(timer);
+    if (timer) clearTimeout(timer);
     el.remove();
   };
   let tapped = false;
