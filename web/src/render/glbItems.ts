@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { MAX_SIZE, type SlotKind } from '../world/plotPlan';
+import { legendaryGlow } from './legendaryGlow';
 
 export interface GlbItem {
   /** Path below assets/, e.g. 'season1/warlock.glb'. */
@@ -240,6 +241,9 @@ export function glbAsset(itemId: string, kind: string): THREE.Group {
   );
   placeholder.position.y = placeholder.geometry.parameters.height / 2;
   holder.add(placeholder);
+
+  // The legendary Horror-Haus carries an eerie light cone (teacher, 29.10.2026).
+  if (itemId === 'season_house_horror') holder.add(legendaryGlow());
 
   // One LOD node per item: the full model up close, the simplified far version beyond the distance.
   // The far version is added only after the full one, so the LOD never shows it up close.
