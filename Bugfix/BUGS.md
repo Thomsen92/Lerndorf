@@ -5,7 +5,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 > Jeder Fehler bekommt eine ID, einen Steckbrief und – sobald beauftragt –
 > ein Fix-Paket in `handoff/`. Bilder liegen unter `bilder/`.
 
-> **Als nächstes zu fixen:** BUG-003 + BUG-004 (nach Review von BUG-002). BUG-001 committet (70add80).
+> **Als nächstes zu fixen:** BUG-008 (nach Review von BUG-003/004). BUG-001 committet (70add80).
 
 ## Übersicht
 
@@ -13,8 +13,8 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 |---|---|---|---|---|---|---|
 | [BUG-001](#bug-001--smartphone-hud-überdeckt-die-kopfzeile-der-daily-quests) | Smartphone: HUD überdeckt die Kopfzeile der Daily Quests, „Schließen“ praktisch unerreichbar (auch Profil/Settings) | Dorf → Aufgaben / Profil | **S2** | **S** | **Fix da** | [FIX-01](handoff/FIX-01.md) |
 | [BUG-002](#bug-002--learnpass-münzen-einsammeln-friert-die-seite-ein) | Learnpass: Münzen einsammeln friert die Seite ein (Hard Reset nötig) | Season-Pass / Learnpass | **S1** | **L** | **Fix da** (Abnahme am Gerät offen) | [FIX-02](handoff/FIX-02.md) |
-| [BUG-003](#bug-003--learnpass-ansicht-zu-groß-für-smartphones) | Learnpass-Ansicht zu groß für Smartphones, Karten links/rechts angeschnitten | Season-Pass / Learnpass | **S3** | **M** | bestätigt | [FIX-02](handoff/FIX-02.md) |
-| [BUG-004](#bug-004--scrollen-im-learnpass-ruckelt) | Scrollen im Learnpass ruckelt / fühlt sich verbuggt an | Season-Pass / Learnpass | **S3** | **M** | bestätigt | [FIX-02](handoff/FIX-02.md) |
+| [BUG-003](#bug-003--learnpass-ansicht-zu-groß-für-smartphones) | Learnpass-Ansicht zu groß für Smartphones, Karten links/rechts angeschnitten | Season-Pass / Learnpass | **S3** | **M** | **Fix da** | [FIX-02](handoff/FIX-02.md) |
+| [BUG-004](#bug-004--scrollen-im-learnpass-ruckelt) | Scrollen im Learnpass ruckelt / fühlt sich verbuggt an | Season-Pass / Learnpass | **S3** | **M** | **Fix da** (Abnahme am Gerät offen) | [FIX-02](handoff/FIX-02.md) |
 | [BUG-005](#bug-005--bau-modus-feldauswahl-verdeckt-das-dorf-direkter-klick-auf-gebäudedeko-fehlt) | Bau-Modus: Feldauswahl verdeckt das Dorf, direkter Klick auf Gebäude/Deko fehlt | Dorf → Bauen | **S3** | **M** | bestätigt | [FIX-03](handoff/FIX-03.md) |
 | [BUG-007](#bug-007--season-hub-almanac-direkt-unter-season-1) | Season-Hub: My Almanac steht unten – soll direkt unter Season 1 | Season-Hub / Almanac | **S3** | **S** | bestätigt | [FIX-04](handoff/FIX-04.md) |
 | [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | bestätigt | [FIX-05](handoff/FIX-05.md) |
@@ -296,9 +296,17 @@ im Debugger sofort sichtbar, kann es **M** werden.
 | **Aufwand** | **M – 0,5–2 Std** |
 | **Häufigkeit** | immer auf dem Smartphone (380 × 839 px) |
 | **Gerät/Browser** | Screenshot 380 × 839 px; Browser nicht angegeben |
-| **Status** | bestätigt (Screenshot) |
+| **Status** | **Fix da** (29.10.2026) |
 | **Bild** | `bilder/BUG-002_01.png` |
 | **Fix-Paket** | [FIX-02](handoff/FIX-02.md) |
+
+### Änderungsnotiz BUG-003 (Fix da, 29.10.2026)
+
+- **Datei:** `web/src/ui/learnpass/learnpass.css`, Block `@media (max-width: 860px)`.
+- **Nachgestellt (Harness `dev/learnpass-ui.html`, 380 × 839):** Der X-Knopf stand in einer zweiten Kopfzeile neben der Münzzahl (`.lp-head` mit `flex-wrap`), über der Kartenreihe lag viel Leerraum (Track `min-height: 330px` + 36 px Innenabstand).
+- **Fix:** Kopfzeile als Grid: Titel und X oben (X am rechten Rand), „days left“ und Münzen darunter; Track `min-height: 0` und oben 24 px Innenabstand. Karten und Desktop-Layout unverändert.
+- **Gemessen:** 360 × 800, 380 × 839, 430 × 932: X rechts oben (z. B. 380: x 316–364, y 16), kein horizontaler Überlauf (`scrollWidth` = Viewportbreite), Desktop 1280 unverändert. Die angeschnittenen Nachbarkarten links/rechts sind das gewollte „Peek“ der wischbaren Kartenreihe (Rand 16 px, Track scrollt horizontal); die Karten selbst habe ich nicht verkleinert. Der untere Bereich ist durch Scrollen der Seite erreichbar (Seitenhöhe 1186 px bei 839 px Fenster).
+- **Bild:** [bilder/BUG-003_02.jpg](bilder/BUG-003_02.jpg)
 
 ### Beobachtung (Ist)
 
@@ -373,9 +381,15 @@ Geräten. Wenn nur ein Container-Padding fehlt, eher **S**.
 | **Aufwand** | **M – 0,5–2 Std** |
 | **Häufigkeit** | beim Scrollen im Learnpass selbst; wie stark, ist offen |
 | **Gerät/Browser** | Screenshot 380 × 839 px; Browser nicht angegeben |
-| **Status** | bestätigt (Nutzermeldung) |
+| **Status** | **Fix da** (29.10.2026, Abnahme am Gerät offen) |
 | **Bild** | `bilder/BUG-002_01.png` |
 | **Fix-Paket** | [FIX-02](handoff/FIX-02.md) |
+
+### Änderungsnotiz BUG-004 (Fix da, 29.10.2026)
+
+- **Ursache:** `.lp-track` hatte `touch-action: pan-x`. Die Kartenreihe ist auf dem Handy rund 340–356 px hoch (über 40 % des Bildschirms); ein senkrechter Wisch, der dort beginnt, kann die Seite nicht scrollen. Das fühlt sich wie hängendes, ruckelndes Scrollen an. Im Browser gemessen: `touch-action: pan-x`.
+- **Fix:** `touch-action: pan-x pan-y` (horizontal scrollt weiter nur die Reihe, `overscroll-behavior-x: contain` bleibt).
+- **Nicht geprüft:** echtes Touch-Verhalten (die Emulation sendet Mausereignisse) und Bildrate auf einem Gerät. Schwere Effekte (`backdrop-filter`) habe ich nicht angefasst; falls es am Gerät noch ruckelt, wären sie der nächste Kandidat.
 
 ### Beobachtung (Ist)
 

@@ -210,7 +210,9 @@
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
-  touch-action: pan-x;
+  /* pan-y too: with pan-x alone a vertical swipe that starts on the track (over 40% of a phone screen)
+     could not scroll the page, which felt like stuck, jerky scrolling */
+  touch-action: pan-x pan-y;
   cursor: grab;
 }
 .lp-track::-webkit-scrollbar {
@@ -575,9 +577,27 @@
 }
 
 @media (max-width: 860px) {
+  /* title and close button on the first row (close at the top right), the two chips below */
   .lp-head {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    align-items: center;
+    gap: 10px 8px;
     padding: 16px 16px 0;
+  }
+  .lp-head .lp-title {
+    grid-column: 1 / 4;
+    grid-row: 1;
+  }
+  .lp-head .lp-grow {
+    display: none;
+  }
+  .lp-head .lp-chip {
+    grid-row: 2;
+  }
+  .lp-head .lp-close {
+    grid-column: 4;
+    grid-row: 1;
   }
   .lp-title {
     font-size: 30px;
@@ -594,6 +614,8 @@
     margin: 2px 0 0;
   }
   .lp-track {
+    min-height: 0;
+    padding-top: 24px;
     padding-left: 16px;
     padding-right: 16px;
   }
