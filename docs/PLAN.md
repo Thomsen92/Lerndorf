@@ -553,3 +553,16 @@ Plan: [DeepSeek-Umsetzungsplan](../../Prototyp/marktplatz/DEEPSEEK_UMSETZUNGSPLA
 | H16 | [x] | **Spelling Bee am Markt (28.10.2026, Lehrkraft):** neue Aktivität für Münzen/XP. Bienenkorb mit drei runden Bienen (eigene Geometrie) rechts neben der Questtafel, Platz je Karte automatisch frei von Bänken, Ständen, Shops und Brunnen; Schild „Spelling Bee“ mit Umriss. Eigenes Fenster (Dorf pausiert): 7 Buchstaben in Waben, gelber Mittelbuchstabe Pflicht, 3 Minuten, Tippen oder Tastatur, gefundene Wörter werden vorgelesen, Sir Byte kommentiert (Begrüßung, lange Wörter, Pangramm, Zeit um). Migration 0057: 40 Rätsel aus Highlight-8-Themen (`web/scripts/spelling/make-puzzles.py`), jeden Tag ein neues (Berliner Zeit), der Server prüft jedes Wort und rechnet Punkte (4 Buchstaben 1, länger 1 je Buchstabe, Pangramm +7), der Browser bekommt nur gesalzene Prüfsummen. Die ersten 3 Runden pro Tag zahlen (Punkte 1–9: 4 Münzen/10 XP · 10–24: 6/16 · 25–39: 8/24 · 40+: 10/30; auf Wunsch der Lehrkraft verdoppelt). Erste Runde = Übungsrunde (5 Minuten, die 2 kürzesten Wörter als Hilfe, der nächste Buchstabe leuchtet orange, Sir Byte erklärt; Bonus außerhalb der 3 Runden, nur einmal). Goldenes Wort pro Tag zählt doppelt (Glitzer, Sir Byte, „×2“); Bestenliste mit Reitern Woche · Allzeit · Fleißigste, „Neuer Allzeit-Rekord!“; jede gestartete Runde verbraucht ihren Platz, danach zählt nur noch die Bestenliste. Wochen-Bestenliste beider Klassen (Top 10 + eigener Platz). Tests: SQL, Spiellogik, Fenster, Bienenkorb-Platz auf allen Karten, E2E `spelling-bee` mit Screenshots 1280/768 und Markt. |
 
 Offen und bewusst nicht behauptet: Truhen-Kartenchancen (Trefferhäufigkeit/Gewichte) sind leer, der Bonus ist deaktiviert; keine echte Tablet-FPS-Messung; Pakete 4–5, 10–11 nicht Teil dieses Auftrags; kein Push, keine Live-Migration.
+
+## Zwischenpaket J – Live-Betrieb und Feinschliff (29.10.2026)
+
+**Seit 29.10.2026 ist die App live, echte Schüler (8a/8b) spielen.** Datenschutzregeln für Änderungen: `CLAUDE.md`, Abschnitt „Live-Betrieb – Datenverlust vermeiden“. Alle Punkte unten sind lokal umgesetzt, **nicht committet und nicht auf der Live-Datenbank**; Migrationen 0058/0059 warten auf die Freigabe der Lehrkraft.
+
+| Paket | Status | Notiz |
+| --- | --- | --- |
+| J1 | [x] | Musik leiser (Dorf 0,22 → 0,11, Quiz 0,10 → 0,06); in Ollies Story-Quest ist die Musik komplett pausiert (`Sound.hush()`), danach läuft sie weiter; Tests angepasst |
+| J2 | [x] | Season-I-Ticket öffnet direkt den LearnPass (der Stand: siehe J3); Willkommens-Fenster mit Erklärtext entfällt, Season gilt still als gesehen (`acknowledgeWelcome` bleibt) |
+| J3 | [x] | Halloween-Stand heißt „Spooooooky QUIZ“ und öffnet direkt das Spooky English Quiz |
+| J4 | [x] | Sieben neue Shop-Artikel aus Tripo-Modellen (Burg, Exo-Roboter, Obama-Statue, Simson, Moped, Roller, Fendt) per Migration 0058, optimierte GLBs + LODs (`web/scripts/assets/optimize-tripo-decos.mjs`), Lizenzvermerk **nicht CC0** in `blender/sources/LICENSES.md`, im Browser geprüft |
+| J5 | [x] | Migration 0059: Seltenheit der bestehenden Shop-Artikel nach Preisstufe (<150 common, 150–499 rare, 500–1999 epic, ab 2000 legendary); nur Etikett, keine Auswirkung auf Münzen/Besitz |
+| J6 | [ ] | **Abnahme durch die Lehrkraft und kontrolliertes Einspielen von 0058/0059** (Backup/Zeilenzahlen vorher, siehe CLAUDE.md) |

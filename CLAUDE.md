@@ -24,6 +24,18 @@ Eine Englisch-Lehrkraft, kein Entwickler. Erkläre Schritte, die sie selbst ausf
 - **Optik nie schlechter als der Prototyp.** Werte aus `docs/LOOK.md` übernehmen; jedes Dorf-Bild der Galerie mit dem Soll-Bild in `Konzept/Stil_Referenz/` vergleichen, bevor ein AP als fertig gilt.
 - Welt-Generierung **deterministisch** aus dem Seed (eigener PRNG, kein `Math.random` in `world/`).
 
+## Live-Betrieb – Datenverlust vermeiden (Stand 29.10.2026)
+
+**Die App ist live. Echte Schüler (8a/8b) spielen jetzt und ihr Fortschritt (Münzen, Besitz, Platzierungen, Aufgabenstand, Tutorial) liegt in der Produktiv-Datenbank.** Datenverlust ist der schlimmste denkbare Fehler – wichtiger als jedes neue Feature.
+
+- **Produktiv-DB nie zurücksetzen oder leeren:** kein `db reset`, `TRUNCATE`, `DROP TABLE/COLUMN`, kein `DELETE`/`UPDATE` ohne enges `WHERE`, keine Seeds gegen Produktion. Tests und Experimente nur lokal oder gegen eine Supabase-Branch/Testprojekt.
+- **Migrationen nur additiv und abwärtskompatibel:** neue Spalten mit Default, neue Tabellen, `CREATE OR REPLACE` für RPCs. Bereits ausgelieferte Migrationen (siehe „freeze migrations“) **nie ändern** – Korrekturen als neue Migration. Umbenennen/Löschen von Spalten nur in zwei Schritten (erst Code umstellen und ausliefern, später entfernen) und nur nach Rücksprache mit der Lehrkraft.
+- **Vor jeder Migration auf Produktion:** Backup/Export der betroffenen Tabellen (Zeilenzahlen notieren), Migration vorher auf Branch/Testprojekt mit Kopie realistischer Daten prüfen, danach Zeilenzahlen und ein paar Stichproben vergleichen. Eingespielt wird erst nach Freigabe der Lehrkraft.
+- **Daten-Änderungen von Hand (SQL, Skripte) nur nach Rücksprache**, in einer Transaktion, mit vorherigem `SELECT` derselben Zeilen und Sicherung der alten Werte.
+- **Client-Updates dürfen den Spielstand nicht entwerten:** Spielstand liegt serverseitig, nicht in `localStorage`; beim Ändern von Item-IDs, Preisen, Wochenwechsel- oder Münzlogik bestehenden Besitz und Guthaben erhalten bzw. sauber migrieren. Keine Änderungen, die Käufe, Münzen oder Platzierungen rückwirkend neu berechnen, ohne Rücksprache.
+- **Deploys klein halten** und nichts mit Schülern-sichtbarer Wirkung während der Unterrichtszeit ausliefern, wenn es vermeidbar ist; bei Problemen zuerst Client zurückrollen, nie Daten „reparieren“, ohne die Ursache verstanden zu haben.
+- Im Zweifel: **nicht ausführen, sondern der Lehrkraft das Risiko erklären und fragen.**
+
 ## Konventionen
 
 - TypeScript strict, Vite, three.js 0.170.x gepinnt.
@@ -36,4 +48,4 @@ Eine Englisch-Lehrkraft, kein Entwickler. Erkläre Schritte, die sie selbst ausf
 
 ## Arbeitsreihenfolge
 
-Arbeitspakete laut `docs/PLAN.md`, Stufe 1 → 1b → 2 → 3 → 4 → 5. **Stand 23.10.2026:** Stufe 1b ist umgesetzt, Optik am Prototyp nachgezogen, Abnahme durch die Lehrkraft (L.11) steht aus. Das Erststart-Tutorial (PLAN Zwischenpaket E, SPEC §8a, Migration 0019) ist auf dem Zweig `feature/first-login-tutorial` fertig, aber **noch nicht auf `main` und Migration 0019 noch nirgends eingespielt**; Abnahme E.5 durch die Lehrkraft steht aus. Als Nächstes Stufe 2 (Stil-Test mit CC0-Modellen und Blender-Pipeline). Jede Änderung an Welt oder Rendering mit der Galerie prüfen. Nach jeder Stufe auf die Abnahme der Lehrkraft warten. Innerhalb von Stufe 2 zuerst der Stil-Test zur Abnahme durch die Lehrkraft, bevor alle Assets gebaut werden. Offene Punkte (SPEC §19) mit dem Standardwert umsetzen und konfigurierbar halten.
+Arbeitspakete laut `docs/PLAN.md`, Stufe 1 → 1b → 2 → 3 → 4 → 5. **Stand 23.10.2026 (die App ist seit 29.10.2026 live, siehe „Live-Betrieb“; der folgende Stand kann veraltet sein – `docs/PLAN.md` prüfen):** Stufe 1b ist umgesetzt, Optik am Prototyp nachgezogen, Abnahme durch die Lehrkraft (L.11) steht aus. Das Erststart-Tutorial (PLAN Zwischenpaket E, SPEC §8a, Migration 0019) ist auf dem Zweig `feature/first-login-tutorial` fertig, aber **noch nicht auf `main` und Migration 0019 noch nirgends eingespielt**; Abnahme E.5 durch die Lehrkraft steht aus. Als Nächstes Stufe 2 (Stil-Test mit CC0-Modellen und Blender-Pipeline). Jede Änderung an Welt oder Rendering mit der Galerie prüfen. Nach jeder Stufe auf die Abnahme der Lehrkraft warten. Innerhalb von Stufe 2 zuerst der Stil-Test zur Abnahme durch die Lehrkraft, bevor alle Assets gebaut werden. Offene Punkte (SPEC §19) mit dem Standardwert umsetzen und konfigurierbar halten.
