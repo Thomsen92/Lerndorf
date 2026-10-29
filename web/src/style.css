@@ -511,8 +511,8 @@ table.ledger td {
 
 .overlay:not(.modal) {
   inset: 0 0 var(--nav-bottom) var(--nav-left);
-  /* Clearance for the avatar and shortcuts. */
-  padding-top: calc(max(12px, env(safe-area-inset-top)) + 92px);
+  /* Clearance for the two-row HUD (138 px at zoom 1, scaled like the HUD, plus 8 px of air). */
+  padding-top: calc(max(12px, env(safe-area-inset-top)) + 146px * var(--ui));
 }
 
 .game-nav {
