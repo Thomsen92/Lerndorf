@@ -117,3 +117,19 @@
 .quest-board-cue.honey.is-highlighted .quest-board-label {
   background: #ffe07a;
 }
+
+/* Ollie's market sign: teal, a little smaller than the other signs */
+.quest-board-cue.market .quest-board-label {
+  background: #1d6b66;
+  color: #eafff8;
+  border-color: #7fe3d2;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.quest-board-cue.market.is-highlighted .quest-board-label {
+  background: #26887f;
+}
+.quest-board-cue.market img {
+  width: 30px;
+  height: 30px;
+}

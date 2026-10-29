@@ -97,6 +97,7 @@ import { setBoardNote } from '../render/plaza';
 import type { ReadOnlyView } from './readOnlyVillage';
 import { openProfile } from './profileView';
 import { createBeehive, type Beehive } from '../render/beehive';
+import { marketShopPlacement } from '../render/marketShop';
 import { openSpellingBee } from '../minigames/spellingBee/spellingBeeView';
 import { spellingApi } from '../api/spellingBee';
 import {
@@ -659,7 +660,10 @@ export async function mountVillage(
         ],
         z: box.max.z,
         baseY: 0,
-        at: new THREE.Vector3((x0 + x1) / 2, top + 0.8, box.max.z).applyMatrix4(standRoot.matrixWorld),
+        // above the stand itself, not at the front edge of the box (the cat and cauldron stand in front)
+        at: new THREE.Vector3((x0 + x1) / 2, top + 0.8, (box.min.z + box.max.z) / 2).applyMatrix4(
+          standRoot.matrixWorld,
+        ),
       },
       onOpen: () => {
         if (!inTutorial && !flight) seasonHub?.open();
@@ -691,13 +695,47 @@ export async function mountVillage(
   });
   beeCue.el.classList.add('honey');
   beeCue.setVisible(!inTutorial);
-  beeCueVisible = (on) => beeCue.setVisible(on);
-  beeCueUpdate = (cam) => beeCue.update(cam);
+  // Ollie's market gets a title like the other places (teacher, 29.10.2026): label and arrow only
+  const ollieSpot = marketShopPlacement(layout);
+  const ollieCue = createQuestBoardCue({
+    host: root,
+    board: new THREE.Object3D(),
+    layout,
+    label: "Ollie's Market",
+    ariaLabel: tr('Ollies Shop öffnen'),
+    noOutline: true,
+    shape: {
+      contour: [
+        [0, 0],
+        [0, 1],
+      ],
+      z: 0,
+      baseY: 0,
+      at: new THREE.Vector3(ollieSpot.x, layout.plazaHeight + 3.4, ollieSpot.z),
+    },
+    onOpen: () => {
+      if (inTutorial || flight) return;
+      shopReturnArea = 'dorf';
+      silenceSirByte();
+      void areas?.select('shop');
+    },
+  });
+  ollieCue.el.classList.add('market');
+  ollieCue.setVisible(!inTutorial);
+  beeCueVisible = (on) => {
+    beeCue.setVisible(on);
+    ollieCue.setVisible(on);
+  };
+  beeCueUpdate = (cam) => {
+    beeCue.update(cam);
+    ollieCue.update(cam);
+  };
   const disposeQuestCue = disposeBoardCue;
   disposeBoardCue = () => {
     disposeQuestCue();
     shopCue?.dispose();
     beeCue.dispose();
+    ollieCue.dispose();
   };
   worldThemes = createWorldThemeController({
     classId: profile.classId,

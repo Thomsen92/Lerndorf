@@ -371,6 +371,7 @@ export const EN: Record<string, string> = {
   'Auto-Platz': 'Car space',
   'Tippe im Dorf auf einen Platz oder wähle hier:': 'Tap a space in the village or pick here:',
   Auto: 'Car',
+  'Ollies Shop öffnen': "Open Ollie's shop",
   'Deko 1': 'Deco 1',
   'Deko 2': 'Deco 2',
   'Deko 3': 'Deco 3',

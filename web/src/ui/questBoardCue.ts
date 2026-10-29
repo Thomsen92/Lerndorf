@@ -31,6 +31,8 @@ export function createQuestBoardCue(opts: {
   spooky?: boolean;
   /** Draw a glowing silhouette around this model (inverted hull) instead of the drawn outline. */
   silhouette?: THREE.Object3D;
+  /** Label and arrow only, no outline (Ollie's market sign). */
+  noOutline?: boolean;
 }) {
   const el = document.createElement('button');
   el.type = 'button';
@@ -93,7 +95,9 @@ export function createQuestBoardCue(opts: {
     opacity: 0.8,
   });
   let outline: THREE.Object3D;
-  if (opts.silhouette?.parent) {
+  if (opts.noOutline) {
+    outline = new THREE.Object3D();
+  } else if (opts.silhouette?.parent) {
     // a slightly larger copy that only shows its back faces: a glowing rim around the real shape
     const source = opts.silhouette;
     const parent = source.parent!;
