@@ -5,6 +5,7 @@ import { tr } from '../i18n';
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { SLOTS, slotAccepts, type SlotId } from '../world/plotPlan';
+import { partById } from '../avatars/catalog';
 import { shownItem, loadOwnSlots, type SlotMap } from './build';
 import { buyItem, loadCatalog, loadInventory, type CatalogItem, type Outcome } from './economy';
 
@@ -70,6 +71,15 @@ export function buildItemBook(
   });
 }
 
+/**
+ * Avatar items need a wardrobe model to be worn or shown. The first seed (0006: Kurzhaar,
+ * Pferdeschwanz, Wuschel, T-Shirt, ...) has none: those rows only showed a generic T-shirt and could
+ * not be put on (BUG-009). They stay in the database untouched and are just not listed.
+ */
+export function isListable(c: Pick<CatalogItem, 'id' | 'kind'>): boolean {
+  return c.kind !== 'avatar' || partById(c.id) !== undefined;
+}
+
 export function groupByKind(entries: ItemEntry[]): Array<{ kind: ItemKind; items: ItemEntry[] }> {
   return KIND_ORDER.map((kind) => ({ kind, items: entries.filter((e) => e.kind === kind) }));
 }
@@ -103,7 +113,7 @@ export function supabaseItemApi(supabase: SupabaseClient, uid: string): ItemApi 
       if (!cat.ok) return cat;
       if (!inv.ok) return inv;
       if (!slots.ok) return slots;
-      return { ok: true, value: buildItemBook(cat.value, inv.value, slots.value) };
+      return { ok: true, value: buildItemBook(cat.value.filter(isListable), inv.value, slots.value) };
     },
     buy: (itemId) => buyItem(supabase, itemId),
   };

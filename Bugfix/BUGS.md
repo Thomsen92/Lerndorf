@@ -5,7 +5,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 > Jeder Fehler bekommt eine ID, einen Steckbrief und – sobald beauftragt –
 > ein Fix-Paket in `handoff/`. Bilder liegen unter `bilder/`.
 
-> **Als nächstes zu fixen:** BUG-009 (nach Review von BUG-005). BUG-001 committet (70add80).
+> **Als nächstes zu fixen:** BUG-010 (nach Review von BUG-009) – vorher klären, woher die Unit-Wörter kommen. BUG-001 committet (70add80).
 
 ## Übersicht
 
@@ -18,7 +18,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 | [BUG-005](#bug-005--bau-modus-feldauswahl-verdeckt-das-dorf-direkter-klick-auf-gebäudedeko-fehlt) | Bau-Modus: Feldauswahl verdeckt das Dorf, direkter Klick auf Gebäude/Deko fehlt | Dorf → Bauen | **S3** | **M** | **Fix da** | [FIX-03](handoff/FIX-03.md) |
 | [BUG-007](#bug-007--season-hub-almanac-direkt-unter-season-1) | Season-Hub: My Almanac steht unten – soll direkt unter Season 1 | Season-Hub / Almanac | **S3** | **S** | **Fix da** | [FIX-04](handoff/FIX-04.md) |
 | [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | **Fix da** | [FIX-05](handoff/FIX-05.md) |
-| [BUG-009](#bug-009--inventar-platzhalter-gegenstände-mit-falschem-icon) | Inventar: Platzhalter-Gegenstände (Haare/T-Shirt) mit falschem T-Shirt-Icon | Inventar / Kleiderschrank | **S3** | **M** | bestätigt | [FIX-06](handoff/FIX-06.md) |
+| [BUG-009](#bug-009--inventar-platzhalter-gegenstände-mit-falschem-icon) | Inventar: Platzhalter-Gegenstände (Haare/T-Shirt) mit falschem T-Shirt-Icon | Inventar / Kleiderschrank | **S3** | **M** | **Fix da** | [FIX-06](handoff/FIX-06.md) |
 | [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | bestätigt | [FIX-07](handoff/FIX-07.md) |
 | [BUG-011](#bug-011--legendäres-hausmodell-ersetzen) | Legendäres Hausmodell rendert als schwarze/grüne Masse – durch angehängtes Fantasy-Treehouse-GLB ersetzen | Dorf / Hausplatz | **S3** | **M** | bestätigt | [FIX-08](handoff/FIX-08.md) |
 
@@ -982,9 +982,16 @@ Knopf, danach vier Breiten prüfen. Kein Datenmodell, keine Logik.
 | **Aufwand** | **M – 0,5–2 Std**; **L**, wenn Assets erstellt oder Produktivdaten bereinigt werden müssen |
 | **Häufigkeit** | immer bei 433 × 429 px |
 | **Gerät/Browser** | Screenshot 433 × 429 px; Browser nicht angegeben |
-| **Status** | bestätigt |
+| **Status** | **Fix da** (29.10.2026, Anzeige-Filter; Datenbereinigung offen) |
 | **Bild** | `bilder/BUG-009_01.png` |
 | **Fix-Paket** | [FIX-06](handoff/FIX-06.md) |
+
+### Änderungsnotiz (Fix da, 29.10.2026)
+
+- **Bestand aufgenommen (nur Code und Migrationen gelesen, die Live-Datenbank nicht abgefragt):** Die vier Karten sind die Start-Items der ersten Seed-Migration `0006_avatar_shop_build.sql`: `hair_01` Kurzhaar, `hair_02` Pferdeschwanz, `hair_03` Wuschel, `top_01` T-Shirt (dazu `top_02`, `top_03`, `pants_01`, `pants_02`; `starter = true`, also bei **jedem** Schüler im Inventar). Der Avatar-Kleiderschrank (`content/avatar/wardrobe.json`, Migration 0023) kennt nur die neuen `avatar_*`-Teile; für die alten IDs gibt es kein tragbares Modell (`partById` liefert nichts). Die Vorschau fiel deshalb für alle auf das generische Platzhalter-Emoji 👕 (`THUMB_PLACEHOLDER.avatar` in `render/itemThumbs.ts`), und die Detailansicht sagt „noch kein tragbares Modell verfügbar“.
+- **Fix (nur Anzeige, keine Datenänderung):** `web/src/api/items.ts`: neue Funktion `isListable`; `supabaseItemApi.loadBook` listet Avatar-Items nur, wenn der Kleiderschrank ein Modell dafür hat. Die alten Zeilen bleiben unverändert in der Datenbank (kein Löschen, keine Migration); Besitz, Münzen und Platzierungen sind unberührt. Shop und Inventar nutzen dieselbe Liste, die Platzhalter verschwinden dort. Echte Haar-/Kleidungs-Icons gibt es für diese Items nicht und ich habe keine erfunden.
+- **Tests:** neuer Test in `tests/ui/items.test.ts`; `npm test` grün; `tsc` grün; Build weiter lokal blockiert. Screenshot nachher habe ich nicht gemacht (die Inventar-Testseite wurde nicht geöffnet).
+- **Offen für die Lehrkraft (Datenfrage, nicht umgesetzt):** Die acht alten Zeilen könnten per additiver Migration auf `active = false` gesetzt werden, damit sie auch serverseitig nirgends mehr auftauchen. Dafür brauche ich deine Freigabe; nötig ist es für die Anzeige nicht.
 
 ### Beobachtung (Ist)
 

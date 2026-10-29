@@ -89,3 +89,13 @@ describe('supabaseItemApi', () => {
     expect(out.ok).toBe(false);
   });
 });
+
+describe('placeholder avatar items (BUG-009)', () => {
+  it('lists avatar items only when the wardrobe has a model for them', async () => {
+    const { isListable } = await import('../../src/api/items');
+    expect(isListable({ id: 'hair_01', kind: 'avatar' })).toBe(false);
+    expect(isListable({ id: 'top_01', kind: 'avatar' })).toBe(false);
+    expect(isListable({ id: 'avatar_girl_soft_bow', kind: 'avatar' })).toBe(true);
+    expect(isListable({ id: 'deco_bench', kind: 'deco' })).toBe(true);
+  });
+});
