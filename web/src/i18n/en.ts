@@ -278,7 +278,7 @@ export const EN: Record<string, string> = {
   'Heute gibt es keine Münzen mehr – du spielst für die Bestenliste.':
     'No more coins today – you are playing for the high score list.',
   'Dein Bestwert diese Woche: {0} Punkte': 'Your best this week: {0} points',
-  'Bilde Wörter mit mindestens 4 Buchstaben.': 'Make words with at least 4 letters.',
+  'Bilde Wörter mit mindestens 3 Buchstaben.': 'Make words with at least 3 letters.',
   'Jedes Wort braucht den gelben Buchstaben.': 'Every word needs the yellow letter.',
   'Buchstaben dürfen mehrmals vorkommen.': 'You can use letters more than once.',
   'Ein Wort mit allen 7 Buchstaben bringt 7 Extrapunkte.': 'A word with all 7 letters gets 7 bonus points.',
@@ -299,7 +299,7 @@ export const EN: Record<string, string> = {
   'Hinweis: {0} und noch {1} Buchstaben': 'Hint: {0} and {1} more letters',
   'Du hast schon alle Wörter!': 'You have found every word!',
   'Joker gerade nicht möglich.': 'No joker right now.',
-  'Zu kurz – mindestens 4 Buchstaben.': 'Too short – at least 4 letters.',
+  'Zu kurz – mindestens 3 Buchstaben.': 'Too short – at least 3 letters.',
   'Der gelbe Buchstabe fehlt.': 'The yellow letter is missing.',
   'Nur die Buchstaben der Waben.': 'Only the letters in the honeycomb.',
   'Dieses Wort kennt die Biene nicht.': "The bee doesn't know this word.",

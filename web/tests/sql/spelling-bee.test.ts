@@ -72,8 +72,8 @@ describe('spelling bee', () => {
   it('every puzzle is solvable: seven letters, the centre in every word, at least one pangram', async () => {
     await db.exec('reset role;');
     const rows = (
-      await db.query<{ center: string; letters: string; words: string[]; max_points: number }>(
-        'select center, letters, words, max_points from public.spelling_puzzles order by id',
+      await db.query<{ center: string; letters: string; words: string[]; max_points: number; set_name: string | null }>(
+        'select center, letters, words, max_points, set_name from public.spelling_puzzles order by id',
       )
     ).rows;
     expect(rows.length).toBeGreaterThanOrEqual(30);
@@ -81,7 +81,8 @@ describe('spelling bee', () => {
       const all = new Set(p.center + p.letters);
       expect(all.size).toBe(7);
       for (const w of p.words) {
-        expect(w.length).toBeGreaterThanOrEqual(4);
+        // the USA set (0061) also has words of three letters
+        expect(w.length).toBeGreaterThanOrEqual(p.set_name === 'usa' ? 3 : 4);
         expect(w).toContain(p.center);
         expect([...w].every((c) => all.has(c))).toBe(true);
       }
@@ -323,5 +324,39 @@ describe('spelling bee', () => {
     expect(await points('abc')).toBe(1);
     expect(await points('abcd')).toBe(1);
     expect(await points('abcde')).toBe(5);
+  });
+
+  it('takes the puzzle of the day from the USA set (0061): one a day, then it starts over, points add up', async () => {
+    await db.exec('reset role;');
+    const usa = (
+      await db.query<{ id: number; center: string; letters: string; words: string[]; max_points: number }>(
+        `select id, center, letters, words, max_points from public.spelling_puzzles where set_name = 'usa' order by id`,
+      )
+    ).rows;
+    expect(usa.length).toBeGreaterThanOrEqual(30);
+    const ids = new Set(usa.map((p) => p.id));
+    const days = (
+      await db.query<{ id: number }>(
+        `select public.spelling_puzzle_for((date '2026-10-26' + g)::date) id from generate_series(0, ${usa.length - 1}) g`,
+      )
+    ).rows.map((r) => r.id);
+    expect(days.every((id) => ids.has(id))).toBe(true);
+    expect(new Set(days).size).toBe(usa.length); // every puzzle once, in order
+    const again = (
+      await db.query<{ id: number }>(
+        `select public.spelling_puzzle_for((date '2026-10-26' + ${usa.length})::date) id`,
+      )
+    ).rows[0].id;
+    expect(again).toBe(days[0]);
+    for (const p of usa) {
+      const total = (
+        await db.query<{ t: number }>(
+          `select sum(public.spelling_word_points(w, $2, $3))::int t from unnest($1::text[]) w`,
+          [p.words, p.center, p.letters],
+        )
+      ).rows[0].t;
+      expect(total).toBe(p.max_points);
+    }
+    expect(usa.flatMap((p) => p.words).filter((w) => w.length === 3).length).toBeGreaterThan(usa.length * 2);
   });
 });

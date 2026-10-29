@@ -1,7 +1,8 @@
 /**
  * Spelling Bee rules in the browser (instant feedback only; the server recounts everything).
- * A word needs four letters, the centre letter and only the seven letters; it is right when its
- * salted hash is one of the puzzle's hashes. 4 letters = 1 point, longer = 1 point per letter,
+ * A word needs three letters (USA puzzles, migration 0060/0061; the first puzzles only have words of
+ * four or more), the centre letter and only the seven letters; it is right when its
+ * salted hash is one of the puzzle's hashes. 3 or 4 letters = 1 point, longer = 1 point per letter,
  * a pangram (all seven letters) +7 — the same rule as spelling_word_points in migration 0057.
  */
 export type Verdict = 'ok' | 'too-short' | 'missing-center' | 'bad-letter' | 'not-in-list' | 'already-found';
@@ -22,12 +23,12 @@ export function isPangram(word: string, puzzle: Pick<Puzzle, 'center' | 'letters
 }
 
 export function wordPoints(word: string, puzzle: Pick<Puzzle, 'center' | 'letters'>): number {
-  return (word.length === 4 ? 1 : word.length) + (isPangram(word, puzzle) ? 7 : 0);
+  return (word.length <= 4 ? 1 : word.length) + (isPangram(word, puzzle) ? 7 : 0);
 }
 
 /** The checks that need no word list, in the order a pupil would want to hear them. */
 export function precheck(word: string, puzzle: Pick<Puzzle, 'center' | 'letters'>): Verdict | null {
-  if (word.length < 4) return 'too-short';
+  if (word.length < 3) return 'too-short';
   if (!word.includes(puzzle.center)) return 'missing-center';
   const allowed = new Set([puzzle.center, ...puzzle.letters]);
   if (![...word].every((c) => allowed.has(c))) return 'bad-letter';

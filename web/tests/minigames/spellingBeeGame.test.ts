@@ -16,7 +16,8 @@ const hash = (w: string) =>
 const puzzle = { id: 7, center: 'l', letters, hashes: ['tall', 'alligator', 'trail'].map(hash) };
 
 describe('spelling bee rules in the browser', () => {
-  it('scores like the server: 4 letters 1 point, longer 1 per letter, pangram +7', () => {
+  it('scores like the server: 3 or 4 letters 1 point, longer 1 per letter, pangram +7', () => {
+    expect(wordPoints('tal', puzzle)).toBe(1);
     expect(wordPoints('tall', puzzle)).toBe(1);
     expect(wordPoints('trail', puzzle)).toBe(5);
     expect(isPangram('alligator', puzzle)).toBe(true);
@@ -28,7 +29,8 @@ describe('spelling bee rules in the browser', () => {
   });
 
   it('says why a word does not count', async () => {
-    expect(precheck('tal', puzzle)).toBe('too-short');
+    expect(precheck('ta', puzzle)).toBe('too-short');
+    expect(precheck('tal', puzzle)).toBe(null); // three letters are allowed (USA puzzles)
     expect(precheck('roat', puzzle)).toBe('missing-center');
     expect(precheck('lamp', puzzle)).toBe('bad-letter');
     expect(await evaluate('TRAIL', puzzle, new Set())).toBe('ok');

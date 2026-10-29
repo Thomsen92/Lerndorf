@@ -5,7 +5,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 > Jeder Fehler bekommt eine ID, einen Steckbrief und – sobald beauftragt –
 > ein Fix-Paket in `handoff/`. Bilder liegen unter `bilder/`.
 
-> **Als nächstes zu fixen:** BUG-010 wartet auf Antworten der Lehrkraft (siehe Notiz). Alle anderen offenen Bugs sind bearbeitet; BUG-006 und UX-001/002 sind laut Auftrag ausgenommen. BUG-001 committet (70add80).
+> **Als nächstes zu fixen:** BUG-010 und alle anderen Bugs sind lokal bearbeitet; offen ist das Einspielen der Migrationen 0058 bis 0061 nach Freigabe; BUG-006 und UX-001/002 sind laut Auftrag ausgenommen. BUG-001 committet (70add80).
 
 ## Übersicht
 
@@ -19,7 +19,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 | [BUG-007](#bug-007--season-hub-almanac-direkt-unter-season-1) | Season-Hub: My Almanac steht unten – soll direkt unter Season 1 | Season-Hub / Almanac | **S3** | **S** | **Fix da** | [FIX-04](handoff/FIX-04.md) |
 | [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | **Fix da** | [FIX-05](handoff/FIX-05.md) |
 | [BUG-009](#bug-009--inventar-platzhalter-gegenstände-mit-falschem-icon) | Inventar: Platzhalter-Gegenstände (Haare/T-Shirt) mit falschem T-Shirt-Icon | Inventar / Kleiderschrank | **S3** | **M** | **Fix da** | [FIX-06](handoff/FIX-06.md) |
-| [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | **teilweise** (Joker fertig, Wörter folgen) | [FIX-07](handoff/FIX-07.md) |
+| [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | **Fix da** (lokal, Migrationen offen) | [FIX-07](handoff/FIX-07.md) |
 | [BUG-011](#bug-011--legendäres-hausmodell-ersetzen) | Legendäres Hausmodell rendert als schwarze/grüne Masse – durch angehängtes Fantasy-Treehouse-GLB ersetzen | Dorf / Hausplatz | **S3** | **M** | **Fix da** | [FIX-08](handoff/FIX-08.md) |
 
 ## UI/UX-Vorhaben (keine Fehler)
@@ -1079,7 +1079,7 @@ dann vorher Backup und Rücksprache.
 | **Aufwand** | **M – 0,5–2 Std**; **L**, wenn der Wortpool erst aus dem Lehrbuch/Unit importiert werden muss |
 | **Häufigkeit** | bei jedem Spiel |
 | **Gerät/Browser** | nicht angegeben |
-| **Status** | **teilweise umgesetzt** (29.10.2026): Joker fertig (lokal, Migration 0060 nicht eingespielt); mehr Wörter und USA-Wortliste in Arbeit |
+| **Status** | **Fix da** (29.10.2026, lokal): Joker, Wörter ab 3 Buchstaben und USA-Rätsel; Migrationen 0060/0061 **nicht eingespielt**, Abnahme durch die Lehrkraft offen |
 | **Bild** | — |
 | **Fix-Paket** | [FIX-07](handoff/FIX-07.md) |
 
@@ -1101,7 +1101,8 @@ Ich habe BUG-010 gelesen und **nichts geändert**, weil alle drei Wünsche Live-
 
 - **Mehr Buchstaben = mehr gültige Wörter** (7 Buchstaben bleiben, Wörter ab 3 Buchstaben, größere Wortlisten). **Joker = Wortanfang zeigen.** **Wörter:** zum aktuellen Thema (USA, Highlight 8 Unit 1); die Lehrkraft liefert die Vokabelseiten (S. 173 bis 178), es müssen nicht nur Buchstabenwörter aus dem Buch sein.
 - **Joker (fertig, lokal):** Migration `0060_spelling_jokers.sql` (additiv, **nicht eingespielt**): Spalte `spelling_rounds.hinted`, Funktion `spelling_hint(round, found)` mit 3 Jokern je Runde (zeigt Länge und die ersten zwei Buchstaben eines Wortes, das nicht gefunden und nicht schon angezeigt ist; nichts gefunden = kein Joker verbraucht), 3-Buchstaben-Wörter zählen 1 Punkt. Client: Joker-Knopf mit Zähler und angezeigte Hinweise (`spellingBeeView.ts`, `api/spellingBee.ts`). SQL- und Ansichts-Tests grün. **Einspielreihenfolge: erst die Migration, dann der neue Client**; ohne Migration zeigt der Joker nur „Joker gerade nicht möglich“. Bild: [bilder/BUG-010_02_joker.jpg](bilder/BUG-010_02_joker.jpg).
-- **Noch offen:** neue Rätsel mit der USA-Wortliste und Wörtern ab 3 Buchstaben (nur Vorbereitung, nichts auf der Live-Datenbank ändern).
+- **Wörter ab 3 Buchstaben und USA-Rätsel (fertig, lokal, Migration `0061_spelling_usa_puzzles.sql`, nicht eingespielt):** Die Vokabelseiten (Highlight 8 S. 173 bis 178: Hi from America, A BIG American quiz, Unit 1 Vocabulary, Theme 1/2, Story, Skills training, Anfang Unit 2) habe ich als Wortliste abgetippt (nur Wörter, ohne Erklärtexte): `content/spelling/usa-words.txt`, dazu Wörter zum Thema USA (Reise, Sport, Essen). Generator `web/scripts/spelling/make-puzzles-usa.py` (7 Buchstaben, Pangram aus der Liste, gültige Wörter: häufige Wörter aus Wörterbuch und Häufigkeitsliste; 3-Buchstaben-Wörter nur sehr häufige, ohne Namen und Abkürzungen) erzeugt **40 neue Rätsel** (101 bis 140, `set_name = 'usa'`, 22 bis 80 Wörter je Rätsel). Die Migration ist additiv (neue Zeilen und eine neue Spalte); sie ersetzt `spelling_puzzle_for`: das Tagesrätsel kommt dann aus dem USA-Satz (ein Rätsel pro Tag, dann von vorn), die alten 40 Rätsel und alle gespielten Runden bleiben unverändert. Client: Mindestlänge 3, Regeltext und Meldung angepasst. SQL-Tests (Lösbarkeit, Punkte, Tagesrätsel) und Client-Tests grün.
+- **Einspielen (nach Freigabe, am besten nachmittags nach dem Unterricht):** 1. Backup/Zeilenzahlen von `spelling_puzzles` und `spelling_rounds`, 2. Migration 0060, 3. Migration 0061 (das Tagesrätsel wechselt sofort; angefangene Runden laufen mit ihrem alten Rätsel weiter), 4. neuen Client ausliefern. Wortqualität bitte stichprobenartig prüfen (`web/scripts/spelling/puzzles-usa.json`).
 
 ### Beobachtung (Ist)
 

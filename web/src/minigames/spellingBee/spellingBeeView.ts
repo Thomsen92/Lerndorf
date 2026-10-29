@@ -41,7 +41,7 @@ export interface SpellingBeeHandle {
 }
 
 const MESSAGES: Record<Exclude<Verdict, 'ok'>, string> = {
-  'too-short': 'Zu kurz – mindestens 4 Buchstaben.',
+  'too-short': 'Zu kurz – mindestens 3 Buchstaben.',
   'missing-center': 'Der gelbe Buchstabe fehlt.',
   'bad-letter': 'Nur die Buchstaben der Waben.',
   'not-in-list': 'Dieses Wort kennt die Biene nicht.',
@@ -164,7 +164,7 @@ export function openSpellingBee(opts: SpellingBeeOptions): SpellingBeeHandle {
     main.innerHTML = html`<div class="bee-start">
       <div class="bee-hero">${beeSvg(140)}</div>
       <ul class="bee-rules">
-        <li>Bilde Wörter mit mindestens 4 Buchstaben.</li>
+        <li>Bilde Wörter mit mindestens 3 Buchstaben.</li>
         <li>Jedes Wort braucht den gelben Buchstaben.</li>
         <li>Buchstaben dürfen mehrmals vorkommen.</li>
         <li>Ein Wort mit allen 7 Buchstaben bringt 7 Extrapunkte.</li>
