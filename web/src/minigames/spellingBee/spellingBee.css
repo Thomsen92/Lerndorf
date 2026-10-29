@@ -518,3 +518,33 @@
 .bee-boards [role='tabpanel'][hidden] {
   display: none;
 }
+
+/* Jokers (teacher, 29.10.2026): the button with its counter and the hints found so far */
+.bee-actions [data-joker] b {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  margin-left: 4px;
+  border-radius: 999px;
+  background: #3b2a10;
+  color: #ffe7a0;
+  font-size: 14px;
+}
+.bee-joker-hints {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  min-height: 0;
+  margin: 0;
+}
+.bee-joker-hints b {
+  padding: 4px 12px;
+  border: 2px solid #e0a92b;
+  border-radius: 999px;
+  background: #fff8e1;
+  letter-spacing: 3px;
+  font-weight: 800;
+  color: #3b2a10;
+}

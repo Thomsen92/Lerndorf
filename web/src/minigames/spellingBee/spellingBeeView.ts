@@ -6,6 +6,7 @@
  */
 import { tr, msg, html } from '../../i18n';
 import { openModal, type ModalHandle } from '../../ui/dialog';
+import { JOKERS_PER_ROUND } from '../../api/spellingBee';
 import type {
   SpellingApi,
   SpellingBoard,
@@ -226,8 +227,10 @@ export function openSpellingBee(opts: SpellingBeeOptions): SpellingBeeHandle {
       <div class="bee-actions">
         <button type="button" data-delete>Löschen</button>
         <button type="button" data-shuffle aria-label="Mischen">⟳</button>
+        <button type="button" data-joker aria-label="Joker">💡 Joker <b data-jokers>${JOKERS_PER_ROUND}</b></button>
         <button type="button" class="primary" data-enter>Enter</button>
       </div>
+      <p class="bee-joker-hints" aria-live="polite"></p>
       <p class="bee-toast" role="status"></p>
       ${
         hints.length
@@ -375,6 +378,38 @@ export function openSpellingBee(opts: SpellingBeeOptions): SpellingBeeHandle {
 
     q('[data-delete]').addEventListener('click', back);
     q('[data-shuffle]').addEventListener('click', mix);
+    // Jokers: three a round, each shows the start of a word that is not found yet (the server knows the words)
+    const jokerButton = q<HTMLButtonElement>('[data-joker]');
+    const hintBox = q('.bee-joker-hints');
+    let jokersLeft = JOKERS_PER_ROUND;
+    let jokerBusy = false;
+    const drawJokers = (): void => {
+      q('[data-jokers]').textContent = String(jokersLeft);
+      jokerButton.disabled = jokersLeft <= 0 || jokerBusy;
+    };
+    jokerButton.addEventListener('click', async () => {
+      if (jokerBusy || jokersLeft <= 0) return;
+      jokerBusy = true;
+      drawJokers();
+      try {
+        const hint = await opts.api.hint(roundId, found);
+        if (closed) return;
+        jokersLeft = hint.jokersLeft;
+        if ('prefix' in hint) {
+          const chip = document.createElement('b');
+          chip.lang = 'en';
+          chip.textContent = `${hint.prefix.toUpperCase()}${'·'.repeat(Math.max(0, hint.length - hint.prefix.length))}`;
+          chip.title = msg`${hint.length} Buchstaben`;
+          chip.setAttribute('aria-label', msg`Hinweis: ${hint.prefix} und noch ${hint.length - hint.prefix.length} Buchstaben`);
+          hintBox.append(chip);
+        } else toast(tr('Du hast schon alle Wörter!'), 'good');
+      } catch {
+        if (!closed) toast(tr('Joker gerade nicht möglich.'), 'bad');
+      } finally {
+        jokerBusy = false;
+        if (!closed) drawJokers();
+      }
+    });
     q('[data-enter]').addEventListener('click', () => void enter());
     q('[data-stop]').addEventListener('click', () => void end());
 

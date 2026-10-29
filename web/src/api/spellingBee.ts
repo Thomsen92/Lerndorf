@@ -72,8 +72,18 @@ export interface SpellingResult {
   progress: ProgressDelta | null;
 }
 
+/** A joker (migration 0060): the length and first two letters of a word not found yet. */
+export type SpellingHint =
+  | { prefix: string; length: number; jokersLeft: number }
+  /** Every word is found: nothing to show and no joker spent. */
+  | { none: true; jokersLeft: number };
+
+/** Jokers of one round; the server counts them (spelling_joker_count) and sends what is left. */
+export const JOKERS_PER_ROUND = 3;
+
 export interface SpellingApi {
   state(): Promise<SpellingState>;
+  hint(round: number, found: string[]): Promise<SpellingHint>;
   start(): Promise<SpellingRound>;
   finish(round: number, words: string[]): Promise<SpellingResult>;
 }
@@ -162,6 +172,12 @@ export function spellingApi(supabase: SupabaseClient): SpellingApi {
         tutorial: r.tutorial === true,
         hints: strings(r.hints),
       };
+    },
+    async hint(round, found) {
+      const r = record(await rpc('spelling_hint', { p_round: round, p_found: found }));
+      if (r.none === true) return { none: true, jokersLeft: int(r.jokers_left) };
+      if (typeof r.prefix !== 'string') throw new Error('Invalid spelling data');
+      return { prefix: r.prefix, length: int(r.length), jokersLeft: int(r.jokers_left) };
     },
     async finish(round, words) {
       const r = record(await rpc('spelling_finish', { p_round: round, p_words: words }));

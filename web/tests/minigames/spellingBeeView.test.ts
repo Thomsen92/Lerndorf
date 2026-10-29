@@ -73,6 +73,7 @@ describe('spelling bee view', () => {
         tutorial: false,
         hints: [],
       }),
+      hint: vi.fn(),
       finish,
     };
     const onCoins = vi.fn();
@@ -105,7 +106,7 @@ describe('spelling bee view', () => {
   });
 
   it('says when a round only counts for the list', async () => {
-    const api: SpellingApi = { state: vi.fn().mockResolvedValue(state(0)), start: vi.fn(), finish: vi.fn() };
+    const api: SpellingApi = { state: vi.fn().mockResolvedValue(state(0)), start: vi.fn(), hint: vi.fn(), finish: vi.fn() };
     openSpellingBee({ api, reducedMotion: true });
     await flush();
     expect(document.body.textContent).toContain('Heute gibt es keine Münzen mehr');
@@ -124,6 +125,7 @@ describe('spelling bee view', () => {
         tutorial: true,
         hints: ['tall', 'trail'],
       }),
+      hint: vi.fn(),
       finish: vi.fn(),
     };
     openSpellingBee({ api, reducedMotion: true });
@@ -168,6 +170,7 @@ describe('spelling bee view', () => {
         tutorial: false,
         hints: [],
       }),
+      hint: vi.fn(),
       finish: vi.fn(),
     };
     openSpellingBee({ api, reducedMotion: true });
@@ -192,5 +195,56 @@ describe('spelling bee view', () => {
     expect(document.querySelector('.bee-score')?.textContent).toBe('10 Punkte');
     expect(document.querySelector('.bee-golden')?.textContent).toBe('Goldenes Wort gefunden: TRAIL');
     expect(document.querySelector('.bee-found li.golden')?.textContent).toBe('trail');
+  });
+
+  it('has three jokers a round that show the start of a word (migration 0060)', async () => {
+    const hint = vi
+      .fn()
+      .mockResolvedValueOnce({ prefix: 'ta', length: 4, jokersLeft: 2 })
+      .mockResolvedValueOnce({ prefix: 'tr', length: 5, jokersLeft: 1 })
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValueOnce({ none: true, jokersLeft: 1 });
+    const api: SpellingApi = {
+      state: vi.fn().mockResolvedValue(state()),
+      start: vi.fn().mockResolvedValue({
+        round: 9,
+        puzzle: 3,
+        endsAt: '',
+        seconds: 180,
+        rewarded: true,
+        rewardedLeft: 2,
+        tutorial: false,
+        hints: [],
+      }),
+      hint,
+      finish: vi.fn(),
+    };
+    openSpellingBee({ api, reducedMotion: true });
+    await flush();
+    document.querySelector<HTMLButtonElement>('[data-start]')!.click();
+    await flush();
+    const joker = document.querySelector<HTMLButtonElement>('[data-joker]')!;
+    expect(document.querySelector('[data-jokers]')?.textContent).toBe('3');
+    tapWord('tall');
+    await flush();
+    joker.click();
+    await flush();
+    expect(hint).toHaveBeenCalledWith(9, ['tall']);
+    expect(document.querySelector('.bee-joker-hints')?.textContent).toBe('TA··');
+    expect(document.querySelector('[data-jokers]')?.textContent).toBe('2');
+    joker.click();
+    await flush();
+    expect(document.querySelector('.bee-joker-hints')?.textContent).toBe('TA··TR···');
+    // a failed call spends nothing and says so
+    joker.click();
+    await flush();
+    expect(document.querySelector('.bee-toast')?.textContent).toBe('Joker gerade nicht möglich.');
+    expect(document.querySelector('[data-jokers]')?.textContent).toBe('1');
+    expect(joker.disabled).toBe(false);
+    // every word found: no hint, the joker stays
+    joker.click();
+    await flush();
+    expect(document.querySelector('.bee-toast')?.textContent).toBe('Du hast schon alle Wörter!');
+    expect(document.querySelectorAll('.bee-joker-hints b')).toHaveLength(2);
   });
 });

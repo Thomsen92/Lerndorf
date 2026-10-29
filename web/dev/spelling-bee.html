@@ -76,6 +76,7 @@
         ),
       });
       const rounds = new Map();
+      const hinted = [];
       const api = {
         async state() {
           return {
@@ -104,6 +105,13 @@
             tutorial,
             hints: tutorial ? hints : [],
           };
+        },
+        async hint(round, foundWords) {
+          const open = p.words.filter((w) => !foundWords.includes(w) && !hinted.includes(w));
+          if (!open.length) return { none: true, jokersLeft: 3 - hinted.length };
+          const w = open[hinted.length % open.length];
+          hinted.push(w);
+          return { prefix: w.slice(0, 2), length: w.length, jokersLeft: 3 - hinted.length };
         },
         async finish(round, words) {
           const found = [...new Set(words)].filter((w) => p.words.includes(w)).sort();

@@ -19,7 +19,7 @@ Stand: 29.10.2026 · **10 Befunde · 2 UI/UX-Vorhaben · 1 Eingang (unvollständ
 | [BUG-007](#bug-007--season-hub-almanac-direkt-unter-season-1) | Season-Hub: My Almanac steht unten – soll direkt unter Season 1 | Season-Hub / Almanac | **S3** | **S** | **Fix da** | [FIX-04](handoff/FIX-04.md) |
 | [BUG-008](#bug-008--learnpass-open-in-inventory-button-überlappt-die-karte) | Learnpass: „Open in inventory“-Button überlappt die Kartenkante / stößt an die nächste Karte | Learnpass / Chests | **S3** | **S** | **Fix da** | [FIX-05](handoff/FIX-05.md) |
 | [BUG-009](#bug-009--inventar-platzhalter-gegenstände-mit-falschem-icon) | Inventar: Platzhalter-Gegenstände (Haare/T-Shirt) mit falschem T-Shirt-Icon | Inventar / Kleiderschrank | **S3** | **M** | **Fix da** | [FIX-06](handoff/FIX-06.md) |
-| [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | **Rückfrage an Lehrkraft** | [FIX-07](handoff/FIX-07.md) |
+| [BUG-010](#bug-010--spelling-bee-zu-schwer) | Spelling Bee: zu schwer – leichter, mehr Buchstaben zur Auswahl, 3 Joker, Wörter aus der Unit | Dorf → Spelling Bee | **S3** | **M** | **teilweise** (Joker fertig, Wörter folgen) | [FIX-07](handoff/FIX-07.md) |
 | [BUG-011](#bug-011--legendäres-hausmodell-ersetzen) | Legendäres Hausmodell rendert als schwarze/grüne Masse – durch angehängtes Fantasy-Treehouse-GLB ersetzen | Dorf / Hausplatz | **S3** | **M** | **Fix da** | [FIX-08](handoff/FIX-08.md) |
 
 ## UI/UX-Vorhaben (keine Fehler)
@@ -1079,7 +1079,7 @@ dann vorher Backup und Rücksprache.
 | **Aufwand** | **M – 0,5–2 Std**; **L**, wenn der Wortpool erst aus dem Lehrbuch/Unit importiert werden muss |
 | **Häufigkeit** | bei jedem Spiel |
 | **Gerät/Browser** | nicht angegeben |
-| **Status** | **gestoppt: Rückfrage an die Lehrkraft** (29.10.2026, Daten-/Designfragen) |
+| **Status** | **teilweise umgesetzt** (29.10.2026): Joker fertig (lokal, Migration 0060 nicht eingespielt); mehr Wörter und USA-Wortliste in Arbeit |
 | **Bild** | — |
 | **Fix-Paket** | [FIX-07](handoff/FIX-07.md) |
 
@@ -1096,6 +1096,12 @@ Ich habe BUG-010 gelesen und **nichts geändert**, weil alle drei Wünsche Live-
 2. Joker: Was soll ein Joker tun (z. B. „zeigt den Anfang eines noch nicht gefundenen Wortes“)? Pro Runde 3? Kosten sie Punkte?
 3. „Mehr Buchstaben“: Meinst du ein größeres Sechseck (8–9 Buchstaben) oder dass **mehr Wörter mit den vorhandenen 7** akzeptiert werden (kürzere/häufigere Wörter, Mindestlänge 3 statt 4)? Letzteres wäre ohne Änderung der Buchstaben-Form möglich, aber ebenfalls eine Migration (Wortlisten der Rätsel).
 4. Darf eine neue Migration die Rätsel-Tabelle ergänzen/ändern (nur additiv, vorher Backup)?
+
+### Antworten der Lehrkraft und Stand (29.10.2026)
+
+- **Mehr Buchstaben = mehr gültige Wörter** (7 Buchstaben bleiben, Wörter ab 3 Buchstaben, größere Wortlisten). **Joker = Wortanfang zeigen.** **Wörter:** zum aktuellen Thema (USA, Highlight 8 Unit 1); die Lehrkraft liefert die Vokabelseiten (S. 173 bis 178), es müssen nicht nur Buchstabenwörter aus dem Buch sein.
+- **Joker (fertig, lokal):** Migration `0060_spelling_jokers.sql` (additiv, **nicht eingespielt**): Spalte `spelling_rounds.hinted`, Funktion `spelling_hint(round, found)` mit 3 Jokern je Runde (zeigt Länge und die ersten zwei Buchstaben eines Wortes, das nicht gefunden und nicht schon angezeigt ist; nichts gefunden = kein Joker verbraucht), 3-Buchstaben-Wörter zählen 1 Punkt. Client: Joker-Knopf mit Zähler und angezeigte Hinweise (`spellingBeeView.ts`, `api/spellingBee.ts`). SQL- und Ansichts-Tests grün. **Einspielreihenfolge: erst die Migration, dann der neue Client**; ohne Migration zeigt der Joker nur „Joker gerade nicht möglich“. Bild: [bilder/BUG-010_02_joker.jpg](bilder/BUG-010_02_joker.jpg).
+- **Noch offen:** neue Rätsel mit der USA-Wortliste und Wörtern ab 3 Buchstaben (nur Vorbereitung, nichts auf der Live-Datenbank ändern).
 
 ### Beobachtung (Ist)
 

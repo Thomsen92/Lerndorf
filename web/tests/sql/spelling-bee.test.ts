@@ -261,4 +261,67 @@ describe('spelling bee', () => {
     expect(total.me.score as number).toBeGreaterThan((board.me as Row).score as number);
     expect(total.top[0]).toMatchObject({ nickname: 'anna', me: true });
   });
+
+  // Migration 0060 (teacher, 29.10.2026): three jokers a round, each shows the length and the first two
+  // letters of a word that is neither found nor hinted yet; words of three letters score 1 point.
+  it('gives three jokers a round that show the start of a word not found or hinted yet', async () => {
+    const p = await puzzle();
+    await actor(C);
+    const round = await call('public.spelling_start()');
+    const found = p.words.slice(0, 3);
+    for (let i = 0; i < 3; i++) {
+      const hint = await call('public.spelling_hint($1, $2)', [round.round, found]);
+      expect(hint.jokers_left).toBe(2 - i);
+      const matches = p.words.filter(
+        (w) => w.startsWith(hint.prefix as string) && w.length === hint.length && !found.includes(w),
+      );
+      expect(matches.length).toBeGreaterThan(0);
+    }
+    await db.exec('reset role;');
+    const hinted = (
+      await db.query<{ hinted: string[] }>('select hinted from public.spelling_rounds where id = $1', [
+        round.round,
+      ])
+    ).rows[0].hinted;
+    expect(new Set(hinted).size).toBe(3);
+    expect(hinted.some((w) => found.includes(w))).toBe(false);
+    await actor(C);
+    await expect(call('public.spelling_hint($1, $2)', [round.round, found])).rejects.toThrow('no jokers left');
+  });
+
+  it('hints only the one word left and charges nothing when every word is found', async () => {
+    const p = await puzzle();
+    await actor(D);
+    const round = await call('public.spelling_start()');
+    const last = p.words[p.words.length - 1];
+    const hint = await call('public.spelling_hint($1, $2)', [round.round, p.words.slice(0, -1)]);
+    expect(hint).toMatchObject({ prefix: last.slice(0, 2), length: last.length, jokers_left: 2 });
+    const none = await call('public.spelling_hint($1, $2)', [round.round, p.words]);
+    expect(none).toMatchObject({ none: true, jokers_left: 2 });
+  });
+
+  it('refuses a joker for a stranger, a finished round and the teacher', async () => {
+    await actor(A);
+    const round = await call('public.spelling_start()');
+    await actor(B);
+    await expect(call('public.spelling_hint($1, $2)', [round.round, []])).rejects.toThrow('round not found');
+    await actor(A);
+    await call('public.spelling_finish($1, $2)', [round.round, []]);
+    await expect(call('public.spelling_hint($1, $2)', [round.round, []])).rejects.toThrow('round is over');
+    await actor(T);
+    await expect(call('public.spelling_hint($1, $2)', [round.round, []])).rejects.toThrow('only pupils can play');
+    await actor(null);
+    await expect(call('public.spelling_hint($1, $2)', [round.round, []])).rejects.toThrow();
+  });
+
+  it('scores a word of three letters like one of four letters', async () => {
+    await db.exec('reset role;');
+    const points = async (word: string) =>
+      (
+        await db.query<{ v: number }>(`select public.spelling_word_points($1, 'a', 'bcdefg') v`, [word])
+      ).rows[0].v;
+    expect(await points('abc')).toBe(1);
+    expect(await points('abcd')).toBe(1);
+    expect(await points('abcde')).toBe(5);
+  });
 });
