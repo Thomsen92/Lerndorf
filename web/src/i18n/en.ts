@@ -652,6 +652,8 @@ export const EN: Record<string, string> = {
   Präsidentenwagen: 'Presidential car',
   'Trump-Statue': 'Trump statue',
   Mittelalterburg: 'Medieval castle',
+  Märchenschloss: 'Fairytale castle',
+  Spukvilla: 'Haunted mansion',
   'Blauer Exo-Roboter': 'Blue exosuit robot',
   'Obama-Statue': 'Obama statue',
   'Simson-Motorrad': 'Simson motorcycle',

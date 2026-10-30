@@ -151,6 +151,9 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   // Tripo models (0058): textures and meshes trimmed by web/scripts/assets/optimize-tripo-decos.mjs.
   // The vehicles are authored at real size along X, so they keep it (no `fill`) and turn a quarter.
   shop_medieval_castle: { file: 'shop/medieval-castle.glb', kind: 'house', fill: true },
+  // Two more Tripo houses (0062).
+  shop_fairytale_castle: { file: 'shop/fairytale-castle.glb', kind: 'house', fill: true },
+  shop_haunted_mansion: { file: 'shop/haunted-mansion.glb', kind: 'house', fill: true },
   shop_exosuit_robot: { file: 'shop/exosuit-robot.glb', kind: 'deco', fill: true },
   shop_obama_statue: { file: 'shop/obama-statue.glb', kind: 'deco', fill: true },
   shop_simson_motorcycle: { file: 'shop/simson-motorcycle.glb', kind: 'car', yaw: Math.PI / 2 },

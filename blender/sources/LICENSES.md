@@ -158,3 +158,7 @@ Die goldene Tafelkontur und der Hinweis-Button sind eigene Geometrie/UI. Der Sir
 - `web/public/assets/season1/house-horror.glb` und `.lod.glb` (Item `season_house_horror`, legendary) ersetzen das alte, fleckig rendernde Modell durch das gelieferte Fantasy-Treehouse (`Bugfix/modelle/legendary-house-fantasy-treehouse.glb`, Generator Tripo). **Lizenz laut Lehrkraft (29.10.2026): CC0 / freigegeben**, die Lehrkraft hat das Modell geliefert und ausdrücklich zum Tausch freigegeben. Der Tripo-Generator vermerkt selbst keine Lizenz in der Datei.
 - Änderungen (`web/scripts/assets/optimize-tripo-decos.mjs`): Dreiecke 9752 → 8149 (Ferne 1224), nur Basisfarbtextur (JPEG 1024 px), Normal-/Metallic-Maps entfernt, meshopt; 10,6 MB → 463 KB (Ferne 34 KB). Item-Name und Beschreibung blieben unverändert.
 
+## Märchenschloss und Spukvilla (30.10.2026, Migration 0062)
+
+- `web/public/assets/shop/fairytale-castle.glb` und `haunted-mansion.glb` (je mit `.lod.glb`): von der Lehrkraft gelieferte GLBs (`castle 3d model.glb`, `haunted mansion 3d model_Clone1.glb`, Generator Tripo, KI-generiert). **Lizenz laut Lehrkraft (29.10.2026): CC0 / freigegeben** (dieselbe Aussage wie bei den übrigen Tripo-Modellen). Bearbeitung wie dort: nur Basisfarbtextur, weniger Dreiecke, meshopt (`web/scripts/assets/optimize-tripo-decos.mjs`).
+

@@ -1015,6 +1015,24 @@
             "triangles": 7999,
             "bytes": 310724,
             "dims": "1,16 × 1,62 × 4,20 m"
+        },
+        {
+            "file": "fairytale-castle.glb",
+            "name": "Märchenschloss",
+            "kind": "house",
+            "price": 1500,
+            "triangles": 6494,
+            "bytes": 250864,
+            "dims": "3,96 × 2,66 × 4,00 m"
+        },
+        {
+            "file": "haunted-mansion.glb",
+            "name": "Spukvilla",
+            "kind": "house",
+            "price": 1200,
+            "triangles": 13230,
+            "bytes": 432784,
+            "dims": "4,80 × 4,94 × 4,00 m"
         }
     ],
     "pending": [
