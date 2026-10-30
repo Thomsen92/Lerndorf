@@ -99,6 +99,8 @@ Der `prompt` enthält `___` (drei Unterstriche). `solution` ist eine Liste erlau
 }
 ```
 
+**Wichtig: nur ein Satz darf richtig sein.** Die Datenbank vergleicht die Wörter Stelle für Stelle mit `solution`. Sätze, bei denen man zwei Teile vertauschen kann und wieder einen richtigen Satz bekommt, sind nicht lösbar: „my pie is not as sweet as your cake“ lässt sich auch als „my cake is not as sweet as your pie“ legen (so geschehen am 30.10.2026). Nimm Sätze, bei denen nur eine Reihenfolge stimmt, z. B. mit einer Tatsache: „a bike is not as fast as a plane“ (andersherum ist es falsch). Der Hinweis (`hint`) darf auf die Tatsache zeigen („Which one is faster?“).
+
 ### listening (Hörverstehen)
 
 `speak` ist der Text, der vorgelesen wird (höchstens 400 Zeichen). `mode` ist `choice` oder `gap` (nicht `match`, nicht `order`).

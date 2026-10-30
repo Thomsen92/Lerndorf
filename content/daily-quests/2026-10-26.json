@@ -37,7 +37,7 @@
       "date": "2026-10-30",
       "quests": [
         { "id": "fri-1", "type": "match", "prompt": "Match the words.", "hint": "Think of food and cooking.", "reward": 10, "pairs": [["hash browns", "Kartoffelpuffer"], ["fry", "braten"], ["piece", "Stück"], ["pasta", "Nudeln"]] },
-        { "id": "fri-2", "type": "order", "prompt": "Put the words in order.", "hint": "The word 'not' comes right after the verb.", "reward": 15, "solution": ["my", "pie", "is", "not", "as", "sweet", "as", "your", "cake"] },
+        { "id": "fri-2", "type": "order", "prompt": "Put the words in order.", "hint": "The word 'not' comes right after the verb. Which one is faster?", "reward": 15, "solution": ["a", "bike", "is", "not", "as", "fast", "as", "a", "plane"] },
         { "id": "fri-3", "type": "choice", "prompt": "Your friend asks: 'What is Kaiserschmarrn?' Which explanation is best?", "hint": "Kaiserschmarrn is made with eggs and sugar.", "reward": 10, "options": ["It's a sweet dish which you eat for dessert.", "It's a fizzy drink which is very cold.", "It's a person who cooks in a diner."], "solution": "It's a sweet dish which you eat for dessert." }
       ]
     },
@@ -52,7 +52,7 @@
     {
       "date": "2026-11-01",
       "quests": [
-        { "id": "sun-1", "type": "order", "prompt": "Put the words in order.", "hint": "Compare two things with 'than'.", "reward": 15, "solution": ["the", "river", "is", "wider", "than", "the", "street"] },
+        { "id": "sun-1", "type": "order", "prompt": "Put the words in order.", "hint": "Compare two things with 'than'. Which one is taller?", "reward": 15, "solution": ["the", "Empire", "State", "Building", "is", "taller", "than", "our", "school"] },
         { "id": "sun-2", "type": "listening", "prompt": "Listen. What did Alex get?", "hint": "Listen to the sentence with 'yesterday'.", "reward": 10, "speak": "Hi, this is Alex. I love New York! Yesterday I got a new phone and I felt really happy. Now I can write my blog every day.", "mode": "choice", "options": ["a new phone", "a new bike", "a new book"], "solution": "a new phone" },
         { "id": "sun-3", "type": "gap", "prompt": "Our class ___ (get) a prize last week.", "hint": "Last week means past. This verb is irregular.", "reward": 10, "solution": ["got"], "bank": ["get", "gets", "has got", "got"] }
       ]
