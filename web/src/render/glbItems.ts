@@ -154,6 +154,11 @@ export const GLB_ITEMS: Record<string, GlbItem> = {
   // Two more Tripo houses (0062).
   shop_fairytale_castle: { file: 'shop/fairytale-castle.glb', kind: 'house', fill: true },
   shop_haunted_mansion: { file: 'shop/haunted-mansion.glb', kind: 'house', fill: true },
+  // Four more figures and props (0063), from Tripo and Sketchfab files supplied by the teacher.
+  shop_fizzy_drink: { file: 'shop/fizzy-drink.glb', kind: 'deco', fill: true },
+  shop_snorlax: { file: 'shop/snorlax.glb', kind: 'deco', fill: true },
+  shop_king_boo: { file: 'shop/king-boo.glb', kind: 'deco', fill: true },
+  shop_power_armor: { file: 'shop/power-armor.glb', kind: 'deco', fill: true },
   shop_exosuit_robot: { file: 'shop/exosuit-robot.glb', kind: 'deco', fill: true },
   shop_obama_statue: { file: 'shop/obama-statue.glb', kind: 'deco', fill: true },
   shop_simson_motorcycle: { file: 'shop/simson-motorcycle.glb', kind: 'car', yaw: Math.PI / 2 },

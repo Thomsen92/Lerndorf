@@ -1033,6 +1033,42 @@
             "triangles": 13230,
             "bytes": 432784,
             "dims": "4,80 × 4,94 × 4,00 m"
+        },
+        {
+            "file": "fizzy-drink.glb",
+            "name": "Brausedose",
+            "kind": "deco",
+            "price": 80,
+            "triangles": 5998,
+            "bytes": 41228,
+            "dims": "2,47 × 3,01 × 2,45 m"
+        },
+        {
+            "file": "snorlax.glb",
+            "name": "Snorlax",
+            "kind": "deco",
+            "price": 600,
+            "triangles": 4500,
+            "bytes": 47288,
+            "dims": "3,00 × 1,29 × 2,50 m"
+        },
+        {
+            "file": "king-boo.glb",
+            "name": "King Boo",
+            "kind": "deco",
+            "price": 500,
+            "triangles": 6874,
+            "bytes": 80724,
+            "dims": "3,00 × 2,38 × 2,53 m"
+        },
+        {
+            "file": "power-armor.glb",
+            "name": "Power-Rüstung",
+            "kind": "deco",
+            "price": 800,
+            "triangles": 9000,
+            "bytes": 320496,
+            "dims": "1,59 × 3,00 × 0,84 m"
         }
     ],
     "pending": [

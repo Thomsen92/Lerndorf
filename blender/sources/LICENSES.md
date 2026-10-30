@@ -162,3 +162,13 @@ Die goldene Tafelkontur und der Hinweis-Button sind eigene Geometrie/UI. Der Sir
 
 - `web/public/assets/shop/fairytale-castle.glb` und `haunted-mansion.glb` (je mit `.lod.glb`): von der Lehrkraft gelieferte GLBs (`castle 3d model.glb`, `haunted mansion 3d model_Clone1.glb`, Generator Tripo, KI-generiert). **Lizenz laut Lehrkraft (29.10.2026): CC0 / freigegeben** (dieselbe Aussage wie bei den übrigen Tripo-Modellen). Bearbeitung wie dort: nur Basisfarbtextur, weniger Dreiecke, meshopt (`web/scripts/assets/optimize-tripo-decos.mjs`).
 
+## Brausedose, Snorlax, King Boo und Power-Rüstung (30.10.2026, Migration 0063)
+
+- Von der Lehrkraft gelieferte GLBs, auf **ausdrückliche Anweisung der Lehrkraft eingebaut mit der Aussage „sind CC0“** (30.10.2026). Die Dateien selbst nennen teils andere Bedingungen; das steht hier zur Nachvollziehbarkeit, nicht als Widerspruch zur Anweisung:
+  - `day13_fizzy_drink.glb` (→ `fizzy-drink.glb`): in der Datei „DAY13: FIZZY DRINK“ von binrong (https://sketchfab.com/binrong), **CC-BY-NC-4.0**, Quelle https://sketchfab.com/3d-models/day13-fizzy-drink-7daf996679c64815b48f650d1b3ff82d .
+  - `pokemon_snorlax.glb` (→ `snorlax.glb`): in der Datei „Pokemon Snorlax“ von Tigerar1 (https://sketchfab.com/allanromanreyes), Lizenz **„SKETCHFAB Standard“** (keine Weitergabe der Rohdatei), Quelle https://sketchfab.com/3d-models/pokemon-snorlax-34b750479e894111919f1f46835bf79f . Figur: Pokémon (Nintendo).
+  - `mario_kart_tour_-_king_boo_luigis_mansion.glb` (→ `king-boo.glb`): in der Datei „Mario kart tour - King Boo (Luigi's Mansion)“ von H,yoshi (https://sketchfab.com/HY2245), **CC-BY-4.0**, Quelle https://sketchfab.com/3d-models/mario-kart-tour-king-boo-luigis-mansion-00f4207b695b46db9f4f6819d0b3d5f7 . Figur: Nintendo.
+  - `fallout power armor 3d model_Clone1.glb` (→ `power-armor.glb`): Generator Tripo, keine Lizenzangabe in der Datei; Design angelehnt an Fallout (Bethesda).
+- Bearbeitung (`web/scripts/assets/optimize-tripo-decos.mjs`): Skelett entfernt, nur Basisfarbtextur, Dreiecke reduziert (Power-Rüstung 1,97 Mio. → 9000, 78 MB → 313 KB), meshopt, Fernversionen.
+- Offener Hinweis: Da das Repository öffentlich ist, bleibt die Frage der Weitergabe (Sketchfab Standard, NC, Marken von Nintendo und Bethesda) bei der Lehrkraft.
+

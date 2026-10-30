@@ -2,7 +2,7 @@
 // usage: node optimize-tripo-decos.mjs
 import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
-import { reorder, weld, simplify, textureCompress, prune, dedup, meshopt, getBounds, flatten, join } from '@gltf-transform/functions';
+import { dequantize, reorder, weld, simplify, textureCompress, prune, dedup, meshopt, getBounds, flatten, join } from '@gltf-transform/functions';
 import { MeshoptDecoder, MeshoptEncoder, MeshoptSimplifier } from 'meshoptimizer';
 import sharp from 'sharp';
 import { homedir } from 'node:os';
@@ -26,7 +26,7 @@ const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies(
 });
 const countTris = (doc) => doc.getRoot().listMeshes().reduce((n, m) => n + m.listPrimitives().reduce((k, p) => k + (p.getIndices()?.getCount() ?? p.getAttribute('POSITION').getCount()) / 3, 0), 0);
 
-for (const [src, name, hi, lo, tex, metres] of JOBS) {
+for (const [src, name, hi, lo, tex, metres, fmt = 'jpeg'] of JOBS) {
   for (const [variant, target, px] of [['', hi, tex], ['.lod', lo, 256]]) {
     const doc = await io.read(DL + src);
     const root = doc.getRoot();
@@ -41,21 +41,24 @@ for (const [src, name, hi, lo, tex, metres] of JOBS) {
       m.setMetallicFactor(0); m.setRoughnessFactor(0.85); m.setEmissiveFactor([0, 0, 0]);
       for (const ext of m.listExtensions()) ext.dispose();
     }
+    await doc.transform(dequantize());
     await doc.transform(flatten(), dedup());
     await doc.transform(weld({ tolerance: 0.0001 }));
     const before = countTris(doc);
     if (before > target) await doc.transform(simplify({ simplifier: MeshoptSimplifier, ratio: target / before, error: variant ? 0.15 : 0.03, lockBorder: false }));
     await doc.transform(join());
-    if (variant && countTris(doc) > target * 1.3) {
-      // UV islands pin the normal simplifier; the far version may be sloppy
+    if (countTris(doc) > target * 1.3) {
+      // UV islands pin the normal simplifier (and a 2-million-triangle scan needs a big cut): sloppy fallback
       for (const mesh of root.listMeshes()) for (const p of mesh.listPrimitives()) {
         const idx = p.getIndices(), pos = p.getAttribute('POSITION');
-        const next = MeshoptSimplifier.simplifySloppy(new Uint32Array(idx.getArray()), pos.getArray(), 3, null, Math.max(300, target) * 3, 0.2)[0];
+        const want = Math.max(300, target) * 3;
+        if (!idx || idx.getCount() <= want) continue; // small parts stay as they are
+        const next = MeshoptSimplifier.simplifySloppy(new Uint32Array(idx.getArray()), new Float32Array(pos.getArray()), 3, null, want, 0.2)[0];
         idx.setArray(new Uint32Array(next));
       }
       await doc.transform(reorder({ encoder: MeshoptEncoder }));
     }
-    await doc.transform(textureCompress({ encoder: sharp, targetFormat: 'jpeg', resize: [px, px], quality: 80 }));
+    await doc.transform(textureCompress({ encoder: sharp, targetFormat: fmt, resize: [px, px], quality: 80 }));
     await doc.transform(prune());
     // real-world size in metres (longest side), applied on the scene root
     const scene = root.listScenes()[0];
